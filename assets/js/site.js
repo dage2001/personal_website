@@ -213,8 +213,44 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var coverFramePending = false;
 
+  function updateNavbarState() {
+    if (!navbar) return;
+
+    if (cover) {
+      var revealPoint = Math.max(cover.offsetHeight - navbar.offsetHeight, 0);
+      var passedCover = window.scrollY >= revealPoint;
+      navbar.classList.toggle('after-cover', passedCover);
+      navbar.setAttribute('aria-hidden', passedCover ? 'false' : 'true');
+    }
+
+    navbar.classList.toggle('scrolled', window.scrollY > 10);
+  }
+
+  function updateHomeSectionState() {
+    if (!cover || !navbar) return;
+
+    var sectionLinks = Array.from(navbar.querySelectorAll('.nav-link[href*="#"]'));
+    var activeLink = null;
+    var probe = window.scrollY + Math.min(window.innerHeight * .38, 320);
+
+    sectionLinks.forEach(function (link) {
+      var hash = new URL(link.href, window.location.href).hash;
+      var section = hash && document.querySelector(hash);
+      link.classList.remove('active');
+      link.removeAttribute('aria-current');
+      if (section && probe >= section.offsetTop) activeLink = link;
+    });
+
+    if (activeLink) {
+      activeLink.classList.add('active');
+      activeLink.setAttribute('aria-current', 'location');
+    }
+  }
+
   function updateCoverMotion() {
     coverFramePending = false;
+    updateNavbarState();
+    updateHomeSectionState();
     if (!cover || reducedMotion.matches) return;
     var height = Math.max(cover.offsetHeight, 1);
     var progress = Math.min(Math.max(window.scrollY / height, 0), 1);
@@ -235,24 +271,11 @@
     window.addEventListener('scroll', requestCoverUpdate, { passive: true });
     window.addEventListener('resize', requestCoverUpdate, { passive: true });
 
-    if ('IntersectionObserver' in window && navbar) {
-      var coverObserver = new IntersectionObserver(function (entries) {
-        navbar.classList.toggle('over-cover', entries[0].isIntersecting);
-      }, { threshold: 0.05 });
-      coverObserver.observe(cover);
-    } else if (navbar) {
-      navbar.classList.add('over-cover');
-    }
   }
 
   if (navbar) {
-    window.addEventListener('scroll', function () {
-      if (window.scrollY > 10) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    }, { passive: true });
+    updateNavbarState();
+    window.addEventListener('scroll', requestCoverUpdate, { passive: true });
   }
 
   // ----- Fade-in on Scroll -----
