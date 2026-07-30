@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785449849">
+  <link rel="stylesheet" href="/assets/main.css?v=1785450545">
   <link rel="canonical" href="/notes/openems-code-break-down/">
   
     
@@ -185,33 +185,38 @@ window.MathJax = {
   </li>
   <li><strong>CMake + C + Other:</strong> 1.0% + 0.3% + 0.1%, this documents help to generate <em>.lib</em>, <em>.dll</em> and <em>.exe</em>.
     <h3 id="2-code-structure">(2) Code Structure</h3>
-    <h4 id="0-concepts">&lt;0&gt; Concepts</h4>
-    <p><strong>Engine &amp; Operator:</strong> Most of the code files can be classified into either <strong>engines</strong> or <strong>operators</strong>. <strong>Operators</strong> yield coefficients <span class="math-inline" role="math">\(vv, ii, vi, iv\)</span> used to update fields at each time steps, while <strong>engines</strong> literally manipulate the data stored in RAM with these coefficients.
+  </li>
+</ul>
+
+<h4 id="0-concepts">&lt;0&gt; Concepts</h4>
+<p><strong>Engine &amp; Operator:</strong> Most of the code files can be classified into either <strong>engines</strong> or <strong>operators</strong>. <strong>Operators</strong> yield coefficients <span class="math-inline" role="math">\(vv, ii, vi, iv\)</span> used to update fields at each time steps, while <strong>engines</strong> literally manipulate the data stored in RAM with these coefficients.
 <strong>Extension:</strong> Boundary conditions, lumped components and excitations are implemented as <strong>extensions</strong> in OpenEMS, which are also separated into <strong>engines and operators</strong>.</p>
-    <h4 id="1-main-structure">&lt;1&gt; Main Structure</h4>
-    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">CMakeLists</span><span class="p">.</span><span class="nx">txt</span>  <span class="cm">/* cmake config */</span>
+
+<h4 id="1-main-structure">&lt;1&gt; Main Structure</h4>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">CMakeLists</span><span class="p">.</span><span class="nx">txt</span>  <span class="cm">/* cmake config */</span>
 <span class="nx">extension</span> <span class="cm">/* a folder containing extension */</span>
 <span class="kd">class</span> <span class="nc">operator</span><span class="o">*</span>
 <span class="kd">class</span> <span class="nc">engine</span><span class="o">*</span>
 <span class="kd">class</span> <span class="nc">engine_interface</span><span class="o">*</span>
 <span class="kd">class</span> <span class="nc">openems_fdtd_mpi</span><span class="o">*</span>
 <span class="kd">class</span> <span class="nc">excitation</span><span class="o">*</span>
-</code></pre></div>    </div>
-  </li>
-</ul>
+</code></pre></div></div>
 
 <h4 id="2-operator-class">&lt;2&gt; Operator Class</h4>
-<pre><code class="language-Js">operator.cpp
-operator_sse.cpp
-operator_sse_compressed.cpp
-operator_mpi.cpp
-operator_multithread.cpp
-operator_cylinder.cpp
-operator_cylindermultigrid.cpp
-</code></pre>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">operator_sse</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">operator_sse_compressed</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">operator_mpi</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">operator_multithread</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">operator_cylinder</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">operator_cylindermultigrid</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
 
 <h4 id="3-engine-class">&lt;3&gt; Engine Class</h4>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">engine</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">engine</span><span class="p">.</span><span class="nx">cpp</span>
 <span class="nx">engine_sse</span><span class="p">.</span><span class="nx">cpp</span>
 <span class="nx">engine_sse_compressed</span><span class="p">.</span><span class="nx">cpp</span>
 <span class="nx">engine_mpi</span><span class="p">.</span><span class="nx">cpp</span>
@@ -219,22 +224,27 @@ operator_cylindermultigrid.cpp
 <span class="nx">engine_cylinder</span><span class="p">.</span><span class="nx">cpp</span>
 <span class="nx">engine_cylindermultigrid</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
+
 <h4 id="4-engine-interface-class">&lt;4&gt; Engine Interface Class</h4>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">engine_interface_sse_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">engine_interface_sse_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
 <span class="nx">engine_interface_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
 <span class="nx">engine_interface_cylindrical_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <h4 id="5-openems-fdtd-mpi-message-passing-interface">&lt;5&gt; OpenEMS FDTD MPI (Message Passing Interface)</h4>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">openems_fdtd_mpi</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">openems_fdtd_mpi</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <h4 id="6-excitation-class">&lt;6&gt; Excitation Class</h4>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">excitation</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">excitation</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <p>.h file have a similar structure:</p>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_sse_compressed</span><span class="p">.</span><span class="nx">h</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_sse_compressed</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">operator_sse</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">operator_multithread</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">operator_mpi</span><span class="p">.</span><span class="nx">h</span>
@@ -257,46 +267,55 @@ operator_cylindermultigrid.cpp
 
 <h4 id="7-extension">&lt;7&gt; Extension</h4>
 <h5 id="i-tools">i. Tools</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">CMakeLists</span><span class="p">.</span><span class="nx">txt</span> <span class="cm">/* cmake config */</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">CMakeLists</span><span class="p">.</span><span class="nx">txt</span> <span class="cm">/* cmake config */</span>
 <span class="nx">OptimizeCondSheetParameter</span><span class="p">.</span><span class="nx">m</span> <span class="cm">/* Conducting Sheet Optimizer */</span>
 <span class="nx">cond_sheet_parameter</span><span class="p">.</span><span class="nx">h</span> <span class="cm">/* Definitions of conduction sheets, used by operator_ext_conductingsheet */</span>
 </code></pre></div></div>
 <h5 id="ii-extension-loader">ii. Extension Loader</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_extension</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">operator_extension</span><span class="p">.</span><span class="nx">h</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_extension</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">operator_extension</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">engine_extension</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_extension</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">engine_extension_dispatcher</span><span class="p">.</span><span class="nx">h</span>
 </code></pre></div></div>
 <h5 id="iii-boundary-condition">iii. Boundary Condition</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_upml</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_upml</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* perfect matching layer */</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_upml</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_upml</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* perfect matching layer */</span>
 <span class="nx">operator_ext_tfsf</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_tfsf</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* total field / scattered field boundary */</span>
 <span class="nx">operator_ext_mur_abc</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_mur_abc</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* Mur absorbing boundary */</span>
 <span class="nx">operator_ext_absorbing_bc</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_absorbing_bc</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* sheet-type absorbing boundary */</span>
 </code></pre></div></div>
 
 <h5 id="iv-material-dispersion">iv. Material Dispersion</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* Lorentz model */</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* Lorentz model */</span>
 <span class="nx">operator_ext_dispersive</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_dispersive</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* dispersive material, more general */</span>
 <span class="nx">operator_ext_conductingsheet</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* conducting sheet, operate with cond_sheet_parameter.h*/</span>
 </code></pre></div></div>
 
 <h5 id="v-lumped-rlc">v. Lumped RLC</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_lumpedRLC</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_lumpedRLC</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_lumpedRLC</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_lumpedRLC</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <h5 id="vi-excitation">vi. Excitation</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_excitation</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_excitation</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_excitation</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_excitation</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <h5 id="vii-steady-state">vii. Steady State</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_steadystate</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_steadystate</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_steadystate</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_steadystate</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <h5 id="viii-cylinder--multigrid">viii. Cylinder &amp; Multigrid</h5>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_cylinder</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_cylindermultigrid</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_cylinder</span><span class="p">.</span><span class="nx">cpp</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_cylinder</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_cylindermultigrid</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_cylinder</span><span class="p">.</span><span class="nx">cpp</span>
 </code></pre></div></div>
 
 <p>.h files have a similar structure:</p>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_upml</span><span class="p">.</span><span class="nx">h</span>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_upml</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">operator_ext_tfsf</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">operator_ext_steadystate</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">operator_ext_mur_abc</span><span class="p">.</span><span class="nx">h</span>
@@ -338,105 +357,108 @@ operator_cylindermultigrid.cpp
 <strong>Step 3.</strong> Code in Python and Cython decorator. The following is an example calculating Fibonacci</p>
 
 <ul>
-  <li>Pure Python
-```python
-    <h1 id="this-is-a-pure-python-code-calculating-fibonacci">This is a pure python code calculating fibonacci</h1>
-    <h1 id="filename-fibonaccipy">Filename: fibonacci.py</h1>
-    <p>def fibonacci(n: int) -&gt; int:
-  if n&lt;= 1:
-      return n</p>
-
-    <p>a, b = 0, 1</p>
-
-    <p>for _ in range(2, n + 1):
-      a, b = b, a + b
-  return b</p>
-  </li>
+  <li>Pure Python</li>
 </ul>
 
-<p>if <strong>name</strong> == “<strong>main</strong>”:
-	print(“Pure Python Fibonacci(10):”, fibonacci(n=10))</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-* Cython (.pyx)
-```Cython
-# This is a cython code calculating fibonacci
-# Filename: fibonacci_cython.pyx
-cimport cython
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This is a pure python code calculating fibonacci
+# Filename: fibonacci.py
+</span><span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+	<span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">n</span>
+	
+	<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+	
+	<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+		<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+	<span class="k">return</span> <span class="n">b</span>
 
-@cython.cdivision(True)
-def fibonacci_cython(int n):
-	cdef int i
-	
-	if n &lt;= 1:
-		return n
-	
-	a, b = 0, 1
-	
-	for i in range(2, n + 1):
-		temp = a + b
-		a = b
-		b = temp		
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+	<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Pure Python Fibonacci(10):</span><span class="sh">"</span><span class="p">,</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
 <ul>
-  <li>Python + Cython decorator (.py)
-```Python
-    <h1 id="this-is-a-python-code-with-cython-decorator-calculating-fibonacci">This is a python code with cython decorator calculating fibonacci</h1>
-    <h1 id="filename-fibonacci_purepy">Filename: fibonacci_pure.py</h1>
-    <p>import cython</p>
-  </li>
+  <li>Cython (.pyx)</li>
 </ul>
 
-<p>@cython.locals(n=cython.int)
-def fibonacci(n: int) -&gt; int:
-	if n&lt;= 1:
-		return n</p>
+<div class="language-cython highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This is a cython code calculating fibonacci
+# Filename: fibonacci_cython.pyx
+</span><span class="kn">cimport</span> <span class="nn">cython</span>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a, b = 0, 1
-
-for _ in range(2, n + 1):
-	a, b = b, a + b
-return b
+<span class="nd">@cython.cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">fibonacci_cython</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">):</span>
+	<span class="k">cdef</span> <span class="kt">int</span> <span class="n">i</span>
+	
+	<span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">n</span>
+	
+	<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+	
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+		<span class="n">temp</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+		<span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+		<span class="n">b</span> <span class="o">=</span> <span class="n">temp</span>		
 </code></pre></div></div>
 
-<p>if <strong>name</strong> == “<strong>main</strong>”:
-	print(“Pure Python Fibonacci(10):”, fibonacci(n=10))</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* Setup File
-```Python
-# This file compiles cython code into a c-extension
+<ul>
+  <li>Python + Cython decorator (.py)</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This is a python code with cython decorator calculating fibonacci
+# Filename: fibonacci_pure.py
+</span><span class="kn">import</span> <span class="n">cython</span>
+
+<span class="nd">@cython.locals</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">cython</span><span class="p">.</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+	<span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">n</span>
+	
+	<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+	
+	<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+		<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+	<span class="k">return</span> <span class="n">b</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+	<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Pure Python Fibonacci(10):</span><span class="sh">"</span><span class="p">,</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+<ul>
+  <li>Setup File</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This file compiles cython code into a c-extension
 # Filename: setup.py
-from setuptools import setup, Extension
-from Cython.Build import cythonize
+</span><span class="kn">from</span> <span class="n">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Extension</span>
+<span class="kn">from</span> <span class="n">Cython.Build</span> <span class="kn">import</span> <span class="n">cythonize</span>
 
-extensions = [
-	Extension(
-		name="fibonacci_cython",
-		sources=["fibonacci_cython.pyx"],
-		extra_compile_args=["-03"], # Maximal optimization of the C compiler
-		extra_link_args=["-03"],
-	),
-	Extension(
-		name="fibonacci_pure",
-		sources=["fibonacci_pure.py"],
-		extra_compile_args=["-03"], # Maximal optimization of the C compiler
-		extra_link_args=["-03"],
-	),
-]
+<span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span>
+	<span class="nc">Extension</span><span class="p">(</span>
+		<span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">fibonacci_cython</span><span class="sh">"</span><span class="p">,</span>
+		<span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">fibonacci_cython.pyx</span><span class="sh">"</span><span class="p">],</span>
+		<span class="n">extra_compile_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span> <span class="c1"># Maximal optimization of the C compiler
+</span>		<span class="n">extra_link_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span>
+	<span class="p">),</span>
+	<span class="nc">Extension</span><span class="p">(</span>
+		<span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">fibonacci_pure</span><span class="sh">"</span><span class="p">,</span>
+		<span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">fibonacci_pure.py</span><span class="sh">"</span><span class="p">],</span>
+		<span class="n">extra_compile_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span> <span class="c1"># Maximal optimization of the C compiler
+</span>		<span class="n">extra_link_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span>
+	<span class="p">),</span>
+<span class="p">]</span>
 
-setup(
-	name="Test"
-	ext_modules=cythonize(
-		module_list=extensions,
-		compiler_directives={
-			'language_level': 3,
-			'boundscheck': False,
-			'wraparound': False,
-			'cdivision': True,
-		},
-	),
-	zip_safe=False,
-	install_requires=['cython']
-)
+<span class="nf">setup</span><span class="p">(</span>
+	<span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">Test</span><span class="sh">"</span>
+	<span class="n">ext_modules</span><span class="o">=</span><span class="nf">cythonize</span><span class="p">(</span>
+		<span class="n">module_list</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span>
+		<span class="n">compiler_directives</span><span class="o">=</span><span class="p">{</span>
+			<span class="sh">'</span><span class="s">language_level</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+			<span class="sh">'</span><span class="s">boundscheck</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+			<span class="sh">'</span><span class="s">wraparound</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+			<span class="sh">'</span><span class="s">cdivision</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+		<span class="p">},</span>
+	<span class="p">),</span>
+	<span class="n">zip_safe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+	<span class="n">install_requires</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">cython</span><span class="sh">'</span><span class="p">]</span>
+<span class="p">)</span>
 </code></pre></div></div>
 
 <p><strong>Step 4.</strong> Execute <code class="language-plaintext highlighter-rouge">python3 setup.py build_ext --inplace</code> in the command line, which will create <em>.pyd</em> files for Windows (<em>.os</em> files for Linux and MacOS).</p>

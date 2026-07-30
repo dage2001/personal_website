@@ -71,6 +71,107 @@
     wrapper.appendChild(btn);
   });
 
+  // ----- Markdown Code Blocks -----
+
+  var codeLanguageNames = {
+    bash: 'Bash',
+    c: 'C',
+    cpp: 'C++',
+    css: 'CSS',
+    cython: 'Cython',
+    docker: 'Dockerfile',
+    dockerfile: 'Dockerfile',
+    fortran: 'Fortran',
+    go: 'Go',
+    html: 'HTML',
+    java: 'Java',
+    javascript: 'JavaScript',
+    js: 'JavaScript',
+    json: 'JSON',
+    julia: 'Julia',
+    kotlin: 'Kotlin',
+    latex: 'LaTeX',
+    make: 'Makefile',
+    matlab: 'MATLAB',
+    plaintext: 'Text',
+    powershell: 'PowerShell',
+    python: 'Python',
+    r: 'R',
+    ruby: 'Ruby',
+    rust: 'Rust',
+    scss: 'SCSS',
+    sql: 'SQL',
+    swift: 'Swift',
+    typescript: 'TypeScript',
+    xml: 'XML',
+    yaml: 'YAML'
+  };
+
+  function copyCode(text, button) {
+    var complete = function () {
+      var label = button.querySelector('span');
+      var icon = button.querySelector('i');
+      label.textContent = 'Copied';
+      icon.className = 'fa-solid fa-check';
+      window.setTimeout(function () {
+        label.textContent = 'Copy';
+        icon.className = 'fa-regular fa-copy';
+      }, 1800);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(complete);
+      return;
+    }
+
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+    complete();
+  }
+
+  document.querySelectorAll('.post .highlighter-rouge').forEach(function (wrapper) {
+    var pre = wrapper.querySelector('pre');
+    var code = pre && pre.querySelector('code');
+    if (!pre || !code || wrapper.classList.contains('code-block')) return;
+
+    var languageClass = Array.from(wrapper.classList).find(function (className) {
+      return className.startsWith('language-');
+    });
+    var language = languageClass ? languageClass.slice(9).toLowerCase() : 'plaintext';
+    var languageName = codeLanguageNames[language] || language.replace(/(^|-)([a-z])/g, function (_, separator, letter) {
+      return (separator ? ' ' : '') + letter.toUpperCase();
+    });
+
+    wrapper.classList.add('code-block');
+
+    var toolbar = document.createElement('div');
+    toolbar.className = 'code-toolbar';
+
+    var label = document.createElement('span');
+    label.className = 'code-language';
+    label.textContent = languageName;
+
+    var button = document.createElement('button');
+    button.className = 'code-copy';
+    button.type = 'button';
+    button.setAttribute('aria-label', 'Copy ' + languageName + ' code');
+    button.innerHTML = '<span>Copy</span><i class="fa-regular fa-copy" aria-hidden="true"></i>';
+    button.addEventListener('click', function () {
+      copyCode(code.textContent, button);
+    });
+
+    toolbar.appendChild(label);
+    toolbar.appendChild(button);
+    wrapper.insertBefore(toolbar, wrapper.firstChild);
+  });
+
   // ----- Publication Year Badges -----
 
   document.querySelectorAll('.pub-entry').forEach(function (entry) {
