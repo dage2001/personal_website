@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785446049">
+  <link rel="stylesheet" href="/assets/main.css?v=1785446528">
   <link rel="canonical" href="/notes/review-perfectly-matched-layers-implementation-stability/">
   
     
@@ -164,18 +164,19 @@ window.MathJax = {
   <div itemprop="articleBody">
     <h2 id="1-brief-intro-pml">1. Brief Intro: PML</h2>
 <h3 id="1-bérengers-pml-with-split-fields">(1) Bérenger’s PML with split fields</h3>
-<blockquote>
-  <p>[!NOTE] Wave Impedance of Lossy Materials
-When the magnetic loss exists, the characteristic impedance can be expressed as
+<aside class="callout callout-note" data-callout="note" aria-label="Wave Impedance of Lossy Materials">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Wave Impedance of Lossy Materials</div>
+<div class="callout-content">
+<p>When the magnetic loss exists, the characteristic impedance can be expressed as
 \(\newcommand{\dif}{\mathrm{d}}
 \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\)
 which degenerates to the lossless expression when <span class="math-inline" role="math">\(\sigma_m/\mu=\sigma_e/\epsilon\)</span>.</p>
-
-  <p><em>Proof.</em> From the frequency domain Maxwell equation
+<p><em>Proof.</em> From the frequency domain Maxwell equation
 \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\)
 The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space
 \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\)</p>
-</blockquote>
+</div>
+</aside>
 
 <p>For simplicity, we only deal with 2D transverse electric (<span class="math-inline" role="math">\(E_z =0\)</span>) Maxwell equation. The simplified dimensionless Maxwell equations in a lossy medium are</p>
 
@@ -265,27 +266,32 @@ The characteristic impedance is defined as the magnitude ratio of the electric a
 
 <div class="math-display" role="math">\[\mathrm{E}(t) = \int_{\mathbb{R}^2} \left(\left|\frac{\partial U}{\partial t}\right|^2+\left|\frac{\partial U}{\partial x}\right|^2+\left|\frac{\partial U}{\partial y}\right|^2\right)\dif x\dif y,\quad ||H_x(t)||^2_0=\int_{\mathbb{R}^2}H_x^2\dif x\dif y\]</div>
 
-<blockquote>
-  <p>[!MATH] Theorem 2.1. Weak Stability I
-If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system with <span class="math-inline" role="math">\(\sigma_1=\sigma_2=0\)</span> belongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
+<aside class="callout callout-math" data-callout="math" aria-label="Theorem 2.1. Weak Stability I">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Theorem 2.1. Weak Stability I</div>
+<div class="callout-content">
+<p>If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system with <span class="math-inline" role="math">\(\sigma_1=\sigma_2=0\)</span> belongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
 \(\mathrm{E}(t)=\mathrm{E}(0),\quad ||H_x(t)||_0 \leq ||H_x(0)||_0 + \int_0^t \mathrm{E}(\tau)^{1/2} \dif\tau\)</p>
-</blockquote>
+</div>
+</aside>
 
-<blockquote>
-  <p>[!NOTE] Theorem 2.2. Weak Stability II
-If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system belwongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
+<aside class="callout callout-note" data-callout="note" aria-label="Theorem 2.2. Weak Stability II">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Theorem 2.2. Weak Stability II</div>
+<div class="callout-content">
+<p>If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system belwongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
 \(\mathrm{E}(t)\leq C(\sigma_1,\sigma_2)e^{C(\sigma_1+\sigma_2)t}(\mathrm{E}(0)+||H_x(0)||_0^2+||H_y(0)||^2_0)\)
 \(||H_x(t)||_0\leq e^{-\sigma_1 t}||H_x(0)||_0 +\int_0^\tau \mathrm{E}(\tau)^{1/2}\dif\tau\)
 \(||H_y(t)||_0\leq e^{-\sigma_2 t}||H_y(0)||_0 +\int_0^\tau \mathrm{E}(\tau)^{1/2}\dif\tau\)
 where <span class="math-inline" role="math">\(C(\sigma_1,\sigma_2)\)</span> depends on <span class="math-inline" role="math">\(\sigma_1\)</span> and <span class="math-inline" role="math">\(\sigma_2\)</span>.</p>
-</blockquote>
+</div>
+</aside>
 
 <p>The two conditions are called <strong>Weak Stability</strong>, since the <span class="math-inline" role="math">\(L^2\)</span>-norms of <span class="math-inline" role="math">\(H_{x,y}\)</span> are not only bounded by the <span class="math-inline" role="math">\(L^2\)</span>-norms of the initial data, but also bounded by that of the derivatives. This property may cause instabilities in numerical computations.</p>
 
 <h3 id="2-unsplit-field-upml">(2) Unsplit-field UPML</h3>
-<blockquote>
-  <p>[!NOTE] Modified Maxwell’s Equations
-For a general medium, we define the modified Maxwell’s equations
+<aside class="callout callout-note" data-callout="note" aria-label="Modified Maxwell’s Equations">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Modified Maxwell’s Equations</div>
+<div class="callout-content">
+<p>For a general medium, we define the modified Maxwell’s equations
 \(\nabla_e\times \mathbf{E} = i\omega\mu \mathbf{H}\)
 \(\nabla_h\times \mathbf{H} = -i\omega \epsilon \mathbf{E}\)
 \(\nabla_h\cdot \epsilon\mathbf{ E} = \rho\)
@@ -293,7 +299,8 @@ For a general medium, we define the modified Maxwell’s equations
 where
 \(\nabla_e = \hat{x} \frac{1}{e_x}\frac{\partial}{\partial x}+\hat{y}\frac{1}{e_y}\frac{\partial}{\partial y} + \hat{z} \frac{1}{e_z}\frac{\partial}{\partial z},\quad \nabla_h = \hat{x} \frac{1}{h_x}\frac{\partial}{\partial x}+\hat{y}\frac{1}{h_y}\frac{\partial}{\partial y}+\hat{z}\frac{1}{h_z}\frac{\partial}{\partial z}\)
 <span class="math-inline" role="math">\(e_i,h_i,\,i=x,y,z\)</span> are coordinate-stretching variables. When they are complex numbers, the medium can be lossy.</p>
-</blockquote>
+</div>
+</aside>
 
 <p>Using the modified Maxwell’s equations in <span class="math-inline" role="math">\(k\)</span>-space</p>
 
@@ -338,12 +345,13 @@ k_{ix} = k_{tx},\, k_{iy}=k_{ty},\,\frac{k_{iz}}{s_{iz}} = \frac{k_{tz}}{s_{tz}}
 </ul>
 
 <p>Moreover, the coordinate stretching is equivalent to a transformation of <span class="math-inline" role="math">\(\epsilon, \mu\)</span> according to the <strong>transformation optics</strong>.</p>
-<blockquote>
-  <p>[!NOTE] Transformation Optics Fundamental Principle
-The transformation optics describes how Maxwell equations changed under an arbitrary differentiable coordinate transformation. Assuming we employ a coordinate transformation
+<aside class="callout callout-note" data-callout="note" aria-label="Transformation Optics Fundamental Principle">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Transformation Optics Fundamental Principle</div>
+<div class="callout-content">
+<p>The transformation optics describes how Maxwell equations changed under an arbitrary differentiable coordinate transformation. Assuming we employ a coordinate transformation
 \(x'^i = f^{ij}(x_j),\quad \Lambda^i_j = \frac{\partial x'^i}{\partial x^j},\quad J = \det(\Lambda),\quad g_{ij} = \Lambda_i^k\Lambda_j^l g'_{kl},\quad \sqrt{g} = \sqrt{\det(g_{ij})}\)
 We have the following transformation</p>
-  <ul>
+<ul>
     <li><strong>Field Components:</strong>
       <ul>
         <li>Covariant vectors: <span class="math-inline" role="math">\(E&#39;_i=(\Lambda^{-1})_i^jE_j,\,H&#39;_i=(\Lambda^{-1})^j_i H_j\)</span></li>
@@ -363,7 +371,8 @@ We have the following transformation</p>
       </ul>
     </li>
   </ul>
-</blockquote>
+</div>
+</aside>
 
 <p>For the coordinate scaling, i.e. <span class="math-inline" role="math">\(\mathbf{\Lambda}=\mathrm{diag}(s_x,s_y,s_z)\)</span>, used in UPMLs, we can therefore obtain equivalent expressions in conventional Euclidean space with</p>
 
