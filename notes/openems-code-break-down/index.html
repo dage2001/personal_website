@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785451093">
+  <link rel="stylesheet" href="/assets/main.css?v=1785451675">
   <link rel="canonical" href="/notes/openems-code-break-down/">
   
     
@@ -190,8 +190,9 @@ window.MathJax = {
 <h3 id="2-code-structure">(2) Code Structure</h3>
 
 <h4 id="0-concepts">&lt;0&gt; Concepts</h4>
-<p><strong>Engine &amp; Operator:</strong> Most of the code files can be classified into either <strong>engines</strong> or <strong>operators</strong>. <strong>Operators</strong> yield coefficients <span class="math-inline" role="math">\(vv, ii, vi, iv\)</span> used to update fields at each time steps, while <strong>engines</strong> literally manipulate the data stored in RAM with these coefficients.
-<strong>Extension:</strong> Boundary conditions, lumped components and excitations are implemented as <strong>extensions</strong> in OpenEMS, which are also separated into <strong>engines and operators</strong>.</p>
+<p><strong>Engine &amp; Operator:</strong> Most of the code files can be classified into either <strong>engines</strong> or <strong>operators</strong>. <strong>Operators</strong> yield coefficients <span class="math-inline" role="math">\(vv, ii, vi, iv\)</span> used to update fields at each time steps, while <strong>engines</strong> literally manipulate the data stored in RAM with these coefficients.</p>
+
+<p><strong>Extension:</strong> Boundary conditions, lumped components and excitations are implemented as <strong>extensions</strong> in OpenEMS, which are also separated into <strong>engines and operators</strong>.</p>
 
 <h4 id="1-main-structure">&lt;1&gt; Main Structure</h4>
 
