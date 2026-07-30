@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenEMS Source Code Breakdown - Junda Wang</title>
+  <meta name="description" content="This blog studies the code structure and attempts to extend the openEMS code to time-varying/nonlinear systems.">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="OpenEMS Source Code Breakdown">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/notes/openems-code-break-down/">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="OpenEMS Source Code Breakdown">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1785449593">
+  <link rel="canonical" href="/notes/openems-code-break-down/">
+  
+    
+    
+  <link rel="alternate" hreflang="en" href="/notes/openems-code-break-down/">
+      
+  <link rel="alternate" hreflang="x-default" href="/notes/openems-code-break-down/">
+      
+    
+  
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  output: {
+    displayOverflow: 'scale'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "OpenEMS Source Code Breakdown",
+    "url": "/notes/openems-code-break-down/",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">About</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/notes/">Notes</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">Contact</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">OpenEMS Source Code Breakdown</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2026-06-21T00:00:00+00:00" itemprop="datePublished">Jun 21, 2026</time>
+    
+  </p>
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <h2 id="1-overview-of-openems">1. Overview of OpenEMS</h2>
+<h3 id="1-languages-composition">(1) Languages Composition</h3>
+<ul>
+  <li><strong>C++:</strong> 56.5%, the core solver is based on C++
+    <ul>
+      <li>EC-FDTD solver</li>
+      <li>Field propagator</li>
+    </ul>
+  </li>
+  <li><strong>MATLAB / Octave:</strong> 33.3%, this part serves as MATLAB / Octave interface bridging to the C++ core.
+    <ul>
+      <li>These files end with a suffix <em>.m</em>.</li>
+      <li>The MATLAB / Octave interface doesn’t directly call the C++ core. It will simply invoke <em>openEMS.exe</em> with a generated <em>setup.xml</em>.</li>
+    </ul>
+  </li>
+  <li><strong>Python + Cython:</strong> 7.1% + 1.7%, this part serves as the Python interface.
+    <ul>
+      <li>The Python interface communicate with the C++ core directly.</li>
+      <li>This link process is completed by Cython. Cython will make use of <em>.dll</em> and/or <em>.lib</em></li>
+    </ul>
+  </li>
+  <li><strong>CMake + C + Other:</strong> 1.0% + 0.3% + 0.1%, this documents help to generate <em>.lib</em>, <em>.dll</em> and <em>.exe</em>.
+    <h3 id="2-code-structure">(2) Code Structure</h3>
+    <h4 id="0-concepts">&lt;0&gt; Concepts</h4>
+    <p><strong>Engine &amp; Operator:</strong> Most of the code files can be classified into either <strong>engines</strong> or <strong>operators</strong>. <strong>Operators</strong> yield coefficients <span class="math-inline" role="math">\(vv, ii, vi, iv\)</span> used to update fields at each time steps, while <strong>engines</strong> literally manipulate the data stored in RAM with these coefficients.
+<strong>Extension:</strong> Boundary conditions, lumped components and excitations are implemented as <strong>extensions</strong> in OpenEMS, which are also separated into <strong>engines and operators</strong>.</p>
+    <h4 id="1-main-structure">&lt;1&gt; Main Structure</h4>
+    <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">CMakeLists</span><span class="p">.</span><span class="nx">txt</span>  <span class="cm">/* cmake config */</span>
+<span class="nx">extension</span> <span class="cm">/* a folder containing extension */</span>
+<span class="kd">class</span> <span class="nc">operator</span><span class="o">*</span>
+<span class="kd">class</span> <span class="nc">engine</span><span class="o">*</span>
+<span class="kd">class</span> <span class="nc">engine_interface</span><span class="o">*</span>
+<span class="kd">class</span> <span class="nc">openems_fdtd_mpi</span><span class="o">*</span>
+<span class="kd">class</span> <span class="nc">excitation</span><span class="o">*</span>
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h4 id="2-operator-class">&lt;2&gt; Operator Class</h4>
+<pre><code class="language-Js">operator.cpp
+operator_sse.cpp
+operator_sse_compressed.cpp
+operator_mpi.cpp
+operator_multithread.cpp
+operator_cylinder.cpp
+operator_cylindermultigrid.cpp
+</code></pre>
+
+<h4 id="3-engine-class">&lt;3&gt; Engine Class</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">engine</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_sse</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_sse_compressed</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_mpi</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_multithread</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_cylinder</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_cylindermultigrid</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+<h4 id="4-engine-interface-class">&lt;4&gt; Engine Interface Class</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">engine_interface_sse_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_interface_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
+<span class="nx">engine_interface_cylindrical_fdtd</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<h4 id="4-openems-fdtd-mpi-message-passing-interface">&lt;4&gt; OpenEMS FDTD MPI (Message Passing Interface)</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">openems_fdtd_mpi</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<h3 id="5-excitation-class">&lt;5&gt; Excitation Class</h3>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">excitation</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<p>.h file have a similar structure:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_sse_compressed</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_sse</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_multithread</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_mpi</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_cylindermultigrid</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_cylinder</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">openems_fdtd_mpi</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">excitation</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_sse_compressed</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_sse</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_multithread</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_mpi</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_interface_sse_fdtd</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_interface_fdtd</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_interface_cylindrical_fdtd</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_cylindermultigrid</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_cylinder</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine</span><span class="p">.</span><span class="nx">h</span>
+</code></pre></div></div>
+
+<h3 id="6-extension">&lt;6&gt; Extension</h3>
+<h5 id="i-tools">i. Tools</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">CMakeLists</span><span class="p">.</span><span class="nx">txt</span> <span class="cm">/* cmake config */</span>
+<span class="nx">OptimizeCondSheetParameter</span><span class="p">.</span><span class="nx">m</span> <span class="cm">/* Conducting Sheet Optimizer */</span>
+<span class="nx">cond_sheet_parameter</span><span class="p">.</span><span class="nx">h</span> <span class="cm">/* Definitions of conduction sheets, used by operator_ext_conductingsheet */</span>
+</code></pre></div></div>
+<h5 id="ii-extension-loader">ii. Extension Loader</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_extension</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">operator_extension</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_extension</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_extension</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_extension_dispatcher</span><span class="p">.</span><span class="nx">h</span>
+</code></pre></div></div>
+<h5 id="iii-boundary-condition">iii. Boundary Condition</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_upml</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_upml</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* perfect matching layer */</span>
+<span class="nx">operator_ext_tfsf</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_tfsf</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* total field / scattered field boundary */</span>
+<span class="nx">operator_ext_mur_abc</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_mur_abc</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* Mur absorbing boundary */</span>
+<span class="nx">operator_ext_absorbing_bc</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_absorbing_bc</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* sheet-type absorbing boundary */</span>
+</code></pre></div></div>
+
+<h5 id="iv-material-dispersion">iv. Material Dispersion</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* Lorentz model */</span>
+<span class="nx">operator_ext_dispersive</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_dispersive</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* dispersive material, more general */</span>
+<span class="nx">operator_ext_conductingsheet</span><span class="p">.</span><span class="nx">cpp</span> <span class="cm">/* conducting sheet, operate with cond_sheet_parameter.h*/</span>
+</code></pre></div></div>
+
+<h5 id="v-lumped-rlc">v. Lumped RLC</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_lumpedRLC</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_lumpedRLC</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<h5 id="vi-excitation">vi. Excitation</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_excitation</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_excitation</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<h5 id="vii-steady-state">vii. Steady State</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_steadystate</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_steadystate</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<h5 id="viii-cylinder--multigrid">viii. Cylinder &amp; Multigrid</h5>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_cylinder</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_cylindermultigrid</span><span class="p">.</span><span class="nx">cpp</span><span class="p">,</span> <span class="nx">engine_ext_cylinder</span><span class="p">.</span><span class="nx">cpp</span>
+</code></pre></div></div>
+
+<p>.h files have a similar structure:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">operator_ext_upml</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_tfsf</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_steadystate</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_mur_abc</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_lumpedRLC</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_excitation</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_dispersive</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_cylinder</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_conductingsheet</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">operator_ext_absorbing_bc</span><span class="p">.</span><span class="nx">h</span>
+
+
+<span class="nx">engine_ext_upml</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_tfsf</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_steadystate</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_mur_abc</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_lumpedRLC</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_lorentzmaterial</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_excitation</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_dispersive</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_cylindermultigrid</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_cylinder</span><span class="p">.</span><span class="nx">h</span>
+<span class="nx">engine_ext_absorbing_bc</span><span class="p">.</span><span class="nx">h</span>
+</code></pre></div></div>
+<h3 id="3-cython-overview">(3) Cython Overview</h3>
+
+<aside class="callout callout-quote" data-callout="quote" aria-label="Quote">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Quote</div>
+<div class="callout-content">
+<p><strong>What is Cython?</strong></p>
+<p><strong>Cython</strong> is an <strong>optimising static compiler</strong> for both the <strong><a href="http://www.python.org/about/">Python</a></strong> programming language and the extended Cython programming language (based on <strong>Pyrex</strong>). It makes writing C extensions for Python as easy as Python itself.</p>
+</div>
+</aside>
+
+<h4 id="quick-start">Quick Start:</h4>
+
+<p><strong>Step 1.</strong> Install Cython lib with pip or conda.
+<strong>Step 2.</strong> New a file named either filename==.pyx== or filename==.py==, according to the chosen mode (Cython or Python)
+<strong>Step 3.</strong> Code in Python and Cython decorator. The following is an example calculating Fibonacci</p>
+
+<ul>
+  <li>Pure Python
+```python
+    <h1 id="this-is-a-pure-python-code-calculating-fibonacci">This is a pure python code calculating fibonacci</h1>
+    <h1 id="filename-fibonaccipy">Filename: fibonacci.py</h1>
+    <p>def fibonacci(n: int) -&gt; int:
+  if n&lt;= 1:
+      return n</p>
+
+    <p>a, b = 0, 1</p>
+
+    <p>for _ in range(2, n + 1):
+      a, b = b, a + b
+  return b</p>
+  </li>
+</ul>
+
+<p>if <strong>name</strong> == “<strong>main</strong>”:
+	print(“Pure Python Fibonacci(10):”, fibonacci(n=10))</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+* Cython (.pyx)
+```Cython
+# This is a cython code calculating fibonacci
+# Filename: fibonacci_cython.pyx
+cimport cython
+
+@cython.cdivision(True)
+def fibonacci_cython(int n):
+	cdef int i
+	
+	if n &lt;= 1:
+		return n
+	
+	a, b = 0, 1
+	
+	for i in range(2, n + 1):
+		temp = a + b
+		a = b
+		b = temp		
+</code></pre></div></div>
+
+<ul>
+  <li>Python + Cython decorator (.py)
+```Python
+    <h1 id="this-is-a-python-code-with-cython-decorator-calculating-fibonacci">This is a python code with cython decorator calculating fibonacci</h1>
+    <h1 id="filename-fibonacci_purepy">Filename: fibonacci_pure.py</h1>
+    <p>import cython</p>
+  </li>
+</ul>
+
+<p>@cython.locals(n=cython.int)
+def fibonacci(n: int) -&gt; int:
+	if n&lt;= 1:
+		return n</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>a, b = 0, 1
+
+for _ in range(2, n + 1):
+	a, b = b, a + b
+return b
+</code></pre></div></div>
+
+<p>if <strong>name</strong> == “<strong>main</strong>”:
+	print(“Pure Python Fibonacci(10):”, fibonacci(n=10))</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>* Setup File
+```Python
+# This file compiles cython code into a c-extension
+# Filename: setup.py
+from setuptools import setup, Extension
+from Cython.Build import cythonize
+
+extensions = [
+	Extension(
+		name="fibonacci_cython",
+		sources=["fibonacci_cython.pyx"],
+		extra_compile_args=["-03"], # Maximal optimization of the C compiler
+		extra_link_args=["-03"],
+	),
+	Extension(
+		name="fibonacci_pure",
+		sources=["fibonacci_pure.py"],
+		extra_compile_args=["-03"], # Maximal optimization of the C compiler
+		extra_link_args=["-03"],
+	),
+]
+
+setup(
+	name="Test"
+	ext_modules=cythonize(
+		module_list=extensions,
+		compiler_directives={
+			'language_level': 3,
+			'boundscheck': False,
+			'wraparound': False,
+			'cdivision': True,
+		},
+	),
+	zip_safe=False,
+	install_requires=['cython']
+)
+</code></pre></div></div>
+
+<p><strong>Step 4.</strong> Execute <code class="language-plaintext highlighter-rouge">python3 setup.py build_ext --inplace</code> in the command line, which will create <em>.pyd</em> files for Windows (<em>.os</em> files for Linux and MacOS).</p>
+
+<h3 id="4-concept-of-spice-fdtd-co-simulation">(4) Concept of SPICE-FDTD Co-simulation</h3>
+
+<h3 id="5-task-checklist">(5) Task Checklist</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Review basic concepts of FDTD.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Find a way to embed time-varying / NL lumped components into Yee cell.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Build <em>operator_ext_NLlumpedRLC.cpp</em>, <em>engine_ext_NLlumpedRLC.cpp</em> (as well as <em>.h</em>).</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />SPICE solver for nonlinear simulation capability.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />CMake and generate <em>.dll</em></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Case study &amp; Convergence test.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Generalize to distributed NL media.
+    <h2 id="2-fdtd-review">2. FDTD Review</h2>
+    <aside class="callout callout-important" data-callout="important" aria-label="Important">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Important</div>
+<div class="callout-content">
+<p><strong>I. Introduction: Yee Cell &amp; Time Stepping</strong>
+	(1) Brief overview of the Finite-Difference Time-Domain (FDTD) method
+	(2) Description of the Yee cell structure
+	(3) Electric and magnetic fields updating strategy at each time step
+	(4) Numerical stability</p>
+<p><strong>II. Boundary Conditions</strong>
+	(1) PEC / PMC
+	(2) PML
+	(3) ABC (Mur)
+	(4) PBC / BBC</p>
+
+      <p>III. Lumped Components
+	(1) Lumped RLC
+	(2) Active components, lumped wave port
+	(3) Lumped ferrite</p>
+</div>
+</aside>
+  </li>
+</ul>
+
+<h3 id="i-intro-yee-cell--time-stepping">(I) Intro: Yee Cell &amp; Time Stepping</h3>
+<p>The curl part of the Maxwell equations</p>
+
+<div class="math-display" role="math">\[\partial_t\mathbf{H} = - \frac{1}{\mu}\nabla\times\mathbf{E},\quad
+\partial_t\mathbf{E} = \frac{1}{\epsilon}\nabla\times\mathbf{H}\]</div>
+
+<p>With finite-difference approximation (leap-frog), we can get the <em>update equations</em></p>
+
+<div class="math-display" role="math">\[\mathbf{H}(t+\Delta t/2)=\mathbf{H}(t-\Delta t/2) -\frac{\Delta t}{\mu}\nabla\times \mathbf{E}(t)\]</div>
+
+<div class="math-display" role="math">\[\mathbf{E}(t+\Delta t) = \mathbf{E}(t)+\frac{\Delta t}{\epsilon} \nabla\times \mathbf{H}(t+\Delta t/2)\]</div>
+
+<aside class="callout callout-warning" data-callout="warning" aria-label="Warning">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Warning</div>
+<div class="callout-content">
+<p>Notice the FD approach is not unique, there are many variants using different FD approximations.</p>
+</div>
+</aside>
+
+<h3 id="2-boundary-conditions">(2) Boundary Conditions</h3>
+
+<h3 id="3-lumped-elements">(3) Lumped Elements</h3>
+
+<h3 id="4-probe--measurement">(4) Probe &amp; Measurement</h3>
+
+<h4 id="near-field-to-far-field-nf2ff">Near Field to Far Field (NF2FF)</h4>
+
+<aside class="callout callout-tip" data-callout="tip" aria-label="Chirped Gaussian Pulse (Quadratic Spectral Phase)">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Chirped Gaussian Pulse (Quadratic Spectral Phase)</div>
+<div class="callout-content">
+<p>Assume the Gaussian pulse has a center frequency <span class="math-inline" role="math">\(\omega_0\)</span>, a spectral width <span class="math-inline" role="math">\(\sigma_\omega\)</span> and a quadratic chirp rate <span class="math-inline" role="math">\(\beta\)</span>, in the frequency domain the signal can be expressed as
+\(\tilde{u}(\omega) = \exp\left[-\frac{(\omega-\omega_0)^2}{2\sigma^2_\omega}\right] \exp\left[i\frac{\beta}{2}(\omega-\omega_0)^2\right]=\exp\left[-(1+iC)\frac{(\omega-\omega_0)^2}{2\sigma^2_\omega}\right]\)
+in which <span class="math-inline" role="math">\(C=-\beta\sigma_\omega^2\)</span>. IFT this signal back into time domain and separate the real / imaginary part
+\(u(t) = u_r(t)+iu_i(t):\quad u_r(t) = e^{-t^2/2\tau^2}\cos(\omega_0 t+kt^2),\quad u_i(t) = -e^{-t^2/2\tau^2}\sin(\omega_0 t+kt^2)\)
+where <span class="math-inline" role="math">\(\tau^2 = (1+C^2)/\sigma_\omega^2,\, k=-C/2\tau^2\)</span>.</p>
+</div>
+</aside>
+
+<h2 id="3-manual--smoke-test">3. Manual &amp; Smoke Test</h2>
+<h3 id="1-cad-design">(1) CAD Design</h3>
+<p>OpenEMS is powered by <strong>continuous structure XML CAD (CSXCAD)</strong>, which is a C++ library for describing geometrical objects and their physical or non-physical properties. It contains either physical or non-physical API, including <em>Geometry</em>, <em>Materials</em>, <em>Mesh</em>, <em>Excitation</em>, <em>Probes</em> and <em>Data Export</em>.</p>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js"></script>
+
+
+  </body>
+
+</html>

@@ -5,7 +5,7 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 30 Jul 2026 22:10:29 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 30 Jul 2026 22:13:13 +0000</lastBuildDate>
     
     <item>
       <title>Floquet 光子学简介</title>
@@ -39,6 +39,14 @@ This short note is a starting point. Future revisions will add equations, numeri
       <pubDate>Sun, 12 Jul 2026 00:00:00 +0000</pubDate>
       <link>/notes/review-perfectly-matched-layers-implementation-stability/</link>
       <guid isPermaLink="true">/notes/review-perfectly-matched-layers-implementation-stability/</guid>
+    </item>
+    
+    <item>
+      <title>OpenEMS Source Code Breakdown</title>
+      <description>1. Overview of OpenEMS (1) Languages Composition C++: 56.5%, the core solver is based on C++ EC-FDTD solver Field propagator MATLAB / Octave: 33.3%, this part serves as MATLAB / Octave interface bridging to the C++ core. These files end with a suffix .m. The MATLAB / Octave interface doesn’t directly call the C++ core. It will simply invoke openEMS.exe with a generated setup.xml. Python + Cython: 7.1% + 1.7%, this part serves as the Python interface. The Python interface communicate with the C++ core directly. This link process is completed by Cython. Cython will make use of .dll and/or...</description>
+      <pubDate>Sun, 21 Jun 2026 00:00:00 +0000</pubDate>
+      <link>/notes/openems-code-break-down/</link>
+      <guid isPermaLink="true">/notes/openems-code-break-down/</guid>
     </item>
     
     <item>
