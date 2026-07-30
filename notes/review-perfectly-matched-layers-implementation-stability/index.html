@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review   Perfectly Matched Layers Implementation &amp; Stability - Junda Wang</title>
+  <meta name="description" content="1. Brief Intro: PML (1) Bérenger’s PML with split fields [!WIKI] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as \(\newcommand{\dif}{\mathrm{d}} \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\) which degenerates to the lossless expression when $\sigma_m/\mu=\sigma_e/\epsilon$. Proof. From the frequency domain Maxwell equation \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\) The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\)">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="Review   Perfectly Matched Layers Implementation &amp; Stability">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/notes/review-perfectly-matched-layers-implementation-stability/">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Review   Perfectly Matched Layers Implementation &amp; Stability">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1785445866">
+  <link rel="canonical" href="/notes/review-perfectly-matched-layers-implementation-stability/">
+  
+    
+    
+  <link rel="alternate" hreflang="en" href="/notes/review-perfectly-matched-layers-implementation-stability/">
+      
+  <link rel="alternate" hreflang="x-default" href="/notes/review-perfectly-matched-layers-implementation-stability/">
+      
+    
+  
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  output: {
+    displayOverflow: 'scale'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Review   Perfectly Matched Layers Implementation &amp; Stability",
+    "url": "/notes/review-perfectly-matched-layers-implementation-stability/",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">About</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/notes/">Notes</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">Contact</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">Review   Perfectly Matched Layers Implementation &amp; Stability</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2026-07-30T00:00:00+00:00" itemprop="datePublished">Jul 30, 2026</time>
+    
+  </p>
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <h2 id="1-brief-intro-pml">1. Brief Intro: PML</h2>
+<h3 id="1-bérengers-pml-with-split-fields">(1) Bérenger’s PML with split fields</h3>
+<blockquote>
+  <p>[!WIKI] Wave Impedance of Lossy Materials
+When the magnetic loss exists, the characteristic impedance can be expressed as
+\(\newcommand{\dif}{\mathrm{d}}
+\eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\)
+which degenerates to the lossless expression when <span class="math-inline" role="math">\(\sigma_m/\mu=\sigma_e/\epsilon\)</span>.</p>
+
+  <p><em>Proof.</em> From the frequency domain Maxwell equation
+\(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\)
+The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space
+\(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\)</p>
+</blockquote>
+
+<p>For simplicity, we only deal with 2D transverse electric (<span class="math-inline" role="math">\(E_z =0\)</span>) Maxwell equation. The simplified dimensionless Maxwell equations in a lossy medium are</p>
+
+<div class="math-display" role="math">\[\frac{\partial E_y}{\partial t} + \sigma_1 E_y = - \frac{\partial H_z}{\partial x},\quad
+\frac{\partial E_x}{\partial t} + \sigma_2 E_x = \frac{\partial H_z}{\partial y},\quad
+\frac{\partial H_z}{\partial t} + \rho^* H_z = \frac{\partial E_x}{\partial y} - \frac{\partial E_y}{\partial x}\]</div>
+
+<p>The Bérenger’s idea is that the orthogonal magnetic field <span class="math-inline" role="math">\(H_z\)</span> can be split into nonphysical components <span class="math-inline" role="math">\(H_x+H_y\)</span>. The system becomes</p>
+
+<div class="math-display" role="math">\[\frac{\partial E_y}{\partial t} + \sigma_1 E_y =-\frac{\partial (H_x+H_y)}{\partial x},\quad \frac{\partial E_x}{\partial t}+\sigma_2 E_x = \frac{\partial (H_x+H_y)}{\partial y}, \quad \frac{\partial H_x}{\partial t}+\sigma_1^* H_x = -\frac{\partial E_y}{\partial x},\quad \frac{\partial H_y}{\partial t}+\sigma_2^* H_y = \frac{\partial E_x}{\partial y}\]</div>
+
+<p>Notice here instead of using only one scalar <span class="math-inline" role="math">\(\rho^*\)</span>, we use anisotropic <span class="math-inline" role="math">\(\mathbf{\rho}^* = \mathrm{diag}(\sigma_1^*, \sigma_2^*)\)</span>. Let’s then consider a wave whose electric field of magnitude <span class="math-inline" role="math">\(E_0\)</span> forms an angle <span class="math-inline" role="math">\(\varphi\)</span> with the y-axis. If a plane wave propagates in the PML, then the 4-component field can be expressed as</p>
+
+<div class="math-display" role="math">\[E_x = -E_0\sin\varphi \,e^{i\omega(t-\alpha x-\beta y)},\;E_y = E_0\cos\varphi\, e^{i\omega(t-\alpha x-\beta y)},\, H_x = H_{x0}\,e^{i\omega (t-\alpha x-\beta y)},\, H_y = H_{y0}\,e^{i\omega(t-\alpha x-\beta y)}\]</div>
+
+<p>By substituting them back into the equations, we get</p>
+
+<div class="math-display" role="math">\[E_0\cos\varphi-i\frac{\sigma_1}{\omega} E_0\cos\varphi=\alpha( H_{x0} + H_{y0})\]</div>
+
+<div class="math-display" role="math">\[E_0\sin\varphi -i \frac{\sigma_2}{\omega}E_0\sin\varphi  = \beta(H_{x0}+H_{y0})\]</div>
+
+<div class="math-display" role="math">\[H_{x0} - i\frac{\sigma_1^*}{\omega}H_{x0} = \alpha E_0 \cos\varphi\]</div>
+
+<div class="math-display" role="math">\[H_{y0}-i\frac{\sigma_2^*}{\omega}H_{y0} = \beta E_0 \sin\varphi\]</div>
+
+<p>By substituting <span class="math-inline" role="math">\(H_{x0},\,H_{y0}\)</span> back into the first two equations, we get</p>
+
+<div class="math-display" role="math">\[(1-i\frac{\sigma_2}{\omega})\sin\varphi = \beta \left[ \frac{\alpha \cos\varphi}{1-i\sigma_1^*/\omega} + \frac{\beta\sin\varphi}{1-i\sigma_2^*/\omega} \right]\]</div>
+
+<div class="math-display" role="math">\[(1-i\frac{\sigma_1}{\omega})\cos\varphi = \alpha \left[ \frac{\alpha \cos\varphi}{1-i\sigma_1^*/\omega} +\frac{\beta\sin\varphi}{1-i\sigma_2^*/\omega} \right]\]</div>
+
+<p>Therefore, <span class="math-inline" role="math">\(\alpha,\beta\)</span> satisfy the following identity</p>
+
+<div class="math-display" role="math">\[\frac{\beta}{\alpha} = \frac{\sin\varphi}{\cos\varphi} \frac{1-i\sigma_2/\omega}{1-i\sigma_1/\omega}\]</div>
+
+<p>There are two sets of <span class="math-inline" role="math">\((\alpha,\beta)\)</span> with opposite signs, which stand for two opposite propagation directions. Only keeping the positive sign, we have</p>
+
+<div class="math-display" role="math">\[\alpha = \frac{1}{G}\left(1-i\frac{\sigma_1}{\omega}\right)\cos\varphi,\quad \beta = \frac{1}{G}\left(1-i\frac{\sigma_2}{\omega}\right)\sin\varphi\]</div>
+
+<div class="math-display" role="math">\[G=\sqrt{w_x\cos^2\varphi + w_y \sin^2\varphi},\quad w_1 = \frac{1-i\sigma_1/\omega}{1-i\sigma_1^*/\omega},\quad w_2=\frac{1-i\sigma_2/\omega}{1-i\sigma_2^*/\omega}\]</div>
+
+<p>The field can be written as</p>
+
+<div class="math-display" role="math">\[\psi = \psi_0 \exp i\omega [t-(x\cos\varphi+y\sin\varphi)/G]\cdot\exp[-\sigma_1 x\cos\varphi / G]\cdot\exp[-\sigma_2y\sin\varphi/G]\]</div>
+
+<p>in which <span class="math-inline" role="math">\(\psi = \{E_x,E_y,H_x,H_y\}\)</span>. The amplitudes satisfy</p>
+
+<div class="math-display" role="math">\[H_{x0} = \frac{E_0}{G}w_x\cos^2\varphi,\; H_{y0} = \frac{E_0}{G}w_y\sin^2\varphi\Rightarrow H_0=GE_0\]</div>
+
+<p>Thus, the impedance is</p>
+
+<div class="math-display" role="math">\[Z= \frac{E_0}{H_0}=\frac{1}{G}\quad(=1\text{ if } \sigma_{1,2}^*=\sigma_{1,2})\]</div>
+
+<p>When <span class="math-inline" role="math">\(G=1\)</span> we get the field solutions</p>
+
+<div class="math-display" role="math">\[\psi = \psi_0\exp i\omega[t-(x\cos\varphi+y\sin\varphi)]\cdot \exp[-\sigma_1 x\cos\varphi]\cdot \exp[-\sigma_2 y \sin\varphi]\]</div>
+
+<p>which decays exponentially along <span class="math-inline" role="math">\(x\)</span> and <span class="math-inline" role="math">\(y\)</span>. Moreover, as the impedance matches the vacuum impedance, there should be no reflection from the interface.</p>
+
+<p>To better understand the reflection at PML-PML interfaces, we study the inclined incidence. Now we first consider the interface normal to <span class="math-inline" role="math">\(x\)</span> along <span class="math-inline" role="math">\(y\)</span>. Taking two points, A, B, along the interface, the field components satisfy</p>
+
+<div class="math-display" role="math">\[\frac{\psi_t(B)}{\psi_i(B)}=\frac{\psi_t(A)}{\psi_i(A)},\quad \psi_{i,t}(B)=\psi_{i,t}(A)\exp[-i\omega\,d\sin\theta_{i,t}/G_{i,t}-(\sigma_2)_{i,t}d\sin\theta_{i,t}/G_{i,t}]\]</div>
+
+<p>As <span class="math-inline" role="math">\(d\)</span> is random, the angles <span class="math-inline" role="math">\(\theta_{i,t}\)</span> should satisfy</p>
+
+<div class="math-display" role="math">\[\left(1-i\frac{\sigma_{2,i}}{\omega}\right)\frac{\sin \theta_i}{G_i}=\left(1-i\frac{\sigma_{2,t}}{\omega}\right)\frac{\sin \theta_t}{G_t}\]</div>
+
+<p>where</p>
+
+<div class="math-display" role="math">\[G_k = \sqrt{w_{1k}\cos^2\theta_k+w_{2k}\sin^2\theta_k},\quad k = i,t\]</div>
+
+<p>Along with <span class="math-inline" role="math">\(\theta_r = \pi-\theta_i\)</span>, it forms the <strong>Snell-Descartes law</strong> at the PML-PML interface. Furthermore, for the TE case, the reflection is</p>
+
+<div class="math-display" role="math">\[r_p = \frac{Z_t\cos\theta_t-Z_i\cos\theta_i}{Z_t\cos\theta_t+Z_i\cos\theta_i}=\frac{G_i\cos\theta_t-G_t\cos\theta_i}{G_i\cos\theta_t+G_t\cos\theta_i}\]</div>
+
+<p>when the two PMLs are impedance matched, i.e. <span class="math-inline" role="math">\(\sigma_{1,t} = \sigma_{1,t}^*,\,\sigma_{1,i}=\sigma_{1,i}^*,\,\sigma_2=\sigma_2^*\Rightarrow G_i=G_t\)</span>, we finally have <span class="math-inline" role="math">\(r_p=0\)</span>. Similarly, if an interface is normal to <span class="math-inline" role="math">\(y\)</span> along <span class="math-inline" role="math">\(x\)</span>, the reflection is null if two PMLs matched.</p>
+
+<p>Now we can move on to the setup of PMLs. In simulation, a PML is first used to absorb the outgoing wave energy and then the tail is reflected with a PEC. Theoretically, a PML with uniform <span class="math-inline" role="math">\(\sigma\)</span> can be applied without causing arbitrary small reflection, e.g. when thickness is <span class="math-inline" role="math">\(\delta\)</span> and the incidence angle is <span class="math-inline" role="math">\(\theta\)</span></p>
+
+<div class="math-display" role="math">\[\psi(\rho) = \psi(0) e^{-\sigma\cos\theta\,\rho},\;R(\theta)= e^{-2\sigma\cos\theta\,\delta}\]</div>
+
+<p>However, numerical reflections will happen due to discretization in practice. Graded conductivity is then used to mitigate numerical reflection, e.g. <span class="math-inline" role="math">\(\sigma(\rho) = \sigma_m (\rho/\delta)^n\)</span></p>
+
+<div class="math-display" role="math">\[R(\theta) = \exp\left[-2\cos\theta \int_0^\delta \sigma(\rho)\,\dif\rho\right]=\exp\left[-\frac{2}{n+1}\sigma_m\delta \cos\theta\right]\]</div>
+
+<p>Now we can move on to the stability analysis. Define <span class="math-inline" role="math">\(U = (H_z,E_y,E_x)^T\)</span> and</p>
+
+<div class="math-display" role="math">\[\mathrm{E}(t) = \int_{\mathbb{R}^2} \left(\left|\frac{\partial U}{\partial t}\right|^2+\left|\frac{\partial U}{\partial x}\right|^2+\left|\frac{\partial U}{\partial y}\right|^2\right)\dif x\dif y,\quad ||H_x(t)||^2_0=\int_{\mathbb{R}^2}H_x^2\dif x\dif y\]</div>
+
+<blockquote>
+  <p>[!MATH] Theorem 2.1. Weak Stability I
+If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system with <span class="math-inline" role="math">\(\sigma_1=\sigma_2=0\)</span> belongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
+\(\mathrm{E}(t)=\mathrm{E}(0),\quad ||H_x(t)||_0 \leq ||H_x(0)||_0 + \int_0^t \mathrm{E}(\tau)^{1/2} \dif\tau\)</p>
+</blockquote>
+
+<blockquote>
+  <p>[!MATH] Theorem 2.2. Weak Stability II
+If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system belwongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
+\(\mathrm{E}(t)\leq C(\sigma_1,\sigma_2)e^{C(\sigma_1+\sigma_2)t}(\mathrm{E}(0)+||H_x(0)||_0^2+||H_y(0)||^2_0)\)
+\(||H_x(t)||_0\leq e^{-\sigma_1 t}||H_x(0)||_0 +\int_0^\tau \mathrm{E}(\tau)^{1/2}\dif\tau\)
+\(||H_y(t)||_0\leq e^{-\sigma_2 t}||H_y(0)||_0 +\int_0^\tau \mathrm{E}(\tau)^{1/2}\dif\tau\)
+where <span class="math-inline" role="math">\(C(\sigma_1,\sigma_2)\)</span> depends on <span class="math-inline" role="math">\(\sigma_1\)</span> and <span class="math-inline" role="math">\(\sigma_2\)</span>.</p>
+</blockquote>
+
+<p>The two conditions are called <strong>Weak Stability</strong>, since the <span class="math-inline" role="math">\(L^2\)</span>-norms of <span class="math-inline" role="math">\(H_{x,y}\)</span> are not only bounded by the <span class="math-inline" role="math">\(L^2\)</span>-norms of the initial data, but also bounded by that of the derivatives. This property may cause instabilities in numerical computations.</p>
+
+<h3 id="2-unsplit-field-upml">(2) Unsplit-field UPML</h3>
+<blockquote>
+  <p>[!WIKI] Modified Maxwell’s Equations
+For a general medium, we define the modified Maxwell’s equations
+\(\nabla_e\times \mathbf{E} = i\omega\mu \mathbf{H}\)
+\(\nabla_h\times \mathbf{H} = -i\omega \epsilon \mathbf{E}\)
+\(\nabla_h\cdot \epsilon\mathbf{ E} = \rho\)
+\(\nabla_e\cdot \mu\mathbf{ H} = 0\)
+where
+\(\nabla_e = \hat{x} \frac{1}{e_x}\frac{\partial}{\partial x}+\hat{y}\frac{1}{e_y}\frac{\partial}{\partial y} + \hat{z} \frac{1}{e_z}\frac{\partial}{\partial z},\quad \nabla_h = \hat{x} \frac{1}{h_x}\frac{\partial}{\partial x}+\hat{y}\frac{1}{h_y}\frac{\partial}{\partial y}+\hat{z}\frac{1}{h_z}\frac{\partial}{\partial z}\)
+<span class="math-inline" role="math">\(e_i,h_i,\,i=x,y,z\)</span> are coordinate-stretching variables. When they are complex numbers, the medium can be lossy.</p>
+</blockquote>
+
+<p>Using the modified Maxwell’s equations in <span class="math-inline" role="math">\(k\)</span>-space</p>
+
+<div class="math-display" role="math">\[\mathbf{k}_e \times \mathbf{E} = \omega \mu\mathbf{ H},\quad \mathbf{k}_h \times \mathbf{H}=-\omega \epsilon\mathbf{ E}\]</div>
+
+<div class="math-display" role="math">\[\mathbf{k}_e = \hat{x}\frac{k_x}{e_x}+\hat{y}\frac{k_y}{e_y}+\hat{z}\frac{k_z}{e_z},\quad \mathbf{k}_h = \hat{x}\frac{k_x}{h_x}+\hat{y}\frac{k_y}{h_y}+\hat{z}\frac{k_z}{h_z}\]</div>
+
+<p>Combining the equation above, we have</p>
+
+<div class="math-display" role="math">\[-\omega^2\mu\epsilon \mathbf{H} = \mathbf{k}_e\times \mathbf{k}_h \times \mathbf{H}=\mathbf{k}_h(\mathbf{k}_e\cdot\mathbf{H}) - (\mathbf{k}_e\cdot\mathbf{k}_h)\mathbf{H}\]</div>
+
+<p>As the magnetic divergence equation leads to <span class="math-inline" role="math">\(\mathbf{k}_e\cdot\mathbf{H}=0\)</span> for homogeneous medium, we finally get the dispersion relation</p>
+
+<div class="math-display" role="math">\[\omega^2\mu\epsilon = \mathbf{k}_e\cdot \mathbf{k}_h = k^2 = \sum_i\frac{1}{e_i h_i} k_i^2\]</div>
+
+<p>When <strong>perfectly matched (Condition 1 - Wave Impedance Match)</strong>, i.e., <span class="math-inline" role="math">\(e_i=h_i\equiv s_i\)</span>, the wave impedance is therefore</p>
+
+<div class="math-display" role="math">\[\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \frac{|\mathbf{k}_h|}{\omega\epsilon} = \sqrt{\frac{\mu}{\epsilon}}\]</div>
+
+<p>However, this condition doesn’t necessarily mean no reflection at any angles. Further conditions should be satisfied. Now consider an <span class="math-inline" role="math">\(xy\)</span>-interface separating two PML layers denoted as <span class="math-inline" role="math">\(i,t\)</span>, both of which holds a dispersion relation</p>
+
+<div class="math-display" role="math">\[\omega^2\mu\epsilon=\frac{k_{ix}^2}{s_{ix}^2}+\frac{k_{iy}^2}{s_{iy}^2}+\frac{k_{iz}^2}{s_{iz}^2}=\frac{k_{tx}^2}{s_{tx}^2}+\frac{k_{ty}^2}{s_{ty}^2}+\frac{k_{tz}^2}{s_{tz}^2}\]</div>
+
+<p>The phase matching requires the tangential wave vectors should be continuous, i.e. <span class="math-inline" role="math">\(k_{ix} = k_{tx},\, k_{iy}=k_{ty}\)</span>. In addition, the tangential fields should be continuous as well, i.e.,</p>
+
+<div class="math-display" role="math">\[\text{TE mode: }\qquad\qquad(\mathrm{E}_i)_{xy} = (\mathrm{E}_t)_{xy},\quad (\mathrm{H}_i)_{xy} = (\mathrm{H}_t)_{xy} \; \Leftrightarrow\; (\mathbf{k}_{e,i}\times \mathbf{E}_i)_{xy} = (\mathbf{k}_{e,t}\times \mathbf{E}_t)_{xy} \;\Rightarrow\; \frac{s_{iz}\mu_i}{k_{iz}} = \frac{s_{tz}\mu_t}{k_{tz}}\]</div>
+
+<div class="math-display" role="math">\[\text{TM mode: }\qquad\qquad(\mathrm{H}_i)_{xy} = (\mathrm{H}_t)_{xy},\quad (\mathrm{E}_i)_{xy} = (\mathrm{E}_t)_{xy} \; \Leftrightarrow\; -(\mathbf{k}_{h,i}\times \mathbf{H}_i)_{xy} = -(\mathbf{k}_{h,t}\times \mathbf{H}_t)_{xy} \;\Rightarrow\; \frac{s_{iz}\epsilon_i}{k_{iz}} = \frac{s_{tz}\epsilon_t}{k_{tz}}\]</div>
+
+<p>Assuming both sides have the same vacuum <span class="math-inline" role="math">\(\epsilon_i = \epsilon_t = \epsilon_0,\,\mu_i=\mu_t=\mu_0\)</span>, we conclude the previous conditions as the <strong>Condition 2 - Arbitrary Angle Match</strong></p>
+
+<div class="math-display" role="math">\[\begin{cases}
+k_{ix} = k_{tx},\, k_{iy}=k_{ty},\,\frac{k_{iz}}{s_{iz}} = \frac{k_{tz}}{s_{tz}},\
+\frac{k_{ix}^2}{s_{ix}^2}+\frac{k_{iy}^2}{s_{iy}^2}+\frac{k_{iz}^2}{s_{iz}^2}=\frac{k_{tx}^2}{s_{tx}^2}+\frac{k_{ty}^2}{s_{ty}^2}+\frac{k_{tz}^2}{s_{tz}^2} 
+\end{cases}
+\quad \Rightarrow \quad s_{ix}=s_{tx},\,s_{iy}=s_{ty},\, s_{iz},\,s_{tz}\]</div>
+
+<p>This indicates that a PML should be stretched along the normal direction, while the other two directions remain unchanged. Around edges and corners where the normal directions are ill-defined, several strategies can be applied</p>
+<ul>
+  <li><strong>Prioritized Bypass:</strong> Simply assign the edges/corners to one PML class with respect to priority e.g. x-PML &gt; y-PML &gt; z-PML</li>
+  <li><strong>Multi-direction Stretching:</strong> For example, at the edge of x-PML <span class="math-inline" role="math">\((s_x,1,1,s_x,1,1)\)</span> and y-PML <span class="math-inline" role="math">\((1,s_y,1,1,s_y,1)\)</span>, we can use <span class="math-inline" role="math">\((s_x,s_y,1,s_x,s_y,1)\)</span> which supports modes decaying along both <span class="math-inline" role="math">\(x\)</span> and <span class="math-inline" role="math">\(y\)</span> direction.</li>
+</ul>
+
+<p>Moreover, the coordinate stretching is equivalent to a transformation of <span class="math-inline" role="math">\(\epsilon, \mu\)</span> according to the <strong>transformation optics</strong>.</p>
+<blockquote>
+  <p>[!WIKI] Transformation Optics Fundamental Principle
+The transformation optics describes how Maxwell equations changed under an arbitrary differentiable coordinate transformation. Assuming we employ a coordinate transformation
+\(x'^i = f^{ij}(x_j),\quad \Lambda^i_j = \frac{\partial x'^i}{\partial x^j},\quad J = \det(\Lambda),\quad g_{ij} = \Lambda_i^k\Lambda_j^l g'_{kl},\quad \sqrt{g} = \sqrt{\det(g_{ij})}\)
+We have the following transformation</p>
+  <ul>
+    <li><strong>Field Components:</strong>
+      <ul>
+        <li>Covariant vectors: <span class="math-inline" role="math">\(E&#39;_i=(\Lambda^{-1})_i^jE_j,\,H&#39;_i=(\Lambda^{-1})^j_i H_j\)</span></li>
+        <li>Contravariant densities: <span class="math-inline" role="math">\(D&#39;^i = (\det \Lambda)^{-1} \Lambda^i_j D^j,\,B&#39;^i = (\det\Lambda)^{-1} \Lambda^i_j B^j\)</span></li>
+      </ul>
+    </li>
+    <li><strong>Material Properties</strong>:
+      <ul>
+        <li>Permittivity/Permeability: <span class="math-inline" role="math">\(\epsilon&#39;^{ij}=(\det \Lambda)^{-1}\Lambda^i_k\Lambda^j_q\epsilon^{kq},\,\mu&#39;^{ij}=(\det \Lambda)^{-1}\Lambda^i_k\Lambda^j_q\mu^{kq}\)</span></li>
+        <li>Electric/Magnetic conductivity: <span class="math-inline" role="math">\(\sigma&#39;^{ij}=(\det \Lambda)^{-1}\Lambda^i_k\Lambda^j_q\sigma^{kq},\,\kappa&#39;^{ij}=(\det \Lambda)^{-1}\Lambda^i_k\Lambda^j_q\kappa^{kq}\)</span></li>
+      </ul>
+    </li>
+    <li><strong>Source:</strong>
+      <ul>
+        <li>Current density: <span class="math-inline" role="math">\(J&#39;^i =  (\det \Lambda)^{-1} \Lambda^i_j J^j\)</span></li>
+        <li>Charge density: <span class="math-inline" role="math">\(\rho&#39; = (\det \Lambda)^{-1}\rho\)</span></li>
+      </ul>
+    </li>
+  </ul>
+</blockquote>
+
+<p>For the coordinate scaling, i.e. <span class="math-inline" role="math">\(\mathbf{\Lambda}=\mathrm{diag}(s_x,s_y,s_z)\)</span>, used in UPMLs, we can therefore obtain equivalent expressions in conventional Euclidean space with</p>
+
+<div class="math-display" role="math">\[\mathbf{\epsilon} = \det(\mathbf{\Lambda})\mathbf{\Lambda}^{-1} \epsilon_0 \mathbf{\Lambda}^{-T} = \epsilon_0 \,\mathrm{diag}(\frac{s_ys_z}{s_x},  \frac{s_xs_z}{s_y}, \frac{s_xs_y}{s_z}),\quad \mathbf{\mu} = \mu_0 \,\mathrm{diag}(\frac{s_ys_z}{s_x},  \frac{s_xs_z}{s_y}, \frac{s_xs_y}{s_z})\]</div>
+
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js"></script>
+
+
+  </body>
+
+</html>
