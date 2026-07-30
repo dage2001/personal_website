@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785451675">
+  <link rel="stylesheet" href="/assets/main.css?v=1785451983">
   <link rel="canonical" href="/notes/openems-code-break-down/">
   
     
@@ -368,17 +368,17 @@ window.MathJax = {
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># This is a pure python code calculating fibonacci
 # Filename: fibonacci.py
 </span><span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-	<span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-		<span class="k">return</span> <span class="n">n</span>
-	
-	<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
-	
-	<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-		<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
-	<span class="k">return</span> <span class="n">b</span>
+  <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">n</span>
+  
+  <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+  
+  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+  <span class="k">return</span> <span class="n">b</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
-	<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Pure Python Fibonacci(10):</span><span class="sh">"</span><span class="p">,</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+  <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Pure Python Fibonacci(10):</span><span class="sh">"</span><span class="p">,</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
 <ul>
@@ -391,17 +391,17 @@ window.MathJax = {
 
 <span class="nd">@cython.cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">fibonacci_cython</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">):</span>
-	<span class="k">cdef</span> <span class="kt">int</span> <span class="n">i</span>
-	
-	<span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-		<span class="k">return</span> <span class="n">n</span>
-	
-	<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
-	
-	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-		<span class="n">temp</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
-		<span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
-		<span class="n">b</span> <span class="o">=</span> <span class="n">temp</span>		
+  <span class="k">cdef</span> <span class="kt">int</span> <span class="n">i</span>
+  
+  <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">n</span>
+  
+  <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+  
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">temp</span>		
 </code></pre></div></div>
 
 <ul>
@@ -414,17 +414,17 @@ window.MathJax = {
 
 <span class="nd">@cython.locals</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">cython</span><span class="p">.</span><span class="nb">int</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-	<span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-		<span class="k">return</span> <span class="n">n</span>
-	
-	<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
-	
-	<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-		<span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
-	<span class="k">return</span> <span class="n">b</span>
+  <span class="k">if</span> <span class="n">n</span><span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">n</span>
+  
+  <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+  
+  <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+  <span class="k">return</span> <span class="n">b</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
-	<span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Pure Python Fibonacci(10):</span><span class="sh">"</span><span class="p">,</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+  <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Pure Python Fibonacci(10):</span><span class="sh">"</span><span class="p">,</span> <span class="nf">fibonacci</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 <ul>
   <li>Setup File</li>
@@ -436,33 +436,33 @@ window.MathJax = {
 <span class="kn">from</span> <span class="n">Cython.Build</span> <span class="kn">import</span> <span class="n">cythonize</span>
 
 <span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span>
-	<span class="nc">Extension</span><span class="p">(</span>
-		<span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">fibonacci_cython</span><span class="sh">"</span><span class="p">,</span>
-		<span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">fibonacci_cython.pyx</span><span class="sh">"</span><span class="p">],</span>
-		<span class="n">extra_compile_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span> <span class="c1"># Maximal optimization of the C compiler
-</span>		<span class="n">extra_link_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span>
-	<span class="p">),</span>
-	<span class="nc">Extension</span><span class="p">(</span>
-		<span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">fibonacci_pure</span><span class="sh">"</span><span class="p">,</span>
-		<span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">fibonacci_pure.py</span><span class="sh">"</span><span class="p">],</span>
-		<span class="n">extra_compile_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span> <span class="c1"># Maximal optimization of the C compiler
-</span>		<span class="n">extra_link_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span>
-	<span class="p">),</span>
+  <span class="nc">Extension</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">fibonacci_cython</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">fibonacci_cython.pyx</span><span class="sh">"</span><span class="p">],</span>
+    <span class="n">extra_compile_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span> <span class="c1"># Maximal optimization of the C compiler
+</span>    <span class="n">extra_link_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span>
+  <span class="p">),</span>
+  <span class="nc">Extension</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">fibonacci_pure</span><span class="sh">"</span><span class="p">,</span>
+    <span class="n">sources</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">fibonacci_pure.py</span><span class="sh">"</span><span class="p">],</span>
+    <span class="n">extra_compile_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span> <span class="c1"># Maximal optimization of the C compiler
+</span>    <span class="n">extra_link_args</span><span class="o">=</span><span class="p">[</span><span class="sh">"</span><span class="s">-03</span><span class="sh">"</span><span class="p">],</span>
+  <span class="p">),</span>
 <span class="p">]</span>
 
 <span class="nf">setup</span><span class="p">(</span>
-	<span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">Test</span><span class="sh">"</span>
-	<span class="n">ext_modules</span><span class="o">=</span><span class="nf">cythonize</span><span class="p">(</span>
-		<span class="n">module_list</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span>
-		<span class="n">compiler_directives</span><span class="o">=</span><span class="p">{</span>
-			<span class="sh">'</span><span class="s">language_level</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-			<span class="sh">'</span><span class="s">boundscheck</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-			<span class="sh">'</span><span class="s">wraparound</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
-			<span class="sh">'</span><span class="s">cdivision</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-		<span class="p">},</span>
-	<span class="p">),</span>
-	<span class="n">zip_safe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-	<span class="n">install_requires</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">cython</span><span class="sh">'</span><span class="p">]</span>
+  <span class="n">name</span><span class="o">=</span><span class="sh">"</span><span class="s">Test</span><span class="sh">"</span>
+  <span class="n">ext_modules</span><span class="o">=</span><span class="nf">cythonize</span><span class="p">(</span>
+    <span class="n">module_list</span><span class="o">=</span><span class="n">extensions</span><span class="p">,</span>
+    <span class="n">compiler_directives</span><span class="o">=</span><span class="p">{</span>
+      <span class="sh">'</span><span class="s">language_level</span><span class="sh">'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+      <span class="sh">'</span><span class="s">boundscheck</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+      <span class="sh">'</span><span class="s">wraparound</span><span class="sh">'</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+      <span class="sh">'</span><span class="s">cdivision</span><span class="sh">'</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+    <span class="p">},</span>
+  <span class="p">),</span>
+  <span class="n">zip_safe</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+  <span class="n">install_requires</span><span class="o">=</span><span class="p">[</span><span class="sh">'</span><span class="s">cython</span><span class="sh">'</span><span class="p">]</span>
 <span class="p">)</span>
 </code></pre></div></div>
 
