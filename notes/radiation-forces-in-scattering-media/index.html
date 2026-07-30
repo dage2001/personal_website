@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radiation Forces in Scattering Media as Virtual Work - Junda Wang</title>
+  <meta name="description" content="A short derivarion linking generalized Wigner-Smith operators to radiation forces in wave systems.">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="Radiation Forces in Scattering Media as Virtual Work">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/notes/radiation-forces-in-scattering-media/">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Radiation Forces in Scattering Media as Virtual Work">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="/notes/radiation-forces-in-scattering-media/">
+  
+    
+    
+  <link rel="alternate" hreflang="en" href="/notes/radiation-forces-in-scattering-media/">
+      
+  <link rel="alternate" hreflang="x-default" href="/notes/radiation-forces-in-scattering-media/">
+      
+    
+  
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  <script>
+MathJax = {
+    tex: {
+    inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+    tags: 'ams'  // should be 'ams', 'none', or 'all' }. This line makes the equation numbering and labeling work
+    }, 
+    svg: {
+    fontCache: 'global'
+    }
+};
+</script>
+<script
+    type="text/javascript" id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script> 
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Radiation Forces in Scattering Media as Virtual Work",
+    "url": "/notes/radiation-forces-in-scattering-media/",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/#about">About</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/notes/">Notes</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/#contact">Contact</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">Radiation Forces in Scattering Media as Virtual Work</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2026-05-20T00:00:00+00:00" itemprop="datePublished">May 20, 2026</time>
+    
+  </p>
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <h2 id="1-motivation">1. Motivation</h2>
+<p>The Generalized Wigner–Smith (GWS) framework connects incident wavefronts to radiation forces on objects embedded in complex scattering environments. Existing derivations rely on field-theoretic variational identities within either acoustics or electromagnetism separately. Here we show that the central result — the identification of the GWS matrix expectation value with a generalized radiation force — follows directly and in full generality from the <strong>principle of virtual work</strong>, with the port phase shifts serving as the natural energy bookkeeping variable. This approach (i) unifies acoustic and electromagnetic cases without invoking Maxwell’s stress tensor or acoustic radiation pressure explicitly, (ii) makes the independence of virtual displacements transparent, and (iii) extends naturally to lossy media, where a richer force decomposition emerges.</p>
+<h2 id="2-lossless-case">2. Lossless Case</h2>
+<h3 id="21-setup">2.1 Setup</h3>
+<p>Consider a lossless scattering region coupled to the environment through $N$ ports. Incident and outgoing wave amplitudes at port n are $a_n$ and $b_n$, normalized so that $|a_n|^2$ and $|b_n|^2$ equal the corresponding power flows. The scattering matrix $\mathbf{S}$ is <strong>unitary</strong> ($\mathbf{S}^\dagger \mathbf{S} = \mathbf{I}$) and relates them via $\mathbf{b} = \mathbf{S}\,\mathbf{a}$.</p>
+
+<p>The GWS matrix associated with a parameter $\alpha$ (e.g., the position of an embedded object) is
+\(\mathbf{Q}_\alpha = i\,\mathbf{S}^\dagger\,\partial_\alpha \mathbf{S}. \tag{1}\)</p>
+<h3 id="22-virtual-work-principle">2.2 Virtual Work Principle</h3>
+<p>For a set of objects with positions ${\mathbf{r}_i}$, the principle of virtual work states
+\(\delta W = -\delta U, \tag{2}\)
+where the virtual work done by radiation forces is
+\(\delta W = \sum_i \mathbf{F}_i \cdot \delta\mathbf{r}_i. \tag{3}\)
+Notice the $\delta \mathbf{r}_i$ are completely independent from each other, which means the principle should yield $N$ independent equations if there are no additional geometry constraints.</p>
+<h3 id="23-energy-bookkeeping-via-port-phases">2.3 Energy Bookkeeping via Port Phases</h3>
+<p>Write each outgoing amplitude in polar form: $b_n = \sqrt{P_n}\,e^{i\phi_n},$ where $P_n = |b_n|^2$ is the outgoing power and $\phi_n$ its phase. A virtual displacement $\delta\mathbf{r}<em>i$ perturbs the scattering medium, changing both powers and phases at the ports. For a <strong>single-frequency</strong> (harmonic) excitation, the energy stored in the scattering region associated with port n is related to the group delay (phase delay for single-frequency), so its variation under a parameter shift is
+\(\delta U_n = P_n\,\delta\tau_n = \frac{P_n\,\delta\phi_n}{\omega}. \tag{4}\)
+This identification — energy change equals power times phase-delay change — is the classical-wave analogue of the Wigner–Smith time-delay relation, here applied to a _spatial</em> parameter rather than frequency.</p>
+<h3 id="24-connecting-port-quantities-to-the-s-matrix">2.4 Connecting Port Quantities to the S-matrix</h3>
+<p>From the polar decomposition of $b_n$,
+\(b_n^*\,\delta b_n = \tfrac{1}{2}\delta P_n + i\,P_n\,\delta\phi_n. \tag{5}\)
+Summing over all ports and using matrix notation ($\mathbf{b} = \mathbf{S}\mathbf{a}$):
+\(\sum_n b_n^*\,\delta b_n = \mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = \frac{1}{2}\sum_n\delta P_n + i\sum_n P_n\,\delta\phi_n. \tag{6}\)
+<strong>Lossless condition:</strong> Since $\mathbf{S}$ is unitary, total output power equals total input power. Under a virtual displacement (the incident amplitudes $\mathbf{a}$ are held fixed), $\sum_n \delta P_n = 0$. The real part of (6) vanishes, leaving
+\(\mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = i\sum_n P_n\,\delta\phi_n = i\,\omega\,\delta U. \tag{7}\)</p>
+<h3 id="25-the-central-result">2.5 The Central Result</h3>
+<p>Substituting (7) into the virtual work principle (2)–(3):
+\(\sum_i \mathbf{F}_i\cdot\delta\mathbf{r}_i = -\delta U = \frac{1}{\omega}\,i\,\mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = \mathbf{a}^\dagger\mathbf{Q}_i\,\mathbf{a}\cdot\delta\mathbf{r}_i, \tag{8}\)
+where the last equality uses definition (1) and the fact that $\mathbf{Q}_i$ is Hermitian (so its expectation value is real) in the lossless case.</p>
+
+<p>Since the virtual displacements ${\delta\mathbf{r}_i}$ of <strong>distinct objects</strong> correspond to independent generalized coordinates (no geometric coupling between separate objects), they may be varied independently. Therefore, (8) holds component-by-component:
+\(\boxed{\mathbf{F}_i = \langle \mathbf{Q}_i \rangle \equiv \mathbf{a}^\dagger \mathbf{Q}_i\,\mathbf{a}.} \tag{9}\)
+<strong>This is the central equation of the GWS radiation-force framework, derived purely from virtual work and port-phase bookkeeping.</strong></p>
+
+<h3 id="26-remark-on-independence-and-multi-object-optimization">2.6 Remark on Independence and Multi-Object Optimization</h3>
+<p>The independence of ${\delta\mathbf{r}_i}$ in (8)–(9) has an immediate consequence for multi-objective optimization: there is <strong>no fundamental trade-off</strong> between simultaneously maximizing $\mathbf{F}_i$ and $\mathbf{F}_j$ for distinct objects $i \neq j$ arising from the virtual work structure itself. Any apparent trade-off is entirely a consequence of the specific scattering geometry (encoded in $\mathbf{S}$), not an intrinsic uncertainty principle. In particular:</p>
+
+<ul>
+  <li>If the system is block-diagonal (objects uncoupled), forces are simultaneously maximizable by construction.</li>
+  <li>Even in a coupled system, if $\mathbf{Q}_i$ and $\mathbf{Q}_j$ share a common maximum eigenvector, both forces are simultaneously maximized — irrespective of whether $[\mathbf{Q}_i, \mathbf{Q}_j] = 0$ or not.</li>
+</ul>
+
+<p>A Robertson-type bound on $\langle\mathbf{Q}_i\rangle\langle\mathbf{Q}_j\rangle$ constrains <strong>variances</strong>, not <strong>maxima</strong>, and therefore does not constitute an uncertainty principle for radiation-force optimization.</p>
+
+<h2 id="3-extension-to-lossy-scattering-systems">3. Extension to Lossy Scattering Systems</h2>
+
+<h3 id="31-modified-s-matrix-structure">3.1 Modified S-matrix Structure</h3>
+<p>When the scattering medium is lossy, $\mathbf{S}$ is <strong>sub-unitary</strong>:
+\(\mathbf{S}^\dagger\mathbf{S} = \mathbf{I} - \mathbf{A}, \qquad \mathbf{A} \geq 0, \tag{10}\)
+where $\mathbf{A}$ is the positive semi-definite <strong>absorption matrix</strong>. Total output power is no longer conserved:
+\(\sum_n \delta P_n = -\delta P_\mathrm{abs}, \tag{11}\)
+where $\delta P_\mathrm{abs} &gt; 0$ is the additional power absorbed when the object is displaced to $\mathbf{r}_i + \delta\mathbf{r}_i$.</p>
+
+<p>By recovering the DoFs of loss channels, i.e. the bath, we can have a better understanding of this fact. Now consider a full scattering matrix
+\(\mathbf{S} = \pmatrix{\mathbf{S}_s &amp; \mathbf{C}\\ \mathbf{D} &amp; \mathbf{S}_b}\)
+\(\pmatrix{\mathbf{S}_s &amp; \mathbf{C}\\ \mathbf{D} &amp; \mathbf{S}_b}  \pmatrix{\mathbf{S}_s^\dagger &amp; \mathbf{D}^\dagger\\ \mathbf{C}^\dagger &amp; \mathbf{S}_b^\dagger} =  \pmatrix{I &amp; 0\\ 0&amp; I}\)
+\(\mathbf{S}_s \mathbf{S}_s^\dagger + \mathbf{C}\mathbf{C}^\dagger = I\)
+\(\mathbf{S}_s \mathbf{D}^\dagger + \mathbf{C}\mathbf{S}_b^\dagger = 0\Rightarrow \mathbf{C}\approx-\mathbf{S}_s\mathbf{D}^\dagger\mathbf{S}_b\Rightarrow \mathbf{C}\mathbf{C}^\dagger \approx \mathbf{S}_s\mathbf{D}^\dagger \mathbf{D}\mathbf{S}_s^\dagger\)</p>
+
+<h3 id="32-force-decomposition">3.2 Force Decomposition</h3>
+<p>Returning to (6), the real part no longer vanishes. Defining the (now non-Hermitian) generalized GWS operator ($\mathrm{G^2WS}$ 😂)
+\(\tilde{\mathbf{Q}}_i = \,\mathbf{S}^\dagger\,\partial_i\mathbf{S}, \tag{12}\)
+equation (6) gives
+\(\mathbf{a}^\dagger\tilde{\mathbf{Q}}_i\,\mathbf{a} = -\frac{1}{2}\frac{\partial P_\mathrm{abs}}{\partial \mathbf{r}_i} + i\,\omega\frac{\partial U}{\partial \mathbf{r}_i}. \tag{13}\)
+The virtual work should also be corrected
+\(\delta W + \delta W_\text{abs} = -\delta U\)
+\(F_i \cdot \delta r_i +\delta W_\text{abs} = -\sum_n P_n \delta\phi_n /\omega= a^\dagger Q_i a/i\omega+\frac{1}{2i\omega}\frac{\partial P_\text{abs}}{\partial r_i}\)
+which then yields a <strong>two-component force</strong>:
+\(\mathbf{F}_i = \underbrace{\mathrm{Im}\!\left(\langle\tilde{\mathbf{Q}}_i\rangle\right)}_{\text{reactive (radiation pressure)}} + \underbrace{\frac{1}{2\omega}\,\frac{\partial P_\mathrm{abs}}{\partial \mathbf{r}_i}}_{\text{dissipative (absorption force)}}. \tag{15}\)
+Decomposing $\tilde{\mathbf{Q}}_i = \mathbf{H}_i + i\mathbf{K}_i$ into Hermitian parts ($\mathbf{H}_i^\dagger = \mathbf{H}_i, \mathbf{K}_i^\dagger = \mathbf{K}_i$):</p>
+
+<ul>
+  <li>$\mathbf{H}<em>i = \tfrac{1}{2}(\tilde{\mathbf{Q}}_i + \tilde{\mathbf{Q}}_i^\dagger$) encodes the <strong>absorption gradient</strong>: $\langle\mathbf{H}_i\rangle \propto -\partial_i P</em>\mathrm{abs}$.</li>
+  <li>$\mathbf{K}_i = \tfrac{1}{2i}(\tilde{\mathbf{Q}}_i - \tilde{\mathbf{Q}}_i^\dagger)$ encodes the <strong>radiation force</strong>: $\mathbf{F}_i = \langle\mathbf{K}_i\rangle$.</li>
+</ul>
+
+<p>Note that $\mathbf{K}_i$ is Hermitian, so the radiation-force optimization problem
+\(\max_{\mathbf{a}:\,\|\mathbf{a}\|=1}\;\langle\mathbf{K}_i\rangle \tag{16}\)
+<strong>remains an eigenvalue problem</strong> — the maximum is the largest eigenvalue of $\mathbf{K}_i$, achieved by its corresponding eigenvector. No nonlinear solver is required even in the lossy case.</p>
+
+<h3 id="33-physical-interpretation">3.3 Physical Interpretation</h3>
+<p>The two terms in (14) have natural counterparts in known physics:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>Electromagnetic</th>
+      <th>Acoustic</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Reactive (Im part)</td>
+      <td>Radiation pressure, gradient force</td>
+      <td>Acoustic radiation force</td>
+    </tr>
+    <tr>
+      <td>Dissipative (Re part)</td>
+      <td>Photothermal / photophoretic force</td>
+      <td>Acoustic streaming drag</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The virtual work framework <strong>unifies</strong> these mechanisms within a single port-based expression, whereas they are traditionally treated by separate theories (Maxwell stress tensor + heat equation; Gorkov potential + Navier–Stokes streaming). In the lossless limit $\mathbf{A} \to 0$, the dissipative term vanishes and (14) reduces to (9).</p>
+<h3 id="34-consequences-for-multi-objective-optimization-in-lossy-media">3.4 Consequences for Multi-Objective Optimization in Lossy Media</h3>
+<p>In the lossy case, each objective function is $f_i = \langle\mathbf{K}_i\rangle$, which remains a Hermitian quadratic form. The Pareto structure of the multi-objective problem is therefore governed by the joint spectral properties of ${\mathbf{K}_i}$, not of the non-Hermitian ${\tilde{\mathbf{Q}}_i}$. The remarks of Section 2.6 apply unchanged: simultaneous maximization is possible whenever the matrices ${\mathbf{K}_i}$ share a common maximum eigenvector, and no Robertson-type bound on the maxima follows from non-commutativity alone.</p>
+<h2 id="4-relation-to-smith-1960-and-wigner-1955">4. Relation to Smith (1960) and Wigner (1955)</h2>
+
+<p>The identification in equation (4), $\delta U_n = P_n\,\delta\phi_n/\omega$, is the spatial-parameter analogue of Smith’s time-delay formula. Smith (1960) defined the lifetime matrix $\mathbf{Q}$ through the residence-time argument with $\partial_\omega \mathbf{S}$; the present derivation replaces $\partial_\omega$ by $\partial_{\mathbf{r}_i}$ and replaces the quantum mechanical flux normalization argument by the classical virtual work balance. The two derivations are structurally identical, confirming that the GWS radiation-force relation is the spatial-domain counterpart of the Wigner–Smith time-delay relation, both rooted in the same energy-phase bookkeeping.</p>
+
+<p>This observation implies that the “central equation” of recent GWS-based radiation-force frameworks is not a new variational identity, but rather a direct consequence of Smith’s 1960 construction applied to spatial rather than spectral parameters — a fact made transparent by the virtual work approach but obscured in field-theoretic derivations.</p>
+
+<h2 id="5-summary">5. Summary</h2>
+<p>||Lossless|Lossy|
+|—|—|—|
+|S-matrix|Unitary|Sub-unitary|
+|GWS operator|Hermitian $\mathbf{Q}_i$|Non-Hermitian $\tilde{\mathbf{Q}}_i$|
+|Radiation force|$\mathbf{F}_i = \langle\mathbf{Q}_i\rangle$|$\mathbf{F}_i = \langle\mathbf{K}_i\rangle$ (Im part)|
+|Absorption force|—|$\propto \langle\mathbf{H}_i\rangle$ (Re part)|
+|Optimization|Eigenvalue problem|Eigenvalue problem ($\mathbf{K}_i$)|
+|Multi-object trade-off|Geometry-dependent, not intrinsic|Same|</p>
+
+<p>The virtual work derivation is shorter, more transparent, and more general than field-theoretic approaches. It makes the assumptions explicit (lossless $\leftrightarrow \sum\delta P_n = 0$), reveals the two-force decomposition in lossy media, and demonstrates that analytical eigenvalue methods suffice throughout — eliminating the need for general-purpose nonlinear solvers.</p>
+
+<hr />
+
+<p><em>Note: Equations are written in the +j\omega t time-harmonic convention, consistent with the GWS literature.</em></p>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js"></script>
+
+
+  </body>
+
+</html>

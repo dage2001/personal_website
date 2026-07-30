@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Junda Wang</title>
+    <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Thu, 30 Jul 2026 17:12:42 +0000</lastBuildDate>
+    
+    <item>
+      <title>Floquet 光子学简介</title>
+      <description>Floquet 光子学研究材料参数随时间周期变化的光学与电磁系统。正如空间晶格通过周期结构耦合不同波矢，时间周期介质也能够耦合不同频率。
+
+这一视角为频率转换、非互易波传播和合成维度等现象提供了统一语言。相关计算的核心挑战，是在准确描述多阶谐波耦合的同时保持模型高效，并由此提炼清晰的物理图像。
+
+这篇短文是一个起点；后续版本将加入公式、数值示例以及相关研究链接。
+</description>
+      <pubDate>Thu, 30 Jul 2026 00:00:00 +0000</pubDate>
+      <link>/notes/floquet-photonics-introduction/zh/</link>
+      <guid isPermaLink="true">/notes/floquet-photonics-introduction/zh/</guid>
+    </item>
+    
+    <item>
+      <title>An Introduction to Floquet Photonics</title>
+      <description>Floquet photonics studies optical and electromagnetic systems whose properties vary periodically in time. Just as a spatial crystal couples waves through a repeating structure, a time-periodic medium can couple different frequencies.
+
+This viewpoint provides a compact language for phenomena such as frequency conversion, nonreciprocal wave transport, and synthetic dimensions. The central computational challenge is to represent the coupled harmonics accurately while keeping the model efficient enough to reveal the underlying physics.
+
+This short note is a starting point. Future revisions will add equations, numerical examples, and links to related research.
+</description>
+      <pubDate>Thu, 30 Jul 2026 00:00:00 +0000</pubDate>
+      <link>/notes/floquet-photonics-introduction/</link>
+      <guid isPermaLink="true">/notes/floquet-photonics-introduction/</guid>
+    </item>
+    
+    <item>
+      <title>Radiation Forces in Scattering Media as Virtual Work</title>
+      <description>1. Motivation The Generalized Wigner–Smith (GWS) framework connects incident wavefronts to radiation forces on objects embedded in complex scattering environments. Existing derivations rely on field-theoretic variational identities within either acoustics or electromagnetism separately. Here we show that the central result — the identification of the GWS matrix expectation value with a generalized radiation force — follows directly and in full generality from the principle of virtual work, with the port phase shifts serving as the natural energy bookkeeping variable. This approach (i) unifies acoustic and electromagnetic cases without invoking Maxwell’s stress tensor or acoustic radiation pressure explicitly, (ii) makes the...</description>
+      <pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate>
+      <link>/notes/radiation-forces-in-scattering-media/</link>
+      <guid isPermaLink="true">/notes/radiation-forces-in-scattering-media/</guid>
+    </item>
+    
+    
+  </channel>
+</rss>
