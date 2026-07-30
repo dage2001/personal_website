@@ -56,20 +56,22 @@
   
 
   <script>
-MathJax = {
-    tex: {
-    inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-    tags: 'ams'  // should be 'ams', 'none', or 'all' }. This line makes the equation numbering and labeling work
-    }, 
-    svg: {
-    fontCache: 'global'
-    }
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
 };
 </script>
-<script
-    type="text/javascript" id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-</script> 
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
 
   <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
@@ -161,81 +163,134 @@ MathJax = {
 <p>The Generalized Wigner–Smith (GWS) framework connects incident wavefronts to radiation forces on objects embedded in complex scattering environments. Existing derivations rely on field-theoretic variational identities within either acoustics or electromagnetism separately. Here we show that the central result — the identification of the GWS matrix expectation value with a generalized radiation force — follows directly and in full generality from the <strong>principle of virtual work</strong>, with the port phase shifts serving as the natural energy bookkeeping variable. This approach (i) unifies acoustic and electromagnetic cases without invoking Maxwell’s stress tensor or acoustic radiation pressure explicitly, (ii) makes the independence of virtual displacements transparent, and (iii) extends naturally to lossy media, where a richer force decomposition emerges.</p>
 <h2 id="2-lossless-case">2. Lossless Case</h2>
 <h3 id="21-setup">2.1 Setup</h3>
-<p>Consider a lossless scattering region coupled to the environment through $N$ ports. Incident and outgoing wave amplitudes at port n are $a_n$ and $b_n$, normalized so that $|a_n|^2$ and $|b_n|^2$ equal the corresponding power flows. The scattering matrix $\mathbf{S}$ is <strong>unitary</strong> ($\mathbf{S}^\dagger \mathbf{S} = \mathbf{I}$) and relates them via $\mathbf{b} = \mathbf{S}\,\mathbf{a}$.</p>
+<p>Consider a lossless scattering region coupled to the environment through <span class="math-inline" role="math">\(N\)</span> ports. Incident and outgoing wave amplitudes at port n are <span class="math-inline" role="math">\(a_n\)</span> and <span class="math-inline" role="math">\(b_n\)</span>, normalized so that <span class="math-inline" role="math">\(|a_n|^2\)</span> and <span class="math-inline" role="math">\(|b_n|^2\)</span> equal the corresponding power flows. The scattering matrix <span class="math-inline" role="math">\(\mathbf{S}\)</span> is <strong>unitary</strong> (<span class="math-inline" role="math">\(\mathbf{S}^\dagger \mathbf{S} = \mathbf{I}\)</span>) and relates them via <span class="math-inline" role="math">\(\mathbf{b} = \mathbf{S}\,\mathbf{a}\)</span>.</p>
 
-<p>The GWS matrix associated with a parameter $\alpha$ (e.g., the position of an embedded object) is
-\(\mathbf{Q}_\alpha = i\,\mathbf{S}^\dagger\,\partial_\alpha \mathbf{S}. \tag{1}\)</p>
+<p>The GWS matrix associated with a parameter <span class="math-inline" role="math">\(\alpha\)</span> (e.g., the position of an embedded object) is</p>
+
+<div class="math-display" role="math">\[\mathbf{Q}_\alpha = i\,\mathbf{S}^\dagger\,\partial_\alpha \mathbf{S}. \tag{1}\]</div>
+
 <h3 id="22-virtual-work-principle">2.2 Virtual Work Principle</h3>
-<p>For a set of objects with positions ${\mathbf{r}_i}$, the principle of virtual work states
-\(\delta W = -\delta U, \tag{2}\)
-where the virtual work done by radiation forces is
-\(\delta W = \sum_i \mathbf{F}_i \cdot \delta\mathbf{r}_i. \tag{3}\)
-Notice the $\delta \mathbf{r}_i$ are completely independent from each other, which means the principle should yield $N$ independent equations if there are no additional geometry constraints.</p>
-<h3 id="23-energy-bookkeeping-via-port-phases">2.3 Energy Bookkeeping via Port Phases</h3>
-<p>Write each outgoing amplitude in polar form: $b_n = \sqrt{P_n}\,e^{i\phi_n},$ where $P_n = |b_n|^2$ is the outgoing power and $\phi_n$ its phase. A virtual displacement $\delta\mathbf{r}<em>i$ perturbs the scattering medium, changing both powers and phases at the ports. For a <strong>single-frequency</strong> (harmonic) excitation, the energy stored in the scattering region associated with port n is related to the group delay (phase delay for single-frequency), so its variation under a parameter shift is
-\(\delta U_n = P_n\,\delta\tau_n = \frac{P_n\,\delta\phi_n}{\omega}. \tag{4}\)
-This identification — energy change equals power times phase-delay change — is the classical-wave analogue of the Wigner–Smith time-delay relation, here applied to a _spatial</em> parameter rather than frequency.</p>
-<h3 id="24-connecting-port-quantities-to-the-s-matrix">2.4 Connecting Port Quantities to the S-matrix</h3>
-<p>From the polar decomposition of $b_n$,
-\(b_n^*\,\delta b_n = \tfrac{1}{2}\delta P_n + i\,P_n\,\delta\phi_n. \tag{5}\)
-Summing over all ports and using matrix notation ($\mathbf{b} = \mathbf{S}\mathbf{a}$):
-\(\sum_n b_n^*\,\delta b_n = \mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = \frac{1}{2}\sum_n\delta P_n + i\sum_n P_n\,\delta\phi_n. \tag{6}\)
-<strong>Lossless condition:</strong> Since $\mathbf{S}$ is unitary, total output power equals total input power. Under a virtual displacement (the incident amplitudes $\mathbf{a}$ are held fixed), $\sum_n \delta P_n = 0$. The real part of (6) vanishes, leaving
-\(\mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = i\sum_n P_n\,\delta\phi_n = i\,\omega\,\delta U. \tag{7}\)</p>
-<h3 id="25-the-central-result">2.5 The Central Result</h3>
-<p>Substituting (7) into the virtual work principle (2)–(3):
-\(\sum_i \mathbf{F}_i\cdot\delta\mathbf{r}_i = -\delta U = \frac{1}{\omega}\,i\,\mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = \mathbf{a}^\dagger\mathbf{Q}_i\,\mathbf{a}\cdot\delta\mathbf{r}_i, \tag{8}\)
-where the last equality uses definition (1) and the fact that $\mathbf{Q}_i$ is Hermitian (so its expectation value is real) in the lossless case.</p>
+<p>For a set of objects with positions <span class="math-inline" role="math">\(\{\mathbf{r}_i\}\)</span>, the principle of virtual work states</p>
 
-<p>Since the virtual displacements ${\delta\mathbf{r}_i}$ of <strong>distinct objects</strong> correspond to independent generalized coordinates (no geometric coupling between separate objects), they may be varied independently. Therefore, (8) holds component-by-component:
-\(\boxed{\mathbf{F}_i = \langle \mathbf{Q}_i \rangle \equiv \mathbf{a}^\dagger \mathbf{Q}_i\,\mathbf{a}.} \tag{9}\)
-<strong>This is the central equation of the GWS radiation-force framework, derived purely from virtual work and port-phase bookkeeping.</strong></p>
+<div class="math-display" role="math">\[\delta W = -\delta U, \tag{2}\]</div>
+
+<p>where the virtual work done by radiation forces is</p>
+
+<div class="math-display" role="math">\[\delta W = \sum_i \mathbf{F}_i \cdot \delta\mathbf{r}_i. \tag{3}\]</div>
+
+<p>Notice the <span class="math-inline" role="math">\(\delta \mathbf{r}_i\)</span> are completely independent from each other, which means the principle should yield <span class="math-inline" role="math">\(N\)</span> independent equations if there are no additional geometry constraints.</p>
+<h3 id="23-energy-bookkeeping-via-port-phases">2.3 Energy Bookkeeping via Port Phases</h3>
+<p>Write each outgoing amplitude in polar form: <span class="math-inline" role="math">\(b_n = \sqrt{P_n}\,e^{i\phi_n},\)</span> where <span class="math-inline" role="math">\(P_n = |b_n|^2\)</span> is the outgoing power and <span class="math-inline" role="math">\(\phi_n\)</span> its phase. A virtual displacement <span class="math-inline" role="math">\(\delta\mathbf{r}_i\)</span> perturbs the scattering medium, changing both powers and phases at the ports. For a <strong>single-frequency</strong> (harmonic) excitation, the energy stored in the scattering region associated with port n is related to the group delay (phase delay for single-frequency), so its variation under a parameter shift is</p>
+
+<div class="math-display" role="math">\[\delta U_n = P_n\,\delta\tau_n = \frac{P_n\,\delta\phi_n}{\omega}. \tag{4}\]</div>
+
+<p>This identification — energy change equals power times phase-delay change — is the classical-wave analogue of the Wigner–Smith time-delay relation, here applied to a <em>spatial</em> parameter rather than frequency.</p>
+<h3 id="24-connecting-port-quantities-to-the-s-matrix">2.4 Connecting Port Quantities to the S-matrix</h3>
+<p>From the polar decomposition of <span class="math-inline" role="math">\(b_n\)</span>,</p>
+
+<div class="math-display" role="math">\[b_n^*\,\delta b_n = \tfrac{1}{2}\delta P_n + i\,P_n\,\delta\phi_n. \tag{5}\]</div>
+
+<p>Summing over all ports and using matrix notation (<span class="math-inline" role="math">\(\mathbf{b} = \mathbf{S}\mathbf{a}\)</span>):</p>
+
+<div class="math-display" role="math">\[\sum_n b_n^*\,\delta b_n = \mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = \frac{1}{2}\sum_n\delta P_n + i\sum_n P_n\,\delta\phi_n. \tag{6}\]</div>
+
+<p><strong>Lossless condition:</strong> Since <span class="math-inline" role="math">\(\mathbf{S}\)</span> is unitary, total output power equals total input power. Under a virtual displacement (the incident amplitudes <span class="math-inline" role="math">\(\mathbf{a}\)</span> are held fixed), <span class="math-inline" role="math">\(\sum_n \delta P_n = 0\)</span>. The real part of (6) vanishes, leaving</p>
+
+<div class="math-display" role="math">\[\mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = i\sum_n P_n\,\delta\phi_n = i\,\omega\,\delta U. \tag{7}\]</div>
+
+<h3 id="25-the-central-result">2.5 The Central Result</h3>
+<p>Substituting (7) into the virtual work principle (2)–(3):</p>
+
+<div class="math-display" role="math">\[\sum_i \mathbf{F}_i\cdot\delta\mathbf{r}_i = -\delta U = \frac{1}{\omega}\,i\,\mathbf{a}^\dagger\mathbf{S}^\dagger\delta\mathbf{S}\,\mathbf{a} = \mathbf{a}^\dagger\mathbf{Q}_i\,\mathbf{a}\cdot\delta\mathbf{r}_i, \tag{8}\]</div>
+
+<p>where the last equality uses definition (1) and the fact that <span class="math-inline" role="math">\(\mathbf{Q}_i\)</span> is Hermitian (so its expectation value is real) in the lossless case.</p>
+
+<p>Since the virtual displacements <span class="math-inline" role="math">\(\{\delta\mathbf{r}_i\}\)</span> of <strong>distinct objects</strong> correspond to independent generalized coordinates (no geometric coupling between separate objects), they may be varied independently. Therefore, (8) holds component-by-component:</p>
+
+<div class="math-display" role="math">\[\boxed{\mathbf{F}_i = \langle \mathbf{Q}_i \rangle \equiv \mathbf{a}^\dagger \mathbf{Q}_i\,\mathbf{a}.} \tag{9}\]</div>
+
+<p><strong>This is the central equation of the GWS radiation-force framework, derived purely from virtual work and port-phase bookkeeping.</strong></p>
 
 <h3 id="26-remark-on-independence-and-multi-object-optimization">2.6 Remark on Independence and Multi-Object Optimization</h3>
-<p>The independence of ${\delta\mathbf{r}_i}$ in (8)–(9) has an immediate consequence for multi-objective optimization: there is <strong>no fundamental trade-off</strong> between simultaneously maximizing $\mathbf{F}_i$ and $\mathbf{F}_j$ for distinct objects $i \neq j$ arising from the virtual work structure itself. Any apparent trade-off is entirely a consequence of the specific scattering geometry (encoded in $\mathbf{S}$), not an intrinsic uncertainty principle. In particular:</p>
+<p>The independence of <span class="math-inline" role="math">\(\{\delta\mathbf{r}_i\}\)</span> in (8)–(9) has an immediate consequence for multi-objective optimization: there is <strong>no fundamental trade-off</strong> between simultaneously maximizing <span class="math-inline" role="math">\(\mathbf{F}_i\)</span> and <span class="math-inline" role="math">\(\mathbf{F}_j\)</span> for distinct objects <span class="math-inline" role="math">\(i \neq j\)</span> arising from the virtual work structure itself. Any apparent trade-off is entirely a consequence of the specific scattering geometry (encoded in <span class="math-inline" role="math">\(\mathbf{S}\)</span>), not an intrinsic uncertainty principle. In particular:</p>
 
 <ul>
   <li>If the system is block-diagonal (objects uncoupled), forces are simultaneously maximizable by construction.</li>
-  <li>Even in a coupled system, if $\mathbf{Q}_i$ and $\mathbf{Q}_j$ share a common maximum eigenvector, both forces are simultaneously maximized — irrespective of whether $[\mathbf{Q}_i, \mathbf{Q}_j] = 0$ or not.</li>
+  <li>Even in a coupled system, if <span class="math-inline" role="math">\(\mathbf{Q}_i\)</span> and <span class="math-inline" role="math">\(\mathbf{Q}_j\)</span> share a common maximum eigenvector, both forces are simultaneously maximized — irrespective of whether <span class="math-inline" role="math">\([\mathbf{Q}_i, \mathbf{Q}_j] = 0\)</span> or not.</li>
 </ul>
 
-<p>A Robertson-type bound on $\langle\mathbf{Q}_i\rangle\langle\mathbf{Q}_j\rangle$ constrains <strong>variances</strong>, not <strong>maxima</strong>, and therefore does not constitute an uncertainty principle for radiation-force optimization.</p>
+<p>A Robertson-type bound on <span class="math-inline" role="math">\(\langle\mathbf{Q}_i\rangle\langle\mathbf{Q}_j\rangle\)</span> constrains <strong>variances</strong>, not <strong>maxima</strong>, and therefore does not constitute an uncertainty principle for radiation-force optimization.</p>
 
 <h2 id="3-extension-to-lossy-scattering-systems">3. Extension to Lossy Scattering Systems</h2>
 
 <h3 id="31-modified-s-matrix-structure">3.1 Modified S-matrix Structure</h3>
-<p>When the scattering medium is lossy, $\mathbf{S}$ is <strong>sub-unitary</strong>:
-\(\mathbf{S}^\dagger\mathbf{S} = \mathbf{I} - \mathbf{A}, \qquad \mathbf{A} \geq 0, \tag{10}\)
-where $\mathbf{A}$ is the positive semi-definite <strong>absorption matrix</strong>. Total output power is no longer conserved:
-\(\sum_n \delta P_n = -\delta P_\mathrm{abs}, \tag{11}\)
-where $\delta P_\mathrm{abs} &gt; 0$ is the additional power absorbed when the object is displaced to $\mathbf{r}_i + \delta\mathbf{r}_i$.</p>
+<p>When the scattering medium is lossy, <span class="math-inline" role="math">\(\mathbf{S}\)</span> is <strong>sub-unitary</strong>:</p>
 
-<p>By recovering the DoFs of loss channels, i.e. the bath, we can have a better understanding of this fact. Now consider a full scattering matrix
-\(\mathbf{S} = \pmatrix{\mathbf{S}_s &amp; \mathbf{C}\\ \mathbf{D} &amp; \mathbf{S}_b}\)
-\(\pmatrix{\mathbf{S}_s &amp; \mathbf{C}\\ \mathbf{D} &amp; \mathbf{S}_b}  \pmatrix{\mathbf{S}_s^\dagger &amp; \mathbf{D}^\dagger\\ \mathbf{C}^\dagger &amp; \mathbf{S}_b^\dagger} =  \pmatrix{I &amp; 0\\ 0&amp; I}\)
-\(\mathbf{S}_s \mathbf{S}_s^\dagger + \mathbf{C}\mathbf{C}^\dagger = I\)
-\(\mathbf{S}_s \mathbf{D}^\dagger + \mathbf{C}\mathbf{S}_b^\dagger = 0\Rightarrow \mathbf{C}\approx-\mathbf{S}_s\mathbf{D}^\dagger\mathbf{S}_b\Rightarrow \mathbf{C}\mathbf{C}^\dagger \approx \mathbf{S}_s\mathbf{D}^\dagger \mathbf{D}\mathbf{S}_s^\dagger\)</p>
+<div class="math-display" role="math">\[\mathbf{S}^\dagger\mathbf{S} = \mathbf{I} - \mathbf{A}, \qquad \mathbf{A} \geq 0, \tag{10}\]</div>
+
+<p>where <span class="math-inline" role="math">\(\mathbf{A}\)</span> is the positive semi-definite <strong>absorption matrix</strong>. Total output power is no longer conserved:</p>
+
+<div class="math-display" role="math">\[\sum_n \delta P_n = -\delta P_\mathrm{abs}, \tag{11}\]</div>
+
+<p>where <span class="math-inline" role="math">\(\delta P_\mathrm{abs} &gt; 0\)</span> is the additional power absorbed when the object is displaced to <span class="math-inline" role="math">\(\mathbf{r}_i + \delta\mathbf{r}_i\)</span>.</p>
+
+<p>By recovering the DoFs of loss channels, i.e. the bath, we can have a better understanding of this fact. Now consider a full scattering matrix</p>
+
+<div class="math-display" role="math">\[\mathbf{S} =
+\begin{pmatrix}
+\mathbf{S}_s &amp; \mathbf{C}\
+\mathbf{D} &amp; \mathbf{S}_b
+\end{pmatrix}\]</div>
+
+<div class="math-display" role="math">\[\begin{pmatrix}
+\mathbf{S}_s &amp; \mathbf{C}\
+\mathbf{D} &amp; \mathbf{S}_b
+\end{pmatrix}
+\begin{pmatrix}
+\mathbf{S}_s^\dagger &amp; \mathbf{D}^\dagger\
+\mathbf{C}^\dagger &amp; \mathbf{S}_b^\dagger
+\end{pmatrix}
+=
+\begin{pmatrix}
+I &amp; 0\
+0 &amp; I
+\end{pmatrix}\]</div>
+
+<div class="math-display" role="math">\[\mathbf{S}_s \mathbf{S}_s^\dagger + \mathbf{C}\mathbf{C}^\dagger = I\]</div>
+
+<div class="math-display" role="math">\[\mathbf{S}_s \mathbf{D}^\dagger + \mathbf{C}\mathbf{S}_b^\dagger = 0\Rightarrow \mathbf{C}\approx-\mathbf{S}_s\mathbf{D}^\dagger\mathbf{S}_b\Rightarrow \mathbf{C}\mathbf{C}^\dagger \approx \mathbf{S}_s\mathbf{D}^\dagger \mathbf{D}\mathbf{S}_s^\dagger\]</div>
 
 <h3 id="32-force-decomposition">3.2 Force Decomposition</h3>
-<p>Returning to (6), the real part no longer vanishes. Defining the (now non-Hermitian) generalized GWS operator ($\mathrm{G^2WS}$ 😂)
-\(\tilde{\mathbf{Q}}_i = \,\mathbf{S}^\dagger\,\partial_i\mathbf{S}, \tag{12}\)
-equation (6) gives
-\(\mathbf{a}^\dagger\tilde{\mathbf{Q}}_i\,\mathbf{a} = -\frac{1}{2}\frac{\partial P_\mathrm{abs}}{\partial \mathbf{r}_i} + i\,\omega\frac{\partial U}{\partial \mathbf{r}_i}. \tag{13}\)
-The virtual work should also be corrected
-\(\delta W + \delta W_\text{abs} = -\delta U\)
-\(F_i \cdot \delta r_i +\delta W_\text{abs} = -\sum_n P_n \delta\phi_n /\omega= a^\dagger Q_i a/i\omega+\frac{1}{2i\omega}\frac{\partial P_\text{abs}}{\partial r_i}\)
-which then yields a <strong>two-component force</strong>:
-\(\mathbf{F}_i = \underbrace{\mathrm{Im}\!\left(\langle\tilde{\mathbf{Q}}_i\rangle\right)}_{\text{reactive (radiation pressure)}} + \underbrace{\frac{1}{2\omega}\,\frac{\partial P_\mathrm{abs}}{\partial \mathbf{r}_i}}_{\text{dissipative (absorption force)}}. \tag{15}\)
-Decomposing $\tilde{\mathbf{Q}}_i = \mathbf{H}_i + i\mathbf{K}_i$ into Hermitian parts ($\mathbf{H}_i^\dagger = \mathbf{H}_i, \mathbf{K}_i^\dagger = \mathbf{K}_i$):</p>
+<p>Returning to (6), the real part no longer vanishes. Defining the (now non-Hermitian) generalized GWS operator (<span class="math-inline" role="math">\(\mathrm{G^2WS}\)</span> 😂)</p>
+
+<div class="math-display" role="math">\[\tilde{\mathbf{Q}}_i = \,\mathbf{S}^\dagger\,\partial_i\mathbf{S}, \tag{12}\]</div>
+
+<p>equation (6) gives</p>
+
+<div class="math-display" role="math">\[\mathbf{a}^\dagger\tilde{\mathbf{Q}}_i\,\mathbf{a} = -\frac{1}{2}\frac{\partial P_\mathrm{abs}}{\partial \mathbf{r}_i} + i\,\omega\frac{\partial U}{\partial \mathbf{r}_i}. \tag{13}\]</div>
+
+<p>The virtual work should also be corrected</p>
+
+<div class="math-display" role="math">\[\delta W + \delta W_\text{abs} = -\delta U\]</div>
+
+<div class="math-display" role="math">\[F_i \cdot \delta r_i +\delta W_\text{abs} = -\sum_n P_n \delta\phi_n /\omega= a^\dagger Q_i a/i\omega+\frac{1}{2i\omega}\frac{\partial P_\text{abs}}{\partial r_i}\]</div>
+
+<p>which then yields a <strong>two-component force</strong>:</p>
+
+<div class="math-display" role="math">\[\mathbf{F}_i = \underbrace{\mathrm{Im}\!\left(\langle\tilde{\mathbf{Q}}_i\rangle\right)}_{\text{reactive (radiation pressure)}} + \underbrace{\frac{1}{2\omega}\,\frac{\partial P_\mathrm{abs}}{\partial \mathbf{r}_i}}_{\text{dissipative (absorption force)}}. \tag{15}\]</div>
+
+<p>Decomposing <span class="math-inline" role="math">\(\tilde{\mathbf{Q}}_i = \mathbf{H}_i + i\mathbf{K}_i\)</span> into Hermitian parts (<span class="math-inline" role="math">\(\mathbf{H}_i^\dagger = \mathbf{H}_i, \mathbf{K}_i^\dagger = \mathbf{K}_i\)</span>):</p>
 
 <ul>
-  <li>$\mathbf{H}<em>i = \tfrac{1}{2}(\tilde{\mathbf{Q}}_i + \tilde{\mathbf{Q}}_i^\dagger$) encodes the <strong>absorption gradient</strong>: $\langle\mathbf{H}_i\rangle \propto -\partial_i P</em>\mathrm{abs}$.</li>
-  <li>$\mathbf{K}_i = \tfrac{1}{2i}(\tilde{\mathbf{Q}}_i - \tilde{\mathbf{Q}}_i^\dagger)$ encodes the <strong>radiation force</strong>: $\mathbf{F}_i = \langle\mathbf{K}_i\rangle$.</li>
+  <li><span class="math-inline" role="math">\(\mathbf{H}_i = \tfrac{1}{2}(\tilde{\mathbf{Q}}_i + \tilde{\mathbf{Q}}_i^\dagger)\)</span> encodes the <strong>absorption gradient</strong>: <span class="math-inline" role="math">\(\langle\mathbf{H}_i\rangle \propto -\partial_i P_\mathrm{abs}\)</span>.</li>
+  <li><span class="math-inline" role="math">\(\mathbf{K}_i = \tfrac{1}{2i}(\tilde{\mathbf{Q}}_i - \tilde{\mathbf{Q}}_i^\dagger)\)</span> encodes the <strong>radiation force</strong>: <span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{K}_i\rangle\)</span>.</li>
 </ul>
 
-<p>Note that $\mathbf{K}_i$ is Hermitian, so the radiation-force optimization problem
-\(\max_{\mathbf{a}:\,\|\mathbf{a}\|=1}\;\langle\mathbf{K}_i\rangle \tag{16}\)
-<strong>remains an eigenvalue problem</strong> — the maximum is the largest eigenvalue of $\mathbf{K}_i$, achieved by its corresponding eigenvector. No nonlinear solver is required even in the lossy case.</p>
+<p>Note that <span class="math-inline" role="math">\(\mathbf{K}_i\)</span> is Hermitian, so the radiation-force optimization problem</p>
+
+<div class="math-display" role="math">\[\max_{\mathbf{a}:\,\|\mathbf{a}\|=1}\;\langle\mathbf{K}_i\rangle \tag{16}\]</div>
+
+<p><strong>remains an eigenvalue problem</strong> — the maximum is the largest eigenvalue of <span class="math-inline" role="math">\(\mathbf{K}_i\)</span>, achieved by its corresponding eigenvector. No nonlinear solver is required even in the lossy case.</p>
 
 <h3 id="33-physical-interpretation">3.3 Physical Interpretation</h3>
 <p>The two terms in (14) have natural counterparts in known physics:</p>
@@ -262,26 +317,26 @@ Decomposing $\tilde{\mathbf{Q}}_i = \mathbf{H}_i + i\mathbf{K}_i$ into Hermitian
   </tbody>
 </table>
 
-<p>The virtual work framework <strong>unifies</strong> these mechanisms within a single port-based expression, whereas they are traditionally treated by separate theories (Maxwell stress tensor + heat equation; Gorkov potential + Navier–Stokes streaming). In the lossless limit $\mathbf{A} \to 0$, the dissipative term vanishes and (14) reduces to (9).</p>
+<p>The virtual work framework <strong>unifies</strong> these mechanisms within a single port-based expression, whereas they are traditionally treated by separate theories (Maxwell stress tensor + heat equation; Gorkov potential + Navier–Stokes streaming). In the lossless limit <span class="math-inline" role="math">\(\mathbf{A} \to 0\)</span>, the dissipative term vanishes and (14) reduces to (9).</p>
 <h3 id="34-consequences-for-multi-objective-optimization-in-lossy-media">3.4 Consequences for Multi-Objective Optimization in Lossy Media</h3>
-<p>In the lossy case, each objective function is $f_i = \langle\mathbf{K}_i\rangle$, which remains a Hermitian quadratic form. The Pareto structure of the multi-objective problem is therefore governed by the joint spectral properties of ${\mathbf{K}_i}$, not of the non-Hermitian ${\tilde{\mathbf{Q}}_i}$. The remarks of Section 2.6 apply unchanged: simultaneous maximization is possible whenever the matrices ${\mathbf{K}_i}$ share a common maximum eigenvector, and no Robertson-type bound on the maxima follows from non-commutativity alone.</p>
+<p>In the lossy case, each objective function is <span class="math-inline" role="math">\(f_i = \langle\mathbf{K}_i\rangle\)</span>, which remains a Hermitian quadratic form. The Pareto structure of the multi-objective problem is therefore governed by the joint spectral properties of <span class="math-inline" role="math">\(\{\mathbf{K}_i\}\)</span>, not of the non-Hermitian <span class="math-inline" role="math">\(\{\tilde{\mathbf{Q}}_i\}\)</span>. The remarks of Section 2.6 apply unchanged: simultaneous maximization is possible whenever the matrices <span class="math-inline" role="math">\(\{\mathbf{K}_i\}\)</span> share a common maximum eigenvector, and no Robertson-type bound on the maxima follows from non-commutativity alone.</p>
 <h2 id="4-relation-to-smith-1960-and-wigner-1955">4. Relation to Smith (1960) and Wigner (1955)</h2>
 
-<p>The identification in equation (4), $\delta U_n = P_n\,\delta\phi_n/\omega$, is the spatial-parameter analogue of Smith’s time-delay formula. Smith (1960) defined the lifetime matrix $\mathbf{Q}$ through the residence-time argument with $\partial_\omega \mathbf{S}$; the present derivation replaces $\partial_\omega$ by $\partial_{\mathbf{r}_i}$ and replaces the quantum mechanical flux normalization argument by the classical virtual work balance. The two derivations are structurally identical, confirming that the GWS radiation-force relation is the spatial-domain counterpart of the Wigner–Smith time-delay relation, both rooted in the same energy-phase bookkeeping.</p>
+<p>The identification in equation (4), <span class="math-inline" role="math">\(\delta U_n = P_n\,\delta\phi_n/\omega\)</span>, is the spatial-parameter analogue of Smith’s time-delay formula. Smith (1960) defined the lifetime matrix <span class="math-inline" role="math">\(\mathbf{Q}\)</span> through the residence-time argument with <span class="math-inline" role="math">\(\partial_\omega \mathbf{S}\)</span>; the present derivation replaces <span class="math-inline" role="math">\(\partial_\omega\)</span> by <span class="math-inline" role="math">\(\partial_{\mathbf{r}_i}\)</span> and replaces the quantum mechanical flux normalization argument by the classical virtual work balance. The two derivations are structurally identical, confirming that the GWS radiation-force relation is the spatial-domain counterpart of the Wigner–Smith time-delay relation, both rooted in the same energy-phase bookkeeping.</p>
 
 <p>This observation implies that the “central equation” of recent GWS-based radiation-force frameworks is not a new variational identity, but rather a direct consequence of Smith’s 1960 construction applied to spatial rather than spectral parameters — a fact made transparent by the virtual work approach but obscured in field-theoretic derivations.</p>
 
 <h2 id="5-summary">5. Summary</h2>
-<p>||Lossless|Lossy|
+<p>| | Lossless | Lossy |
 |—|—|—|
-|S-matrix|Unitary|Sub-unitary|
-|GWS operator|Hermitian $\mathbf{Q}_i$|Non-Hermitian $\tilde{\mathbf{Q}}_i$|
-|Radiation force|$\mathbf{F}_i = \langle\mathbf{Q}_i\rangle$|$\mathbf{F}_i = \langle\mathbf{K}_i\rangle$ (Im part)|
-|Absorption force|—|$\propto \langle\mathbf{H}_i\rangle$ (Re part)|
-|Optimization|Eigenvalue problem|Eigenvalue problem ($\mathbf{K}_i$)|
-|Multi-object trade-off|Geometry-dependent, not intrinsic|Same|</p>
+| S-matrix | Unitary | Sub-unitary |
+| GWS operator | Hermitian <span class="math-inline" role="math">\(\mathbf{Q}_i\)</span> | Non-Hermitian <span class="math-inline" role="math">\(\tilde{\mathbf{Q}}_i\)</span> |
+| Radiation force | <span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{Q}_i\rangle\)</span> | <span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{K}_i\rangle\)</span> (Im part) |
+| Absorption force | — | <span class="math-inline" role="math">\(\propto \langle\mathbf{H}_i\rangle\)</span> (Re part) |
+| Optimization | Eigenvalue problem | Eigenvalue problem (<span class="math-inline" role="math">\(\mathbf{K}_i\)</span>) |
+| Multi-object trade-off | Geometry-dependent, not intrinsic | Same |</p>
 
-<p>The virtual work derivation is shorter, more transparent, and more general than field-theoretic approaches. It makes the assumptions explicit (lossless $\leftrightarrow \sum\delta P_n = 0$), reveals the two-force decomposition in lossy media, and demonstrates that analytical eigenvalue methods suffice throughout — eliminating the need for general-purpose nonlinear solvers.</p>
+<p>The virtual work derivation is shorter, more transparent, and more general than field-theoretic approaches. It makes the assumptions explicit (lossless <span class="math-inline" role="math">\(\leftrightarrow \sum\delta P_n = 0\)</span>), reveals the two-force decomposition in lossy media, and demonstrates that analytical eigenvalue methods suffice throughout — eliminating the need for general-purpose nonlinear solvers.</p>
 
 <hr />
 
