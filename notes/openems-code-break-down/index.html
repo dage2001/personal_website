@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785450545">
+  <link rel="stylesheet" href="/assets/main.css?v=1785450744">
   <link rel="canonical" href="/notes/openems-code-break-down/">
   
     
@@ -163,6 +163,7 @@ window.MathJax = {
   </header>
   <div itemprop="articleBody">
     <h2 id="1-overview-of-openems">1. Overview of OpenEMS</h2>
+
 <h3 id="1-languages-composition">(1) Languages Composition</h3>
 <ul>
   <li><strong>C++:</strong> 56.5%, the core solver is based on C++
@@ -183,10 +184,10 @@ window.MathJax = {
       <li>This link process is completed by Cython. Cython will make use of <em>.dll</em> and/or <em>.lib</em></li>
     </ul>
   </li>
-  <li><strong>CMake + C + Other:</strong> 1.0% + 0.3% + 0.1%, this documents help to generate <em>.lib</em>, <em>.dll</em> and <em>.exe</em>.
-    <h3 id="2-code-structure">(2) Code Structure</h3>
-  </li>
+  <li><strong>CMake + C + Other:</strong> 1.0% + 0.3% + 0.1%, this documents help to generate <em>.lib</em>, <em>.dll</em> and <em>.exe</em>.</li>
 </ul>
+
+<h3 id="2-code-structure">(2) Code Structure</h3>
 
 <h4 id="0-concepts">&lt;0&gt; Concepts</h4>
 <p><strong>Engine &amp; Operator:</strong> Most of the code files can be classified into either <strong>engines</strong> or <strong>operators</strong>. <strong>Operators</strong> yield coefficients <span class="math-inline" role="math">\(vv, ii, vi, iv\)</span> used to update fields at each time steps, while <strong>engines</strong> literally manipulate the data stored in RAM with these coefficients.
@@ -340,6 +341,7 @@ window.MathJax = {
 <span class="nx">engine_ext_cylinder</span><span class="p">.</span><span class="nx">h</span>
 <span class="nx">engine_ext_absorbing_bc</span><span class="p">.</span><span class="nx">h</span>
 </code></pre></div></div>
+
 <h3 id="3-cython-overview">(3) Cython Overview</h3>
 
 <aside class="callout callout-quote" data-callout="quote" aria-label="Quote">
