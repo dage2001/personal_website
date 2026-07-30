@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Review   Perfectly Matched Layers Implementation &amp; Stability - Junda Wang</title>
-  <meta name="description" content="1. Brief Intro: PML (1) Bérenger’s PML with split fields [!WIKI] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as \(\newcommand{\dif}{\mathrm{d}} \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\) which degenerates to the lossless expression when $\sigma_m/\mu=\sigma_e/\epsilon$. Proof. From the frequency domain Maxwell equation \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\) The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\)">
+  <meta name="description" content="1. Brief Intro: PML (1) Bérenger’s PML with split fields [!NOTE] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as \(\newcommand{\dif}{\mathrm{d}} \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\) which degenerates to the lossless expression when $\sigma_m/\mu=\sigma_e/\epsilon$. Proof. From the frequency domain Maxwell equation \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\) The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\)">
 
   <!-- Open Graph / Social Sharing -->
   <meta property="og:title" content="Review   Perfectly Matched Layers Implementation &amp; Stability">
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785445866">
+  <link rel="stylesheet" href="/assets/main.css?v=1785446049">
   <link rel="canonical" href="/notes/review-perfectly-matched-layers-implementation-stability/">
   
     
@@ -165,7 +165,7 @@ window.MathJax = {
     <h2 id="1-brief-intro-pml">1. Brief Intro: PML</h2>
 <h3 id="1-bérengers-pml-with-split-fields">(1) Bérenger’s PML with split fields</h3>
 <blockquote>
-  <p>[!WIKI] Wave Impedance of Lossy Materials
+  <p>[!NOTE] Wave Impedance of Lossy Materials
 When the magnetic loss exists, the characteristic impedance can be expressed as
 \(\newcommand{\dif}{\mathrm{d}}
 \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\)
@@ -272,7 +272,7 @@ If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the 
 </blockquote>
 
 <blockquote>
-  <p>[!MATH] Theorem 2.2. Weak Stability II
+  <p>[!NOTE] Theorem 2.2. Weak Stability II
 If the solution <span class="math-inline" role="math">\((U,H_x)\)</span> to the system belwongs to the <em>Sobolev space</em> <span class="math-inline" role="math">\(H^1([0,\infty);H^1(\mathbb{R}^2))\)</span>, then the following properties are valid
 \(\mathrm{E}(t)\leq C(\sigma_1,\sigma_2)e^{C(\sigma_1+\sigma_2)t}(\mathrm{E}(0)+||H_x(0)||_0^2+||H_y(0)||^2_0)\)
 \(||H_x(t)||_0\leq e^{-\sigma_1 t}||H_x(0)||_0 +\int_0^\tau \mathrm{E}(\tau)^{1/2}\dif\tau\)
@@ -284,7 +284,7 @@ where <span class="math-inline" role="math">\(C(\sigma_1,\sigma_2)\)</span> depe
 
 <h3 id="2-unsplit-field-upml">(2) Unsplit-field UPML</h3>
 <blockquote>
-  <p>[!WIKI] Modified Maxwell’s Equations
+  <p>[!NOTE] Modified Maxwell’s Equations
 For a general medium, we define the modified Maxwell’s equations
 \(\nabla_e\times \mathbf{E} = i\omega\mu \mathbf{H}\)
 \(\nabla_h\times \mathbf{H} = -i\omega \epsilon \mathbf{E}\)
@@ -339,7 +339,7 @@ k_{ix} = k_{tx},\, k_{iy}=k_{ty},\,\frac{k_{iz}}{s_{iz}} = \frac{k_{tz}}{s_{tz}}
 
 <p>Moreover, the coordinate stretching is equivalent to a transformation of <span class="math-inline" role="math">\(\epsilon, \mu\)</span> according to the <strong>transformation optics</strong>.</p>
 <blockquote>
-  <p>[!WIKI] Transformation Optics Fundamental Principle
+  <p>[!NOTE] Transformation Optics Fundamental Principle
 The transformation optics describes how Maxwell equations changed under an arbitrary differentiable coordinate transformation. Assuming we employ a coordinate transformation
 \(x'^i = f^{ij}(x_j),\quad \Lambda^i_j = \frac{\partial x'^i}{\partial x^j},\quad J = \det(\Lambda),\quad g_{ij} = \Lambda_i^k\Lambda_j^l g'_{kl},\quad \sqrt{g} = \sqrt{\det(g_{ij})}\)
 We have the following transformation</p>
