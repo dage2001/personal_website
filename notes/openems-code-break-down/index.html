@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785450744">
+  <link rel="stylesheet" href="/assets/main.css?v=1785450903">
   <link rel="canonical" href="/notes/openems-code-break-down/">
   
     
@@ -475,9 +475,11 @@ window.MathJax = {
   <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />SPICE solver for nonlinear simulation capability.</li>
   <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />CMake and generate <em>.dll</em></li>
   <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Case study &amp; Convergence test.</li>
-  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Generalize to distributed NL media.
-    <h2 id="2-fdtd-review">2. FDTD Review</h2>
-    <aside class="callout callout-important" data-callout="important" aria-label="Important">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Generalize to distributed NL media.</li>
+</ul>
+
+<h2 id="2-fdtd-review">2. FDTD Review</h2>
+<aside class="callout callout-important" data-callout="important" aria-label="Important">
 <div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Important</div>
 <div class="callout-content">
 <p><strong>I. Introduction: Yee Cell &amp; Time Stepping</strong>
@@ -491,14 +493,12 @@ window.MathJax = {
 	(3) ABC (Mur)
 	(4) PBC / BBC</p>
 
-      <p>III. Lumped Components
+  <p>III. Lumped Components
 	(1) Lumped RLC
 	(2) Active components, lumped wave port
 	(3) Lumped ferrite</p>
 </div>
 </aside>
-  </li>
-</ul>
 
 <h3 id="i-intro-yee-cell--time-stepping">(I) Intro: Yee Cell &amp; Time Stepping</h3>
 <p>The curl part of the Maxwell equations</p>
@@ -539,6 +539,7 @@ where <span class="math-inline" role="math">\(\tau^2 = (1+C^2)/\sigma_\omega^2,\
 </aside>
 
 <h2 id="3-manual--smoke-test">3. Manual &amp; Smoke Test</h2>
+
 <h3 id="1-cad-design">(1) CAD Design</h3>
 <p>OpenEMS is powered by <strong>continuous structure XML CAD (CSXCAD)</strong>, which is a C++ library for describing geometrical objects and their physical or non-physical properties. It contains either physical or non-physical API, including <em>Geometry</em>, <em>Materials</em>, <em>Mesh</em>, <em>Excitation</em>, <em>Probes</em> and <em>Data Export</em>.</p>
 
