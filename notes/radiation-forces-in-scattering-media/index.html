@@ -64,13 +64,16 @@ window.MathJax = {
     processEnvironments: true,
     tags: 'ams'
   },
+  output: {
+    displayOverflow: 'scale'
+  },
   options: {
     skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
   }
 };
 </script>
 <script id="MathJax-script" defer
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
 
 
   <!-- JSON-LD Structured Data -->
@@ -295,7 +298,7 @@ I &amp; 0\
 <h3 id="33-physical-interpretation">3.3 Physical Interpretation</h3>
 <p>The two terms in (14) have natural counterparts in known physics:</p>
 
-<table>
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
   <thead>
     <tr>
       <th>Term</th>
@@ -315,7 +318,7 @@ I &amp; 0\
       <td>Acoustic streaming drag</td>
     </tr>
   </tbody>
-</table>
+</table></div>
 
 <p>The virtual work framework <strong>unifies</strong> these mechanisms within a single port-based expression, whereas they are traditionally treated by separate theories (Maxwell stress tensor + heat equation; Gorkov potential + Navier–Stokes streaming). In the lossless limit <span class="math-inline" role="math">\(\mathbf{A} \to 0\)</span>, the dissipative term vanishes and (14) reduces to (9).</p>
 <h3 id="34-consequences-for-multi-objective-optimization-in-lossy-media">3.4 Consequences for Multi-Objective Optimization in Lossy Media</h3>
@@ -327,14 +330,48 @@ I &amp; 0\
 <p>This observation implies that the “central equation” of recent GWS-based radiation-force frameworks is not a new variational identity, but rather a direct consequence of Smith’s 1960 construction applied to spatial rather than spectral parameters — a fact made transparent by the virtual work approach but obscured in field-theoretic derivations.</p>
 
 <h2 id="5-summary">5. Summary</h2>
-<p>| | Lossless | Lossy |
-|—|—|—|
-| S-matrix | Unitary | Sub-unitary |
-| GWS operator | Hermitian <span class="math-inline" role="math">\(\mathbf{Q}_i\)</span> | Non-Hermitian <span class="math-inline" role="math">\(\tilde{\mathbf{Q}}_i\)</span> |
-| Radiation force | <span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{Q}_i\rangle\)</span> | <span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{K}_i\rangle\)</span> (Im part) |
-| Absorption force | — | <span class="math-inline" role="math">\(\propto \langle\mathbf{H}_i\rangle\)</span> (Re part) |
-| Optimization | Eigenvalue problem | Eigenvalue problem (<span class="math-inline" role="math">\(\mathbf{K}_i\)</span>) |
-| Multi-object trade-off | Geometry-dependent, not intrinsic | Same |</p>
+
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Lossless</th>
+      <th>Lossy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>S-matrix</td>
+      <td>Unitary</td>
+      <td>Sub-unitary</td>
+    </tr>
+    <tr>
+      <td>GWS operator</td>
+      <td>Hermitian <span class="math-inline" role="math">\(\mathbf{Q}_i\)</span></td>
+      <td>Non-Hermitian <span class="math-inline" role="math">\(\tilde{\mathbf{Q}}_i\)</span></td>
+    </tr>
+    <tr>
+      <td>Radiation force</td>
+      <td><span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{Q}_i\rangle\)</span></td>
+      <td><span class="math-inline" role="math">\(\mathbf{F}_i = \langle\mathbf{K}_i\rangle\)</span> (Im part)</td>
+    </tr>
+    <tr>
+      <td>Absorption force</td>
+      <td>—</td>
+      <td><span class="math-inline" role="math">\(\propto \langle\mathbf{H}_i\rangle\)</span> (Re part)</td>
+    </tr>
+    <tr>
+      <td>Optimization</td>
+      <td>Eigenvalue problem</td>
+      <td>Eigenvalue problem (<span class="math-inline" role="math">\(\mathbf{K}_i\)</span>)</td>
+    </tr>
+    <tr>
+      <td>Multi-object trade-off</td>
+      <td>Geometry-dependent, not intrinsic</td>
+      <td>Same</td>
+    </tr>
+  </tbody>
+</table></div>
 
 <p>The virtual work derivation is shorter, more transparent, and more general than field-theoretic approaches. It makes the assumptions explicit (lossless <span class="math-inline" role="math">\(\leftrightarrow \sum\delta P_n = 0\)</span>), reveals the two-force decomposition in lossy media, and demonstrates that analytical eigenvalue methods suffice throughout — eliminating the need for general-purpose nonlinear solvers.</p>
 
