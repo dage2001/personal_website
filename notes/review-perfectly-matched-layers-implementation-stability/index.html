@@ -4,17 +4,17 @@
   <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Review   Perfectly Matched Layers Implementation &amp; Stability - Junda Wang</title>
-  <meta name="description" content="1. Brief Intro: PML (1) Bérenger’s PML with split fields [!NOTE] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as \(\newcommand{\dif}{\mathrm{d}} \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\) which degenerates to the lossless expression when $\sigma_m/\mu=\sigma_e/\epsilon$. Proof. From the frequency domain Maxwell equation \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\) The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\)">
+  <title>Review: Perfectly Matched Layers Implementation &amp; Stability - Junda Wang</title>
+  <meta name="description" content="Reviewing the implementation of various PML layers, as well as their stability.">
 
   <!-- Open Graph / Social Sharing -->
-  <meta property="og:title" content="Review   Perfectly Matched Layers Implementation &amp; Stability">
+  <meta property="og:title" content="Review: Perfectly Matched Layers Implementation &amp; Stability">
   <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="/notes/review-perfectly-matched-layers-implementation-stability/">
   <meta property="og:image" content="/images/headshot.jpg">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Review   Perfectly Matched Layers Implementation &amp; Stability">
+  <meta name="twitter:title" content="Review: Perfectly Matched Layers Implementation &amp; Stability">
   <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
   <meta name="twitter:image" content="/images/headshot.jpg">
 
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1785446528">
+  <link rel="stylesheet" href="/assets/main.css?v=1785449429">
   <link rel="canonical" href="/notes/review-perfectly-matched-layers-implementation-stability/">
   
     
@@ -81,7 +81,7 @@ window.MathJax = {
   {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": "Review   Perfectly Matched Layers Implementation &amp; Stability",
+    "name": "Review: Perfectly Matched Layers Implementation &amp; Stability",
     "url": "/notes/review-perfectly-matched-layers-implementation-stability/",
     "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
     "author": {
@@ -150,9 +150,9 @@ window.MathJax = {
     <main class="site-container" id="main-content">
       <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
   <header class="post-header">
-  <h1 itemprop="name headline">Review   Perfectly Matched Layers Implementation &amp; Stability</h1>
+  <h1 itemprop="name headline">Review: Perfectly Matched Layers Implementation &amp; Stability</h1>
   <p class="post-meta text-muted">
-    <time datetime="2026-07-30T00:00:00+00:00" itemprop="datePublished">Jul 30, 2026</time>
+    <time datetime="2026-07-12T00:00:00+00:00" itemprop="datePublished">Jul 12, 2026</time>
     
   </p>
   

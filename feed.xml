@@ -5,15 +5,7 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 30 Jul 2026 21:22:08 +0000</lastBuildDate>
-    
-    <item>
-      <title>Review   Perfectly Matched Layers Implementation &amp; Stability</title>
-      <description>1. Brief Intro: PML (1) Bérenger’s PML with split fields [!NOTE] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as \(\newcommand{\dif}{\mathrm{d}} \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\) which degenerates to the lossless expression when JUNDAMATHINLINETOKEN0END. Proof. From the frequency domain Maxwell equation \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\) The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\) For simplicity, we only deal with 2D transverse electric (JUNDAMATHINLINETOKEN1END) Maxwell equation. The simplified dimensionless Maxwell...</description>
-      <pubDate>Thu, 30 Jul 2026 00:00:00 +0000</pubDate>
-      <link>/notes/review-perfectly-matched-layers-implementation-stability/</link>
-      <guid isPermaLink="true">/notes/review-perfectly-matched-layers-implementation-stability/</guid>
-    </item>
+    <lastBuildDate>Thu, 30 Jul 2026 22:10:29 +0000</lastBuildDate>
     
     <item>
       <title>Floquet 光子学简介</title>
@@ -39,6 +31,14 @@ This short note is a starting point. Future revisions will add equations, numeri
       <pubDate>Thu, 30 Jul 2026 00:00:00 +0000</pubDate>
       <link>/notes/floquet-photonics-introduction/</link>
       <guid isPermaLink="true">/notes/floquet-photonics-introduction/</guid>
+    </item>
+    
+    <item>
+      <title>Review: Perfectly Matched Layers Implementation &amp; Stability</title>
+      <description>1. Brief Intro: PML (1) Bérenger’s PML with split fields [!NOTE] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as \(\newcommand{\dif}{\mathrm{d}} \eta = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}=\sqrt{\frac{\epsilon-i\sigma_e/\omega}{\mu-i\sigma_m/\omega}}\) which degenerates to the lossless expression when JUNDAMATHINLINETOKEN0END. Proof. From the frequency domain Maxwell equation \(\mathbf{\nabla} \times \mathbf{E} = -i\omega\mu \mathbf{H} -\sigma_m\mathbf{H}=-i\omega\tilde{\mu}\mathbf{H},\quad \mathbf{\nabla}\times \mathbf{H}=i\omega\epsilon \mathbf{E}+\sigma_e\mathbf{E}=i\omega\tilde{\epsilon}\mathbf{E}\) The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space \(\eta = \frac{|\mathbf{E}|}{|\mathbf{H}|} = \sqrt{\frac{\tilde{\mu}}{\tilde{\epsilon}}}\) For simplicity, we only deal with 2D transverse electric (JUNDAMATHINLINETOKEN1END) Maxwell equation. The simplified dimensionless Maxwell...</description>
+      <pubDate>Sun, 12 Jul 2026 00:00:00 +0000</pubDate>
+      <link>/notes/review-perfectly-matched-layers-implementation-stability/</link>
+      <guid isPermaLink="true">/notes/review-perfectly-matched-layers-implementation-stability/</guid>
     </item>
     
     <item>
