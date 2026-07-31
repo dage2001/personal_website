@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>【整活】混合型有水乙醇的制备与应用（一） - Junda Wang</title>
+  <meta name="description" content="本文回顾了一些有水乙醇的制备方法，为研发新型有水乙醇配方奠定了坚实的基础。">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="【整活】混合型有水乙醇的制备与应用（一）">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/notes/review-ethanol-with-water">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="【整活】混合型有水乙醇的制备与应用（一）">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1785458423">
+  <link rel="canonical" href="/notes/review-ethanol-with-water">
+  
+    
+    
+  <link rel="alternate" hreflang="zh" href="/notes/review-ethanol-with-water">
+      
+    
+  
+  <link rel="icon" href="/favicon.ico?v=1785458423" sizes="any">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  output: {
+    displayOverflow: 'scale'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "【整活】混合型有水乙醇的制备与应用（一）",
+    "url": "/notes/review-ethanol-with-water",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="/notes/" aria-current="page">Notes</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">【整活】混合型有水乙醇的制备与应用（一）</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2025-04-13T00:00:00+00:00" itemprop="datePublished">Apr 13, 2025</time>
+    
+  </p>
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <h2 id="abstract">Abstract</h2>
+
+<p>有水乙醇（Ethanol with Water）的发明距今已有超过千年的历史，其在当代社会中也起到越来越重要的作用。一种主要的混合型有水乙醇（Cocktail Type）通过混合多种有机溶液，达到缓解乙醇本身刺激性气味的目的。本文主要记录了部分混合型有水乙醇的配料与制备方法，并将在后续部分中结合具体场景讨论相关应用。</p>
+
+<h2 id="main">Main</h2>
+
+<h3 id="1-干马天尼dry-martini">1. 干马天尼（Dry Martini）</h3>
+
+<p><strong>成分：</strong>金酒60ml + 干味美思20ml +  橄榄</p>
+
+<p><strong>地点：</strong>雅典卫城山顶酒吧</p>
+
+<p><img src="images/notes/review-ethanol-with-water/1.jpg" alt="1" /></p>
+
+<h3 id="2-椰林飘香pina-colada">2. 椰林飘香（Pina Colada）</h3>
+
+<p><strong>成分：</strong>白朗姆45ml + 椰子利口酒15ml + 菠萝汁45～60ml + 椰奶60ml （+ 椰子糖浆10ml）</p>
+
+<p><strong>地点：</strong>北京南锣鼓巷</p>
+
+<p><img src="images/notes/review-ethanol-with-water/2.jpg" alt="2" /></p>
+
+<h3 id="3-意式浓缩马天尼espresso-martini">3. 意式浓缩马天尼（Espresso Martini）</h3>
+
+<p><strong>成分：</strong>伏特加50ml + 咖啡利口酒30ml + 糖浆10ml + 意式浓缩20～25ml</p>
+
+<p><strong>地点：</strong>Holy Cow Tap House</p>
+
+<p><img src="images/notes/review-ethanol-with-water/3.jpg" alt="3" /></p>
+
+<h3 id="4-1-抹茶尼格罗尼matcha-negroni">4-1. 抹茶尼格罗尼（Matcha Negroni）</h3>
+
+<p><strong>成分：</strong>金酒30ml + 甜味美思30ml + 金巴利30ml + 抹茶粉1/4茶匙</p>
+
+<p><strong>地点：</strong>Lausanne LCC</p>
+
+<h3 id="4-2-柑迈泰grand-mai-tai">4-2. 柑迈泰（Grand Mai-Tai）</h3>
+
+<p><strong>成分：</strong>白朗姆30ml + 黑朗姆30ml + 柑曼怡（Grand Marnier）45ml + 杏仁糖浆（Orgeat Syrup）15ml + 柠檬汁15ml</p>
+
+<p><strong>地点：</strong>Lausanne LCC</p>
+
+<p><img src="images/notes/review-ethanol-with-water/4.jpg" alt="4" /></p>
+
+<h3 id="5-1-雨果lcclcc-hugo">5-1. 雨果LCC（LCC Hugo）</h3>
+
+<p><strong>成分（推测）：</strong>长相思白葡萄酒（Sauvignon Blanc）150ml + 接骨木花糖浆20ml + 气泡水50ml</p>
+
+<p><strong>地点：</strong>Lausanne LCC</p>
+
+<h3 id="5-2-夏日骡子summer-mule">5-2. 夏日骡子（Summer Mule）</h3>
+
+<p><strong>成分：</strong>覆盆子味伏特加60ml + 姜汁啤酒150ml + 柠檬汁15ml + 大黄浓缩糖浆10ml（和莫斯科骡子区别似乎仅在于伏特加味道和大黄浓缩汁）</p>
+
+<p><strong>地点：</strong>Lausanne LCC</p>
+
+<p><img src="images/notes/review-ethanol-with-water/5.jpg" alt="5" /></p>
+
+<h3 id="6-长岛冰茶-自制缺料版long-island-tea">6. 长岛冰茶-自制缺料版（Long Island Tea）</h3>
+
+<p><strong>成分：</strong>白朗姆15ml + 伏特加15ml + 金酒15ml + 君度橙酒15ml + 龙舌兰酒0ml + 可乐60～75ml</p>
+
+<p><strong>地点：</strong>某高档住宅区（x</p>
+
+<p><img src="images/notes/review-ethanol-with-water/6.jpg" alt="6" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>能整出这样的活，本文作者精神状态看起来确实不太正常 :)</p>
+
+<h2 id="acknowledgements">Acknowledgements</h2>
+
+<p>所有人。</p>
+
+<h2 id="references">References</h2>
+
+<p>[1] Fig. 4-6 reproduced with permission from cameramen.
+[2] La Carte, Lausanne Cocktail Club LCC.
+[3] Cocktail Tutorials, Rednote.</p>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js"></script>
+
+
+  </body>
+
+</html>
