@@ -278,81 +278,10 @@
     window.addEventListener('scroll', requestCoverUpdate, { passive: true });
   }
 
-  // ----- Inertial Wheel Scrolling -----
-
-  var finePointer = window.matchMedia('(pointer: fine)');
-  var inertialTarget = window.scrollY;
-  var inertialPosition = window.scrollY;
-  var inertialFrame = null;
-
-  function stopInertialScroll() {
-    if (inertialFrame !== null) {
-      window.cancelAnimationFrame(inertialFrame);
-      inertialFrame = null;
-    }
-    inertialTarget = window.scrollY;
-    inertialPosition = window.scrollY;
-  }
-
-  function canScrollInside(element, deltaY) {
-    var current = element instanceof Element ? element : null;
-    while (current && current !== document.body) {
-      var style = window.getComputedStyle(current);
-      var scrollable = /(auto|scroll)/.test(style.overflowY) && current.scrollHeight > current.clientHeight;
-      if (scrollable) {
-        var canMoveUp = deltaY < 0 && current.scrollTop > 0;
-        var canMoveDown = deltaY > 0 && current.scrollTop + current.clientHeight < current.scrollHeight - 1;
-        if (canMoveUp || canMoveDown) return true;
-      }
-      current = current.parentElement;
-    }
-    return false;
-  }
-
-  function runInertialScroll() {
-    var distance = inertialTarget - inertialPosition;
-    inertialPosition += distance * .13;
-    window.scrollTo(0, inertialPosition);
-
-    if (Math.abs(distance) > .45) {
-      inertialFrame = window.requestAnimationFrame(runInertialScroll);
-    } else {
-      window.scrollTo(0, inertialTarget);
-      inertialFrame = null;
-      inertialPosition = inertialTarget;
-    }
-  }
-
-  window.addEventListener('scroll', function () {
-    if (inertialFrame === null) {
-      inertialTarget = window.scrollY;
-      inertialPosition = window.scrollY;
-    }
-  }, { passive: true });
-
-  if (!reducedMotion.matches && finePointer.matches) {
-    window.addEventListener('wheel', function (event) {
-      if (event.ctrlKey || event.metaKey || canScrollInside(event.target, event.deltaY)) return;
-
-      event.preventDefault();
-      var multiplier = event.deltaMode === 1 ? 18 : (event.deltaMode === 2 ? window.innerHeight : 1);
-      var maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
-      inertialPosition = inertialFrame === null ? window.scrollY : inertialPosition;
-      inertialTarget = Math.min(Math.max(inertialTarget + event.deltaY * multiplier, 0), maxScroll);
-
-      if (inertialFrame === null) {
-        inertialFrame = window.requestAnimationFrame(runInertialScroll);
-      }
-    }, { passive: false });
-
-    window.addEventListener('mousedown', stopInertialScroll, { passive: true });
-    window.addEventListener('touchstart', stopInertialScroll, { passive: true });
-    window.addEventListener('keydown', function (event) {
-      if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) {
-        stopInertialScroll();
-      }
-    });
-  }
+  // Wheel and trackpad scrolling deliberately remain native. High-resolution
+  // trackpads already supply momentum at the operating-system level; applying
+  // another requestAnimationFrame easing layer causes double inertia, lag, and
+  // poor direction changes on macOS and Windows precision touchpads.
 
   // ----- Fade-in on Scroll -----
 
