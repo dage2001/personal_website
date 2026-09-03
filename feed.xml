@@ -5,7 +5,15 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 03 Sep 2026 06:40:57 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 03 Sep 2026 06:55:39 +0000</lastBuildDate>
+    
+    <item>
+      <title>(SI) Metamaterials 2026 @ New York</title>
+      <description>1. The Tight-binding Model To help understand the physics behind, we developed a phenomenological tight-binding model before the scattering model. It captures the symmetry-protected topological phase (D-class topological insulators), as well as the non-unitary nature of this time-modulated system (parametric instability). (see Fig. 1(a)) The model has a dual Floquet Su-Schrieffer-Heeger (SSH) chain, where the nearest couplings are modulated at two different phases. At the same time, only the upper-to-lower coupling is modulated, just like the practice that only permittivity JUNDAMATHINLINETOKEN0END (or capacitance JUNDAMATHINLINETOKEN1END) is modulated in many time-varying systems. The phase diagram is then calculated using the tight-binding model...</description>
+      <pubDate>Thu, 03 Sep 2026 00:00:00 +0000</pubDate>
+      <link>/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/</link>
+      <guid isPermaLink="true">/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/</guid>
+    </item>
     
     <item>
       <title>(SI) Metamaterials 2026 @ New York</title>

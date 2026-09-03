@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>(SI) Metamaterials 2026 @ New York - Junda Wang</title>
+  <meta name="description" content="1. The Tight-binding Model">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="(SI) Metamaterials 2026 @ New York">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="(SI) Metamaterials 2026 @ New York">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1788418539">
+  <link rel="canonical" href="/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/">
+  
+    
+    
+  <link rel="alternate" hreflang="en" href="/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/">
+      
+  <link rel="alternate" hreflang="x-default" href="/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/">
+      
+    
+  
+  <link rel="icon" href="/favicon.ico?v=1788418539" sizes="any">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  output: {
+    displayOverflow: 'scroll'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "(SI) Metamaterials 2026 @ New York",
+    "url": "/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="/notes/" aria-current="page">Notes</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">(SI) Metamaterials 2026 @ New York</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2026-09-03T00:00:00+00:00" itemprop="datePublished">Sep 3, 2026</time>
+    
+  </p>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <h2 id="1-the-tight-binding-model">1. The Tight-binding Model</h2>
+
+<p>To help understand the physics behind, we developed a phenomenological tight-binding model before the scattering model. It captures the symmetry-protected topological phase (<strong>D-class topological insulators</strong>), as well as the non-unitary nature of this time-modulated system (<strong>parametric instability</strong>). (see Fig. 1(a))</p>
+<ul>
+  <li>The model has a dual Floquet Su-Schrieffer-Heeger (SSH) chain, where the nearest couplings are modulated at two different phases.</li>
+  <li>At the same time, only the upper-to-lower coupling is modulated, just like the practice that only permittivity <span class="math-inline" role="math">\(\epsilon(t)\)</span> (or capacitance <span class="math-inline" role="math">\(C(t)\)</span>) is modulated in many time-varying systems.</li>
+</ul>
+
+<p>The phase diagram is then calculated using the tight-binding model (see Fig. 1(b)). Only two parameters are swept</p>
+<ul>
+  <li><strong>Static Coupling <span class="math-inline" role="math">\(v_0=w_0\)</span>:</strong> This changes the static bandwidth, and determines whether Floquet replicas intersect.</li>
+  <li><strong>Staggered Phase <span class="math-inline" role="math">\(\theta\)</span>:</strong> This affects both the parametric stability and the topological property.</li>
+</ul>
+
+<p>We can tell from the phase diagram that</p>
+<ul>
+  <li><span class="math-inline" role="math">\(\theta=\pi\)</span>, nearest neighbors are anti-symmetrically modulated: Unstable phase as a line between the trivial and topological phase.</li>
+  <li><span class="math-inline" role="math">\(\theta = 0\)</span>, nearest neighbors are symmetrically modulated: Almost always unstable outside the trivial phase.</li>
+  <li><span class="math-inline" role="math">\(\theta\in(0,\pi)\)</span>, mixed modulation: Topological, trivial and unstable phases coexist.</li>
+</ul>
+
+<p>The <strong>bulk-edge correspondence</strong> kicks in either when one chain is bounded by vacuum or when there is an interface between two chains. Parametrically amplified/attenuated edge states will arise in the Floquet <span class="math-inline" role="math">\(\pi\)</span>-gap, since connecting two topologically-distinct phases needs to close the gap and cross the unstable phase (see Fig. 1(c)(d)).</p>
+
+<p><img src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Fig1.png" alt="Fig1" /></p>
+
+<p>Another noteworthy point is the 10-fold symmetry class of this Floquet SSH model. When <span class="math-inline" role="math">\(\theta=0,\pi\)</span>, the modulation still preserves both chiral and particle-hole symmetry and the model falls into BDI-class. Nevertheless, for general cases where <span class="math-inline" role="math">\(\theta\in(0,\pi)\)</span>, chiral symmetry breaks and the model only has particle-hole symmetry, which falls into D-class. For 1D Floquet D-class insulators, the <span class="math-inline" role="math">\(\mathbb{Z}_2\)</span> invariant is then defined at symmetric points in <span class="math-inline" role="math">\(k\)</span>-space as an analog to static D-class insulators.</p>
+
+<p><img src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Fig2.png" alt="Fig2" /></p>
+
+<h2 id="2-more-on-the-fdtd-package">2. More On the FDTD Package</h2>
+
+<p>To fulfill the demand of high-performance full-wave simulations of time-varying and nonlinear EM systems, we developed a CUDA FDTD package on the basis of <em>openEMS</em>, an open-source C++ package for FDTD simulation. Our modified package features full support for time-varying (TV) components, Bloch boundary conditions (BBC), uniaxial perfectly matched layers (UPMLs) and complex frequency-shifted convolution perfectly matched layer (CFS-CPMLs). A full FDTD-SPICE workflow will be progressively introduced in the future, which could give more freedom to researchers working on the frontier electromagnetic problems.</p>
+
+<p>With GPU-oriented optimization such as FP4/8/16 codebook quantization, batched engines for parameter sweeping, adaptive memory layout and CUDA graph record/replay, this engine finally achieves considerably high Yee cell rates, e.g. ~16GC/s PEC/PMC only (tested locally, Nvidia RTX 4070SUPER) and ~8GC/s in the presence of BBC/PML/TV-RLC (tested on the EPFL-SCITAS KUMA cluster, Nvidia H100). (See Fig. 3)</p>
+
+<p><img src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Fig3.png" alt="Fig3" /></p>
+
+<h2 id="3-temporal-field-evolution-in-the-duo-modulator-unit-cell">3. Temporal Field Evolution In the Duo-modulator Unit Cell</h2>
+
+<p>With the 3D full-wave FDTD package, we manage to extract the frequency-preserved (@1.5 GHz) scattering element from a Floquet system, where two modulators are modulated at 3 GHz with different phases. The following videos show how the field <span class="math-inline" role="math">\(E_z\)</span> in the structure evolves when modulation phases vary.</p>
+
+<p><strong>Case 1:</strong> Static case
+<video class="note-video" controls preload="metadata" playsinline aria-label="VD1"><source src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Media1.mp4" type="video/mp4">Your browser does not support embedded video. <a href="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Media1.mp4">Open VD1</a>.</video>
+<strong>Case 2:</strong> Anti-symmetric modulation
+<video class="note-video" controls preload="metadata" playsinline aria-label="VD2"><source src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Media2.mp4" type="video/mp4">Your browser does not support embedded video. <a href="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Media2.mp4">Open VD2</a>.</video>
+<strong>Case 3:</strong> Symmetric modulation
+<video class="note-video" controls preload="metadata" playsinline aria-label="VD3"><source src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Media3.mp4" type="video/mp4">Your browser does not support embedded video. <a href="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Media3.mp4">Open VD3</a>.</video></p>
+
+<h2 id="4-experimental-measurement-of-the-edge-states">4. Experimental Measurement of the Edge States</h2>
+
+<p>This are some preliminary experimental results (still undergoing)<img src="/images/notes/this-is-the-supplementary-information-for-the-poster-of-metamaterials-2026-at-new-york/Fig4.png" alt="Fig4" /></p>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js?v=1788418539"></script>
+
+
+  </body>
+
+</html>
