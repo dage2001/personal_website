@@ -46,11 +46,11 @@ export function numbers(source, ticks=false) {
  if (!source.trim()) return [];
  let values;
  if(ticks && source.includes(':')) {
-  const p=source.split(':').map(Number);
-  if(p.length!==3 || !p.every(Number.isFinite) || p[2]===0 || (p[1]-p[0])*p[2]<0) throw Error('Ticks must be start:end:step with a step toward the end.');
-  const n=Math.floor((p[1]-p[0])/p[2]+1e-9)+1;
+  const parts=source.split(':');const [start,step,end]=parts.map(Number);
+  if(parts.length!==3 || parts.some(p=>!p.trim()) || ![start,step,end].every(Number.isFinite) || step===0 || (end-start)*step<0) throw Error('Ticks must be start:step:end with a step toward the end.');
+  const n=Math.floor((end-start)/step+1e-9)+1;
   if(n>200) throw Error('Use at most 200 ticks.');
-  values=Array.from({length:n},(_,i)=>p[0]+i*p[2]);
+  values=Array.from({length:n},(_,i)=>start+i*step);
  } else {
   const parts=source.split(',');
   if(parts.some(s=>!s.trim())) throw Error('Use comma-separated numbers without empty entries.');

@@ -3,7 +3,7 @@ import {render} from './render.js';
 const $=id=>document.getElementById(`plot-${id}`);
 let series=[],colors=[...palette],nextId=0,table=null,csvText='',current=null,revision=0;
 const defaults=['#f6a168','#65a583','#5d8bbf','#c091ab'];
-function item(type,name,extra={}){return {id:++nextId,type,name,color:colors.includes(defaults[series.length%defaults.length])?defaults[series.length%defaults.length]:colors[series.length%colors.length],shape:'circle',markersize:9,shading:true,mode:type==='csv'?'scatter':'count',positions:'2, 4, 6',count:13,min:0,max:10,...extra};}
+function item(type,name,extra={}){return {id:++nextId,type,name,color:colors.includes(defaults[series.length%defaults.length])?defaults[series.length%defaults.length]:colors[series.length%colors.length],shape:'circle',markersize:12,shading:true,mode:type==='csv'?'scatter':'count',positions:'2, 4, 6',count:13,min:0,max:10,...extra};}
 function input(parent,label,value,change,type='text'){
  const l=document.createElement('label');l.textContent=label;const n=document.createElement('input');n.type=type;n.value=value;l.append(n);parent.append(l);n.addEventListener('input',()=>{change(n.value);update();});return n;
 }
