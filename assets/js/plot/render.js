@@ -11,7 +11,7 @@ function marker(parent,shape,x,y,size,color){
  if(shape==='circle')add(g,'circle',{r});
  else if(shape==='square')add(g,'rect',{x:-r,y:-r,width:size,height:size});
  else if(shape==='diamond')add(g,'polygon',{points:`0,${-r*1.3} ${r},0 0,${r*1.3} ${-r},0`});
- else if(shape==='star')add(g,'polygon',{points:Array.from({length:10},(_,i)=>{const a=-Math.PI/2+i*Math.PI/5,t=i%2?r*.45:r*1.25;return `${Math.cos(a)*t},${Math.sin(a)*t}`;}).join(' ')});
+ else if(shape==='star')add(g,'polygon',{points:Array.from({length:10},(_,i)=>{const a=-Math.PI/2+i*Math.PI/5,t=i%2?r*.75:r*1.25;return `${Math.cos(a)*t},${Math.sin(a)*t}`;}).join(' ')});
  else add(g,'polygon',{points:polygon(shape==='hexagon'?6:3,r*1.2)});
 }
 export async function render(series,s){
