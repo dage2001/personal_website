@@ -28,10 +28,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1791723342">
+  <link rel="stylesheet" href="/assets/main.css?v=1791725921">
   <link rel="canonical" href="/tools/arbitrary-plot-generator/">
   
-  <link rel="icon" href="/favicon.ico?v=1791723342" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1791725921" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -47,6 +47,8 @@
   
 
   
+  <script>window.MathJax = {startup: {typeset: false}, tex: {tags: 'none'}, svg: {fontCache: 'none'}};</script>
+  <script id="MathJax-script" defer src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-svg.js"></script>
   <script type="module" src="/assets/js/plot.min.js"></script>
   
 
@@ -154,11 +156,10 @@
         <div id="plot-columns" hidden></div>
         <p class="plot-hint">Choose one X column and one or more Y columns. Empty pairs are skipped; nonnumeric values are reported. Files stay in your browser.</p>
         <label>LaTeX function, y = f(x)<textarea id="plot-expression" rows="3" spellcheck="false" placeholder="\exp(-x^2)"></textarea></label>
-        <div class="plot-row"><button id="plot-add-expression" type="button">Add function</button><label class="plot-file-button">Load .tex / .txt<input id="plot-tex" type="file" accept=".tex,.txt,text/plain"></label></div>
+        <button id="plot-add-expression" type="button">Add function</button>
         <details class="plot-help"><summary>Supported expressions</summary><p>Use x, real numbers, π, e, arithmetic, fractions, powers, roots, abs, exp, ln, log (base 10), sin, cos, tan, inverse trig, sinh, cosh and tanh. Trig uses radians. Optional y= and math delimiters are accepted. Piecewise expressions, integrals, sums, arbitrary functions and extra variables are unsupported and produce an error.</p></details>
         <p id="plot-import-status" role="status" class="plot-hint"></p>
       </details>
-      <section class="plot-panel"><h2>Series</h2><div id="plot-series"></div><button id="plot-demo" type="button">Reset to example</button></section>
       <details class="plot-panel" open><summary>Figure settings</summary>
         <div class="plot-pair"><label>Width (px)<input id="plot-width" type="number" min="320" max="2400" value="900"></label><label>Height (px)<input id="plot-height" type="number" min="260" max="1800" value="600"></label></div>
         <div class="plot-pair"><label>X min<input id="plot-xmin" type="number" step="any" value="0"></label><label>X max<input id="plot-xmax" type="number" step="any" value="10"></label></div>
@@ -167,14 +168,18 @@
         <label>Y ticks<input id="plot-yticks" placeholder="Auto, or start:end:step"></label>
         <div class="plot-pair"><label>X label<input id="plot-xlabel" value="x"></label><label>Y label<input id="plot-ylabel" value="Amplitude"></label></div>
         <label>Title<input id="plot-title" placeholder="Optional"></label><label>Caption<textarea id="plot-caption" rows="2" placeholder="Describe your figure"></textarea></label>
-        <div class="plot-pair"><label>Line width<input id="plot-linewidth" type="number" min="0.5" max="10" step="0.5" value="3"></label><label>Marker size<input id="plot-markersize" type="number" min="2" max="24" value="9"></label></div>
-        <label class="plot-check"><input id="plot-shading" type="checkbox" checked> Gradient shading under curves</label>
+        <div class="plot-pair"><label>Line width<input id="plot-linewidth" type="number" min="0.5" max="10" step="0.5" value="3"></label><label>Label font size<input id="plot-fontsize" type="number" min="8" max="36" value="17"></label></div>
+        <label>Tick font size<input id="plot-ticksize" type="number" min="8" max="28" value="14"></label>
+        <p class="plot-hint">Axis labels, title, caption and legend names support inline $math$.</p>
         <label>Shading baseline<input id="plot-baseline" type="number" step="any" value="0"></label>
         <label class="plot-check"><input id="plot-legend" type="checkbox" checked> Show legend</label>
       </details>
       <details class="plot-panel"><summary>Color palette</summary><div id="plot-palette"></div><label>Custom colors (comma-separated hex)<textarea id="plot-custom-palette" rows="2" placeholder="#5d8bbf, #65a583, #f6a168"></textarea></label><div class="plot-row"><button id="plot-apply-palette" type="button">Apply colors</button><button id="plot-default-palette" type="button">Restore reference</button></div><p class="plot-hint">Select colors individually in each series. Reference palette sampled from the supplied Nature low saturation color card.</p></details>
     </div>
-    <section class="plot-preview-panel"><div class="plot-preview-toolbar"><h2>Preview</h2><button id="plot-download" type="button">Download SVG</button></div><p id="plot-status" role="status" aria-live="polite"></p><div id="plot-preview"></div><p class="plot-hint">The downloaded SVG includes the caption, markers and gradients. It has no external font or image dependencies.</p></section>
+    <div class="plot-output">
+      <section class="plot-panel"><div class="plot-preview-toolbar"><h2>Series</h2><button id="plot-demo" type="button">Reset to example</button></div><div id="plot-series"></div></section>
+      <section class="plot-preview-panel"><div class="plot-preview-toolbar"><h2>Preview</h2><button id="plot-download" type="button">Download SVG</button></div><p id="plot-status" role="status" aria-live="polite"></p><div id="plot-preview"></div><p class="plot-hint">The downloaded SVG includes the caption, markers and gradients. Math labels are embedded SVG paths; no external fonts or images are needed.</p></section>
+    </div>
   </div>
 </div>
 
@@ -216,7 +221,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1791723342"></script>
+<script src="/assets/js/site.js?v=1791725921"></script>
 
 
   </body>
