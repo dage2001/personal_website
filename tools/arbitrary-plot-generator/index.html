@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arbitrary Plot Generator - Junda Wang</title>
+  <meta name="description" content="Plot CSV data and LaTeX functions, customize scientific figures, and export SVG.">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="Arbitrary Plot Generator">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/tools/arbitrary-plot-generator/">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Arbitrary Plot Generator">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1791723342">
+  <link rel="canonical" href="/tools/arbitrary-plot-generator/">
+  
+  <link rel="icon" href="/favicon.ico?v=1791723342" sizes="any">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  
+  <script type="module" src="/assets/js/plot.min.js"></script>
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Arbitrary Plot Generator",
+    "url": "/tools/arbitrary-plot-generator/",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="/tools/" aria-current="page">Tools</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/notes/">Notes</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <div class="content-page fade-in-section">
+  <a class="category-back" href="/tools/">← All tools</a>
+<header class="category-header">
+  <p class="section-label">Data &amp; visualization</p>
+  <h1>Arbitrary Plot Generator</h1>
+  <p class="notes-intro">CSV data and LaTeX functions. One consistent style, ready to export.</p>
+</header>
+<div class="plot-tool" id="plot-tool">
+  <noscript>Enable JavaScript to use this tool.</noscript>
+  <div class="plot-layout">
+    <div class="plot-controls">
+      <details class="plot-panel" open>
+        <summary>Add data</summary>
+        <label>CSV file<input id="plot-csv" type="file" accept=".csv,text/csv"></label>
+        <label class="plot-check"><input id="plot-header" type="checkbox" checked> First row contains column names</label>
+        <div id="plot-columns" hidden></div>
+        <p class="plot-hint">Choose one X column and one or more Y columns. Empty pairs are skipped; nonnumeric values are reported. Files stay in your browser.</p>
+        <label>LaTeX function, y = f(x)<textarea id="plot-expression" rows="3" spellcheck="false" placeholder="\exp(-x^2)"></textarea></label>
+        <div class="plot-row"><button id="plot-add-expression" type="button">Add function</button><label class="plot-file-button">Load .tex / .txt<input id="plot-tex" type="file" accept=".tex,.txt,text/plain"></label></div>
+        <details class="plot-help"><summary>Supported expressions</summary><p>Use x, real numbers, π, e, arithmetic, fractions, powers, roots, abs, exp, ln, log (base 10), sin, cos, tan, inverse trig, sinh, cosh and tanh. Trig uses radians. Optional y= and math delimiters are accepted. Piecewise expressions, integrals, sums, arbitrary functions and extra variables are unsupported and produce an error.</p></details>
+        <p id="plot-import-status" role="status" class="plot-hint"></p>
+      </details>
+      <section class="plot-panel"><h2>Series</h2><div id="plot-series"></div><button id="plot-demo" type="button">Reset to example</button></section>
+      <details class="plot-panel" open><summary>Figure settings</summary>
+        <div class="plot-pair"><label>Width (px)<input id="plot-width" type="number" min="320" max="2400" value="900"></label><label>Height (px)<input id="plot-height" type="number" min="260" max="1800" value="600"></label></div>
+        <div class="plot-pair"><label>X min<input id="plot-xmin" type="number" step="any" value="0"></label><label>X max<input id="plot-xmax" type="number" step="any" value="10"></label></div>
+        <div class="plot-pair"><label>Y min (blank = auto)<input id="plot-ymin" type="number" step="any"></label><label>Y max (blank = auto)<input id="plot-ymax" type="number" step="any"></label></div>
+        <label>X ticks<input id="plot-xticks" placeholder="Auto, or 0, 2, 4, 6, 8, 10"></label>
+        <label>Y ticks<input id="plot-yticks" placeholder="Auto, or start:end:step"></label>
+        <div class="plot-pair"><label>X label<input id="plot-xlabel" value="x"></label><label>Y label<input id="plot-ylabel" value="Amplitude"></label></div>
+        <label>Title<input id="plot-title" placeholder="Optional"></label><label>Caption<textarea id="plot-caption" rows="2" placeholder="Describe your figure"></textarea></label>
+        <div class="plot-pair"><label>Line width<input id="plot-linewidth" type="number" min="0.5" max="10" step="0.5" value="3"></label><label>Marker size<input id="plot-markersize" type="number" min="2" max="24" value="9"></label></div>
+        <label class="plot-check"><input id="plot-shading" type="checkbox" checked> Gradient shading under curves</label>
+        <label>Shading baseline<input id="plot-baseline" type="number" step="any" value="0"></label>
+        <label class="plot-check"><input id="plot-legend" type="checkbox" checked> Show legend</label>
+      </details>
+      <details class="plot-panel"><summary>Color palette</summary><div id="plot-palette"></div><label>Custom colors (comma-separated hex)<textarea id="plot-custom-palette" rows="2" placeholder="#5d8bbf, #65a583, #f6a168"></textarea></label><div class="plot-row"><button id="plot-apply-palette" type="button">Apply colors</button><button id="plot-default-palette" type="button">Restore reference</button></div><p class="plot-hint">Select colors individually in each series. Reference palette sampled from the supplied Nature low saturation color card.</p></details>
+    </div>
+    <section class="plot-preview-panel"><div class="plot-preview-toolbar"><h2>Preview</h2><button id="plot-download" type="button">Download SVG</button></div><p id="plot-status" role="status" aria-live="polite"></p><div id="plot-preview"></div><p class="plot-hint">The downloaded SVG includes the caption, markers and gradients. It has no external font or image dependencies.</p></section>
+  </div>
+</div>
+
+</div>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js?v=1791723342"></script>
+
+
+  </body>
+
+</html>
