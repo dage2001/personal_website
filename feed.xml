@@ -5,7 +5,15 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>/</link>
     <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 12 Oct 2026 14:13:16 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 12 Oct 2026 18:12:59 +0000</lastBuildDate>
+    
+    <item>
+      <title>Topological Physics for Babies</title>
+      <description>← Previous 1 / 65 Next → Fullscreen TOPOLOGICALPHYSICSforbabiesJunda Wang?This is a wave.Wave travels across space.It has a momentum.xykThis is a ball.Wave hits the ball.It will be scattered but still travel.If wave stays in the ball,it will be trapped.Traveling wave runs with a constant amplitude. We say it has a real wave momentum, k.Trapped wave runs with a decreasing amplitude. We say it has an imaginary wave momentum, sqrt(-1)*k.When two traveling waves meet, they may interfere and get trapped. When two trapped waves meet, they may hop and begin to travel. Traveling wave has energy.It’s continuous like the rainbow.Trapped wave...</description>
+      <pubDate>Mon, 12 Oct 2026 00:00:00 +0000</pubDate>
+      <link>/notes/topological-physics-for-babies/</link>
+      <guid isPermaLink="true">/notes/topological-physics-for-babies/</guid>
+    </item>
     
     <item>
       <title>Floquet 光子学简介</title>
