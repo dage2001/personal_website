@@ -1,4 +1,4 @@
-import {palette, csv, csvPoints, prepare, numbers} from './model.js';
+import {palette, csv, csvPoints, prepare, numbers, functionAxis, setFunctionAxis, hasMarkers} from './model.js';
 import {render} from './render.js';
 const $=id=>document.getElementById(`plot-${id}`);
 let series=[],colors=[...palette],nextId=0,table=null,csvText='',current=null,revision=0;
@@ -14,22 +14,32 @@ function seriesUI(){
   if(!colors.includes(a.color))a.color=colors[series.indexOf(a)%colors.length];
   const d=document.createElement('details');d.className='plot-series-item';const title=document.createElement('summary');const dot=document.createElement('span');dot.className='plot-series-color';dot.style.background=a.color;const name=document.createTextNode(a.name);title.append(dot,name);d.append(title);
   input(d,'Legend name',a.name,v=>{a.name=v;name.textContent=v;});
-  if(a.type==='function'){input(d,'LaTeX expression',a.formula,v=>a.formula=v);const pair=document.createElement('div');pair.className='plot-pair';input(pair,'Function X min',a.min,v=>a.min=v,'number').step='any';input(pair,'Function X max',a.max,v=>a.max=v,'number').step='any';d.append(pair);}
-  const modes=a.type==='csv'?[['scatter','Scatter only'],['linear','Scatter + polyline'],['spline','Scatter + spline']]:[['curve','Curve only'],['positions','Curve + specified X points'],['count','Curve + N points']];
-  select(d,'Mode',modes,a.mode,v=>{a.mode=v;fields();});
-  const positions=input(d,'Marker X coordinates',a.positions,v=>a.positions=v),count=input(d,'Marker count',a.count,v=>a.count=v,'number');count.min=1;count.max=10000;
-  function fields(){positions.parentElement.hidden=a.type!=='function'||a.mode!=='positions';count.parentElement.hidden=a.type!=='function'||a.mode!=='count';}fields();
+  checkbox(d,'Show in legend',a.legend!==false,v=>a.legend=v);
+  let form,min,max;
+  if(a.type==='function'){
+   a.axis=functionAxis(a.formula,a.axis||'x');
+   const formula=input(d,'LaTeX expression',a.formula,v=>{a.formula=v;a.axis=functionAxis(v,a.axis);form.value=a.axis;fields();});
+   form=select(d,'Function form',[['x','y = f(x)'],['y','x = f(y)']],a.axis,v=>{a.axis=v;a.formula=setFunctionAxis(a.formula,v);formula.value=a.formula;fields();});
+   const pair=document.createElement('div');pair.className='plot-pair';min=input(pair,'Function min',a.min,v=>a.min=v,'number');max=input(pair,'Function max',a.max,v=>a.max=v,'number');min.step=max.step='any';d.append(pair);
+  }
+  const modes=a.type==='csv'?[['scatter','Scatter only'],['linear','Scatter + polyline'],['spline','Scatter + spline']]:[['curve','Curve only'],['positions','Curve + specified points'],['count','Curve + N points']];
+  const mode=select(d,'Mode',modes,a.mode,v=>{a.mode=v;fields();});
+  const positions=input(d,'Marker coordinates',a.positions,v=>a.positions=v),count=input(d,'Marker count',a.count,v=>a.count=v,'number');count.min=1;count.max=10000;
+  function relabel(n,text){n.parentElement.firstChild.textContent=text;}
+  function fields(){const axis=(a.axis||'x').toUpperCase();positions.parentElement.hidden=a.type!=='function'||a.mode!=='positions';count.parentElement.hidden=a.type!=='function'||a.mode!=='count';shape.parentElement.hidden=size.parentElement.hidden=!hasMarkers(a);if(min){relabel(min,`Function ${axis} min`);relabel(max,`Function ${axis} max`);relabel(positions,`Marker ${axis} coordinates`);mode.options[1].textContent=`Curve + specified ${axis} points`;}}
   const colorLabel=document.createElement('label');colorLabel.textContent='Palette color';d.append(colorLabel);
   const swatches=document.createElement('div');swatches.className='plot-swatch-grid';swatches.setAttribute('role','group');swatches.setAttribute('aria-label',`Palette color for ${a.name}`);
   for(const c of colors){const b=document.createElement('button');b.type='button';b.style.background=c;b.setAttribute('aria-label',`Choose ${c}`);b.title=c;b.setAttribute('aria-pressed',String(c===a.color));b.onclick=()=>{a.color=c;dot.style.background=c;for(const n of swatches.children)n.setAttribute('aria-pressed',String(n===b));update();};swatches.append(b);}d.append(swatches);
-  select(d,'Marker shape',['circle','square','triangle','diamond','hexagon','star'].map(v=>[v,v]),a.shape,v=>a.shape=v);
+  const shape=select(d,'Marker shape',['circle','square','triangle','diamond','hexagon','star'].map(v=>[v,v]),a.shape,v=>a.shape=v);
   const size=input(d,'Marker size (px)',a.markersize,v=>a.markersize=Number(v),'number');size.min=2;size.max=36;
+  fields();
   const dashLabel=document.createElement('label');dashLabel.className='plot-check';const dash=document.createElement('input');dash.type='checkbox';dash.checked=Boolean(a.dashed);dash.addEventListener('change',()=>{a.dashed=dash.checked;update();});dashLabel.append(dash,document.createTextNode('Dashed line'));d.append(dashLabel);
   const shadeLabel=document.createElement('label');shadeLabel.className='plot-check';const shade=document.createElement('input');shade.type='checkbox';shade.checked=a.shading;shade.addEventListener('change',()=>{a.shading=shade.checked;update();});shadeLabel.append(shade,document.createTextNode('Gradient shading'));d.append(shadeLabel);
   const error=document.createElement('p');error.className='plot-error';error.id=`plot-error-${a.id}`;d.append(error);
   const remove=document.createElement('button');remove.type='button';remove.textContent='Remove series';remove.onclick=()=>{series=series.filter(s=>s!==a);seriesUI();update();};d.append(remove);$('series').append(d);
  }
 }
+function checkbox(parent,text,checked,change){const l=document.createElement('label');l.className='plot-check';const n=document.createElement('input');n.type='checkbox';n.checked=checked;n.addEventListener('change',()=>{change(n.checked);update();});l.append(n,document.createTextNode(text));parent.append(l);return n;}
 function settings(){
  const num=id=>{const v=Number($(id).value);if(!$(id).value.trim()||!Number.isFinite(v))throw Error(`Enter a finite ${id} value.`);return v;};
  const s={};for(const id of ['width','height','xmin','xmax','linewidth','fontsize','ticksize','baseline'])s[id]=num(id);
@@ -48,7 +58,7 @@ async function update(){
  current=null;$('download').disabled=true;
  try{
   const s=settings();if(!series.length)throw Error('Add a function or CSV series to begin.');
-  let bad=false;const data=series.map(a=>{const e=document.getElementById(`plot-error-${a.id}`);try{if(!Number.isFinite(a.markersize)||a.markersize<2||a.markersize>36)throw Error('Marker size must be 2–36 px.');const p=prepare(a,s);e.textContent='';return p;}catch(err){e.textContent=err.message;e.closest('details').open=true;bad=true;}});
+  let bad=false;const data=series.map(a=>{const e=document.getElementById(`plot-error-${a.id}`);try{if(hasMarkers(a)&&(!Number.isFinite(a.markersize)||a.markersize<2||a.markersize>36))throw Error('Marker size must be 2–36 px.');const p=prepare(a,s);e.textContent='';return p;}catch(err){e.textContent=err.message;e.closest('details').open=true;bad=true;}});
   if(bad)throw Error('Correct the highlighted series before exporting.');
   $('status').dataset.error='false';$('status').textContent='Rendering labels…';
   const svg=await render(data,s);if(version!==revision)return;
@@ -69,7 +79,7 @@ function columns(){
 }
 $('csv').onchange=async()=>{try{const file=$('csv').files[0];if(!file)return;if(file.size>5*1024*1024)throw Error('CSV file must be smaller than 5 MB.');csvText=await file.text();columns();}catch(e){importStatus(e.message);}};
 $('header').onchange=()=>{if(csvText)columns();};
-$('add-expression').onclick=()=>{series.push(item('function',`Function ${series.filter(a=>a.type==='function').length+1}`,{formula:$('expression').value,min:$('xmin').value,max:$('xmax').value}));seriesUI();update();};
+$('add-expression').onclick=()=>{const axis=functionAxis($('expression').value,$('form').value);series.push(item('function',`Function ${series.filter(a=>a.type==='function').length+1}`,{formula:$('expression').value,axis,min:axis==='x'?$('xmin').value:$('ymin').value||0,max:axis==='x'?$('xmax').value:$('ymax').value||10}));seriesUI();update();};
 $('demo').onclick=demo;
 for(const id of ['width','height','xmin','xmax','ymin','ymax','xticks','yticks','xlabel','ylabel','title','caption','linewidth','fontsize','ticksize','baseline','legend'])$(id).addEventListener('input',update);
 $('apply-palette').onclick=()=>{const next=$('custom-palette').value.split(',').map(s=>s.trim());if(!next.length||next.length>90||next.some(c=>!/^#[\da-f]{6}$/i.test(c))){importStatus('Enter 1–90 colors in #RRGGBB format, separated by commas.');return;}colors=next;paletteUI();seriesUI();update();};

@@ -1,6 +1,7 @@
 import { scaleLinear } from 'd3-scale';
 import { line, area, curveLinear, curveMonotoneX } from 'd3-shape';
 import {label, wrapLabel} from './labels.js';
+import {hasMarkers} from './model.js';
 const NS='http://www.w3.org/2000/svg';
 function el(tag, attrs={}, text) {const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs)) n.setAttribute(k,v);if(text!==undefined)n.textContent=text;return n;}
 function add(parent,tag,attrs,text){const n=el(tag,attrs,text);parent.append(n);return n;}
@@ -20,7 +21,7 @@ export async function render(series,s){
  if(base-top<80)throw Error('Increase figure height or shorten the caption.');
  const vals=series.flatMap(a=>a.points.filter(p=>p[0]>=s.xmin && p[0]<=s.xmax && Number.isFinite(p[1])).map(p=>p[1]));
  if(!vals.length)throw Error('No visible data in the displayed X range.');
- let lo=Infinity,hi=-Infinity;for(const v of vals){lo=Math.min(lo,v);hi=Math.max(hi,v);}const shaded=series.some(a=>a.shading&&(a.type==='function'||a.mode!=='scatter'));if(shaded){lo=Math.min(lo,s.baseline);hi=Math.max(hi,s.baseline);}const pad=(hi-lo||Math.abs(hi)||1)*.08;
+ let lo=Infinity,hi=-Infinity;for(const v of vals){lo=Math.min(lo,v);hi=Math.max(hi,v);}const shaded=series.some(a=>a.axis!=='y'&&a.shading&&(a.type==='function'||a.mode!=='scatter'));if(shaded){lo=Math.min(lo,s.baseline);hi=Math.max(hi,s.baseline);}const pad=(hi-lo||Math.abs(hi)||1)*.08;
  lo=s.ymin??(s.yticks.length>1?s.yticks[0]:shaded&&lo===s.baseline?lo:lo-pad);hi=s.ymax??(s.yticks.length>1?s.yticks.at(-1):hi+pad);if(lo>=hi)throw Error('Y min must be smaller than Y max.');
  if(!s.yticks.length){const nice=scaleLinear().domain([lo,hi]).nice(5).domain();if(s.ymin===null)lo=nice[0];if(s.ymax===null)hi=nice[1];}
  const x=scaleLinear().domain([s.xmin,s.xmax]).range([left,right]),y=scaleLinear().domain([lo,hi]).range([base,top]);
@@ -31,9 +32,16 @@ export async function render(series,s){
  const plot=add(svg,'g',{'clip-path':'url(#plot-clip)'});
  series.forEach((a,i)=>{
   const curve=a.mode==='spline'?curveMonotoneX:curveLinear;
-  const finite=p=>Number.isFinite(p[1]);
+  const finite=p=>p.every(Number.isFinite);
   const drawLine=a.type==='function'||a.mode!=='scatter';
-  if(drawLine && a.shading){let peak=s.baseline;for(const p of a.points)if(finite(p)&&p[0]>=s.xmin&&p[0]<=s.xmax&&Math.abs(p[1]-s.baseline)>Math.abs(peak-s.baseline))peak=p[1];const grad=add(defs,'linearGradient',{id:`plot-shade-${i}`,gradientUnits:'userSpaceOnUse',x1:0,y1:y(peak),x2:0,y2:y(s.baseline)});for(const [offset,opacity] of [['0%','.4'],['30%','.18'],['60%','0'],['100%','0']])add(grad,'stop',{offset,'stop-color':a.color,'stop-opacity':opacity});add(plot,'path',{'data-series-shading':a.id,d:area().defined(finite).x(p=>x(p[0])).y0(y(s.baseline)).y1(p=>y(p[1])).curve(curve)(a.points),fill:`url(#plot-shade-${i})`});}
+  if(drawLine && a.shading){
+   const horizontal=a.axis==='y',dependent=horizontal?0:1;let peak=s.baseline;
+   for(const p of a.points)if(finite(p)&&p[0]>=s.xmin&&p[0]<=s.xmax&&Math.abs(p[dependent]-s.baseline)>Math.abs(peak-s.baseline))peak=p[dependent];
+   const grad=add(defs,'linearGradient',{id:`plot-shade-${i}`,gradientUnits:'userSpaceOnUse',x1:horizontal?x(peak):0,y1:horizontal?0:y(peak),x2:horizontal?x(s.baseline):0,y2:horizontal?0:y(s.baseline)});
+   for(const [offset,opacity] of [['0%','.4'],['30%','.18'],['60%','0'],['100%','0']])add(grad,'stop',{offset,'stop-color':a.color,'stop-opacity':opacity});
+   const shade=area().defined(finite).curve(curve);if(horizontal)shade.y(p=>y(p[1])).x0(x(s.baseline)).x1(p=>x(p[0]));else shade.x(p=>x(p[0])).y0(y(s.baseline)).y1(p=>y(p[1]));
+   add(plot,'path',{'data-series-shading':a.id,d:shade(a.points),fill:`url(#plot-shade-${i})`});
+  }
   if(drawLine)add(plot,'path',{'data-series-line':a.id,d:line().defined(finite).x(p=>x(p[0])).y(p=>y(p[1])).curve(curve)(a.points),fill:'none',stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none','stroke-linejoin':'round','stroke-linecap':'round'});
  });
  // All markers paint after all curves; opaque pastel interiors mask the lines.
@@ -48,6 +56,7 @@ export async function render(series,s){
  await label(svg,s.ylabel,{x:21,y:(top+base)/2,size:s.fontsize,anchor:'middle',rotate:-90});
  if(s.title)await label(svg,s.title,{x:(left+right)/2,y:20+s.fontsize*.4,size:s.fontsize,anchor:'middle'});
  for(let i=0;i<caption.length;i++)await label(svg,caption[i],{x:left,y:base+38+s.fontsize+i*lineHeight+lineHeight,size:s.fontsize});
- if(s.legend)for(let i=0;i<series.length;i++){const a=series[i],py=top+22+i*Math.max(24,lineHeight);add(svg,'path',{d:`M${left+15},${py}h28`,stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none'});marker(svg,a.shape,left+29,py,a.markersize,a.color);await label(svg,a.name,{x:left+54,y:py+s.fontsize*.35,size:s.fontsize,color:a.color});}
+ const legendSeries=s.legend?series.filter(a=>a.legend!==false):[];
+ for(let i=0;i<legendSeries.length;i++){const a=legendSeries[i],py=top+22+i*Math.max(24,lineHeight),entry=add(svg,'g',{'data-legend-series':a.id});if(a.type==='function'||a.mode!=='scatter')add(entry,'path',{d:`M${left+15},${py}h28`,stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none'});if(hasMarkers(a))marker(entry,a.shape,left+29,py,a.markersize,a.color);await label(entry,a.name,{x:left+54,y:py+s.fontsize*.35,size:s.fontsize,color:a.color});}
  return svg;
 }
