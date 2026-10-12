@@ -15,16 +15,18 @@ export const palette = [
 ].flat();
 const ops = {
  Add: (...v)=>v.reduce((a,b)=>a+b,0), Multiply: (...v)=>v.reduce((a,b)=>a*b,1),
+ InvisibleOperator: (...v)=>v.reduce((a,b)=>a*b,1),
  Subtract:(a,b)=>a-b, Divide:(a,b)=>a/b, Negate:a=>-a, Power:(a,b)=>Math.pow(a,b),
  Square:a=>a*a, Sqrt:Math.sqrt, Root:(a,b=2)=> b%2 && a<0 ? -Math.pow(-a,1/b):Math.pow(a,1/b),
  Exp:Math.exp, Ln:Math.log, Log:(a,b=10)=>Math.log(a)/Math.log(b), Abs:Math.abs,
  Sin:Math.sin, Cos:Math.cos, Tan:Math.tan, Arcsin:Math.asin, Arccos:Math.acos, Arctan:Math.atan,
  Sinh:Math.sinh, Cosh:Math.cosh, Tanh:Math.tanh, Rational:(a,b)=>a/b
 };
-function compile(node) {
+function compile(node, bindings=new Set(), allowX=true) {
  if (typeof node==='number') return ()=>node;
  if (typeof node==='string') {
-  if (node==='x') return x=>x;
+  if(bindings.has(node))return (x,scope)=>scope[node];
+  if (node==='x') {if(!allowX)throw Error('Sum/product bounds must be fixed finite integers or depend on an outer index, not x.');return x=>x;}
   const constants={Pi:Math.PI,ExponentialE:Math.E,e:Math.E};
   if (node in constants) return ()=>constants[node];
   throw Error(`Unsupported symbol: ${node}. Only x, π and e are supported.`);
@@ -32,15 +34,25 @@ function compile(node) {
  if (node && !Array.isArray(node) && 'num' in node) {
   const n=Number(node.num); if (Number.isFinite(n)) return ()=>n;
  }
- if (Array.isArray(node) && node[0]==='Delimiter') return compile(node[1]);
+ if (Array.isArray(node) && node[0]==='Delimiter') return compile(node[1],bindings,allowX);
+ if (Array.isArray(node) && ['Sum','Product'].includes(node[0])) {
+  const range=node[2];
+  if(node.length!==3 || !Array.isArray(range) || range[0]!=='Tuple' || range.length!==4 || typeof range[1]!=='string' || range[1]==='Nothing' || range.slice(2).some(v=>v==='Nothing'||v==='PositiveInfinity'||v==='NegativeInfinity'))throw Error('Sum/product requires an index and finite integer bounds, e.g. \\sum_{k=1}^{5} x^k. Infinite or unbounded series are unsupported.');
+  const index=range[1],lo=compile(range[2],bindings,false),hi=compile(range[3],bindings,false);
+  const body=compile(node[1],new Set([...bindings,index]),allowX),product=node[0]==='Product';
+  function bounds(x,scope,state={steps:0}){const start=lo(x,scope,state),end=hi(x,scope,state);if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end))throw Error('Sum/product bounds must evaluate to finite safe integers.');if(end-start+1>1000)throw Error('Use at most 1,000 terms in each sum/product.');return [start,end];}
+  if(!bindings.size)bounds(0,Object.create(null));
+  return (x,scope,state)=>{const [start,end]=bounds(x,scope,state);const local=Object.assign(Object.create(null),scope);let result=product?1:0;for(let i=start;i<=end;i++){if(++state.steps>10000)throw Error('Nested sums/products exceed 10,000 total terms per evaluation.');local[index]=i;const value=body(x,local,state);result=product?result*value:result+value;}return result;};
+ }
  if (!Array.isArray(node) || !ops[node[0]]) throw Error(`Unsupported expression or function: ${Array.isArray(node)?node[0]:'invalid input'}.`);
- const args=node.slice(1).map(compile), op=ops[node[0]];
- return x=>op(...args.map(f=>f(x)));
+ const args=node.slice(1).map(n=>compile(n,bindings,allowX)), op=ops[node[0]];
+ return (x,scope,state)=>op(...args.map(f=>f(x,scope,state)));
 }
 export function expression(source) {
  let latex=source.trim().replace(/^\$\$?([\s\S]*?)\$\$?$/, '$1').replace(/^\\[([]([\s\S]*?)\\[)\]]$/, '$1').replace(/^y\s*=/,'');
  if (!latex) throw Error('Enter a LaTeX function.');
- return compile(syntax.parse(latex));
+ const f=compile(syntax.parse(latex));
+ return x=>f(x,Object.create(null),{steps:0});
 }
 export function numbers(source, ticks=false) {
  if (!source.trim()) return [];

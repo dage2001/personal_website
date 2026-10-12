@@ -34,7 +34,7 @@ export async function render(series,s){
   const finite=p=>Number.isFinite(p[1]);
   const drawLine=a.type==='function'||a.mode!=='scatter';
   if(drawLine && a.shading){let peak=s.baseline;for(const p of a.points)if(finite(p)&&p[0]>=s.xmin&&p[0]<=s.xmax&&Math.abs(p[1]-s.baseline)>Math.abs(peak-s.baseline))peak=p[1];const grad=add(defs,'linearGradient',{id:`plot-shade-${i}`,gradientUnits:'userSpaceOnUse',x1:0,y1:y(peak),x2:0,y2:y(s.baseline)});for(const [offset,opacity] of [['0%','.4'],['30%','.18'],['60%','0'],['100%','0']])add(grad,'stop',{offset,'stop-color':a.color,'stop-opacity':opacity});add(plot,'path',{'data-series-shading':a.id,d:area().defined(finite).x(p=>x(p[0])).y0(y(s.baseline)).y1(p=>y(p[1])).curve(curve)(a.points),fill:`url(#plot-shade-${i})`});}
-  if(drawLine)add(plot,'path',{d:line().defined(finite).x(p=>x(p[0])).y(p=>y(p[1])).curve(curve)(a.points),fill:'none',stroke:a.color,'stroke-width':s.linewidth,'stroke-linejoin':'round','stroke-linecap':'round'});
+  if(drawLine)add(plot,'path',{'data-series-line':a.id,d:line().defined(finite).x(p=>x(p[0])).y(p=>y(p[1])).curve(curve)(a.points),fill:'none',stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none','stroke-linejoin':'round','stroke-linecap':'round'});
  });
  // All markers paint after all curves; opaque pastel interiors mask the lines.
  const markers=add(svg,'g',{'data-layer':'markers','clip-path':'url(#plot-clip)'});
@@ -48,6 +48,6 @@ export async function render(series,s){
  await label(svg,s.ylabel,{x:21,y:(top+base)/2,size:s.fontsize,anchor:'middle',rotate:-90});
  if(s.title)await label(svg,s.title,{x:(left+right)/2,y:20+s.fontsize*.4,size:s.fontsize,anchor:'middle'});
  for(let i=0;i<caption.length;i++)await label(svg,caption[i],{x:left,y:base+38+s.fontsize+i*lineHeight+lineHeight,size:s.fontsize});
- if(s.legend)for(let i=0;i<series.length;i++){const a=series[i],py=top+22+i*Math.max(24,lineHeight);add(svg,'path',{d:`M${left+15},${py}h28`,stroke:a.color,'stroke-width':s.linewidth});marker(svg,a.shape,left+29,py,a.markersize,a.color);await label(svg,a.name,{x:left+54,y:py+s.fontsize*.35,size:s.fontsize,color:a.color});}
+ if(s.legend)for(let i=0;i<series.length;i++){const a=series[i],py=top+22+i*Math.max(24,lineHeight);add(svg,'path',{d:`M${left+15},${py}h28`,stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none'});marker(svg,a.shape,left+29,py,a.markersize,a.color);await label(svg,a.name,{x:left+54,y:py+s.fontsize*.35,size:s.fontsize,color:a.color});}
  return svg;
 }
