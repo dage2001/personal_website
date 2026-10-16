@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792188565">
+  <link rel="stylesheet" href="/assets/main.css?v=1792188775">
   <link rel="canonical" href="https://jordan-wang.win/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792188565" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792188775" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -181,13 +181,12 @@ window.MathJax = {
 </aside>
 
 <h2 id="0-foreword">0. Foreword</h2>
-
 <p>This note provides a glimpse into the modern morphology of analog electronics and RF semiconductor devices. Most textbooks typically begin with low-level prerequisites, such as Kirchhoff’s circuit laws, Thévenin equivalent circuits, and band theory in semiconductors. While it may be an appropriate way for most learners, those who major in physics or have some experience with solid-state materials don’t really need this level of guidance. In fact, this old-fashioned approach isn’t very efficient when you need a quick refresher on analog electronics circuit design.</p>
 
 <p>In the following sections, we’ll dive straight into <strong>field-effect transistors (FETs)</strong> and then move on to some typical amplifier circuits. <strong>Bipolar junction transistors (BJTs)</strong> aren’t chosen as an entry point for this note, unlike most textbooks, which claim they’re quickly becoming obsolete. As of 2026, the market has largely been taken over by <strong>metal–oxide–semiconductor field-effect transistors (MOSFETs)</strong> for fast-switching and <strong>insulated-gate bipolar transistors (IGBTs)</strong> for high-power handling. However, this excuse doesn’t hold water in certain specific fields where BJTs remain widely used – often due to their robustness and low cost.</p>
 
 <h2 id="1-field-effect-transistors">1. Field-effect Transistors</h2>
-
+<h3 id="11-some-history">1.1 Some History</h3>
 <p>I don’t plan to overburden this note with too may documentaries and fairytales, but it’s worth mentioning the etymology of the word <strong>“transistor”</strong>, which may help us develop a clear understanding of the underlying physics.</p>
 
 <aside class="callout callout-notes" data-callout="notes" aria-label="Transfer + Resistor = Transistor">
@@ -202,13 +201,10 @@ window.MathJax = {
   <li>The concept of FETs was actually first patented in 1925, 17 years earlier than the first observation of transistor effect in the point-contact transistor in 1947.</li>
   <li>The first BJT was invented by W. Shockley in 1948.</li>
   <li>JFET is the first device to be successfully built by J. Nishizawa and Y. Watanabe in 1950, but in the mid-1950s BJTs were the main stream due to FETs’ fabrication difficulty.</li>
-  <li>~ To be updated :) ~</li>
-</ul>
-
-<h3 id="11-basic-concepts">1.1. Basic Concepts</h3>
-
-<p>First, we introduce the typical structure of an N-type MOSFET</p>
-<ul>
+  <li>~ To be updated :) ~
+    <h3 id="12-basic-concepts">1.2 Basic Concepts</h3>
+    <p>First, we introduce the typical structure of an N-type MOSFET</p>
+  </li>
   <li><strong>MOS:</strong> Metal-oxide-semiconductor sandwich, oxide layer typical thickness (1~10 nm).</li>
   <li><strong>Channel:</strong> Narrow path where the charge carriers can flow through, controllable by voltage.</li>
   <li><strong>Source:</strong> The terminal where the charge carriers enter the channel.</li>
@@ -264,7 +260,7 @@ window.MathJax = {
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792188565"></script>
+<script src="/assets/js/site.js?v=1792188775"></script>
 
 
   </body>
