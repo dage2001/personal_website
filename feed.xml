@@ -3,9 +3,9 @@
   <channel>
     <title>Junda Wang</title>
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
-    <link>/</link>
-    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 12 Oct 2026 18:54:17 +0000</lastBuildDate>
+    <link>https://dage2001.github.io/personal_website/</link>
+    <atom:link href="https://dage2001.github.io/personal_website/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Fri, 16 Oct 2026 12:57:35 +0000</lastBuildDate>
     
     <item>
       <title>Topological Physics for Babies</title>
@@ -40,8 +40,8 @@
 
 </description>
       <pubDate>Mon, 12 Oct 2026 00:00:00 +0000</pubDate>
-      <link>/notes/topological-physics-for-babies/</link>
-      <guid isPermaLink="true">/notes/topological-physics-for-babies/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/topological-physics-for-babies/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/topological-physics-for-babies/</guid>
     </item>
     
     <item>
@@ -53,8 +53,8 @@
 这篇短文是一个起点；后续版本将加入公式、数值示例以及相关研究链接。
 </description>
       <pubDate>Thu, 30 Jul 2026 00:00:00 +0000</pubDate>
-      <link>/notes/floquet-photonics-introduction/zh/</link>
-      <guid isPermaLink="true">/notes/floquet-photonics-introduction/zh/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/floquet-photonics-introduction/zh/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/floquet-photonics-introduction/zh/</guid>
     </item>
     
     <item>
@@ -66,40 +66,40 @@ This viewpoint provides a compact language for phenomena such as frequency conve
 This short note is a starting point. Future revisions will add equations, numerical examples, and links to related research.
 </description>
       <pubDate>Thu, 30 Jul 2026 00:00:00 +0000</pubDate>
-      <link>/notes/floquet-photonics-introduction/</link>
-      <guid isPermaLink="true">/notes/floquet-photonics-introduction/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/floquet-photonics-introduction/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/floquet-photonics-introduction/</guid>
     </item>
     
     <item>
       <title>Review: Perfectly Matched Layers Implementation &amp; Stability</title>
       <description>1. Brief Intro: PML (1) Bérenger’s PML with split fields [!NOTE] Wave Impedance of Lossy Materials When the magnetic loss exists, the characteristic impedance can be expressed as JUNDAMATHBLOCKTOKEN0END which degenerates to the lossless expression when JUNDAMATHINLINETOKEN0END. Proof. From the frequency domain Maxwell equation JUNDAMATHBLOCKTOKEN1END The characteristic impedance is defined as the magnitude ratio of the electric and magnetic fields of the wave travelling through free space JUNDAMATHBLOCKTOKEN2END For simplicity, we only deal with 2D transverse electric (JUNDAMATHINLINETOKEN1END) Maxwell equation. The simplified dimensionless Maxwell equations in a lossy medium are JUNDAMATHBLOCKTOKEN13END The Bérenger’s idea is that the orthogonal magnetic field...</description>
       <pubDate>Sun, 12 Jul 2026 00:00:00 +0000</pubDate>
-      <link>/notes/review-perfectly-matched-layers-implementation-stability/</link>
-      <guid isPermaLink="true">/notes/review-perfectly-matched-layers-implementation-stability/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/review-perfectly-matched-layers-implementation-stability/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/review-perfectly-matched-layers-implementation-stability/</guid>
     </item>
     
     <item>
       <title>OpenEMS Source Code Breakdown</title>
       <description>1. Overview of OpenEMS (1) Languages Composition C++: 56.5%, the core solver is based on C++ EC-FDTD solver Field propagator MATLAB / Octave: 33.3%, this part serves as MATLAB / Octave interface bridging to the C++ core. These files end with a suffix .m. The MATLAB / Octave interface doesn’t directly call the C++ core. It will simply invoke openEMS.exe with a generated setup.xml. Python + Cython: 7.1% + 1.7%, this part serves as the Python interface. The Python interface communicate with the C++ core directly. This link process is completed by Cython. Cython will make use of .dll and/or...</description>
       <pubDate>Sun, 21 Jun 2026 00:00:00 +0000</pubDate>
-      <link>/notes/openems-code-break-down/</link>
-      <guid isPermaLink="true">/notes/openems-code-break-down/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/openems-code-break-down/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/openems-code-break-down/</guid>
     </item>
     
     <item>
       <title>Radiation Forces in Scattering Media as Virtual Work</title>
       <description>1. Motivation The Generalized Wigner–Smith (GWS) framework connects incident wavefronts to radiation forces on objects embedded in complex scattering environments. Existing derivations rely on field-theoretic variational identities within either acoustics or electromagnetism separately. Here we show that the central result — the identification of the GWS matrix expectation value with a generalized radiation force — follows directly and in full generality from the principle of virtual work, with the port phase shifts serving as the natural energy bookkeeping variable. This approach (i) unifies acoustic and electromagnetic cases without invoking Maxwell’s stress tensor or acoustic radiation pressure explicitly, (ii) makes the...</description>
       <pubDate>Wed, 20 May 2026 00:00:00 +0000</pubDate>
-      <link>/notes/radiation-forces-in-scattering-media/</link>
-      <guid isPermaLink="true">/notes/radiation-forces-in-scattering-media/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/radiation-forces-in-scattering-media/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/radiation-forces-in-scattering-media/</guid>
     </item>
     
     <item>
       <title>【整活】混合型有水乙醇的制备与应用（一）</title>
       <description>Abstract 有水乙醇（Ethanol with Water）的发明距今已有超过千年的历史，其在当代社会中也起到越来越重要的作用。一种主要的混合型有水乙醇（Cocktail Type）通过混合多种有机溶液，达到缓解乙醇本身刺激性气味的目的。本文主要记录了部分混合型有水乙醇的配料与制备方法，并将在后续部分中结合具体场景讨论相关应用。 Main 1. 干马天尼（Dry Martini） 成分：金酒60ml + 干味美思20ml + 橄榄 地点：雅典卫城山顶酒吧 2. 椰林飘香（Pina Colada） 成分：白朗姆45ml + 椰子利口酒15ml + 菠萝汁45～60ml + 椰奶60ml （+ 椰子糖浆10ml） 地点：北京南锣鼓巷 3. 意式浓缩马天尼（Espresso Martini） 成分：伏特加50ml + 咖啡利口酒30ml + 糖浆10ml + 意式浓缩20～25ml 地点：Holy Cow Tap House 4-1. 抹茶尼格罗尼（Matcha Negroni） 成分：金酒30ml + 甜味美思30ml + 金巴利30ml + 抹茶粉1/4茶匙 地点：Lausanne LCC 4-2. 柑迈泰（Grand Mai-Tai） 成分：白朗姆30ml + 黑朗姆30ml + 柑曼怡（Grand Marnier）45ml + 杏仁糖浆（Orgeat Syrup）15ml + 柠檬汁15ml 地点：Lausanne LCC 5-1. 雨果LCC（LCC Hugo） 成分（推测）：长相思白葡萄酒（Sauvignon Blanc）150ml + 接骨木花糖浆20ml + 气泡水50ml 地点：Lausanne LCC 5-2. 夏日骡子（Summer Mule） 成分：覆盆子味伏特加60ml + 姜汁啤酒150ml + 柠檬汁15ml + 大黄浓缩糖浆10ml（和莫斯科骡子区别似乎仅在于伏特加味道和大黄浓缩汁） 地点：Lausanne LCC 6. 长岛冰茶-自制缺料版（Long Island Tea） 成分：白朗姆15ml + 伏特加15ml...</description>
       <pubDate>Sun, 13 Apr 2025 00:00:00 +0000</pubDate>
-      <link>/notes/review-ethanol-with-water/</link>
-      <guid isPermaLink="true">/notes/review-ethanol-with-water/</guid>
+      <link>https://dage2001.github.io/personal_website/notes/review-ethanol-with-water/</link>
+      <guid isPermaLink="true">https://dage2001.github.io/personal_website/notes/review-ethanol-with-water/</guid>
     </item>
     
     
