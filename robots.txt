@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://www.jordan-wang.win/sitemap.xml
+Sitemap: https://jordan-wang.win/sitemap.xml
