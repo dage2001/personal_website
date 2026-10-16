@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792170088">
+  <link rel="stylesheet" href="/assets/main.css?v=1792188369">
   <link rel="canonical" href="/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792170088" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792188369" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -192,6 +192,7 @@ window.MathJax = {
 <p>Several useful books, articles, video tutorials are listed in the following</p>
 <ul>
     <li>P. Horowitz and W. Hill, <em>The Art of Electronics, 3rd Edition</em></li>
+    <li><a href="https://www.bilibili.com/video/BV1XPYN6DEqU/?share_source=copy_web&amp;vd_source=238345cc7b030d8188e97bcf82a63b3c">Bilibili - Analog Electronics Technology</a></li>
   </ul>
 </div>
 </aside>
@@ -213,7 +214,7 @@ window.MathJax = {
 </div>
 </aside>
 
-<p>It’s also interesting to collect some surprising trivia and fun fact below</p>
+<p>It’s also interesting to collect some surprising trivia and fun facts below</p>
 <ul>
   <li>The concept of FETs was actually first patented in 1925, 17 years earlier than the first observation of transistor effect in the point-contact transistor in 1947.</li>
   <li>The first BJT was invented by W. Shockley in 1948.</li>
@@ -221,6 +222,24 @@ window.MathJax = {
   <li>~ To be updated :) ~
     <h3 id="11-basic-concepts">1.1. Basic Concepts</h3>
   </li>
+</ul>
+
+<p>First, we introduce the typical structure of an N-type MOSFET</p>
+<ul>
+  <li><strong>MOS:</strong> Metal-oxide-semiconductor sandwich, oxide layer typical thickness (1~10 nm).</li>
+  <li><strong>Channel:</strong> Narrow path where the charge carriers can flow through, controllable by voltage.</li>
+  <li><strong>Source:</strong> The terminal where the charge carriers enter the channel.</li>
+  <li><strong>Drain:</strong> The terminal where the charge carriers leave the channel.</li>
+  <li><strong>Gate:</strong> The terminal where a voltage is applied to control the channel’s on/off.
+<img src="/images/notes/learning-fets-analog-electronics/cross_section_nmosfet.png" alt="The schematic of a NMOS from wikipedia|600" /></li>
+</ul>
+
+<p>There are typically 3 terminals in a MOSFET, essentially 2 independent voltages. Usually we choose the source as our voltage reference. In other words, the 2 degrees of freedom (DoFs) are assigned to <span class="math-inline" role="math">\(V_\text{DS}\)</span> and <span class="math-inline" role="math">\(V_\text{GS}\)</span>. The following situations arise when playing with these parameters</p>
+
+<ul>
+  <li><span class="math-inline" role="math">\(V_\text{GS}=0,\, V_\text{DS}\neq 0\)</span>: At least one out of the two PN-junctions are reversely biased. The depletion layer of that junction becomes thicker and blocks the current.</li>
+  <li><span class="math-inline" role="math">\(0&lt;V_\text{GS}&lt;V_\text{th},\, V_\text{DS}= 0\)</span>: Positive charges begin to accumulate on the gate, attracting more negative carriers in the P-type substrate, which depletes the area underneath. The channel becomes even more insulated at first. But when the depletion saturates, free electrons from the source and drain begin to creep into the channel. It forms a layer called <strong>inversion layer</strong>.</li>
+  <li><span class="math-inline" role="math">\(V_\text{GS}=V_\text{th},\, V_\text{DS}=0\)</span>: The two separated inversion layers touch each other and form the channel. The voltage is referred to as the <strong>threshold voltage</strong>.</li>
 </ul>
 
   </div>
@@ -262,7 +281,7 @@ window.MathJax = {
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792170088"></script>
+<script src="/assets/js/site.js?v=1792188369"></script>
 
 
   </body>
