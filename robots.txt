@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dage2001.github.io/personal_website/sitemap.xml
+Sitemap: https://www.jordan-wang.win/sitemap.xml
