@@ -5,11 +5,11 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>https://jordan-wang.win/</link>
     <atom:link href="https://jordan-wang.win/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Fri, 16 Oct 2026 17:01:28 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 16 Oct 2026 22:06:09 +0000</lastBuildDate>
     
     <item>
       <title>[Learnings] FETs &amp; Analog Electronics</title>
-      <description>[!QUOTE] References Several useful books, articles, video tutorials are listed in the following P. Horowitz and W. Hill, The Art of Electronics, 3rd Edition 0. Foreword This note provides a glimpse into the modern morphology of analog electronics and RF semiconductor devices. Most textbooks typically begin with low-level prerequisites, such as Kirchhoff’s circuit laws, Thévenin equivalent circuits, and band theory in semiconductors. While it may be an appropriate way for most learners, those who major in physics or have some experience with solid-state materials don’t really need this level of guidance. In fact, this old-fashioned approach isn’t very efficient when...</description>
+      <description>[!QUOTE] References Several useful books, articles, video tutorials are listed in the following P. Horowitz and W. Hill, The Art of Electronics, 3rd Edition Bilibili - Analog Electronics Technology 0. Foreword This note provides a glimpse into the modern morphology of analog electronics and RF semiconductor devices. Most textbooks typically begin with low-level prerequisites, such as Kirchhoff’s circuit laws, Thévenin equivalent circuits, and band theory in semiconductors. While it may be an appropriate way for most learners, those who major in physics or have some experience with solid-state materials don’t really need this level of guidance. In fact, this old-fashioned...</description>
       <pubDate>Fri, 16 Oct 2026 00:00:00 +0000</pubDate>
       <link>https://jordan-wang.win/notes/learning-fets-analog-electronics/</link>
       <guid isPermaLink="true">https://jordan-wang.win/notes/learning-fets-analog-electronics/</guid>
