@@ -1,0 +1,76 @@
+name: Sync and deploy Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-from-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main snapshot
+        uses: actions/checkout@v6
+        with:
+          path: main-site
+
+      - name: Export static site for the custom domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          domain=$(tr -d '\r\n' < main-site/CNAME)
+          python3 main-site/.github/scripts/export_pages.py \
+            --source main-site --output pages-artifact --url "https://$domain"
+
+      - name: Checkout pages mirror
+        uses: actions/checkout@v6
+        with:
+          ref: pages
+          path: pages-mirror
+
+      - name: Synchronize generated files including deletions
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          rsync -a --delete --exclude=.git/ pages-artifact/ pages-mirror/
+          cd pages-mirror
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "Sync main ${SOURCE_SHA}"
+            git push origin HEAD:pages
+          fi
+
+      - name: Upload deployment artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: pages-artifact
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

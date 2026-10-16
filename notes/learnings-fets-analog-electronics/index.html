@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[Learnings] FETs &amp; Analog Electronics - Junda Wang</title>
+  <meta name="description" content="A continuously-updated learning note on FETs and analog electronics">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="[Learnings] FETs &amp; Analog Electronics">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/notes/learnings-fets-analog-electronics/">
+  <meta property="og:image" content="/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="[Learnings] FETs &amp; Analog Electronics">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1792166780">
+  <link rel="canonical" href="/notes/learnings-fets-analog-electronics/">
+  
+    
+    
+  <link rel="alternate" hreflang="en" href="/notes/learnings-fets-analog-electronics/">
+      
+  <link rel="alternate" hreflang="x-default" href="/notes/learnings-fets-analog-electronics/">
+      
+    
+  
+  <link rel="icon" href="/favicon.ico?v=1792166780" sizes="any">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  output: {
+    displayOverflow: 'scroll'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "[Learnings] FETs &amp; Analog Electronics",
+    "url": "/notes/learnings-fets-analog-electronics/",
+    "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.",
+    "author": {
+      "@type": "Person",
+      "name": "Junda Wang",
+      "jobTitle": "PhD Candidate",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "EPFL"
+      }
+    }
+  }
+  </script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="/notes/" aria-current="page">Notes</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">[Learnings] FETs &amp; Analog Electronics</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2026-10-16T00:00:00+00:00" itemprop="datePublished">Oct 16, 2026</time>
+    
+  </p>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <aside class="callout callout-quote" data-callout="quote" aria-label="References">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>References</div>
+<div class="callout-content">
+<p>Several useful books, articles, video tutorials are listed in the following</p>
+<ul>
+    <li>P. Horowitz and W. Hill, <em>The Art of Electronics, 3rd Edition</em></li>
+  </ul>
+</div>
+</aside>
+
+<h2 id="0-foreword">0. Foreword</h2>
+
+<p>This note provides a glimpse into the modern morphology of analog electronics and RF semiconductor devices. Most textbooks typically begin with low-level prerequisites, such as Kirchhoff’s circuit laws, Thévenin equivalent circuits, and band theory in semiconductors. While it may be an appropriate way for most learners, those who major in physics or have some experience with solid-state materials don’t really need this level of guidance. In fact, this old-fashioned approach isn’t very efficient when you need a quick refresher on analog electronics circuit design.</p>
+
+<p>In the following sections, we’ll dive straight into <strong>field-effect transistors (FETs)</strong> and then move on to some typical amplifier circuits. <strong>Bipolar junction transistors (BJTs)</strong> aren’t chosen as an entry point for this note, unlike most textbooks, which claim they’re quickly becoming obsolete. As of 2026, the market has largely been taken over by <strong>metal–oxide–semiconductor field-effect transistors (MOSFETs)</strong> for fast-switching and <strong>insulated-gate bipolar transistors (IGBTs)</strong> for high-power handling. However, this excuse doesn’t hold water in certain specific fields where BJTs remain widely used – often due to their robustness and low cost.</p>
+
+<h2 id="1-field-effect-tansistors">1. Field-effect Tansistors</h2>
+
+<p>I don’t plan to overburden this note with too may documentaries and fairytales, but it’s worth mentioning the etymology of the word <strong>“transistor”</strong>, which may help us develop a clear understanding of the underlying physics.</p>
+
+<aside class="callout callout-notes" data-callout="notes" aria-label="Transfer + Resistor = Transistor">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Transfer + Resistor = Transistor</div>
+<div class="callout-content">
+<p>The word <strong>transistor</strong> was coined in May 1948 by Bell Labs electrical engineer Walter Brattain and science-fiction author John Robinson Pierce. It’s a portmanteau of “transfer” and “resistor”, which unveils how the solid-state device acts as an electrical resistor that transfers a signal across varying resistance levels (from a low-resistance path to a high-resistance path) to amplify electrical current.</p>
+</div>
+</aside>
+
+<p>It’s also interesting to collect some surprising trivia and fun fact below</p>
+<ul>
+  <li>The concept of FETs was actually first patented in 1925, 17 years earlier than the first observation of transistor effect in the point-contact transistor in 1947.</li>
+  <li>The first BJT was invented by W. Shockley in 1948.</li>
+  <li>JFET is the first device to be successfully built by J. Nishizawa and Y. Watanabe in 1950, but in the mid-1950s BJTs were the main stream due to FETs’ fabrication difficulty.</li>
+  <li>~ To be updated :) ~
+    <h3 id="11-basic-concepts">1.1. Basic Concepts</h3>
+  </li>
+</ul>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js?v=1792166780"></script>
+
+
+  </body>
+
+</html>
