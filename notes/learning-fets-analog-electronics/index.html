@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792245076">
+  <link rel="stylesheet" href="/assets/main.css?v=1792256092">
   <link rel="canonical" href="https://jordan-wang.win/notes/learning-fets-analog-electronics/">
   
     
@@ -45,7 +45,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792245076" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792256092" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -223,7 +223,7 @@ window.MathJax = {
 <p>There are typically 3 terminals in a MOSFET, essentially 2 independent voltages. Usually we choose the source as our voltage reference. In other words, the 2 degrees of freedom (DoFs) are assigned to <span class="math-inline" role="math">\(V_\text{DS}\)</span> and <span class="math-inline" role="math">\(V_\text{GS}\)</span>. The following situations arise when playing with these parameters</p>
 
 <ul>
-  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=0,\, V_\text{DS}\neq 0\)</span>:</strong> At least one out of the two PN-junctions are reversely biased. The depletion layer of that junction becomes thicker and blocks the current.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=0,\, V_\text{DS}\neq 0\)</span>:</strong> At least one out of the two PN-junctions is reversely biased. The depletion layer of that junction becomes thicker and blocks the current.</li>
   <li><strong><span class="math-inline" role="math">\(0&lt;V_\text{GS}&lt;V_\text{th},\, V_\text{DS}= 0\)</span>:</strong> Positive charges begin to accumulate on the gate, attracting more negative carriers in the P-type substrate, which depletes the area underneath. The channel becomes even more insulated at first. But when the depletion saturates, free electrons from the source and drain begin to creep into the channel. It forms a layer called <strong>inversion layer</strong>.</li>
   <li><strong><span class="math-inline" role="math">\(V_\text{GS}=V_\text{th},\, V_\text{DS}=0\)</span>:</strong> The two separated inversion layers touch each other and form the channel. The voltage is referred to as the <strong>threshold voltage</strong>.</li>
   <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, 0\leq V_\text{DS}&lt; V_\text{GS}-V_\text{th}\)</span>:</strong> The electron density in the channel is proportional to <span class="math-inline" role="math">\(V_\text{GS}-V_\text{th}\)</span>. When the gate voltage increases, the channel becomes more conductive. Therefore, if applying drain-source voltage, current will begin to flow in the channel. But the channel width decreases from the source to the drain, since <span class="math-inline" role="math">\(V_\text{GD}&lt;V_\text{GS}\)</span>.</li>
@@ -231,7 +231,45 @@ window.MathJax = {
   <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, V_\text{GS}-V_\text{th}&lt;V_\text{DS}\)</span>:</strong> If we keep increasing the drain-source voltage, the current won’t drop although the channel has been pinched off. A tiny slit with strong electrical field will appear around the drain, where electrons in the channel will fleet towards the drain. In this region, the gate voltage <span class="math-inline" role="math">\(V_\text{GS}\)</span> has strong control on the channel current <span class="math-inline" role="math">\(I_\text{D}\)</span>. Therefore, majority of the MOSFET-based amplifiers work in this region.</li>
 </ul>
 
-<h3 id="13-characteristics">1.3 Characteristics</h3>
+<h3 id="13-characteristics-of-nmosfets">1.3 Characteristics of NMOSFETs</h3>
+<p><img src="/images/notes/learning-fets-analog-electronics/typical_iv_curve_of_n_type_mosfets.png" alt="Typical IV Curve of N-type MOSFETS|800" /></p>
+
+<p>As just analyzed, the “<strong>current response</strong>” of a MOSFETs can be summarized into a 2-variable function</p>
+
+<div class="math-display" role="math">\[I_\text{D}=f(V_\text{GS},V_\text{DS})=
+\begin{cases}
+0,\quad &amp;V_\text{GS}\leq  V_\text{th}\
+2\kappa\left[(V_\text{GS}-V_\text{th})V_\text{DS}-V_\text{DS}^2/2\right],\quad &amp; 0&lt;V_\text{DS}&lt;V_\text{GS}-V_\text{th}\
+\kappa(V_\text{GS}-V_\text{th})^2,\quad &amp; V_\text{GS}-V_\text{th}\leq V_\text{DS}
+\end{cases}.
+\tag{1}\]</div>
+
+<p>We plot out the piecewise function above and find 3 distinct regions (one not indicated),</p>
+<ul>
+  <li><strong>Subthreshold Region:</strong> The gate closes and almost no current from the source to the drain. The current is from thermal fluctuation and carrier diffusion.$<span class="math-inline" role="math">\(I_\text{D}\sim \exp \left(\frac{V_\text{GS}-V_\text{th}}{n\cdot U_\text{T}}\right)\left[1-\exp \left(-\frac{V_\text{DS}}{U_\text{T}}\right)\right], \tag{2}$\)</span> where <span class="math-inline" role="math">\(U_\text{T} = \frac{kT}{q}\)</span> is called <strong>thermal voltage</strong> (<span class="math-inline" role="math">\(\sim 26\,\text{mV}\)</span> at <span class="math-inline" role="math">\(300\,\mathrm{K}\)</span>).</li>
+  <li><strong>Linear Region:</strong> In this region, NMOSFETs are conductive just like a linear resistor. The current increases linearly with the drain-source voltage, with a resistance proportional to the <strong>gate drive</strong> <span class="math-inline" role="math">\(V_\text{GS}-V_\text{th}\)</span>.</li>
+  <li><strong>Saturation Region:</strong> The channel saturates and current only relies on the gate drive.</li>
+</ul>
+
+<p>Practically, a SPICE model is established to describe these properties, including other features such as switching speed. We list some useful specs below</p>
+
+<p>|    Group     |    Parameter     |  Unit   |                   What it means                   |                           Typical value                            |                                     Manufacturing spread (approx.)                                     |
+| :———-: | :————–: | :—–: | :———————————————–: | :—————————————————————-: | :—————————————————————————————————-: |
+|   Turn-on    |     <strong>VTO</strong>      |    V    |    Threshold voltage, where conduction starts     |                 Discrete: 1–3 V;<br />IC: 0.3–0.7 V                  | Discrete: very wide, e.g. 2N7000 0.8–3 V, IRF540 2–4 V<br />IC: about ±50–100 mV between process corners |
+|  Conduction  |      <strong>KP</strong>      |  A/V²   | Transconductance parameter, sets current and gain | Discrete: lumped with W/L, often 0.1–20 A/V²;<br />IC: ~50–300 µA/V² |           Discrete: wide, often seen as R_DS(on) max ≈ 1.3–2× typical;<br />IC: about ±10–20%.           |
+|  Conduction  |     <strong>W, L</strong>     |    m    |             Channel width and length              |                           Set by design                            |            IC: small absolute error (tens of nm), significant only for minimum-size devices            |
+|  Conduction  |    <strong>LAMBDA</strong>    |   1/V   |  Channel-length modulation, limits voltage gain   |             ~0.01–0.1 V⁻¹ (larger for short channels)              |                             About ±20–30%; rarely specified on datasheets                              |
+|    Speed     |     <strong>CGSO</strong>     |   F/m   |          Gate-source overlap capacitance          |                         Process-dependent                          |                                             About ±10–20%                                              |
+|    Speed     |     <strong>CGDO</strong>     |   F/m   |  Gate-drain overlap capacitance (Miller effect)   |                         Process-dependent                          |                                             About ±10–20%                                              |
+|    Speed     | <strong>CBD, CBS, CJ</strong> | F, F/m² |        Junction capacitances to substrate         |             Discrete C_oss: pF to nF depending on size             |                             About ±10–20%; also varies strongly with V_DS                              |
+|    Speed     |     <strong>TOX</strong>      |    m    |               Gate oxide thickness                |                 IC: 1–20 nm; discrete: tens of nm                  |                                     About ±3–5% (well controlled)                                      |
+| Second-order |    <strong>RD, RS</strong>    |    Ω    |     Series resistances, part of on-resistance     |                   mΩ (power) to Ω (small-signal)                   |                           About ±20–30%; rises ~1.5–2× from 25 °C to 125 °C                            |
+| Second-order |  <strong>GAMMA, PHI</strong>  |  √V, V  | Body effect (threshold shift with source ≠ body)  |                 GAMMA ~0.3–0.6 √V; PHI ~0.6–0.8 V                  |                                               About ±10%                                               |
+| Second-order |      <strong>IS</strong>      |    A    |           Body diode saturation current           |                           ~10⁻¹⁴–10⁻⁹ A                            |                 Up to a factor of several between parts; roughly doubles every ~10 °C                  |</p>
+<ul>
+  <li><em>Key equation (saturation):</em> I_D = (KP/2) × (W/L) × (V_GS − VTO)² × (1 + LAMBDA × V_DS)</li>
+  <li><em>Top three to remember:</em> VTO, KP, LAMBDA (also gate capacitances for RF work)</li>
+</ul>
 
   </div>
 </article>
@@ -272,7 +310,7 @@ window.MathJax = {
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792245076"></script>
+<script src="/assets/js/site.js?v=1792256092"></script>
 
 
   </body>
