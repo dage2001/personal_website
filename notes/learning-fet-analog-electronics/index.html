@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learning   FET &amp; Analog Electronics - Junda Wang</title>
+  <meta name="description" content="[!QUOTE] References Several useful books, articles, video tutorials are listed in the following P. Horowitz and W. Hill, The Art of Electronics, 3rd Edition Bilibili - Analog Electronics Technology">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="Learning   FET &amp; Analog Electronics">
+  <meta property="og:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jordan-wang.win/notes/learning-fet-analog-electronics/">
+  <meta property="og:image" content="https://jordan-wang.win/images/headshot.jpg">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Learning   FET &amp; Analog Electronics">
+  <meta name="twitter:description" content="Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.">
+  <meta name="twitter:image" content="https://jordan-wang.win/images/headshot.jpg">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;0,8..60,800;1,8..60,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/assets/main.css?v=1792270745">
+  <link rel="canonical" href="https://jordan-wang.win/notes/learning-fet-analog-electronics/">
+  
+    
+    
+  <link rel="alternate" hreflang="en" href="https://jordan-wang.win/notes/learning-fet-analog-electronics/">
+      
+  <link rel="alternate" hreflang="x-default" href="https://jordan-wang.win/notes/learning-fet-analog-electronics/">
+      
+    
+  
+  <link rel="icon" href="/favicon.ico?v=1792270745" sizes="any">
+  <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
+
+  <!-- Accent color from config -->
+  
+  <style>
+    :root { --accent: #111111; --accent-hover: #111111; }
+  </style>
+  
+
+  
+  
+
+  
+
+  
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: 'ams'
+  },
+  output: {
+    displayOverflow: 'scroll'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  }
+};
+</script>
+<script id="MathJax-script" defer
+  src="https://cdn.jsdelivr.net/npm/mathjax@4.0.0/tex-chtml.js"></script>
+
+  
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebPage", "name": "Learning   FET &amp; Analog Electronics", "url": "https://jordan-wang.win/notes/learning-fet-analog-electronics/", "description": "Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.", "author": {"@type": "Person", "name": "Junda Wang", "jobTitle": "PhD Candidate", "affiliation": {"@type": "Organization", "name": "EPFL"}}}</script>
+</head>
+
+
+  <body class="">
+
+    <a class="skip-link" href="#main-content">Skip to content</a>
+<nav class="navbar sticky-top navbar-expand-md" aria-label="Primary navigation">
+  <div class="container" style="max-width: var(--container-max);">
+    <a class="navbar-brand" href="/">
+      Junda Wang
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/research/">Research</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/publications/">Publications</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/tools/">Tools</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link active" href="/notes/" aria-current="page">Notes</a>
+        </li>
+        
+        
+        
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/cv/">CV</a>
+        </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+    <main class="site-container" id="main-content">
+      <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+  <h1 itemprop="name headline">Learning   FET &amp; Analog Electronics</h1>
+  <p class="post-meta text-muted">
+    <time datetime="2026-10-17T00:00:00+00:00" itemprop="datePublished">Oct 17, 2026</time>
+    
+  </p>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  </header>
+  <div itemprop="articleBody">
+    <aside class="callout callout-quote" data-callout="quote" aria-label="References">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>References</div>
+<div class="callout-content">
+<p>Several useful books, articles, video tutorials are listed in the following</p>
+<ul>
+    <li>P. Horowitz and W. Hill, <em>The Art of Electronics, 3rd Edition</em></li>
+    <li><a href="https://www.bilibili.com/video/BV1XPYN6DEqU/?share_source=copy_web&amp;vd_source=238345cc7b030d8188e97bcf82a63b3c">Bilibili - Analog Electronics Technology</a></li>
+  </ul>
+</div>
+</aside>
+
+<h2 id="0-foreword">0. Foreword</h2>
+<p>This note provides a glimpse into the modern morphology of analog electronics and RF semiconductor devices. Most textbooks typically begin with low-level prerequisites, such as Kirchhoff’s circuit laws, Thévenin equivalent circuits, and band theory in semiconductors. While it may be an appropriate way for most learners, those who major in physics or have some experience with solid-state materials don’t really need this level of guidance. In fact, this old-fashioned approach isn’t very efficient when you need a quick refresher on analog electronics circuit design.</p>
+
+<p>In the following sections, we’ll dive straight into <strong>field-effect transistors (FETs)</strong> and then move on to some typical amplifier circuits. <strong>Bipolar junction transistors (BJTs)</strong> aren’t chosen as an entry point for this note, unlike most textbooks, which claim they’re quickly becoming obsolete. As of 2026, the market has largely been taken over by <strong>metal–oxide–semiconductor field-effect transistors (MOSFETs)</strong> for fast-switching and <strong>insulated-gate bipolar transistors (IGBTs)</strong> for high-power handling. However, this excuse doesn’t hold water in certain specific fields where BJTs remain widely used – often due to their robustness and low cost.</p>
+
+<h2 id="1-field-effect-transistors">1. Field-effect Transistors</h2>
+<h3 id="11-some-history">1.1 Some History</h3>
+<p>I don’t plan to overburden this note with too many documentaries and fairytales, but it’s worth mentioning the etymology of the word <strong>“transistor”</strong>, which may help us develop a clear understanding of the underlying physics.</p>
+
+<aside class="callout callout-notes" data-callout="notes" aria-label="Transfer + Resistor = Transistor">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Transfer + Resistor = Transistor</div>
+<div class="callout-content">
+<p>The word <strong>transistor</strong> was coined in May 1948 by Bell Labs electrical engineer Walter Brattain and science-fiction author John Robinson Pierce. It’s a portmanteau of “transfer” and “resistor”, which unveils how the solid-state device acts as an electrical resistor that transfers a signal across varying resistance levels (from a low-resistance path to a high-resistance path) to amplify electrical current.</p>
+</div>
+</aside>
+
+<p>It’s also interesting to collect some surprising trivia and fun facts below</p>
+<ul>
+  <li>The concept of FETs was actually first patented in 1925, 17 years earlier than the first observation of transistor effect in the point-contact transistor in 1947.</li>
+  <li>The first BJT was invented by W. Shockley in 1948.</li>
+  <li>JFET is the first device to be successfully built by J. Nishizawa and Y. Watanabe in 1950, but in the mid-1950s BJTs were the main stream due to FETs’ fabrication difficulty.</li>
+  <li>~ To be updated :) ~</li>
+</ul>
+
+<h3 id="12-basic-concepts">1.2 Basic Concepts</h3>
+<p>First, we introduce the typical structure of an N-type MOSFET</p>
+<ul>
+  <li><strong>MOS:</strong> Metal-oxide-semiconductor sandwich, oxide layer typical thickness (1~10 nm).</li>
+  <li><strong>Channel:</strong> Narrow path where the charge carriers can flow through, controllable by voltage.</li>
+  <li><strong>Source:</strong> The terminal where the charge carriers enter the channel.</li>
+  <li><strong>Drain:</strong> The terminal where the charge carriers leave the channel.</li>
+  <li><strong>Gate:</strong> The terminal where a voltage is applied to control the channel’s on/off.
+<img src="/images/notes/learning-fet-analog-electronics/cross_section_nmosfet.png" alt="The schematic of a NMOS from wikipedia|600" /></li>
+</ul>
+
+<p>There are typically 3 terminals in a MOSFET, essentially 2 independent voltages. Usually we choose the source as our voltage reference. In other words, the 2 degrees of freedom (DoFs) are assigned to <span class="math-inline" role="math">\(V_\text{DS}\)</span> and <span class="math-inline" role="math">\(V_\text{GS}\)</span>. The following situations arise when playing with these parameters</p>
+
+<ul>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=0,\, V_\text{DS}\neq 0\)</span>:</strong> At least one out of the two PN-junctions is reversely biased. The depletion layer of that junction becomes thicker and blocks the current.</li>
+  <li><strong><span class="math-inline" role="math">\(0&lt;V_\text{GS}&lt;V_\text{th},\, V_\text{DS}= 0\)</span>:</strong> Positive charges begin to accumulate on the gate, attracting more negative carriers in the P-type substrate, which depletes the area underneath. The channel becomes even more insulated at first. But when the depletion saturates, free electrons from the source and drain begin to creep into the channel. It forms a layer called <strong>inversion layer</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=V_\text{th},\, V_\text{DS}=0\)</span>:</strong> The two separated inversion layers touch each other and form the channel. The voltage is referred to as the <strong>threshold voltage</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, 0\leq V_\text{DS}&lt; V_\text{GS}-V_\text{th}\)</span>:</strong> The electron density in the channel is proportional to <span class="math-inline" role="math">\(V_\text{GS}-V_\text{th}\)</span>. When the gate voltage increases, the channel becomes more conductive. Therefore, if applying drain-source voltage, current will begin to flow in the channel. But the channel width decreases from the source to the drain, since <span class="math-inline" role="math">\(V_\text{GD}&lt;V_\text{GS}\)</span>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, V_\text{DS}=V_\text{GS}-V_\text{th}\)</span>:</strong> We find <span class="math-inline" role="math">\(V_{GD} = 0\)</span> and the channel width drops to 0 at the drain. The status is called <strong>pinch-off</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, V_\text{GS}-V_\text{th}&lt;V_\text{DS}\)</span>:</strong> If we keep increasing the drain-source voltage, the current won’t drop although the channel has been pinched off. A tiny slit with strong electrical field will appear around the drain, where electrons in the channel will fleet towards the drain. In this region, the gate voltage <span class="math-inline" role="math">\(V_\text{GS}\)</span> has strong control on the channel current <span class="math-inline" role="math">\(I_\text{D}\)</span>. Therefore, majority of the MOSFET-based amplifiers work in this region.</li>
+</ul>
+
+<h3 id="13-characteristics-of-nmosfets">1.3 Characteristics of NMOSFETs</h3>
+<p><img src="/images/notes/learning-fet-analog-electronics/typical_iv_curve_of_n_type_mosfets.png" alt="Typical IV Curve of N-type MOSFETS|800" /></p>
+
+<p>As just analyzed, the “<strong>current response</strong>” of a MOSFETs can be summarized into a 2-variable function</p>
+
+<div class="math-display" role="math">\[I_\text{D}=f(V_\text{GS},V_\text{DS})=
+\begin{cases}
+0,\quad &amp;V_\text{GS}\leq  V_\text{th}\\
+2\kappa\left[(V_\text{GS}-V_\text{th})V_\text{DS}-V_\text{DS}^2/2\right],\quad &amp; 0&lt;V_\text{DS}&lt;V_\text{GS}-V_\text{th}\\
+\kappa(V_\text{GS}-V_\text{th})^2,\quad &amp; V_\text{GS}-V_\text{th}\leq V_\text{DS}
+\end{cases}.
+\tag{1}\]</div>
+
+<p>We plot out the piecewise function above and find 3 distinct regions (one not indicated),</p>
+<ul>
+  <li><strong>Subthreshold Region:</strong> The gate closes and almost no current from the source to the drain. The current is from thermal fluctuation and carrier diffusion.<span class="math-display math-display-flow" role="math">\[I_\text{D}\sim \exp \left(\frac{V_\text{GS}-V_\text{th}}{n\cdot U_\text{T}}\right)\left[1-\exp \left(-\frac{V_\text{DS}}{U_\text{T}}\right)\right], \tag{2}\]</span> where <span class="math-inline" role="math">\(U_\text{T} = \frac{kT}{q}\)</span> is called <strong>thermal voltage</strong> (<span class="math-inline" role="math">\(\sim 26\,\text{mV}\)</span> at <span class="math-inline" role="math">\(300\,\mathrm{K}\)</span>).</li>
+  <li><strong>Linear Region:</strong> In this region, NMOSFETs are conductive just like a linear resistor. The current increases linearly with the drain-source voltage, with a resistance proportional to the <strong>gate drive</strong> <span class="math-inline" role="math">\(V_\text{GS}-V_\text{th}\)</span>.</li>
+  <li><strong>Saturation Region:</strong> The channel saturates and current only relies on the gate drive.</li>
+</ul>
+
+<p>Practically, a SPICE model is established to describe these properties, including other features such as switching speed. We list some useful specs below</p>
+
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Group</th>
+      <th style="text-align: center">Parameter</th>
+      <th style="text-align: center">Unit</th>
+      <th style="text-align: center">What it means</th>
+      <th style="text-align: center">Typical value</th>
+      <th style="text-align: center">Manufacturing spread (approx.)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Turn-on</td>
+      <td style="text-align: center"><strong>VTO</strong></td>
+      <td style="text-align: center">V</td>
+      <td style="text-align: center">Threshold voltage, where conduction starts</td>
+      <td style="text-align: center">Discrete: 1–3 V;<br />IC: 0.3–0.7 V</td>
+      <td style="text-align: center">Discrete: very wide, e.g. 2N7000 0.8–3 V, IRF540 2–4 V<br />IC: about ±50–100 mV between process corners</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Conduction</td>
+      <td style="text-align: center"><strong>KP</strong></td>
+      <td style="text-align: center">A/V²</td>
+      <td style="text-align: center">Transconductance parameter, sets current and gain</td>
+      <td style="text-align: center">Discrete: lumped with W/L, often 0.1–20 A/V²;<br />IC: ~50–300 µA/V²</td>
+      <td style="text-align: center">Discrete: wide, often seen as R_DS(on) max ≈ 1.3–2× typical;<br />IC: about ±10–20%.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Conduction</td>
+      <td style="text-align: center"><strong>W, L</strong></td>
+      <td style="text-align: center">m</td>
+      <td style="text-align: center">Channel width and length</td>
+      <td style="text-align: center">Set by design</td>
+      <td style="text-align: center">IC: small absolute error (tens of nm), significant only for minimum-size devices</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Conduction</td>
+      <td style="text-align: center"><strong>LAMBDA</strong></td>
+      <td style="text-align: center">1/V</td>
+      <td style="text-align: center">Channel-length modulation, limits voltage gain</td>
+      <td style="text-align: center">~0.01–0.1 V⁻¹ (larger for short channels)</td>
+      <td style="text-align: center">About ±20–30%; rarely specified on datasheets</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>CGSO</strong></td>
+      <td style="text-align: center">F/m</td>
+      <td style="text-align: center">Gate-source overlap capacitance</td>
+      <td style="text-align: center">Process-dependent</td>
+      <td style="text-align: center">About ±10–20%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>CGDO</strong></td>
+      <td style="text-align: center">F/m</td>
+      <td style="text-align: center">Gate-drain overlap capacitance (Miller effect)</td>
+      <td style="text-align: center">Process-dependent</td>
+      <td style="text-align: center">About ±10–20%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>CBD, CBS, CJ</strong></td>
+      <td style="text-align: center">F, F/m²</td>
+      <td style="text-align: center">Junction capacitances to substrate</td>
+      <td style="text-align: center">Discrete C_oss: pF to nF depending on size</td>
+      <td style="text-align: center">About ±10–20%; also varies strongly with V_DS</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>TOX</strong></td>
+      <td style="text-align: center">m</td>
+      <td style="text-align: center">Gate oxide thickness</td>
+      <td style="text-align: center">IC: 1–20 nm; discrete: tens of nm</td>
+      <td style="text-align: center">About ±3–5% (well controlled)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Second-order</td>
+      <td style="text-align: center"><strong>RD, RS</strong></td>
+      <td style="text-align: center">Ω</td>
+      <td style="text-align: center">Series resistances, part of on-resistance</td>
+      <td style="text-align: center">mΩ (power) to Ω (small-signal)</td>
+      <td style="text-align: center">About ±20–30%; rises ~1.5–2× from 25 °C to 125 °C</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Second-order</td>
+      <td style="text-align: center"><strong>GAMMA, PHI</strong></td>
+      <td style="text-align: center">√V, V</td>
+      <td style="text-align: center">Body effect (threshold shift with source ≠ body)</td>
+      <td style="text-align: center">GAMMA ~0.3–0.6 √V; PHI ~0.6–0.8 V</td>
+      <td style="text-align: center">About ±10%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Second-order</td>
+      <td style="text-align: center"><strong>IS</strong></td>
+      <td style="text-align: center">A</td>
+      <td style="text-align: center">Body diode saturation current</td>
+      <td style="text-align: center">~10⁻¹⁴–10⁻⁹ A</td>
+      <td style="text-align: center">Up to a factor of several between parts; roughly doubles every ~10 °C</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<ul>
+  <li><em>Key equation (saturation):</em> I_D = (KP/2) × (W/L) × (V_GS − VTO)² × (1 + LAMBDA × V_DS)</li>
+  <li><em>Top three to remember:</em> VTO, KP, LAMBDA (also gate capacitances for RF work)</li>
+</ul>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <h5>About</h5>
+      <p>
+        Junda Wang<br>
+        PhD Candidate<br>
+        EPFL<br>
+        Laboratory of Wave Engineering
+      </p>
+    </div>
+    <div>
+      <h5>Contact</h5>
+      <p>
+        <a href="mailto:junda.wang@epfl.ch">junda.wang@epfl.ch</a><br>
+        <a href="https://github.com/dage2001">GitHub</a>
+      </p>
+    </div>
+    <div>
+      <h5>Links</h5>
+      <p>
+        
+        <a href="https://orcid.org/0009-0005-9998-7275">ORCID 0009-0005-9998-7275</a>
+      </p>
+    </div>
+  </div>
+  <div class="footer-grid">
+    <div class="footer-copyright" style="grid-column: 1 / -1;">
+      &copy; 2026 Junda Wang
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/site.js?v=1792270745"></script>
+
+
+  </body>
+
+</html>
