@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792188845">
+  <link rel="stylesheet" href="/assets/main.css?v=1792245076">
   <link rel="canonical" href="/notes/learning-fets-analog-electronics/">
   
     
@@ -39,8 +39,13 @@
   <link rel="alternate" hreflang="x-default" href="/notes/learning-fets-analog-electronics/">
       
     
+  <link rel="alternate" hreflang="en" href="/notes/learning-fets-analog-electronics/">
+      
+  <link rel="alternate" hreflang="x-default" href="/notes/learning-fets-analog-electronics/">
+      
+    
   
-  <link rel="icon" href="/favicon.ico?v=1792188845" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792245076" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -168,7 +173,7 @@ window.MathJax = {
   <header class="post-header">
   <h1 itemprop="name headline">[Learnings] FETs &amp; Analog Electronics</h1>
   <p class="post-meta text-muted">
-    <time datetime="2026-10-16T00:00:00+00:00" itemprop="datePublished">Oct 16, 2026</time>
+    <time datetime="2026-10-17T00:00:00+00:00" itemprop="datePublished">Oct 17, 2026</time>
     
   </p>
   
@@ -204,7 +209,7 @@ window.MathJax = {
 
 <h2 id="1-field-effect-transistors">1. Field-effect Transistors</h2>
 <h3 id="11-some-history">1.1 Some History</h3>
-<p>I don’t plan to overburden this note with too may documentaries and fairytales, but it’s worth mentioning the etymology of the word <strong>“transistor”</strong>, which may help us develop a clear understanding of the underlying physics.</p>
+<p>I don’t plan to overburden this note with too many documentaries and fairytales, but it’s worth mentioning the etymology of the word <strong>“transistor”</strong>, which may help us develop a clear understanding of the underlying physics.</p>
 
 <aside class="callout callout-notes" data-callout="notes" aria-label="Transfer + Resistor = Transistor">
 <div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Transfer + Resistor = Transistor</div>
@@ -235,10 +240,15 @@ window.MathJax = {
 <p>There are typically 3 terminals in a MOSFET, essentially 2 independent voltages. Usually we choose the source as our voltage reference. In other words, the 2 degrees of freedom (DoFs) are assigned to <span class="math-inline" role="math">\(V_\text{DS}\)</span> and <span class="math-inline" role="math">\(V_\text{GS}\)</span>. The following situations arise when playing with these parameters</p>
 
 <ul>
-  <li><span class="math-inline" role="math">\(V_\text{GS}=0,\, V_\text{DS}\neq 0\)</span>: At least one out of the two PN-junctions are reversely biased. The depletion layer of that junction becomes thicker and blocks the current.</li>
-  <li><span class="math-inline" role="math">\(0&lt;V_\text{GS}&lt;V_\text{th},\, V_\text{DS}= 0\)</span>: Positive charges begin to accumulate on the gate, attracting more negative carriers in the P-type substrate, which depletes the area underneath. The channel becomes even more insulated at first. But when the depletion saturates, free electrons from the source and drain begin to creep into the channel. It forms a layer called <strong>inversion layer</strong>.</li>
-  <li><span class="math-inline" role="math">\(V_\text{GS}=V_\text{th},\, V_\text{DS}=0\)</span>: The two separated inversion layers touch each other and form the channel. The voltage is referred to as the <strong>threshold voltage</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=0,\, V_\text{DS}\neq 0\)</span>:</strong> At least one out of the two PN-junctions are reversely biased. The depletion layer of that junction becomes thicker and blocks the current.</li>
+  <li><strong><span class="math-inline" role="math">\(0&lt;V_\text{GS}&lt;V_\text{th},\, V_\text{DS}= 0\)</span>:</strong> Positive charges begin to accumulate on the gate, attracting more negative carriers in the P-type substrate, which depletes the area underneath. The channel becomes even more insulated at first. But when the depletion saturates, free electrons from the source and drain begin to creep into the channel. It forms a layer called <strong>inversion layer</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=V_\text{th},\, V_\text{DS}=0\)</span>:</strong> The two separated inversion layers touch each other and form the channel. The voltage is referred to as the <strong>threshold voltage</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, 0\leq V_\text{DS}&lt; V_\text{GS}-V_\text{th}\)</span>:</strong> The electron density in the channel is proportional to <span class="math-inline" role="math">\(V_\text{GS}-V_\text{th}\)</span>. When the gate voltage increases, the channel becomes more conductive. Therefore, if applying drain-source voltage, current will begin to flow in the channel. But the channel width decreases from the source to the drain, since <span class="math-inline" role="math">\(V_\text{GD}&lt;V_\text{GS}\)</span>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, V_\text{DS}=V_\text{GS}-V_\text{th}\)</span>:</strong> We find <span class="math-inline" role="math">\(V_{GD} = 0\)</span> and the channel width drops to 0 at the drain. The status is called <strong>pinch-off</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{th}&lt;V_\text{GS},\, V_\text{GS}-V_\text{th}&lt;V_\text{DS}\)</span>:</strong> If we keep increasing the drain-source voltage, the current won’t drop although the channel has been pinched off. A tiny slit with strong electrical field will appear around the drain, where electrons in the channel will fleet towards the drain. In this region, the gate voltage <span class="math-inline" role="math">\(V_\text{GS}\)</span> has strong control on the channel current <span class="math-inline" role="math">\(I_\text{D}\)</span>. Therefore, majority of the MOSFET-based amplifiers work in this region.</li>
 </ul>
+
+<h3 id="13-characteristics">1.3 Characteristics</h3>
 
   </div>
 </article>
@@ -279,7 +289,7 @@ window.MathJax = {
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792188845"></script>
+<script src="/assets/js/site.js?v=1792245076"></script>
 
 
   </body>
