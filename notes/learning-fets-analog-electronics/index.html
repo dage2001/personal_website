@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792256092">
+  <link rel="stylesheet" href="/assets/main.css?v=1792258843">
   <link rel="canonical" href="/notes/learning-fets-analog-electronics/">
   
     
@@ -39,13 +39,8 @@
   <link rel="alternate" hreflang="x-default" href="/notes/learning-fets-analog-electronics/">
       
     
-  <link rel="alternate" hreflang="en" href="/notes/learning-fets-analog-electronics/">
-      
-  <link rel="alternate" hreflang="x-default" href="/notes/learning-fets-analog-electronics/">
-      
-    
   
-  <link rel="icon" href="/favicon.ico?v=1792256092" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792258843" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -255,34 +250,124 @@ window.MathJax = {
 
 <div class="math-display" role="math">\[I_\text{D}=f(V_\text{GS},V_\text{DS})=
 \begin{cases}
-0,\quad &amp;V_\text{GS}\leq  V_\text{th}\
-2\kappa\left[(V_\text{GS}-V_\text{th})V_\text{DS}-V_\text{DS}^2/2\right],\quad &amp; 0&lt;V_\text{DS}&lt;V_\text{GS}-V_\text{th}\
+0,\quad &amp;V_\text{GS}\leq  V_\text{th}\\
+2\kappa\left[(V_\text{GS}-V_\text{th})V_\text{DS}-V_\text{DS}^2/2\right],\quad &amp; 0&lt;V_\text{DS}&lt;V_\text{GS}-V_\text{th}\\
 \kappa(V_\text{GS}-V_\text{th})^2,\quad &amp; V_\text{GS}-V_\text{th}\leq V_\text{DS}
 \end{cases}.
 \tag{1}\]</div>
 
 <p>We plot out the piecewise function above and find 3 distinct regions (one not indicated),</p>
 <ul>
-  <li><strong>Subthreshold Region:</strong> The gate closes and almost no current from the source to the drain. The current is from thermal fluctuation and carrier diffusion.$<span class="math-inline" role="math">\(I_\text{D}\sim \exp \left(\frac{V_\text{GS}-V_\text{th}}{n\cdot U_\text{T}}\right)\left[1-\exp \left(-\frac{V_\text{DS}}{U_\text{T}}\right)\right], \tag{2}$\)</span> where <span class="math-inline" role="math">\(U_\text{T} = \frac{kT}{q}\)</span> is called <strong>thermal voltage</strong> (<span class="math-inline" role="math">\(\sim 26\,\text{mV}\)</span> at <span class="math-inline" role="math">\(300\,\mathrm{K}\)</span>).</li>
+  <li><strong>Subthreshold Region:</strong> The gate closes and almost no current from the source to the drain. The current is from thermal fluctuation and carrier diffusion.<span class="math-display math-display-flow" role="math">\[I_\text{D}\sim \exp \left(\frac{V_\text{GS}-V_\text{th}}{n\cdot U_\text{T}}\right)\left[1-\exp \left(-\frac{V_\text{DS}}{U_\text{T}}\right)\right], \tag{2}\]</span> where <span class="math-inline" role="math">\(U_\text{T} = \frac{kT}{q}\)</span> is called <strong>thermal voltage</strong> (<span class="math-inline" role="math">\(\sim 26\,\text{mV}\)</span> at <span class="math-inline" role="math">\(300\,\mathrm{K}\)</span>).</li>
   <li><strong>Linear Region:</strong> In this region, NMOSFETs are conductive just like a linear resistor. The current increases linearly with the drain-source voltage, with a resistance proportional to the <strong>gate drive</strong> <span class="math-inline" role="math">\(V_\text{GS}-V_\text{th}\)</span>.</li>
   <li><strong>Saturation Region:</strong> The channel saturates and current only relies on the gate drive.</li>
 </ul>
 
 <p>Practically, a SPICE model is established to describe these properties, including other features such as switching speed. We list some useful specs below</p>
 
-<p>|    Group     |    Parameter     |  Unit   |                   What it means                   |                           Typical value                            |                                     Manufacturing spread (approx.)                                     |
-| :———-: | :————–: | :—–: | :———————————————–: | :—————————————————————-: | :—————————————————————————————————-: |
-|   Turn-on    |     <strong>VTO</strong>      |    V    |    Threshold voltage, where conduction starts     |                 Discrete: 1–3 V;<br />IC: 0.3–0.7 V                  | Discrete: very wide, e.g. 2N7000 0.8–3 V, IRF540 2–4 V<br />IC: about ±50–100 mV between process corners |
-|  Conduction  |      <strong>KP</strong>      |  A/V²   | Transconductance parameter, sets current and gain | Discrete: lumped with W/L, often 0.1–20 A/V²;<br />IC: ~50–300 µA/V² |           Discrete: wide, often seen as R_DS(on) max ≈ 1.3–2× typical;<br />IC: about ±10–20%.           |
-|  Conduction  |     <strong>W, L</strong>     |    m    |             Channel width and length              |                           Set by design                            |            IC: small absolute error (tens of nm), significant only for minimum-size devices            |
-|  Conduction  |    <strong>LAMBDA</strong>    |   1/V   |  Channel-length modulation, limits voltage gain   |             ~0.01–0.1 V⁻¹ (larger for short channels)              |                             About ±20–30%; rarely specified on datasheets                              |
-|    Speed     |     <strong>CGSO</strong>     |   F/m   |          Gate-source overlap capacitance          |                         Process-dependent                          |                                             About ±10–20%                                              |
-|    Speed     |     <strong>CGDO</strong>     |   F/m   |  Gate-drain overlap capacitance (Miller effect)   |                         Process-dependent                          |                                             About ±10–20%                                              |
-|    Speed     | <strong>CBD, CBS, CJ</strong> | F, F/m² |        Junction capacitances to substrate         |             Discrete C_oss: pF to nF depending on size             |                             About ±10–20%; also varies strongly with V_DS                              |
-|    Speed     |     <strong>TOX</strong>      |    m    |               Gate oxide thickness                |                 IC: 1–20 nm; discrete: tens of nm                  |                                     About ±3–5% (well controlled)                                      |
-| Second-order |    <strong>RD, RS</strong>    |    Ω    |     Series resistances, part of on-resistance     |                   mΩ (power) to Ω (small-signal)                   |                           About ±20–30%; rises ~1.5–2× from 25 °C to 125 °C                            |
-| Second-order |  <strong>GAMMA, PHI</strong>  |  √V, V  | Body effect (threshold shift with source ≠ body)  |                 GAMMA ~0.3–0.6 √V; PHI ~0.6–0.8 V                  |                                               About ±10%                                               |
-| Second-order |      <strong>IS</strong>      |    A    |           Body diode saturation current           |                           ~10⁻¹⁴–10⁻⁹ A                            |                 Up to a factor of several between parts; roughly doubles every ~10 °C                  |</p>
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+  <thead>
+    <tr>
+      <th style="text-align: center">Group</th>
+      <th style="text-align: center">Parameter</th>
+      <th style="text-align: center">Unit</th>
+      <th style="text-align: center">What it means</th>
+      <th style="text-align: center">Typical value</th>
+      <th style="text-align: center">Manufacturing spread (approx.)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">Turn-on</td>
+      <td style="text-align: center"><strong>VTO</strong></td>
+      <td style="text-align: center">V</td>
+      <td style="text-align: center">Threshold voltage, where conduction starts</td>
+      <td style="text-align: center">Discrete: 1–3 V;<br />IC: 0.3–0.7 V</td>
+      <td style="text-align: center">Discrete: very wide, e.g. 2N7000 0.8–3 V, IRF540 2–4 V<br />IC: about ±50–100 mV between process corners</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Conduction</td>
+      <td style="text-align: center"><strong>KP</strong></td>
+      <td style="text-align: center">A/V²</td>
+      <td style="text-align: center">Transconductance parameter, sets current and gain</td>
+      <td style="text-align: center">Discrete: lumped with W/L, often 0.1–20 A/V²;<br />IC: ~50–300 µA/V²</td>
+      <td style="text-align: center">Discrete: wide, often seen as R_DS(on) max ≈ 1.3–2× typical;<br />IC: about ±10–20%.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Conduction</td>
+      <td style="text-align: center"><strong>W, L</strong></td>
+      <td style="text-align: center">m</td>
+      <td style="text-align: center">Channel width and length</td>
+      <td style="text-align: center">Set by design</td>
+      <td style="text-align: center">IC: small absolute error (tens of nm), significant only for minimum-size devices</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Conduction</td>
+      <td style="text-align: center"><strong>LAMBDA</strong></td>
+      <td style="text-align: center">1/V</td>
+      <td style="text-align: center">Channel-length modulation, limits voltage gain</td>
+      <td style="text-align: center">~0.01–0.1 V⁻¹ (larger for short channels)</td>
+      <td style="text-align: center">About ±20–30%; rarely specified on datasheets</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>CGSO</strong></td>
+      <td style="text-align: center">F/m</td>
+      <td style="text-align: center">Gate-source overlap capacitance</td>
+      <td style="text-align: center">Process-dependent</td>
+      <td style="text-align: center">About ±10–20%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>CGDO</strong></td>
+      <td style="text-align: center">F/m</td>
+      <td style="text-align: center">Gate-drain overlap capacitance (Miller effect)</td>
+      <td style="text-align: center">Process-dependent</td>
+      <td style="text-align: center">About ±10–20%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>CBD, CBS, CJ</strong></td>
+      <td style="text-align: center">F, F/m²</td>
+      <td style="text-align: center">Junction capacitances to substrate</td>
+      <td style="text-align: center">Discrete C_oss: pF to nF depending on size</td>
+      <td style="text-align: center">About ±10–20%; also varies strongly with V_DS</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Speed</td>
+      <td style="text-align: center"><strong>TOX</strong></td>
+      <td style="text-align: center">m</td>
+      <td style="text-align: center">Gate oxide thickness</td>
+      <td style="text-align: center">IC: 1–20 nm; discrete: tens of nm</td>
+      <td style="text-align: center">About ±3–5% (well controlled)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Second-order</td>
+      <td style="text-align: center"><strong>RD, RS</strong></td>
+      <td style="text-align: center">Ω</td>
+      <td style="text-align: center">Series resistances, part of on-resistance</td>
+      <td style="text-align: center">mΩ (power) to Ω (small-signal)</td>
+      <td style="text-align: center">About ±20–30%; rises ~1.5–2× from 25 °C to 125 °C</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Second-order</td>
+      <td style="text-align: center"><strong>GAMMA, PHI</strong></td>
+      <td style="text-align: center">√V, V</td>
+      <td style="text-align: center">Body effect (threshold shift with source ≠ body)</td>
+      <td style="text-align: center">GAMMA ~0.3–0.6 √V; PHI ~0.6–0.8 V</td>
+      <td style="text-align: center">About ±10%</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Second-order</td>
+      <td style="text-align: center"><strong>IS</strong></td>
+      <td style="text-align: center">A</td>
+      <td style="text-align: center">Body diode saturation current</td>
+      <td style="text-align: center">~10⁻¹⁴–10⁻⁹ A</td>
+      <td style="text-align: center">Up to a factor of several between parts; roughly doubles every ~10 °C</td>
+    </tr>
+  </tbody>
+</table></div>
+
 <ul>
   <li><em>Key equation (saturation):</em> I_D = (KP/2) × (W/L) × (V_GS − VTO)² × (1 + LAMBDA × V_DS)</li>
   <li><em>Top three to remember:</em> VTO, KP, LAMBDA (also gate capacitances for RF work)</li>
@@ -327,7 +412,7 @@ window.MathJax = {
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792256092"></script>
+<script src="/assets/js/site.js?v=1792258843"></script>
 
 
   </body>
