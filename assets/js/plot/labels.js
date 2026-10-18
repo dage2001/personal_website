@@ -1,17 +1,10 @@
+import {addMathSvgStyle,renderMathSvg} from '../mathjax-svg.js';
+
 const NS='http://www.w3.org/2000/svg';
 const cache=new Map();
-let ready;
-function mathReady(){
- if(!ready)ready=new Promise((resolve,reject)=>{
-  const start=()=>{const mj=window.MathJax;if(!mj?.startup?.promise){reject(Error('MathJax did not load. Reload the page to render math labels.'));return;}mj.startup.promise.then(()=>resolve(mj),reject);};
-  if(window.MathJax?.startup?.promise)start();
-  else{const script=document.getElementById('MathJax-script');script.addEventListener('load',start,{once:true});script.addEventListener('error',()=>reject(Error('Unable to load MathJax for math labels.')),{once:true});}
- });
- return ready;
-}
 async function mathSVG(latex){
  if(!cache.has(latex)){
-  const promise=(async()=>{const mj=await mathReady();const result=await mj.tex2svgPromise(latex,{display:false});const error=result.querySelector('[data-mml-node="merror"]');if(error)throw Error(`Invalid math label: ${error.getAttribute('data-mjx-error')||error.textContent}`);return result.querySelector('svg').cloneNode(true);})();
+  const promise=renderMathSvg(latex,{display:false});
   cache.set(latex,promise);promise.catch(()=>cache.delete(latex));if(cache.size>100)cache.delete(cache.keys().next().value);
  }
  return (await cache.get(latex)).cloneNode(true);
@@ -52,7 +45,7 @@ export async function label(parent,text,{x=0,y=0,size=17,anchor='start',color='#
    const g=svg.querySelector('g');if(g){g.setAttribute('fill',color);g.setAttribute('stroke',color);}
    // Labels are graphics, so exported formulas do not retain link targets.
    for(const link of svg.querySelectorAll('a'))link.replaceWith(...link.childNodes);
-   const style=document.createElementNS(NS,'style');style.textContent='[data-frame],[data-line]{stroke-width:70px;fill:none}.mjx-dashed{stroke-dasharray:140}.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}';svg.prepend(style);
+   addMathSvgStyle(svg);
    group.append(svg);width+=vb[2]*scale;
   }
  }

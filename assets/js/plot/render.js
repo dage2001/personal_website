@@ -15,8 +15,13 @@ function marker(parent,shape,x,y,size,color){
  else if(shape==='star')add(g,'polygon',{points:Array.from({length:10},(_,i)=>{const a=-Math.PI/2+i*Math.PI/5,t=i%2?r*.75:r*1.25;return `${Math.cos(a)*t},${Math.sin(a)*t}`;}).join(' ')});
  else add(g,'polygon',{points:polygon(shape==='hexagon'?6:3,r*1.2)});
 }
+export function legendLayout(series,left){
+ const markerSizes=series.filter(hasMarkers).map(a=>a.markersize).filter(Number.isFinite);
+ const lineLength=2*(markerSizes.length?Math.max(...markerSizes):14),lineStart=left+15;
+ return {lineStart,lineLength,markerX:lineStart+lineLength/2,labelX:lineStart+lineLength+11};
+}
 export async function render(series,s){
- const caption=s.caption?wrapLabel(s.caption,Math.floor((s.width-120)/(s.fontsize*.52))):[],lineHeight=s.fontsize*1.45,bottom=40+s.fontsize*1.5+caption.length*lineHeight;
+ const caption=s.caption?wrapLabel(s.caption,Math.floor((s.width-120)/(s.fontsize*.52))):[],lineHeight=s.fontsize*1.45,xLabelGap=16,bottom=40+s.fontsize*1.5+xLabelGap+caption.length*lineHeight;
  const left=64+s.fontsize,right=s.width-28,top=s.title?30+s.fontsize*1.5:28,base=s.height-bottom;
  if(base-top<80)throw Error('Increase figure height or shorten the caption.');
  const vals=series.flatMap(a=>a.points.filter(p=>p[0]>=s.xmin && p[0]<=s.xmax && Number.isFinite(p[1])).map(p=>p[1]));
@@ -52,11 +57,12 @@ export async function render(series,s){
  for(const v of s.xticks.length?s.xticks:x.ticks(6)){if(v<s.xmin||v>s.xmax)continue;const px=x(v);add(svg,'path',{'data-axis':'x-tick',d:`M${px},${base}v6`,stroke:'#919597',fill:'none'});add(svg,'text',{x:px,y:base+10+s.ticksize,'text-anchor':'middle'},format(v));}
  const yticks=[...new Set([lo,...(s.yticks.length?s.yticks:y.ticks(5)),hi])].filter(v=>v>=lo&&v<=hi).sort((a,b)=>a-b);
  for(const v of yticks){const py=y(v);add(svg,'path',{'data-axis':'y-tick',d:`M${left},${py}h-6`,stroke:'#919597',fill:'none'});add(svg,'text',{x:left-11,y:py+s.ticksize*.35,'text-anchor':'end'},format(v));}
- await label(svg,s.xlabel,{x:(left+right)/2,y:base+26+s.fontsize,size:s.fontsize,anchor:'middle'});
+ await label(svg,s.xlabel,{x:(left+right)/2,y:base+26+s.fontsize+xLabelGap,size:s.fontsize,anchor:'middle'});
  await label(svg,s.ylabel,{x:21,y:(top+base)/2,size:s.fontsize,anchor:'middle',rotate:-90});
  if(s.title)await label(svg,s.title,{x:(left+right)/2,y:20+s.fontsize*.4,size:s.fontsize,anchor:'middle'});
- for(let i=0;i<caption.length;i++)await label(svg,caption[i],{x:left,y:base+38+s.fontsize+i*lineHeight+lineHeight,size:s.fontsize});
+ for(let i=0;i<caption.length;i++)await label(svg,caption[i],{x:left,y:base+38+s.fontsize+xLabelGap+i*lineHeight+lineHeight,size:s.fontsize});
  const legendSeries=s.legend?series.filter(a=>a.legend!==false):[];
- for(let i=0;i<legendSeries.length;i++){const a=legendSeries[i],py=top+22+i*Math.max(24,lineHeight),entry=add(svg,'g',{'data-legend-series':a.id});if(a.type==='function'||a.mode!=='scatter')add(entry,'path',{d:`M${left+15},${py}h28`,stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none'});if(hasMarkers(a))marker(entry,a.shape,left+29,py,a.markersize,a.color);await label(entry,a.name,{x:left+54,y:py+s.fontsize*.35,size:s.fontsize,color:a.color});}
+ const legend=legendLayout(legendSeries,left);
+ for(let i=0;i<legendSeries.length;i++){const a=legendSeries[i],py=top+22+i*Math.max(24,lineHeight),entry=add(svg,'g',{'data-legend-series':a.id});if(a.type==='function'||a.mode!=='scatter')add(entry,'path',{d:`M${legend.lineStart},${py}h${legend.lineLength}`,stroke:a.color,'stroke-width':s.linewidth,'stroke-dasharray':a.dashed?`${s.linewidth*3} ${s.linewidth*2}`:'none'});if(hasMarkers(a))marker(entry,a.shape,legend.markerX,py,a.markersize,a.color);await label(entry,a.name,{x:legend.labelX,y:py+s.fontsize*.35,size:s.fontsize,color:a.color});}
  return svg;
 }
