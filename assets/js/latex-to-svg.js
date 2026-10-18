@@ -1,3 +1,5 @@
+import {addMathSvgStyle,mathJaxReady,renderMathSvg,stripMathDelimiters} from './mathjax-svg.js';
+
 (function () {
   'use strict';
   const root = document.getElementById('latex-tool');
@@ -23,20 +25,11 @@
     source.value = '';
     download.disabled = copy.disabled = true;
   }
-  function stripDelimiters(text) {
-    const pairs = [['$$', '$$'], ['\\[', '\\]'], ['\\(', '\\)'], ['$', '$']];
-    for (const [start, end] of pairs) {
-      if (text.startsWith(start) && text.endsWith(end) && text.length >= start.length + end.length) {
-        return text.slice(start.length, -end.length).trim();
-      }
-    }
-    return text;
-  }
   async function render() {
     invalidate();
     if (!ready) return;
     const current = revision;
-    const equation = stripDelimiters(input.value.trim());
+    const equation = stripMathDelimiters(input.value.trim());
     if (!equation) {
       preview.replaceChildren();
       message('Enter an equation to get started.');
@@ -50,12 +43,8 @@
     const equationColor = color.value;
     message('Rendering…');
     try {
-      MathJax.texReset();
-      const result = await MathJax.tex2svgPromise(equation, { display: get('display').checked });
+      const svg = await renderMathSvg(equation, { display: get('display').checked });
       if (current !== revision) return;
-      const error = result.querySelector('[data-mml-node="merror"]');
-      if (error) throw new Error(error.getAttribute('data-mjx-error') || error.textContent || 'Invalid LaTeX expression.');
-      const svg = result.querySelector('svg').cloneNode(true);
       const width = parseFloat(svg.getAttribute('width')) * pxPerEx;
       const height = parseFloat(svg.getAttribute('height')) * pxPerEx;
       if (!Number.isFinite(width) || !Number.isFinite(height)) throw new Error('Unable to determine the SVG dimensions.');
@@ -70,9 +59,7 @@
       const group = svg.querySelector('g');
       group.setAttribute('fill', equationColor);
       group.setAttribute('stroke', equationColor);
-      const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
-      style.textContent = '[data-frame],[data-line]{stroke-width:70px;fill:none}.mjx-dashed{stroke-dasharray:140}.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}';
-      svg.prepend(style);
+      addMathSvgStyle(svg);
       const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
       title.textContent = equation;
       svg.prepend(title);
@@ -138,9 +125,8 @@
   async function initialize() {
     let timeout;
     try {
-      if (!window.MathJax || !MathJax.startup || !MathJax.startup.promise) throw new Error('MathJax could not load. Check your connection and reload the page.');
       await Promise.race([
-        MathJax.startup.promise,
+        mathJaxReady(),
         new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error('MathJax loading timed out. Check your connection and reload the page.')), 20000); })
       ]);
       ready = true;
