@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792350297">
+  <link rel="stylesheet" href="/assets/main.css?v=1792364928">
   <link rel="canonical" href="https://jordan-wang.win/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792350297" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792364928" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -166,7 +166,7 @@ window.MathJax = {
     <header class="post-header">
     <h1 itemprop="name headline">[Learnings] FETs &amp; Analog Electronics</h1>
     <p class="post-meta text-muted">
-      <time datetime="2026-10-17T00:00:00+00:00" itemprop="datePublished">Oct 17, 2026</time>
+      <time datetime="2026-10-18T00:00:00+00:00" itemprop="datePublished">Oct 18, 2026</time>
       
     </p>
     
@@ -373,6 +373,47 @@ window.MathJax = {
   <li><em>Top three to remember:</em> VTO, KP, LAMBDA (also gate capacitances for RF work)</li>
 </ul>
 
+<hr />
+<h3 id="14-junction-fets">1.4 Junction FETs</h3>
+<p>The N-type MOSFET we introduce above works in the <strong>enhancement mode</strong>, where the current increases as the gate voltage increases. There is another mode called <strong>“depletion mode”</strong>, which we will learn with a N-type <strong>junction FET(JFET)</strong> example.</p>
+
+<p>Different from MOSFETs, JFETs get rid of the oxide layer which cuts the conducting path between the gate and the source/drain. Therefore, in JFETs, we cannot apply a positive gate-source voltage <span class="math-inline" role="math">\(V_\text{GS}&gt;0\)</span>, or otherwise, it will diminish the depletion layer and induce a current from the gate to the source. The following are some</p>
+<ul>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}\leq0,\, 0\leq V_\text{DS}&lt; V_\text{GS}-V_\text{off}\)</span>:</strong> The depletion layers become thicker, which in turn causes the conducting channel to narrow. And the channel is less conductive.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}=V_\text{off}\)</span>:</strong> The channel is turned off. The voltage is referred to as the <strong>cutoff voltage</strong>.</li>
+  <li><strong><span class="math-inline" role="math">\(V_\text{GS}\leq 0,\ V_\text{GS}-V_\text{off}\leq V_\text{DS}\)</span>:</strong> Pinch-off similarly happens at one end of the channel. The channel current saturates and won’t change when increasing <span class="math-inline" role="math">\(V_\text{DS}\)</span>.</li>
+</ul>
+
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+  <tbody>
+    <tr>
+      <td>![The schematic of a NJFET</td>
+      <td>600](/images/notes/learning-fets-analog-electronics/cross_section_njfet.png)</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p>These features can be summarized into a 2-variable empirical function, one of which is named as <strong>Shockley’s equation</strong></p>
+
+<div class="math-display" role="math">\[I_\text{D}=h(V_\text{GS},V_\text{DS})=
+\begin{cases}
+0,\quad &amp;V_\text{GS}\leq  V_\text{off}\\
+\frac{2I_\text{DSS}}{V_\text{off}^2}\left[(V_\text{GS}-V_\text{off})V_\text{DS}-V_\text{DS}^2/2\right],\quad &amp; 0&lt;V_\text{DS}&lt;V_\text{GS}-V_\text{off}\\
+I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\text{off}\leq V_\text{DS}
+\end{cases}.
+\tag{3}\]</div>
+
+<p>This time, we plot the transfer characteristic curve with respect to <span class="math-inline" role="math">\(V_\text{GS}\)</span> in the pinch-off region</p>
+
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+  <tbody>
+    <tr>
+      <td>![Transfer Characteristic Curve of N-type JFETs</td>
+      <td>800](/images/notes/learning-fets-analog-electronics/transfer_characteristic_curve_of_n_type_jfets.svg)</td>
+    </tr>
+  </tbody>
+</table></div>
+
     </div>
   </article>
 </div>
@@ -413,7 +454,7 @@ window.MathJax = {
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792350297"></script>
+<script src="/assets/js/site.js?v=1792364928"></script>
 
 
   </body>
