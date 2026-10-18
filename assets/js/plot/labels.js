@@ -4,7 +4,10 @@ const NS='http://www.w3.org/2000/svg';
 const cache=new Map();
 async function mathSVG(latex){
  if(!cache.has(latex)){
-  const promise=renderMathSvg(latex,{display:false});
+  // MathJax 4's inline SVG conversion can expose only a nested glyph for
+  // multi-token expressions.  Render the complete display SVG, then place and
+  // scale it as an inline label ourselves below.
+  const promise=renderMathSvg(latex,{display:true});
   cache.set(latex,promise);promise.catch(()=>cache.delete(latex));if(cache.size>100)cache.delete(cache.keys().next().value);
  }
  return (await cache.get(latex)).cloneNode(true);
