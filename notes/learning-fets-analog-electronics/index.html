@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792366526">
+  <link rel="stylesheet" href="/assets/main.css?v=1792366817">
   <link rel="canonical" href="/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792366526" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792366817" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -245,7 +245,7 @@ window.MathJax = {
   <li><strong>Source:</strong> The terminal where the charge carriers enter the channel.</li>
   <li><strong>Drain:</strong> The terminal where the charge carriers leave the channel.</li>
   <li><strong>Gate:</strong> The terminal where a voltage is applied to control the channel’s on/off.
-<img src="/images/notes/learning-fets-analog-electronics/cross_section_nmosfet.png" alt="The schematic of a NMOS from wikipedia|600" /></li>
+<img src="/images/notes/learning-fets-analog-electronics/cross_section_nmosfet.png" alt="The schematic of a NMOS from wikipedia" width="600" /></li>
 </ul>
 
 <p>There are typically 3 terminals in a MOSFET, essentially 2 independent voltages. Usually we choose the source as our voltage reference. In other words, the 2 degrees of freedom (DoFs) are assigned to <span class="math-inline" role="math">\(V_\text{DS}\)</span> and <span class="math-inline" role="math">\(V_\text{GS}\)</span>. The following situations arise when playing with these parameters</p>
@@ -261,7 +261,7 @@ window.MathJax = {
 
 <hr />
 <h3 id="13-characteristics-of-nmosfets">1.3 Characteristics of NMOSFETs</h3>
-<p><img src="/images/notes/learning-fets-analog-electronics/typical_iv_curve_of_n_type_mosfets.png" alt="Typical IV Curve of N-type MOSFETS|800" /></p>
+<p><img src="/images/notes/learning-fets-analog-electronics/typical_iv_curve_of_n_type_mosfets.png" alt="Typical IV Curve of N-type MOSFETS" width="800" /></p>
 
 <p>As just analyzed, the “<strong>current response</strong>” of a MOSFETs can be summarized into a 2-variable function</p>
 
@@ -401,14 +401,7 @@ window.MathJax = {
   <li><strong><span class="math-inline" role="math">\(V_\text{GS}\leq 0,\ V_\text{GS}-V_\text{off}\leq V_\text{DS}\)</span>:</strong> Pinch-off similarly happens at one end of the channel. The channel current saturates and won’t change when increasing <span class="math-inline" role="math">\(V_\text{DS}\)</span>.</li>
 </ul>
 
-<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
-  <tbody>
-    <tr>
-      <td>![The schematic of a NJFET</td>
-      <td>600](/images/notes/learning-fets-analog-electronics/cross_section_njfet.png)</td>
-    </tr>
-  </tbody>
-</table></div>
+<p><img src="/images/notes/learning-fets-analog-electronics/cross_section_njfet.png" alt="The schematic of a NJFET" width="600" /></p>
 
 <p>These features can be summarized into a 2-variable empirical function, one of which is named as <strong>Shockley’s equation</strong></p>
 
@@ -422,14 +415,7 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 
 <p>This time, we plot the transfer characteristic curve with respect to <span class="math-inline" role="math">\(V_\text{GS}\)</span> in the pinch-off region</p>
 
-<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
-  <tbody>
-    <tr>
-      <td>![Transfer Characteristic Curve of N-type JFETs</td>
-      <td>800](/images/notes/learning-fets-analog-electronics/transfer_characteristic_curve_of_n_type_jfets.svg)</td>
-    </tr>
-  </tbody>
-</table></div>
+<p><img src="/images/notes/learning-fets-analog-electronics/transfer_characteristic_curve_of_n_type_jfets.svg" alt="Transfer Characteristic Curve of N-type JFETs" width="800" /></p>
 
     </div>
   </article>
@@ -471,7 +457,7 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792366526"></script>
+<script src="/assets/js/site.js?v=1792366817"></script>
 
 
   </body>
