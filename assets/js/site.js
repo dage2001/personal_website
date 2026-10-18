@@ -172,6 +172,89 @@
     wrapper.insertBefore(toolbar, wrapper.firstChild);
   });
 
+  // ----- Note section navigation -----
+
+  var noteToc = document.querySelector('[data-note-toc]');
+  var noteBody = document.querySelector('.post [itemprop="articleBody"]');
+
+  if (noteToc && noteBody) {
+    var headings = Array.from(noteBody.querySelectorAll('h2, h3'));
+    var tocNav = noteToc.querySelector('.post-toc-nav');
+    var tocToggle = noteToc.querySelector('.post-toc-toggle');
+    var usedHeadingIds = new Set(Array.from(document.querySelectorAll('[id]')).map(function (element) {
+      return element.id;
+    }));
+
+    function headingId(heading, index) {
+      if (heading.id) return heading.id;
+      var base = heading.textContent.trim().toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9\u00c0-\uffff_-]/g, '')
+        .replace(/^-+|-+$/g, '') || 'section-' + (index + 1);
+      var candidate = base;
+      var suffix = 2;
+      while (usedHeadingIds.has(candidate)) {
+        candidate = base + '-' + suffix;
+        suffix += 1;
+      }
+      usedHeadingIds.add(candidate);
+      heading.id = candidate;
+      return candidate;
+    }
+
+    if (headings.length && tocNav && tocToggle) {
+      var tocLinks = headings.map(function (heading, index) {
+        var link = document.createElement('a');
+        var id = headingId(heading, index);
+        link.className = 'post-toc-link post-toc-link--' + heading.tagName.toLowerCase();
+        link.href = '#' + encodeURIComponent(id);
+        link.textContent = heading.textContent.trim();
+        link.addEventListener('click', function () {
+          noteToc.classList.remove('is-open');
+          tocToggle.setAttribute('aria-expanded', 'false');
+        });
+        tocNav.appendChild(link);
+        return link;
+      });
+
+      function setActiveTocLink() {
+        var activeIndex = 0;
+        var probe = Math.min(window.innerHeight * .24, 150);
+        headings.forEach(function (heading, index) {
+          if (heading.getBoundingClientRect().top <= probe) activeIndex = index;
+        });
+        tocLinks.forEach(function (link, index) {
+          var active = index === activeIndex;
+          link.classList.toggle('is-active', active);
+          if (active) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }
+
+      var tocFramePending = false;
+      function requestTocUpdate() {
+        if (tocFramePending) return;
+        tocFramePending = true;
+        window.requestAnimationFrame(function () {
+          tocFramePending = false;
+          setActiveTocLink();
+        });
+      }
+
+      tocToggle.addEventListener('click', function () {
+        var open = noteToc.classList.toggle('is-open');
+        tocToggle.setAttribute('aria-expanded', String(open));
+      });
+      noteToc.hidden = false;
+      setActiveTocLink();
+      window.addEventListener('scroll', requestTocUpdate, { passive: true });
+      window.addEventListener('resize', requestTocUpdate, { passive: true });
+    } else {
+      var postShell = noteToc.closest('.post-shell');
+      if (postShell) postShell.classList.add('post-shell--no-toc');
+    }
+  }
+
   // ----- Publication Year Badges -----
 
   document.querySelectorAll('.pub-entry').forEach(function (entry) {
