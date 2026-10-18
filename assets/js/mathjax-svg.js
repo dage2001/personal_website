@@ -39,11 +39,12 @@ export function stripMathDelimiters(text) {
   return text;
 }
 
-// MathJax 4 returns the SVG itself for some inline expressions and a wrapper
-// for display expressions. querySelector() on an SVG root skips that root and
-// can therefore select only the first nested glyph SVG.
-export function findMathSvg(result) {
-  const svg = result?.localName === 'svg' ? result : result?.querySelector?.('svg');
+// Use MathJax's adaptor rather than DOM querySelector().  In MathJax 4 some
+// inline results expose nested glyph SVGs to querySelector() before the full
+// equation SVG, while adaptor.tags() returns the output root as documented.
+export function findMathSvg(result, adaptor) {
+  const svg = adaptor?.tags?.(result, 'svg')?.[0]
+    || (result?.localName === 'svg' ? result : result?.querySelector?.('svg'));
   if (!svg) throw new Error('MathJax did not produce an SVG.');
   return svg;
 }
@@ -55,7 +56,7 @@ export async function renderMathSvg(source, { display = true, stripDelimiters = 
   const result = await mathJax.tex2svgPromise(latex, { display });
   const error = result.querySelector?.('[data-mml-node="merror"]');
   if (error) throw new Error(error.getAttribute('data-mjx-error') || error.textContent || 'Invalid LaTeX expression.');
-  return findMathSvg(result).cloneNode(true);
+  return findMathSvg(result, mathJax.startup.adaptor).cloneNode(true);
 }
 
 export function addMathSvgStyle(svg) {
