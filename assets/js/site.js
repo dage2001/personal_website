@@ -247,7 +247,7 @@
         if (tocSiteNavbar && (window.scrollY <= 1 || expandedMenu)) {
           navBottom = Math.max(0, tocSiteNavbar.getBoundingClientRect().bottom);
         }
-        document.documentElement.style.setProperty('--post-toc-mobile-top', Math.round(navBottom + 8) + 'px');
+        document.documentElement.style.setProperty('--post-toc-mobile-top', Math.round(navBottom + 16) + 'px');
       }
 
       var tocFramePending = false;
