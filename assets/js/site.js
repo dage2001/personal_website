@@ -181,6 +181,7 @@
     var headings = Array.from(noteBody.querySelectorAll('h2, h3'));
     var tocNav = noteToc.querySelector('.post-toc-nav');
     var tocToggle = noteToc.querySelector('.post-toc-toggle');
+    var tocBackdrop = noteToc.querySelector('.post-toc-backdrop');
     var usedHeadingIds = new Set(Array.from(document.querySelectorAll('[id]')).map(function (element) {
       return element.id;
     }));
@@ -203,16 +204,20 @@
     }
 
     if (headings.length && tocNav && tocToggle) {
+      function closeNoteToc() {
+        noteToc.classList.remove('is-open');
+        tocToggle.setAttribute('aria-expanded', 'false');
+        tocToggle.setAttribute('aria-label', 'Open Content');
+        document.documentElement.classList.remove('toc-drawer-open');
+      }
+
       var tocLinks = headings.map(function (heading, index) {
         var link = document.createElement('a');
         var id = headingId(heading, index);
         link.className = 'post-toc-link post-toc-link--' + heading.tagName.toLowerCase();
         link.href = '#' + encodeURIComponent(id);
         link.textContent = heading.textContent.trim();
-        link.addEventListener('click', function () {
-          noteToc.classList.remove('is-open');
-          tocToggle.setAttribute('aria-expanded', 'false');
-        });
+        link.addEventListener('click', closeNoteToc);
         tocNav.appendChild(link);
         return link;
       });
@@ -244,11 +249,20 @@
       tocToggle.addEventListener('click', function () {
         var open = noteToc.classList.toggle('is-open');
         tocToggle.setAttribute('aria-expanded', String(open));
+        tocToggle.setAttribute('aria-label', open ? 'Close Content' : 'Open Content');
+        document.documentElement.classList.toggle('toc-drawer-open', open && window.innerWidth <= 960);
+      });
+      if (tocBackdrop) tocBackdrop.addEventListener('click', closeNoteToc);
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeNoteToc();
       });
       noteToc.hidden = false;
       setActiveTocLink();
       window.addEventListener('scroll', requestTocUpdate, { passive: true });
-      window.addEventListener('resize', requestTocUpdate, { passive: true });
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 960) closeNoteToc();
+        requestTocUpdate();
+      }, { passive: true });
     } else {
       var postShell = noteToc.closest('.post-shell');
       if (postShell) postShell.classList.add('post-shell--no-toc');
