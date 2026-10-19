@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792367407">
+  <link rel="stylesheet" href="/assets/main.css?v=1792433251">
   <link rel="canonical" href="/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792367407" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792433251" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -183,7 +183,7 @@ window.MathJax = {
     <header class="post-header">
     <h1 itemprop="name headline">[Learnings] FETs &amp; Analog Electronics</h1>
     <p class="post-meta text-muted">
-      <time datetime="2026-10-18T00:00:00+00:00" itemprop="datePublished">Oct 18, 2026</time>
+      <time datetime="2026-10-19T00:00:00+00:00" itemprop="datePublished">Oct 19, 2026</time>
       
     </p>
     
@@ -245,7 +245,7 @@ window.MathJax = {
   <li><strong>Source:</strong> The terminal where the charge carriers enter the channel.</li>
   <li><strong>Drain:</strong> The terminal where the charge carriers leave the channel.</li>
   <li><strong>Gate:</strong> The terminal where a voltage is applied to control the channel’s on/off.
-<img src="/images/notes/learning-fets-analog-electronics/cross_section_nmosfet.png" alt="The schematic of a NMOS from wikipedia" width="600" /></li>
+<img src="/images/notes/learning-fets-analog-electronics/cross_section_nmosfet.png" alt="The schematic of a NMOS from wikipedia" width="500" /></li>
 </ul>
 
 <p>There are typically 3 terminals in a MOSFET, essentially 2 independent voltages. Usually we choose the source as our voltage reference. In other words, the 2 degrees of freedom (DoFs) are assigned to <span class="math-inline" role="math">\(V_\text{DS}\)</span> and <span class="math-inline" role="math">\(V_\text{GS}\)</span>. The following situations arise when playing with these parameters</p>
@@ -415,7 +415,157 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 
 <p>This time, we plot the transfer characteristic curve with respect to <span class="math-inline" role="math">\(V_\text{GS}\)</span> in the pinch-off region</p>
 
-<p><img src="/images/notes/learning-fets-analog-electronics/transfer_characteristic_curve_of_n_type_jfets.svg" alt="Transfer Characteristic Curve of N-type JFETs" width="800" /></p>
+<p><img src="/images/notes/learning-fets-analog-electronics/transfer_characteristic_curve_of_n_type_jfets.svg" alt="Transfer Characteristic Curve of N-type JFETs" width="600" /></p>
+
+<p>We are interested how much the current will vary when the gate voltage takes a small change. Therefore, a quantity termed as <strong>transconductance</strong> is defined, measuring the slope at a certain DC operation point.</p>
+
+<aside class="callout callout-info" data-callout="info" aria-label="Transconductance: A special conductance">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Transconductance: A special conductance</div>
+<div class="callout-content">
+<p>• <strong>Definition:</strong> The ratio of a change in output current (<span class="math-inline" role="math">\(\Delta  I_{\text{out}}\)</span>) to the change in input voltage (<span class="math-inline" role="math">\(\Delta V_{\text{in}}\)</span>). Or specifically in the JFET, it’s <span class="math-inline" role="math">\(\Delta I_\text{D}/\Delta V_\text{GS}\)</span>.
+• <strong>Symbol:</strong> <span class="math-inline" role="math">\(g_{m}\)</span> (where m stands for mutual).
+• <strong>Unit:</strong> Siemens (<span class="math-inline" role="math">\(\mathrm{S}\)</span>), or amperes per volt (<span class="math-inline" role="math">\(\mathrm{A/V}\)</span>).</p>
+</div>
+</aside>
+
+<p>With the mostly same empirical function, the JFETs’ SPICE model has some parameters only named differently. The biggest differences are:</p>
+<ul>
+  <li>There is <strong>no W, L, KP, or TOX</strong>. Everything about the conduction strength is lumped into a single parameter, <strong>BETA</strong>.</li>
+  <li><strong>VTO is negative</strong> for an n-channel JFET. It’s the pinch-off voltage, where the channel closes.</li>
+  <li><strong>There is no body effect</strong> (no <strong>GAMMA</strong> or <strong>PHI</strong>).</li>
+  <li>The gate is a <strong>real PN diode</strong>, so the diode parameters, e.g., <strong>IS</strong>, the capacitance shape <strong>PB</strong> and <strong>M</strong>, matter more.</li>
+</ul>
+
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+  <thead>
+    <tr>
+      <th>Group</th>
+      <th>Parameter</th>
+      <th>Unit</th>
+      <th>What it means</th>
+      <th>Typical value</th>
+      <th>Manufacturing spread (approx.)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Turn-off</td>
+      <td><strong>VTO</strong></td>
+      <td>V</td>
+      <td>Pinch-off voltage: gate-source voltage where the channel closes (negative for n-channel)</td>
+      <td>−0.5 to −6 V</td>
+      <td>Very wide. 2N5485: −0.5 to −4 V; 2N5457: −0.5 to −6 V; J310: −2 to −6.5 V</td>
+    </tr>
+    <tr>
+      <td>Conduction</td>
+      <td><strong>BETA</strong></td>
+      <td>A/V²</td>
+      <td>Transconductance parameter (combines KP and W/L)</td>
+      <td>~0.1–10 mA/V²</td>
+      <td>Wide, roughly a factor of 2–5. Seen on datasheets through I_DSS and g_fs</td>
+    </tr>
+    <tr>
+      <td>Conduction</td>
+      <td><strong>I_DSS</strong> (derived, = BETA × VTO²)</td>
+      <td>A</td>
+      <td>Drain current at V_GS = 0 (valve fully open)</td>
+      <td>1–60 mA</td>
+      <td>Very wide. 2N5485: 4–10 mA; 2N5457: 1–5 mA; J310: 24–60 mA</td>
+    </tr>
+    <tr>
+      <td>Conduction</td>
+      <td><strong>LAMBDA</strong></td>
+      <td>1/V</td>
+      <td>Channel-length modulation, limits voltage gain</td>
+      <td>~0.001–0.05 V⁻¹</td>
+      <td>About ±20–50%; rarely specified</td>
+    </tr>
+    <tr>
+      <td>Speed</td>
+      <td><strong>CGS</strong></td>
+      <td>F</td>
+      <td>Gate-source junction capacitance at 0 V</td>
+      <td>~2–10 pF</td>
+      <td>About ±20–30%. 2N5485: C_iss ≤ 5 pF</td>
+    </tr>
+    <tr>
+      <td>Speed</td>
+      <td><strong>CGD</strong></td>
+      <td>F</td>
+      <td>Gate-drain junction capacitance at 0 V (Miller effect)</td>
+      <td>~0.5–5 pF</td>
+      <td>About ±20–30%. 2N5485: C_rss ≤ 1 pF</td>
+    </tr>
+    <tr>
+      <td>Speed</td>
+      <td><strong>PB, M</strong></td>
+      <td>V, –</td>
+      <td>Junction potential and grading coefficient: how the capacitances shrink with reverse voltage</td>
+      <td>PB ~0.6–1 V; M ~0.3–0.5</td>
+      <td>About ±10–20%</td>
+    </tr>
+    <tr>
+      <td>Gate diode</td>
+      <td><strong>IS</strong></td>
+      <td>A</td>
+      <td>Gate junction saturation current: gate leakage and forward conduction</td>
+      <td>~10⁻¹⁵–10⁻¹² A</td>
+      <td>Up to a factor of several; roughly doubles every ~10 °C</td>
+    </tr>
+    <tr>
+      <td>Second-order</td>
+      <td><strong>RD, RS</strong></td>
+      <td>Ω</td>
+      <td>Drain and source series resistances</td>
+      <td>~1–100 Ω</td>
+      <td>About ±20–30%; rise with temperature</td>
+    </tr>
+    <tr>
+      <td>Noise</td>
+      <td><strong>KF, AF</strong></td>
+      <td>–, –</td>
+      <td>Flicker (1/f) noise coefficients</td>
+      <td>Part-dependent</td>
+      <td>Large; often not modeled at all</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<ul>
+  <li>*Key equation (saturation): I_D = BETA × (V_GS − VTO)² × (1 + LAMBDA × V_DS)</li>
+  <li>I_DSS = BETA × VTO², which is why datasheets usually specify I_DSS and V_GS(off) instead of BETA.</li>
+  <li>*Datasheet values to compare against: V_GS(off) (= VTO), I_DSS, g_fs (forward transconductance; 2N5485: about 3.5–7 mS), C_iss, C_rss, and I_GSS (gate leakage).</li>
+</ul>
+
+<hr />
+<h3 id="15-fets-family-tree--symbols">1.5 FETs Family Tree &amp; Symbols</h3>
+<p>Generally speaking, there are only 5 types of commonly-used FETs (check below), excluding those with different structures (finFETs) or those built with other materials and mechanisms (HEMTs, TFETs, QFETs … ). Check <a href="https://en.wikipedia.org/wiki/Field-effect_transistor">Wikipedia</a> for more rare but fancy FETs.</p>
+
+<pre><code class="language-mermaid">flowchart TD
+
+    FET(["FETs"])
+    FET --&gt; JFET(["JFET"])
+    FET --&gt; MOSFET(["MOSFET"])
+    JFET --&gt; JDEP(["Depletion"])
+    JDEP --&gt; JN("n-channel")
+    JDEP --&gt; JP("p-channel")
+    MOSFET --&gt; DEP(["Depletion"])
+    MOSFET --&gt; ENH(["Enhancement"])
+    DEP --&gt; DN("n-channel")
+    ENH --&gt; EN("n-channel")
+    ENH --&gt; EP("p-channel")
+    
+    classDef root fill:#eef2ff,stroke:#818cf8,stroke-width:3px,color:#312e81,font-weight:bold;
+    classDef jfet fill:#f0fdfa,stroke:#2dd4bf,stroke-width:2px,color:#134e4a;
+    classDef mosfet fill:#f5f3ff,stroke:#a78bfa,stroke-width:2px,color:#4c1d95;
+    classDef nchannel fill:#f0f9ff,stroke:#38bdf8,color:#0c4a6e;
+    classDef pchannel fill:#fff7ed,stroke:#fb923c,color:#7c2d12;
+    class FET root;
+    class JFET,JDEP jfet;
+    class MOSFET,DEP,ENH mosfet;
+    class JN,DN,EN nchannel;
+    class JP,EP pchannel;
+</code></pre>
 
     </div>
   </article>
@@ -457,7 +607,7 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792367407"></script>
+<script src="/assets/js/site.js?v=1792433251"></script>
 
 
   </body>
