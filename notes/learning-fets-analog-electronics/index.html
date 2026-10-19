@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792435439">
+  <link rel="stylesheet" href="/assets/main.css?v=1792436706">
   <link rel="canonical" href="/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792435439" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1792436706" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -541,11 +541,13 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 <h3 id="15-fets-family-tree--symbols">1.5 FETs Family Tree &amp; Symbols</h3>
 <p>Generally speaking, there are only 5 types of commonly-used FETs (check below), excluding those with different structures (finFETs) or those built with other materials and mechanisms (HEMTs, TFETs, QFETs … ). Check <a href="https://en.wikipedia.org/wiki/Field-effect_transistor">Wikipedia</a> for more rare but fancy FETs.</p>
 
-<pre class="mermaid-source"><code class="language-mermaid">flowchart TD
+<pre class="mermaid-source"><code class="language-mermaid">%%{init: {&quot;themeVariables&quot;: {&quot;fontFamily&quot;: &quot;Times New Roman&quot;}}}%%
+
+flowchart TD
 
     FET([&quot;FETs&quot;])
-    FET --&gt; JFET([&quot;JFET&quot;])
-    FET --&gt; MOSFET([&quot;MOSFET&quot;])
+    FET --&gt; JFET([&quot;JFETs&quot;])
+    FET --&gt; MOSFET([&quot;MOSFETs&quot;])
     JFET --&gt; JDEP([&quot;Depletion&quot;])
     JDEP --&gt; JN(&quot;n-channel&quot;)
     JDEP --&gt; JP(&quot;p-channel&quot;)
@@ -608,10 +610,10 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792435439"></script>
+<script src="/assets/js/site.js?v=1792436706"></script>
 
 <div id="mermaid-config" hidden data-site="{&quot;theme&quot;:&quot;base&quot;}" data-page="null"></div>
-<script type="module" src="/assets/js/mermaid.js?v=1792435439"></script>
+<script type="module" src="/assets/js/mermaid.js?v=1792436706"></script>
 
 
 
