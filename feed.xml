@@ -5,7 +5,7 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>https://jordan-wang.win/</link>
     <atom:link href="https://jordan-wang.win/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Wed, 21 Oct 2026 02:04:53 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 21 Oct 2026 11:40:31 +0000</lastBuildDate>
     
     <item>
       <title>【整活】笑话数则（其一）</title>
@@ -109,6 +109,89 @@
       <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
       <link>https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/ja/</link>
       <guid isPermaLink="true">https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/ja/</guid>
+    </item>
+    
+    <item>
+      <title>【札记】Poincaré-Dulac变换简介</title>
+      <description>0. 引子
+Poincaré–Dulac 变换是一种用于非线性动力系统的近恒等坐标变换（near-identity transformation）。其核心目标是：
+
+
+  [!QUOTE] Goal
+在不改变系统局部动力学本质的前提下，通过非线性坐标变换消去所有可以消去的非线性项，只保留满足特定共振条件（resonance condition）的项。
+
+
+它是研究非线性振荡、模态耦合、分岔理论和 Normal Form理论的重要工具。
+
+
+
+1. 从一般非线性动力系统出发
+考虑平衡点附近的动力系统：
+
+JUNDAMATHFLOWBLOCKTOKEN0END
+
+其中：
+
+  JUNDAMATHINLINETOKEN0END 是线性动力学矩阵。
+  JUNDAMATHINLINETOKEN1END 是 JUNDAMATHINLINETOKEN2END 阶齐次多项式非线性项。
+  假设平衡点为 JUNDAMATHINLINETOKEN3END。
+
+
+首先对角化线性部分（假设 JUNDAMATHINLINETOKEN4END 可对角化）：
+JUNDAMATHFLOWBLOCKTOKEN1END
+于是每个模式满足
+JUNDAMATHFLOWBLOCKTOKEN2END其中
+JUNDAMATHFLOWBLOCKTOKEN3END
+我们的目标是判断哪些非线性耦合项可以通过坐标变换消除。
+
+
+
+2. Poincaré–Dulac 变换
+引入一个近恒等变换：
+JUNDAMATHFLOWBLOCKTOKEN4END
+其中 JUNDAMATHINLINETOKEN5END 为 JUNDAMATHINLINETOKEN6END 阶齐次多项式。考虑一个特定的非线性项：
+JUNDAMATHFLOWBLOCKTOKEN5END
+尝试通过如下变换消去该项
+JUNDAMATHFLOWBLOCKTOKEN6END
+消去该项。保留相应阶数，可得
+JUNDAMATHFLOWBLOCKTOKEN7END
+因此选择
+JUNDAMATHFLOWBLOCKTOKEN8END
+便能够消去该非线性项。但这里存在一个特殊情况：
+JUNDAMATHFLOWBLOCKTOKEN9END
+此时分母为零，无法使用上述变换消除该项。这就是 Poincaré–Dulac 共振条件。
+
+
+
+3. Normal Form
+经过逐阶变换，动力系统被化简为：
+JUNDAMATHFLOWBLOCKTOKEN10END
+其中共振集合为
+JUNDAMATHFLOWBLOCKTOKEN11END
+这就是 Poincaré–Dulac normal form。
+
+需要注意：这是形式幂级数层面的结论。无穷阶变换不一定收敛，在有限阶截断下，还需要控制非共振分母过小带来的问题。
+
+4. 物理图像：共振项为什么无法消除？
+考虑三个振荡模式：
+JUNDAMATHFLOWBLOCKTOKEN12END
+我们希望消除非线性耦合 JUNDAMATHINLINETOKEN7END，对应的变换系数为
+JUNDAMATHFLOWBLOCKTOKEN13END
+
+  当JUNDAMATHINLINETOKEN8END 时，可以在形式级数意义下消除这一项。
+  当JUNDAMATHINLINETOKEN9END时，变换奇异。
+
+
+物理上，这是三波混频的共振条件：两个模式能够有效地向第三个模式传递能量，不能通过近恒等坐标变换将这一物理过程消除。相反，非共振耦合在适当的微扰条件下可以被吸收到坐标的重新定义之中。
+
+
+  [!INFO] 共振项：非微扰频率转换通道
+一句话总结共振项背后的物理图像：其在系统中引入了非微扰条件的频率转换通道，使得不能通过变换将其转换到仅与原始方程仅相错高阶项的等价类中。因此本质上讲，在JUNDAMATHINLINETOKEN10END阶寻找标准型实际上是在求解同调方程。
+
+</description>
+      <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
+      <link>https://jordan-wang.win/notes/poincare-dulac-transformation/</link>
+      <guid isPermaLink="true">https://jordan-wang.win/notes/poincare-dulac-transformation/</guid>
     </item>
     
     <item>
