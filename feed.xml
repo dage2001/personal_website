@@ -5,89 +5,110 @@
     <description>Junda Wang is a PhD Candidate at EPFL working on Floquet photonics, computational electromagnetics, and complex wave systems.</description>
     <link>https://jordan-wang.win/</link>
     <atom:link href="https://jordan-wang.win/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Wed, 21 Oct 2026 11:06:35 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 21 Oct 2026 02:04:53 +0000</lastBuildDate>
     
     <item>
-      <title>【札记】Poincaré-Dulac变换简介</title>
-      <description>0. 引子
-Poincaré–Dulac 变换是一种用于非线性动力系统的近恒等坐标变换（near-identity transformation）。其核心目标是：
+      <title>【整活】笑话数则（其一）</title>
+      <description>笑话是人类智慧的结晶，讲笑话是一项暂时无法被AI替代的能力。下面收录学术笑话数则，纯属娱乐，请勿对号入座。
 
 
-  [!QUOTE] Goal
-在不改变系统局部动力学本质的前提下，通过非线性坐标变换消去所有可以消去的非线性项，只保留满足特定共振条件（resonance condition）的项。
+一、
+
+一位教授受邀编写《综述：G同志的学术生涯》，完成后将在顶级学术期刊上发表。文章中从头到尾完整讲述了近一个世纪以来该领域的发展，细致入微。该期刊的一位编辑写信询问教授，“写得很好，但G同志的工作在哪里？”答：“G同志是本文的通讯作者。”
 
 
-它是研究非线性振荡、模态耦合、分岔理论和 Normal Form理论的重要工具。
+二、
+
+物理学院召开年级大会，院长和年级主任都需要出席。院长讲话时发现F年级的年级主任注意力不能集中，便说大家一定要注意身体，痴呆等疾病在教授群体中经常出现。该年级主任回答到，“我不同意院长的观点，我认为教授群体中最大的问题是自由散漫。不信您看，我们已经开始了好一会儿了，F年级的年级主任还没有来。”
 
 
+三、
 
-1. 从一般非线性动力系统出发
-考虑平衡点附近的动力系统：
-
-JUNDAMATHFLOWBLOCKTOKEN0END
-
-其中：
-
-  JUNDAMATHINLINETOKEN0END 是线性动力学矩阵。
-  JUNDAMATHINLINETOKEN1END 是 JUNDAMATHINLINETOKEN2END 阶齐次多项式非线性项。
-  假设平衡点为 JUNDAMATHINLINETOKEN3END。
+某教授参加学术晚宴。席间一同行前来敬酒，对其近期发表的一篇文章赞不绝口，称是该领域创新研究的典范。该教授听完后十分高兴，转头对学生说：“他说的是什么文章，回去发给我也读一读。”
 
 
-首先对角化线性部分（假设 JUNDAMATHINLINETOKEN4END 可对角化）：
-JUNDAMATHFLOWBLOCKTOKEN1END
-于是每个模式满足
-JUNDAMATHFLOWBLOCKTOKEN2END其中
-JUNDAMATHFLOWBLOCKTOKEN3END
-我们的目标是判断哪些非线性耦合项可以通过坐标变换消除。
+四、
+
+一日应导师要求，某科研组例行召开组会。同学们在组会上着重研究了两个问题：怎样测量散射矩阵与怎样做好成果报告。由于现场没有人知道什么是散射矩阵，所以只好直接研究第二个问题。
 
 
+五、
 
-2. Poincaré–Dulac 变换
-引入一个近恒等变换：
-JUNDAMATHFLOWBLOCKTOKEN4END
-其中 JUNDAMATHINLINETOKEN5END 为 JUNDAMATHINLINETOKEN6END 阶齐次多项式。考虑一个特定的非线性项：
-JUNDAMATHFLOWBLOCKTOKEN5END
-尝试通过如下变换消去该项
-JUNDAMATHFLOWBLOCKTOKEN6END
-消去该项。保留相应阶数，可得
-JUNDAMATHFLOWBLOCKTOKEN7END
-因此选择
-JUNDAMATHFLOWBLOCKTOKEN8END
-便能够消去该非线性项。但这里存在一个特殊情况：
-JUNDAMATHFLOWBLOCKTOKEN9END
-此时分母为零，无法使用上述变换消除该项。这就是 Poincaré–Dulac 共振条件。
+“你为什么没交上周的科研周报？”
+
+“太忙了，没有时间。”
+
+“那为什么不用AI，组里刚买了Claude不是吗。”
+
+“当然，我试过了。”
+
+“很好，那它给你生成了吗？”
+
+“它问我是不是中国人。”
 
 
 
-3. Normal Form
-经过逐阶变换，动力系统被化简为：
-JUNDAMATHFLOWBLOCKTOKEN10END
-其中共振集合为
-JUNDAMATHFLOWBLOCKTOKEN11END
-这就是 Poincaré–Dulac normal form。
-
-需要注意：这是形式幂级数层面的结论。无穷阶变换不一定收敛，在有限阶截断下，还需要控制非共振分母过小带来的问题。
-
-4. 物理图像：共振项为什么无法消除？
-考虑三个振荡模式：
-JUNDAMATHFLOWBLOCKTOKEN12END
-我们希望消除非线性耦合 JUNDAMATHINLINETOKEN7END，对应的变换系数为
-JUNDAMATHFLOWBLOCKTOKEN13END
-
-  当JUNDAMATHINLINETOKEN8END 时，可以在形式级数意义下消除这一项。
-  当JUNDAMATHINLINETOKEN9END时，变换奇异。
-
-
-物理上，这是三波混频的共振条件：两个模式能够有效地向第三个模式传递能量，不能通过近恒等坐标变换将这一物理过程消除。相反，非共振耦合在适当的微扰条件下可以被吸收到坐标的重新定义之中。
-
-
-  [!INFO] 共振项：非微扰频率转换通道
-一句话总结共振项背后的物理图像：其在系统中引入了非微扰条件的频率转换通道，使得不能通过变换将其转换到仅与原始方程仅相错高阶项的等价类中。因此本质上讲，在JUNDAMATHINLINETOKEN10END阶寻找标准型实际上是在求解同调方程。
-
+（未完待续）
 </description>
       <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
-      <link>https://jordan-wang.win/notes/poincare-dulac-transformation/</link>
-      <guid isPermaLink="true">https://jordan-wang.win/notes/poincare-dulac-transformation/</guid>
+      <link>https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/zh/</link>
+      <guid isPermaLink="true">https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/zh/</guid>
+    </item>
+    
+    <item>
+      <title>[Pranks] A Few Jokes (Part 1)</title>
+      <description>Jokes are a product of human wisdom, and telling jokes is a skill that AI cannot replace for the time being. Below are a few academic jokes, purely for entertainment; please do not take them personally. I. A professor was invited to write a review article titled “A Review: Comrade G’s Academic Career,” which was to be published in a top academic journal. The article provided a comprehensive and detailed account of the field’s development over the past century. An editor of the journal wrote to the professor, asking, “It’s very well written, but where is Comrade G’s work?” The...</description>
+      <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
+      <link>https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/</link>
+      <guid isPermaLink="true">https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/</guid>
+    </item>
+    
+    <item>
+      <title>【いたずら】ジョーク集（第１弾）</title>
+      <description>ジョークは人間の知恵の産物であり、ジョークを言う能力は今のところAIが代替できないスキルです。以下に、純粋に娯楽目的の学術的なジョークをいくつかご紹介します。どうか真に受けないでください。
+
+
+一、
+
+ある教授が「レビュー：G同志の学術的経歴」と題した総説論文の執筆を依頼され、一流の学術誌に掲載されることになった。その論文は、過去1世紀にわたる当該分野の発展について包括的かつ詳細に記述したものであった。ところが、その学術誌の編集者が教授に手紙を送り、「非常に良く書けているが、G同志の成果はどこにあるのか？」と尋ねた。教授は「G同志は、この論文の責任著者です」と答えた。
+
+
+二、
+
+物理学科は年度末会議を開催し、学部長と学年主任の出席が義務付けられていた。学部長はスピーチ中、F学年主任が集中していないことに気づき、教授の間では認知症などの病気が蔓延しているため、皆健康に気を付けるべきだと述べた。学年主任は「学部長の意見には賛成できません。教授たちの最大の問題は規律の欠如だと私は考えています。ほら、もうずいぶん前から会議が始まっているのに、F学年主任はまだ来ていないんですよ」と答えた。
+
+
+三、
+
+ある教授が学術的な夕食会に出席した。食事中、同僚が教授に乾杯の挨拶をし、最近発表された論文をその分野における革新的な研究の模範として称賛した。教授は喜び、学生の方を向いて「彼はどの論文のことを言っているんだ？私にも読ませてくれ」と言った。
+
+
+四、
+
+ある日、教授の指示で研究グループが定例会議を開いた。学生たちは主に2つの課題、すなわち散乱行列の測定方法と報告書の作成方法について話し合った。出席者の中に散乱行列が何であるかを知っている者がいなかったため、すぐに2つ目の課題に取り掛からざるを得なかった。
+
+
+五、
+
+「なぜ先週の研究報告書を提出しなかったのですか？」
+
+「忙しすぎて時間がないんです。」
+
+「それならAIを使えばいいじゃないか？つい最近クロードに登録したばかりじゃないか？」
+
+「もちろん、試してみましたよ。」
+
+「そうか。それで、生成されたのですか？」
+
+「中国人かどうか聞かれたんです。」
+
+
+
+（　つづく…　）
+</description>
+      <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
+      <link>https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/ja/</link>
+      <guid isPermaLink="true">https://jordan-wang.win/notes/several-soviet-jokes-1st-collection/ja/</guid>
     </item>
     
     <item>
