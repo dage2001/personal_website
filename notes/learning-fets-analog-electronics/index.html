@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1792942901">
+  <link rel="stylesheet" href="/assets/main.css?v=1793045543">
   <link rel="canonical" href="https://jordan-wang.win/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1792942901" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793045543" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -166,7 +166,7 @@ window.MathJax = {
     <header class="post-header">
     <h1 itemprop="name headline">[Learnings] FETs &amp; Analog Electronics</h1>
     <p class="post-meta text-muted">
-      <time datetime="2026-10-19T00:00:00+00:00" itemprop="datePublished">Oct 19, 2026</time>
+      <time datetime="2026-10-26T00:00:00+00:00" itemprop="datePublished">Oct 26, 2026</time>
       
     </p>
     
@@ -515,9 +515,9 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 </table></div>
 
 <ul>
-  <li>*Key equation (saturation): I_D = BETA × (V_GS − VTO)² × (1 + LAMBDA × V_DS)</li>
+  <li><em>Key equation (saturation):</em> I_D = BETA × (V_GS − VTO)² × (1 + LAMBDA × V_DS)</li>
   <li>I_DSS = BETA × VTO², which is why datasheets usually specify I_DSS and V_GS(off) instead of BETA.</li>
-  <li>*Datasheet values to compare against: V_GS(off) (= VTO), I_DSS, g_fs (forward transconductance; 2N5485: about 3.5–7 mS), C_iss, C_rss, and I_GSS (gate leakage).</li>
+  <li><em>Datasheet values to compare against:</em> V_GS(off) (= VTO), I_DSS, g_fs (forward transconductance; 2N5485: about 3.5–7 mS), C_iss, C_rss, and I_GSS (gate leakage).</li>
 </ul>
 
 <hr />
@@ -552,6 +552,39 @@ flowchart TD
     class JP,EP pchannel;
 </code></pre>
 
+<p>Here are some facts about the FETs’ family tree</p>
+<ul>
+  <li>JFETs only work in depletion modes, regardless of p/n-type.</li>
+  <li>Depletion MOSFETs are already a small niche due to bad power efficiency, since the channel is <em>normally-on</em>.</li>
+  <li>p-channel depletion MOSFETs are physically viable, but they are a niche inside a niche. Reasons include both the bad power efficiency and the high manufacturing cost, as well as the fact that holes are typically 2~3 times heavier than the electrons leading to lower mobility.</li>
+</ul>
+
+<p>Symbols for circuit schematics are designed given MOSFETs mechanisms, generally with two rules</p>
+<ul>
+  <li><strong>Depletion / Enhancement:</strong> If the channel originally exists without gate voltage, we draw a continuous line; if the channel exits only when applying voltage, we draw a dashed line.</li>
+  <li><strong>P / N Substrate:</strong> An arrow is used to represent the channel type, pointing from the p-type area to the n-type area.
+<img src="/images/notes/learning-fets-analog-electronics/mosfet_symbols.png" alt="Symbols of MOSFETs" width="600" /></li>
+</ul>
+
+<aside class="callout callout-question" data-callout="question" aria-label="The extra pin shorted to the source?">
+<div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>The extra pin shorted to the source?</div>
+<div class="callout-content">
+<p>Some may ask why there are 4 pins rather than 3, with one in the middle shorted to the ground. This can be explained from the cross section view above, where we can find an extra <strong>body</strong> terminal. This terminal has an <strong>ohmic contact</strong> to the substrate (or the wells in CMOS), which pins the Fermi level in the background and performs as a reservoir of majority carriers.</p>
+<p>In practical MOSFETs, the body terminal is mostly fabricated as a <strong>heavily doped region</strong>, i.e. p+/n+, either <em>on the backside of a wafer</em> or simply <em>on the frontside besides sources and drains</em>. Without this terminal, MOSFETs may suffer from the following</p>
+  <ul>
+    <li>the threshold drifts</li>
+    <li>parasitic diodes and bipolar transistors turn on</li>
+    <li>noise couples between circuits</li>
+    <li>the chip is at real risk of <strong>latch-up</strong>, which shorts VDD to GND and can destroy it
+SOI wafers might be the exception, as every single transistor is wrapped and isolated by a buried oxide layer. Therefore, the body terminals are sometimes deliberately left floating to save area.</li>
+  </ul>
+
+  <p>In discrete MOSFETs, the body terminal is directly shorted to the source during the packaging process. In CMOS ICs, a bunch of MOSFETs may share the same body terminal, e.g. n-type FETs tapped to GND while p-type FETs tapped to VDD.</p>
+</div>
+</aside>
+
+<p>JFETs have much simpler symbols, as they always work in depletion mode. Therefore, we safety drop the line while keeping the arrow.
+<img src="/images/notes/learning-fets-analog-electronics/jfet_symbols.png" alt="Symbols of MOSFETs" width="500" /></p>
 
     </div>
   </article>
@@ -593,10 +626,10 @@ flowchart TD
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1792942901"></script>
+<script src="/assets/js/site.js?v=1793045543"></script>
 
 <div id="mermaid-config" hidden data-site="{&quot;theme&quot;:&quot;base&quot;}" data-page="null"></div>
-<script type="module" src="/assets/js/mermaid.js?v=1792942901"></script>
+<script type="module" src="/assets/js/mermaid.js?v=1793045543"></script>
 
 
 
