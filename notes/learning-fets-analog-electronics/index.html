@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793060013">
+  <link rel="stylesheet" href="/assets/main.css?v=1793061836">
   <link rel="canonical" href="https://jordan-wang.win/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1793060013" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793061836" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -621,113 +621,354 @@ flowchart LR
   <li><label style="color:#0F6E56">Green</label> = front end of line (transistors)</li>
   <li><label style="color:#854F0B">Amber</label> = middle of line (contacts)</li>
   <li><label style="color:#185FA5">Blue</label> = back end of line (wiring)</li>
-  <li><label style="color:#993556">Pink</label> = test and packaging
-    <h4 id="-substrate-and-isolation">① Substrate and isolation</h4>
-    <details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+  <li><label style="color:#993556">Pink</label> = test and packaging</li>
+</ul>
+
+<h4 id="-substrate-and-isolation">① Substrate and isolation</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
 <summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 1–5</summary>
 <div class="callout-content">
-<p>|#|Process|What and why|
-|—|—|—|
-|1|Starting wafer + epitaxy|300 mm Si wafer with a thin, lightly doped p-type epi layer on top. The epi is purer than the bulk; a more heavily doped substrate below helps resist latch-up.|
-|2|Pad oxide + nitride|~5–10 nm SiO₂ cushions stress; ~50–100 nm Si₃N₄ is the hard mask and later the CMP stop.|
-|3|Active-area litho + trench etch|Defines where transistors will be; plasma etch cuts trenches a few hundred nm deep between them.|
-|4|Liner oxidation + trench fill|Thin liner rounds corners and passivates sidewalls; CVD oxide fills the trenches without voids.|
-|5|Oxide CMP + nitride strip|Leaves oxide only in the trenches. Neighboring devices are now isolated (shallow trench isolation, STI).|</p>
-      <h4 id="-wells-and-channel">② Wells and channel</h4>
-      <p>[!abstract]- Steps 6–8</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|6|n-well implant (phosphorus)|Forms the PMOS body. A deep, retrograde profile lowers well resistance and improves latch-up immunity.|
-|7|p-well implant (boron)|Forms the NMOS body, plus punch-through stop implants below the channel.|
-|8|Vt adjust implants + anneal|Shallow implants fine-tune the threshold voltage; a rapid anneal activates dopants and repairs damage.|</p>
-      <h4 id="-dummy-gate-and-spacers">③ Dummy gate and spacers</h4>
-      <p>[!abstract]- Steps 9–12</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|9|Sacrificial oxide|Protects the channel surface; removed later before the real gate is built.|
-|10|Poly deposition + gate patterning|Polysilicon placeholder that defines the gate length (~15–20 nm at leading nodes). Later steps self-align to it.|
-|11|Extension (LDD) + halo implants|Shallow, low-dose implants soften the drain-side field and reduce hot-carrier damage; angled halo implants suppress short-channel effects.|
-|12|Spacer deposition + etch|SiN sidewalls on the gate keep the heavy source/drain doping away from the channel.|</p>
-      <h4 id="-source--drain-and-body-taps">④ Source / drain and body taps</h4>
-      <p>[!abstract]- Steps 13–16</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|13|S/D recess etch|Cavities beside each gate make room for epitaxial source/drain material.|
-|14|Selective epitaxy|SiGe:B for PMOS compresses the channel and boosts hole mobility; Si:P for NMOS gives very low resistance.|
-|15|Deep n+ / p+ implants|Complete the source/drain doping. <strong>The same masks form the body taps:</strong> p+ in the p-substrate, n+ in the n-wells.|
-|16|Activation anneal (spike / flash / laser)|Millisecond anneals activate dopants with little diffusion. This is the hottest step, which is why the metal gate comes afterward.|</p>
-      <h4 id="-replacement-metal-gate">⑤ Replacement metal gate</h4>
-      <p>[!abstract]- Steps 17–22</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|17|Etch-stop layer + first dielectric|SiN contact etch-stop layer (can also add channel stress), then oxide fills between the gates.|
-|18|CMP to poly open|Polishing continues until the tops of the dummy gates are exposed.|
-|19|Dummy gate removal|Removes the poly and sacrificial oxide, leaving an empty trench between the spacers.|
-|20|Interfacial oxide + high-k ALD|~0.5–1 nm SiO₂ + ~1.5–2 nm HfO₂ (k ≈ 20–25). Thicker than pure SiO₂ for the same capacitance, so far less tunneling leakage.|
-|21|Work-function metals|Different metals for NMOS and PMOS set the threshold voltage; varying thickness gives several Vt flavors.|
-|22|Gate fill + metal CMP|Low-resistance W or Al completes the gate. <strong>The transistors now exist.</strong>|</p>
-      <h4 id="-contacts">⑥ Contacts</h4>
-      <p>[!abstract]- Steps 23–25</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|23|Contact litho + etch|Trench contacts down to source/drain, self-aligned to the gates to avoid shorts.|
-|24|Silicide formation|Ti-based (advanced nodes) or NiSi (older) silicide cuts the metal-to-silicon contact resistance.|
-|25|Contact plugs + CMP|TiN liner + W or Co fill connects the transistors to the first wiring layer.|</p>
-      <h4 id="-copper-wiring">⑦ Copper wiring</h4>
-      <p>[!abstract]- Steps 26–30 (repeated for ~10–15 metal layers)</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|26|Low-k dielectric|Carbon-doped oxide (<span class="math-inline" role="math">\(\kappa ≈ 2.5–3\)</span>) reduces wire capacitance and RC delay, but is mechanically fragile.|
-|27|Via + trench patterning|Dual damascene: vias and lines patterned in the same layer. EUV for the tightest pitches.|
-|28|Barrier + Cu seed|TaN/Ta stops copper from diffusing into silicon, where it would ruin transistors. Seed layer enables plating.|
-|29|Cu electroplating + anneal|Bottom-up, void-free fill; anneal grows larger grains and lowers resistivity.|
-|30|Cu CMP + cap layer|Removes excess copper; SiCN cap protects against diffusion and electromigration. Upper layers are thicker.|</p>
-      <h4 id="-passivation-and-wafer-test">⑧ Passivation and wafer test</h4>
-      <p>[!abstract]- Steps 31–32</p>
-
-      <p>|#|Process|What and why|
-|—|—|—|
-|31|Passivation + pad opening|SiN/oxide protects against moisture and scratches; openings expose bond pads or bump sites.|
-|32|Wafer probe (sort)|Every die is tested; scribe-line structures check Vt, leakage and resistance.|</p>
-      <h4 id="-packaging-and-final-test">⑨ Packaging and final test</h4>
-      <p>[!abstract]- Steps 33–35</p>
-
-      <div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Process</th>
-            <th>What and why</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>33</td>
-            <td>Backgrind + dicing</td>
-            <td>Wafer is thinned and sawn into dies. Optional backside metal creates the <strong>backside substrate contact</strong>.</td>
-          </tr>
-          <tr>
-            <td>34</td>
-            <td>Die attach + interconnect</td>
-            <td>Conductive die attach can ground the substrate; then wire bonding or flip-chip bumps.</td>
-          </tr>
-          <tr>
-            <td>35</td>
-            <td>Final test + burn-in</td>
-            <td>Tested at speed and temperature; burn-in screens out early failures.</td>
-          </tr>
-        </tbody>
-      </table></div>
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Starting wafer + epitaxy</td>
+        <td>300 mm Si wafer with a thin, lightly doped p-type epi layer on top. The epi is purer than the bulk; a more heavily doped substrate below helps resist latch-up.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Pad oxide + nitride</td>
+        <td>~5–10 nm SiO₂ cushions stress; ~50–100 nm Si₃N₄ is the hard mask and later the CMP stop.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Active-area litho + trench etch</td>
+        <td>Defines where transistors will be; plasma etch cuts trenches a few hundred nm deep between them.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Liner oxidation + trench fill</td>
+        <td>Thin liner rounds corners and passivates sidewalls; CVD oxide fills the trenches without voids.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Oxide CMP + nitride strip</td>
+        <td>Leaves oxide only in the trenches. Neighboring devices are now isolated (shallow trench isolation, STI).</td>
+      </tr>
+    </tbody>
+  </table></div>
 </div>
 </details>
-  </li>
-</ul>
+
+<h4 id="-wells-and-channel">② Wells and channel</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 6–8</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>6</td>
+        <td>n-well implant (phosphorus)</td>
+        <td>Forms the PMOS body. A deep, retrograde profile lowers well resistance and improves latch-up immunity.</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>p-well implant (boron)</td>
+        <td>Forms the NMOS body, plus punch-through stop implants below the channel.</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Vt adjust implants + anneal</td>
+        <td>Shallow implants fine-tune the threshold voltage; a rapid anneal activates dopants and repairs damage.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-dummy-gate-and-spacers">③ Dummy gate and spacers</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 9–12</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>9</td>
+        <td>Sacrificial oxide</td>
+        <td>Protects the channel surface; removed later before the real gate is built.</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>Poly deposition + gate patterning</td>
+        <td>Polysilicon placeholder that defines the gate length (~15–20 nm at leading nodes). Later steps self-align to it.</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>Extension (LDD) + halo implants</td>
+        <td>Shallow, low-dose implants soften the drain-side field and reduce hot-carrier damage; angled halo implants suppress short-channel effects.</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>Spacer deposition + etch</td>
+        <td>SiN sidewalls on the gate keep the heavy source/drain doping away from the channel.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-source--drain-and-body-taps">④ Source / drain and body taps</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 13–16</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>13</td>
+        <td>S/D recess etch</td>
+        <td>Cavities beside each gate make room for epitaxial source/drain material.</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td>Selective epitaxy</td>
+        <td>SiGe:B for PMOS compresses the channel and boosts hole mobility; Si:P for NMOS gives very low resistance.</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>Deep n+ / p+ implants</td>
+        <td>Complete the source/drain doping. <strong>The same masks form the body taps:</strong> p+ in the p-substrate, n+ in the n-wells.</td>
+      </tr>
+      <tr>
+        <td>16</td>
+        <td>Activation anneal (spike / flash / laser)</td>
+        <td>Millisecond anneals activate dopants with little diffusion. This is the hottest step, which is why the metal gate comes afterward.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-replacement-metal-gate">⑤ Replacement metal gate</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 17–22</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>17</td>
+        <td>Etch-stop layer + first dielectric</td>
+        <td>SiN contact etch-stop layer (can also add channel stress), then oxide fills between the gates.</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>CMP to poly open</td>
+        <td>Polishing continues until the tops of the dummy gates are exposed.</td>
+      </tr>
+      <tr>
+        <td>19</td>
+        <td>Dummy gate removal</td>
+        <td>Removes the poly and sacrificial oxide, leaving an empty trench between the spacers.</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>Interfacial oxide + high-k ALD</td>
+        <td>~0.5–1 nm SiO₂ + ~1.5–2 nm HfO₂ (k ≈ 20–25). Thicker than pure SiO₂ for the same capacitance, so far less tunneling leakage.</td>
+      </tr>
+      <tr>
+        <td>21</td>
+        <td>Work-function metals</td>
+        <td>Different metals for NMOS and PMOS set the threshold voltage; varying thickness gives several Vt flavors.</td>
+      </tr>
+      <tr>
+        <td>22</td>
+        <td>Gate fill + metal CMP</td>
+        <td>Low-resistance W or Al completes the gate. <strong>The transistors now exist.</strong></td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-contacts">⑥ Contacts</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 23–25</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>23</td>
+        <td>Contact litho + etch</td>
+        <td>Trench contacts down to source/drain, self-aligned to the gates to avoid shorts.</td>
+      </tr>
+      <tr>
+        <td>24</td>
+        <td>Silicide formation</td>
+        <td>Ti-based (advanced nodes) or NiSi (older) silicide cuts the metal-to-silicon contact resistance.</td>
+      </tr>
+      <tr>
+        <td>25</td>
+        <td>Contact plugs + CMP</td>
+        <td>TiN liner + W or Co fill connects the transistors to the first wiring layer.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-copper-wiring">⑦ Copper wiring</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 26–30 (repeated for ~10–15 metal layers)</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>26</td>
+        <td>Low-k dielectric</td>
+        <td>Carbon-doped oxide (<span class="math-inline" role="math">\(\kappa ≈ 2.5–3\)</span>) reduces wire capacitance and RC delay, but is mechanically fragile.</td>
+      </tr>
+      <tr>
+        <td>27</td>
+        <td>Via + trench patterning</td>
+        <td>Dual damascene: vias and lines patterned in the same layer. EUV for the tightest pitches.</td>
+      </tr>
+      <tr>
+        <td>28</td>
+        <td>Barrier + Cu seed</td>
+        <td>TaN/Ta stops copper from diffusing into silicon, where it would ruin transistors. Seed layer enables plating.</td>
+      </tr>
+      <tr>
+        <td>29</td>
+        <td>Cu electroplating + anneal</td>
+        <td>Bottom-up, void-free fill; anneal grows larger grains and lowers resistivity.</td>
+      </tr>
+      <tr>
+        <td>30</td>
+        <td>Cu CMP + cap layer</td>
+        <td>Removes excess copper; SiCN cap protects against diffusion and electromigration. Upper layers are thicker.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-passivation-and-wafer-test">⑧ Passivation and wafer test</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 31–32</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>31</td>
+        <td>Passivation + pad opening</td>
+        <td>SiN/oxide protects against moisture and scratches; openings expose bond pads or bump sites.</td>
+      </tr>
+      <tr>
+        <td>32</td>
+        <td>Wafer probe (sort)</td>
+        <td>Every die is tested; scribe-line structures check Vt, leakage and resistance.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
+
+<h4 id="-packaging-and-final-test">⑨ Packaging and final test</h4>
+
+<details class="callout callout-abstract callout-collapsible" data-callout="abstract">
+<summary class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Steps 33–35</summary>
+<div class="callout-content">
+<div class="table-scroll" role="region" aria-label="Scrollable table" tabindex="0"><table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Process</th>
+        <th>What and why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>33</td>
+        <td>Backgrind + dicing</td>
+        <td>Wafer is thinned and sawn into dies. Optional backside metal creates the <strong>backside substrate contact</strong>.</td>
+      </tr>
+      <tr>
+        <td>34</td>
+        <td>Die attach + interconnect</td>
+        <td>Conductive die attach can ground the substrate; then wire bonding or flip-chip bumps.</td>
+      </tr>
+      <tr>
+        <td>35</td>
+        <td>Final test + burn-in</td>
+        <td>Tested at speed and temperature; burn-in screens out early failures.</td>
+      </tr>
+    </tbody>
+  </table></div>
+</div>
+</details>
 
 <p><img src="/images/notes/learning-fets-analog-electronics/cross_section_mosfet_fab_workflow.svg" alt="Cross Section MOSFET Fab Workflow" width="800" /></p>
 
@@ -771,10 +1012,10 @@ flowchart LR
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793060013"></script>
+<script src="/assets/js/site.js?v=1793061836"></script>
 
 <div id="mermaid-config" hidden data-site="{&quot;theme&quot;:&quot;base&quot;}" data-page="null"></div>
-<script type="module" src="/assets/js/mermaid.js?v=1793060013"></script>
+<script type="module" src="/assets/js/mermaid.js?v=1793061836"></script>
 
 
 
