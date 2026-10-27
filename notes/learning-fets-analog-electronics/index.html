@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793061836">
+  <link rel="stylesheet" href="/assets/main.css?v=1793062261">
   <link rel="canonical" href="https://jordan-wang.win/notes/learning-fets-analog-electronics/">
   
     
@@ -40,7 +40,7 @@
       
     
   
-  <link rel="icon" href="/favicon.ico?v=1793061836" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793062261" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -405,9 +405,11 @@ I_\text{DSS}(1-\frac{V_\text{GS}}{V_\text{off}})^2,\quad &amp; V_\text{GS}-V_\te
 <aside class="callout callout-info" data-callout="info" aria-label="Transconductance: A special conductance">
 <div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>Transconductance: A special conductance</div>
 <div class="callout-content">
-<p>• <strong>Definition:</strong> The ratio of a change in output current (<span class="math-inline" role="math">\(\Delta  I_{\text{out}}\)</span>) to the change in input voltage (<span class="math-inline" role="math">\(\Delta V_{\text{in}}\)</span>). Or specifically in the JFET, it’s <span class="math-inline" role="math">\(\Delta I_\text{D}/\Delta V_\text{GS}\)</span>.
-• <strong>Symbol:</strong> <span class="math-inline" role="math">\(g_{m}\)</span> (where m stands for mutual).
-• <strong>Unit:</strong> Siemens (<span class="math-inline" role="math">\(\mathrm{S}\)</span>), or amperes per volt (<span class="math-inline" role="math">\(\mathrm{A/V}\)</span>).</p>
+<ul>
+    <li><strong>Definition:</strong> The ratio of a change in output current (<span class="math-inline" role="math">\(\Delta  I_{\text{out}}\)</span>) to the change in input voltage (<span class="math-inline" role="math">\(\Delta V_{\text{in}}\)</span>). Or specifically in the JFET, it’s <span class="math-inline" role="math">\(\Delta I_\text{D}/\Delta V_\text{GS}\)</span>.</li>
+    <li><strong>Symbol:</strong> <span class="math-inline" role="math">\(g_{m}\)</span> (where m stands for mutual).</li>
+    <li><strong>Unit:</strong> Siemens (<span class="math-inline" role="math">\(\mathrm{S}\)</span>), or amperes per volt (<span class="math-inline" role="math">\(\mathrm{A/V}\)</span>).</li>
+  </ul>
 </div>
 </aside>
 
@@ -562,9 +564,10 @@ flowchart TD
 <p>Symbols for circuit schematics are designed given MOSFETs mechanisms, generally with two rules</p>
 <ul>
   <li><strong>Depletion / Enhancement:</strong> If the channel originally exists without gate voltage, we draw a continuous line; if the channel exits only when applying voltage, we draw a dashed line.</li>
-  <li><strong>P / N Substrate:</strong> An arrow is used to represent the channel type, pointing from the p-type area to the n-type area.
-<img src="/images/notes/learning-fets-analog-electronics/mosfet_symbols.png" alt="Symbols of MOSFETs" width="600" /></li>
+  <li><strong>P / N Substrate:</strong> An arrow is used to represent the channel type, pointing from the p-type area to the n-type area.</li>
 </ul>
+
+<p><img src="/images/notes/learning-fets-analog-electronics/mosfet_symbols.png" alt="Symbols of MOSFETs" width="600" /></p>
 
 <aside class="callout callout-question" data-callout="question" aria-label="The extra pin shorted to the source?">
 <div class="callout-title"><span class="callout-icon" aria-hidden="true"></span>The extra pin shorted to the source?</div>
@@ -1012,10 +1015,10 @@ flowchart LR
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793061836"></script>
+<script src="/assets/js/site.js?v=1793062261"></script>
 
 <div id="mermaid-config" hidden data-site="{&quot;theme&quot;:&quot;base&quot;}" data-page="null"></div>
-<script type="module" src="/assets/js/mermaid.js?v=1793061836"></script>
+<script type="module" src="/assets/js/mermaid.js?v=1793062261"></script>
 
 
 
