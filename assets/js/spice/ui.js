@@ -18,12 +18,12 @@ if (root) {
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; };
-  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value,detailed:$('detailed').checked});
+  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value,detailed:$('detailed').checked,conventional:$('conventional').checked});
   function invalidate() { svgText = ''; exports(); status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   input.addEventListener('input', invalidate);
-  for (const id of ['font','size','color','detailed']) $(id).addEventListener('input', invalidate);
+  for (const id of ['font','size','color','detailed','conventional']) $(id).addEventListener('input', invalidate);
   function showDiagnostics(items) {
     diagnostics.replaceChildren();
     for (const {severity,line,message,source} of items) {
@@ -147,10 +147,18 @@ if (root) {
       if (items.some(d=>d.severity==='error')) throw Error('Fix the parser errors below before generating.');
       circuit=projectHierarchy(tree,{mode:$('mode').value,expanded,focus});
       const netlist=toNetlistsvg(circuit);
+      if(settings().conventional)items.push(...circuit.layout.diagnostics);
       const rendered=await renderSchematic(netlist,settings());
       const documentSVG=new DOMParser().parseFromString(rendered,'image/svg+xml');
       if (documentSVG.querySelector('parsererror')) throw Error('Renderer produced invalid SVG.');
       const svg=documentSVG.documentElement;
+      const layoutReport=svg.querySelector('#spice-layout-report');
+      if(layoutReport) {
+        circuit.layout.report=JSON.parse(layoutReport.textContent);
+        const r=circuit.layout.report;
+        items.push({severity:'info',message:`Layout: left-to-right signal guide; ${r.powerSourcesChecked} DC/ground symbols checked, ${r.powerOrderViolations} source-column order violation(s). ${r.powerPass}. Global voltage bands are a preference.`});
+        showDiagnostics(items);
+      }
       if (svg.localName!=='svg' || svg.querySelector('script,foreignObject')) throw Error('Invalid schematic output.');
       const width=Number(svg.getAttribute('width')),height=Number(svg.getAttribute('height'));
       full={x:-20,y:-20,w:width+40,h:height+40}; view={...full};
@@ -177,7 +185,9 @@ if (root) {
         for(const coupling of magnetic)for(const name of coupling.inductors) {
           const group=documentSVG.getElementById('cell_'+name);if(!group)continue;
           const dot=documentSVG.createElementNS(svg.namespaceURI,'circle');
-          for(const [key,value]of Object.entries({cx:24,cy:38,r:3,fill:settings().color,stroke:'none','data-coupling':coupling.name}))dot.setAttribute(key,String(value));
+          const firstPort=[...group.children].find(p=>p.getAttribute('s:pid')==='A');
+          const horizontal=firstPort?.getAttribute('s:position')==='left';
+          for(const [key,value]of Object.entries({cx:horizontal?20:24,cy:horizontal?Number(firstPort.getAttribute('s:y'))-8:38,r:3,fill:settings().color,stroke:'none','data-coupling':coupling.name}))dot.setAttribute(key,String(value));
           const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=coupling.name+' · dotted terminal: '+coupling.inductors.join(', ');dot.append(title);group.append(dot);
         }
       }
@@ -186,6 +196,7 @@ if (root) {
       preview.replaceChildren(document.importNode(svg,true)); setView();
       const warnings=items.filter(d=>d.severity==='warning').length;
       status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
+      if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       const rows=Object.values(circuit.nodes).map(n => {
         const tr=document.createElement('tr');
         for (const text of [n.displayName,n.terminals.map(t=>t.component+'.'+t.pin).join(', ')]) {const td=document.createElement('td');td.textContent=text;tr.append(td);} return tr;
