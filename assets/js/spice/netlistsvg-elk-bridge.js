@@ -5,6 +5,7 @@ import flatModulePackage from 'netlistsvg/built/FlatModule.js';
 import skinPackage from 'netlistsvg/built/Skin.js';
 import graphPackage from 'netlistsvg/built/elkGraph.js';
 import drawPackage from 'netlistsvg/built/drawModule.js';
+import {alignGroundBus,straightenGroundDrops,attachGroundSymbol,refreshGroundJunctions,validateGroundAttachment} from './ground-layout.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
 const option='org.eclipse.elk.';
@@ -21,18 +22,34 @@ function portRole(port,cells) {
   return 'neutral';
 }
 
-export async function renderConventional(skin,netlist) {
+export async function renderConventional(skin,netlist,{groundDecoration=true}={}) {
   Skin.skin=onml.parse(skin);
   const flat=new FlatModule(netlist);flat.createWires();
   const cells=netlist.modules.circuit.cells;
+  const groundIds=new Set(groundDecoration?Object.entries(cells).filter(([,c])=>c.attributes.name==='0').map(([id])=>id):[]);
   // Reorder each real net's star hub. No guide-only edges or electrical aliases.
   for(const wire of flat.wires) {
-    const ports=[...wire.drivers,...wire.riders,...wire.laterals];
+    const ports=[...wire.drivers,...wire.riders,...wire.laterals].filter(p=>!groundIds.has(p.parentNode.Key));
     const rank=p=>({driver:0,neutral:1,sink:2,rail:3,ret:3})[portRole(p,cells)];
     ports.sort((a,b)=>rank(a)-rank(b));
     wire.drivers=[];wire.riders=[];wire.laterals=ports;
   }
   const graph=graphPackage.buildElkGraph(flat);
+  for(const child of graph.children) {
+    const template=flat.nodes.find(n=>n.Key===child.id)?.getTemplate();
+    const sides=new Map(Skin.getPortsWithPrefix(template,'').map(p=>[p[1]['s:pid'],{top:'NORTH',bottom:'SOUTH',left:'WEST',right:'EAST'}[p[1]['s:position']]]));
+    for(const port of child.ports) {
+      const side=sides.get(port.id.slice(child.id.length+1));
+      // Some generic symbols reserve a label area below the body. Their body
+      // ports are internal to the overall bounds; do not project those ports
+      // onto the outer rectangle by forcing a side.
+      const onBorder=side==='NORTH'?Math.abs(port.y)<.02:side==='SOUTH'?Math.abs(port.y-child.height)<.02:side==='WEST'?Math.abs(port.x)<.02:side==='EAST'?Math.abs(port.x-child.width)<.02:false;
+      if(onBorder)port.layoutOptions={...port.layoutOptions,[option+'port.side']:side};
+    }
+  }
+  const fixedPorts=new Map(graph.children.flatMap(n=>n.ports.map(p=>[p.id,{x:p.x,y:p.y}])));
+  const groundNodes=graph.children.filter(c=>groundIds.has(c.id));
+  graph.children=graph.children.filter(c=>!groundIds.has(c.id));
   const power=[];
   for(const child of graph.children) {
     const cell=cells[child.id],meta=cell?.spiceLayout;
@@ -57,7 +74,7 @@ export async function renderConventional(skin,netlist) {
     [option+'layered.considerModelOrder.crossingCounterNodeInfluence']:.01,
     [option+'layered.feedbackEdges']:true,
   };
-  let layout=await elk.layout(graph,{layoutOptions:options});
+  let layout=graph.children.length?await elk.layout(graph,{layoutOptions:options}):{...graph,width:0,height:0};
   let powerPass='single-pass';
   if(power.length>1) {
     // Interactive layering uses a complete first layout as its positional input.
@@ -88,24 +105,43 @@ export async function renderConventional(skin,netlist) {
     if(candidate.width*candidate.height<=layout.width*layout.height*1.8) {layout=candidate;powerPass='two-pass';}
     else powerPass='single-pass (source ordering enlarged the sheet excessively)';
   }
-  validateLayoutEndpoints(layout,netlist,graphPackage.ElkModel.wireNameLookup);
+  const lookup=graphPackage.ElkModel.wireNameLookup,attachments=[];let straightened=0;
+  for(const ground of groundNodes) {
+    const bit=cells[ground.id].connections.A[0];
+    straightened+=alignGroundBus(layout,lookup,bit);
+    straightened+=straightenGroundDrops(layout,lookup,bit);
+    const attached=attachGroundSymbol(layout,lookup,ground,netlist);
+    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false});
+    attachments.push(attached);power.push({child:attached.node,voltage:0});
+    refreshGroundJunctions(layout,lookup,bit,attached);
+  }
+  power.sort((a,b)=>b.voltage-a.voltage);
+  validateLayoutEndpoints(layout,netlist,lookup,attachments,fixedPorts);
   const positions=new Map(layout.children.map(n=>[n.id,n]));
   let inversions=0;
   for(let i=0;i<power.length;i++)for(let j=i+1;j<power.length;j++)if(power[i].voltage>power[j].voltage&&positions.get(power[i].child.id).y>=positions.get(power[j].child.id).y)inversions++;
-  const report={version:1,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,
+  const report={version:2,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,
+    groundPlacement:attachments.some(a=>a.anchor)?'rail-attached':attachments.length?'isolated':Object.values(cells).some(c=>c.attributes.name==='0')?'ELK fallback (no clear ground attachment)':'not-present',groundAttachments:attachments.length,straightenedGroundDrops:straightened,
     powerPlacement:'preferred source column; global voltage bands are not guaranteed',verifiedTerminals:true};
   const svg=drawModule(layout,flat);
-  return svg.replace('</svg>',onml.stringify(['metadata',{id:'spice-layout-report'},JSON.stringify(report)])+'</svg>');
+  const decorations=attachments.filter(a=>a.anchor).flatMap(a=>[
+    ['line',{x1:a.anchor.x,y1:a.anchor.y,x2:a.end.x,y2:a.end.y,class:'net_'+a.bit,'data-ground-attachment':'true'}],
+  ]);
+  return svg.replace('</svg>',decorations.map(n=>onml.stringify(n)).join('')+onml.stringify(['metadata',{id:'spice-layout-report'},JSON.stringify(report)])+'</svg>');
 }
 
 /** Reject omitted/misrouted terminal endpoints before rendering or caching. */
-export function validateLayoutEndpoints(graph,netlist,lookup) {
+export function validateLayoutEndpoints(graph,netlist,lookup,groundAttachments=[],fixedPorts=new Map()) {
   const nodes=new Map(graph.children.map(n=>[n.id,n])),nets=new Map(),ends=new Map();
+  for(const node of graph.children)for(const port of node.ports||[]) {
+    const original=fixedPorts.get(port.id);
+    if(original&&(Math.abs(original.x-port.x)>.02||Math.abs(original.y-port.y)>.02))throw Error('Layout moved a fixed symbol terminal.');
+  }
   for(const [id,c]of Object.entries(netlist.modules.circuit.cells))for(const [pin,[bit]]of Object.entries(c.connections)) {
     const key=id+'.'+pin;nets.set(key,bit);
     if(!ends.has(bit))ends.set(bit,[]);ends.get(bit).push(key);
   }
-  const touched=new Set();
+  const touched=new Set(groundAttachments.flatMap(a=>validateGroundAttachment(graph,lookup,a,netlist)));
   for(const e of graph.edges) {
     const source=e.sourcePort||e.sources?.[0],target=e.targetPort||e.targets?.[0];
     const bit=Number(lookup[e.id]?.replaceAll(',',''));

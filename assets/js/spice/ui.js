@@ -157,6 +157,7 @@ if (root) {
         circuit.layout.report=JSON.parse(layoutReport.textContent);
         const r=circuit.layout.report;
         items.push({severity:'info',message:`Layout: left-to-right signal guide; ${r.powerSourcesChecked} DC/ground symbols checked, ${r.powerOrderViolations} source-column order violation(s). ${r.powerPass}. Global voltage bands are a preference.`});
+        if(r.groundPlacement)items.push({severity:'info',message:`Ground: ${r.groundPlacement}; ${r.straightenedGroundDrops||0} return-path simplification(s).`});
         showDiagnostics(items);
       }
       if (svg.localName!=='svg' || svg.querySelector('script,foreignObject')) throw Error('Invalid schematic output.');
@@ -197,6 +198,7 @@ if (root) {
       const warnings=items.filter(d=>d.severity==='warning').length;
       status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
+      if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
       const rows=Object.values(circuit.nodes).map(n => {
         const tr=document.createElement('tr');
         for (const text of [n.displayName,n.terminals.map(t=>t.component+'.'+t.pin).join(', ')]) {const td=document.createElement('td');td.textContent=text;tr.append(td);} return tr;
