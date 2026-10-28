@@ -1,4 +1,5 @@
 import {parsePrimitiveCir, tokenize} from './primitive-parser.js';
+import {loadSources} from './source-loader.js';
 
 const rec = () => Object.create(null);
 const lower = s => s.toLowerCase();
@@ -28,10 +29,11 @@ function splitParameters(tokens) {
 }
 
 /** Definitions and instances remain separate. Parsing does not instantiate or flatten. */
-export function parseHierarchy(source) {
+export function parseHierarchy(source,options={}) {
   if (typeof source !== 'string') throw TypeError('Netlist must be a string.');
-  if (source.length > 500000) throw Error('Netlist exceeds the limit of 500 kB.');
-  const diagnostics=[], scopes=rec(), globals=new Set(['0']);
+  if (source.length > 2000000) throw Error('Netlist exceeds the limit of 2 MB.');
+  const loaded=loadSources(source,options);source=loaded.source;
+  const diagnostics=[...loaded.diagnostics], scopes=rec(), globals=new Set(['0']);
   const report=(severity,line,message)=>diagnostics.push({severity,line,message});
   const makeScope=(id,name,parent,ports=[],defaults=rec(),line=0)=>{
     const scope={id,name,parent,ports,defaults,parameters:rec(),definitions:rec(),devices:[],instances:[],directives:[],line,statements:[]};
@@ -82,7 +84,8 @@ export function parseHierarchy(source) {
       if(head.startsWith('x')) {
         const [body,parameters]=splitParameters(t.slice(1));
         if(!body.length)throw Error('X instance requires a subcircuit name.');
-        scope.instances.push({name:t[0],nodes:body.slice(0,-1).map(lower),definitionName:body.at(-1),definitionId:null,parameters,line,raw:text});
+        const annotation=/;§pnba\s+(.+)$/i.exec(text)?.[1].split(')');
+        scope.instances.push({name:t[0],nodes:body.slice(0,-1).map(lower),definitionName:body.at(-1),definitionId:null,parameters,line,raw:text,pinNames:annotation});
       } else scope.statements.push({line,text});
     }catch(error){report('error',line,error.message+' Statement: '+text);}
   }
@@ -94,11 +97,8 @@ export function parseHierarchy(source) {
   }
   for(const scope of Object.values(scopes)) {
     // Inherit lexical model definitions, while keeping node and device scopes separate.
-    const lineage=[];let current=scope;
-    while(current){lineage.unshift(current);current=scopes[current.parent];}
-    const modelLines=lineage.flatMap(s=>s.statements.filter(st=>/^\.model\b/i.test(st.text)));
-    const statements=[...(scope.statements[0]?.line===1?[]:[{line:0,text:'* Scope'}]),...scope.statements,...modelLines];
-    const parsed=parsePrimitiveCir(statements.map(s=>s.text).join('\n'));
+    const statements=[...(scope.statements[0]?.line===1?[]:[{line:0,text:'* Scope'}]),...scope.statements];
+    const parsed=parsePrimitiveCir(statements.map(s=>s.text).join('\n'),{models:scopes[scope.parent]?.models});
     scope.devices=parsed.components.map(c=>({...c,line:statements[c.line-1]?.line||scope.line}));scope.models=parsed.models;
     if(scope===root)root.title=parsed.title;
     diagnostics.push(...parsed.diagnostics.filter(d=>!d.message.includes('No supported components to render.')&&!d.message.includes('300 components')).map(d=>({...d,line:statements[d.line-1]?.line||scope.line})));
@@ -107,11 +107,10 @@ export function parseHierarchy(source) {
       if(names.has(lower(instance.name)))report('error',instance.line,'Duplicate instance/device name: '+instance.name);
       names.add(lower(instance.name));
       instance.definitionId=lookup(scope,instance.definitionName);
-      if(!instance.definitionId)report('error',instance.line,'Undefined subcircuit: '+instance.definitionName+' in '+instance.name);
-      else {
+      if(!instance.definitionId&&!/^\{[\s\S]*\}$/.test(instance.definitionName))report('error',instance.line,'Undefined subcircuit: '+instance.definitionName+' in '+instance.name);
+      else if(instance.definitionId) {
         const def=scopes[instance.definitionId];
         if(def.ports.length!==instance.nodes.length)report('error',instance.line,`${instance.name}: ${def.name} expects ${def.ports.length} ports; got ${instance.nodes.length}.`);
-        for(const param of Object.keys(instance.parameters))if(!Object.hasOwn(def.defaults,param)&&!Object.hasOwn(def.parameters,param))report('error',instance.line,`${instance.name}: undeclared subcircuit parameter ${param}.`);
       }
     }
   }
@@ -126,5 +125,6 @@ export function parseHierarchy(source) {
   }
   for(const id of Object.keys(scopes))visit(id);
   if(!root.devices.length&&!root.instances.length)report('error',0,'No supported components or instances to render.');
+  for(const d of diagnostics)if(!d.source&&d.line&&loaded.origins[d.line-1]){d.source=loaded.origins[d.line-1].file;d.line=loaded.origins[d.line-1].line;}
   return {kind:'HierarchicalCircuit',version:2,rootId:'root',title:root.title||'',scopes,globals:[...globals],diagnostics};
 }

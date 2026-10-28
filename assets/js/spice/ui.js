@@ -5,6 +5,8 @@ import {renderSchematic} from './renderer.js';
 import mixed from './examples/mixed.cir?raw';
 import filter from './examples/filter.cir?raw';
 import hierarchy from './examples/hierarchy.cir?raw';
+import ltspice from './examples/ltspice-elements.cir?raw';
+import {readSpiceFile} from './file-text.js';
 import './viewer.css';
 
 const $ = id => document.getElementById('spice-' + id);
@@ -12,20 +14,21 @@ const root = $('app');
 if (root) {
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
-  const expanded=new Set();let pendingRoute=false;
+  const expanded=new Set();let pendingRoute=false,libraries={};
+  try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; };
-  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value});
+  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value,detailed:$('detailed').checked});
   function invalidate() { svgText = ''; exports(); status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   input.addEventListener('input', invalidate);
-  for (const id of ['font','size','color']) $(id).addEventListener('input', invalidate);
+  for (const id of ['font','size','color','detailed']) $(id).addEventListener('input', invalidate);
   function showDiagnostics(items) {
     diagnostics.replaceChildren();
-    for (const {severity,line,message} of items) {
+    for (const {severity,line,message,source} of items) {
       const li = document.createElement('li'); li.className = severity;
-      li.textContent = `${severity.toUpperCase()}${line ? ' · line ' + line : ''}: ${message}`; diagnostics.append(li);
+      li.textContent = `${severity.toUpperCase()}${source&&source!=='input.cir'?' · '+source:''}${line ? ' · line ' + line : ''}: ${message}`; diagnostics.append(li);
     }
     $('messages').open = items.some(d => d.severity !== 'info');
     $('message-count').textContent = `${items.length} message${items.length === 1 ? '' : 's'}`;
@@ -126,13 +129,13 @@ if (root) {
   async function generate() {
     if (busy) return;
     busy=true; svgText=''; exports(); $('generate').disabled=true;
-    input.readOnly=true; $('file').disabled=true;
-    for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance')) element.disabled=true;
+    input.readOnly=true; $('file').disabled=true;$('libraries').disabled=true;
+    for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance')) element.disabled=true;
     status.textContent='Parsing netlist and routing wires…'; preview.setAttribute('aria-busy','true');
     let items=[];
     try {
       if(lastSource!==input.value||!tree) {
-        ir=parseHierarchy(input.value);items=ir.diagnostics;
+        ir=parseHierarchy(input.value,{files:libraries});items=[...ir.diagnostics];
         if(items.some(d=>d.severity==='error')){tree=null;throw Error('Fix the parser errors below before generating.');}
         tree=elaborateCircuit(ir);
         if(lastSource&&lastSource!==input.value){expanded.clear();focus='';selectedInstance='';history.replaceState(null,'',location.pathname+location.search);}
@@ -140,7 +143,7 @@ if (root) {
         lastSource=input.value;
         try{sessionStorage.setItem('spice-netlist-v2',input.value);}catch{}
       }
-      items=ir.diagnostics;showDiagnostics(items);
+      items=[...ir.diagnostics];showDiagnostics(items);
       if (items.some(d=>d.severity==='error')) throw Error('Fix the parser errors below before generating.');
       circuit=projectHierarchy(tree,{mode:$('mode').value,expanded,focus});
       const netlist=toNetlistsvg(circuit);
@@ -160,12 +163,22 @@ if (root) {
         if (!element) throw Error('Renderer omitted component '+c.name);
         element.setAttribute('data-component',c.name);
         if(c.kind==='X'){element.setAttribute('data-instance',c.instanceId);element.setAttribute('role','button');element.setAttribute('tabindex','0');element.setAttribute('aria-label','Expand '+c.name);}
-        const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=c.raw+'\n'+Object.entries(c.terminals).map(([p,n])=>p+': '+n).join(', ');element.prepend(title);
+        const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=c.raw+'\nResolved: '+c.value+'\n'+Object.entries(c.terminals).map(([p,n])=>p+': '+n).join(', ');element.prepend(title);
       }
       for (const n of Object.values(circuit.nodes)) {
         for (const element of svg.querySelectorAll('.net_'+n.bit)) {
           element.setAttribute('data-net',n.name);
           const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent='Node '+n.displayName;element.append(title);
+        }
+      }
+      const magnetic=circuit.components.filter(c=>c.kind==='K').map(c=>({name:c.name,inductors:c.coupledInductors,value:c.value}));
+      if(magnetic.length) {
+        const metadata=documentSVG.createElementNS(svg.namespaceURI,'metadata');metadata.setAttribute('id','spice-magnetic-couplings');metadata.textContent=JSON.stringify(magnetic);svg.append(metadata);
+        for(const coupling of magnetic)for(const name of coupling.inductors) {
+          const group=documentSVG.getElementById('cell_'+name);if(!group)continue;
+          const dot=documentSVG.createElementNS(svg.namespaceURI,'circle');
+          for(const [key,value]of Object.entries({cx:24,cy:38,r:3,fill:settings().color,stroke:'none','data-coupling':coupling.name}))dot.setAttribute(key,String(value));
+          const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=coupling.name+' · dotted terminal: '+coupling.inductors.join(', ');dot.append(title);group.append(dot);
         }
       }
       // Export remains at the fitted full-sheet view regardless of preview pan/zoom.
@@ -189,21 +202,30 @@ if (root) {
       if (!items.some(d=>d.severity==='error')) items.push({severity:'error',line:0,message:error.message});
       showDiagnostics(items);
     } finally {
-      busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;
-      for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], #spice-instances button, #spice-collapse-all, #spice-expand-all')) element.disabled=false;
+      busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;$('libraries').disabled=false;
+      for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-collapse-all, #spice-expand-all')) element.disabled=false;
       if(tree&&tree.contexts[focus])updateHierarchy();
       preview.setAttribute('aria-busy','false');exports();
       if(pendingRoute){pendingRoute=false;readRoute();queueMicrotask(generate);}
     }
   }
   $('generate').onclick=generate;
-  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=({mixed,filter,hierarchy})[button.dataset.example];invalidate();generate();};
+  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=({mixed,filter,hierarchy,ltspice})[button.dataset.example];invalidate();generate();};
   $('file').onchange=async event=>{
     const file=event.target.files[0];if (!file)return;
-    if (file.size>500000) {status.textContent='File exceeds 500 kB.';return;}
-    try {input.value=await file.text();invalidate();generate();} catch(error){status.textContent='File could not be read: '+error.message;}
+    if (file.size>2000000) {status.textContent='File exceeds 2 MB.';return;}
+    try {input.value=await readSpiceFile(file);invalidate();generate();} catch(error){status.textContent='File could not be read: '+error.message;}
     finally{event.target.value='';}
   };
+  $('libraries').onchange=async event=>{
+    try{
+      for(const file of event.target.files){if(file.size>16000000)throw Error('Library exceeds 16 MB: '+file.name);libraries[file.webkitRelativePath||file.name]=await readSpiceFile(file);}
+      try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));}catch{}
+      tree=null;lastSource='';$('library-status').textContent=Object.keys(libraries).length+' library file(s) loaded';generate();
+    }catch(error){status.textContent=error.message;}
+    finally{event.target.value='';}
+  };
+  $('library-status').textContent=Object.keys(libraries).length?'Libraries restored from this session.':'For .include / .lib dependencies';
   $('download').onclick=()=>{
     const url=URL.createObjectURL(new Blob([svgText],{type:'image/svg+xml;charset=utf-8'}));
     const a=document.createElement('a');a.href=url;a.download='spice-schematic.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);

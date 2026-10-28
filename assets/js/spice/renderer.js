@@ -28,7 +28,8 @@ function renderInWorker(netlist, settings) {
   const worker = new Worker(new URL('./render-worker.js', import.meta.url), {type:'module'});
   return new Promise((resolve, reject) => {
     const finish = (error, svg) => { clearTimeout(timer); worker.terminate(); error ? reject(Error(error)) : resolve(svg); };
-    const timer = setTimeout(() => finish('Layout exceeded 30 seconds. Try a smaller netlist.'), 30000);
+    const duration=Object.keys(netlist.modules.circuit.cells).length>300?60000:30000;
+    const timer = setTimeout(() => finish('Layout timed out. Open a subcircuit sheet or collapse instances.'), duration);
     worker.onmessage = ({data}) => finish(data.error, data.svg);
     worker.onerror = event => finish(event.message || 'Layout worker failed.');
     worker.postMessage({netlist, settings});
