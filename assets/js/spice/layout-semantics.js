@@ -1,7 +1,7 @@
 import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
 
-export const layoutRulesVersion = 2;
+export const layoutRulesVersion = 3;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -10,6 +10,9 @@ export function namingRole(name) {
   return /^(IN|OUT|IO|PWR|RET|BIAS|FB|N)_/i.exec(label)?.[1].toLowerCase()||'unknown';
 }
 const rail=role=>['pwr','ret','bias'].includes(role);
+const localName=name=>String(name).split('/').at(-1).toLowerCase();
+const legacyRail=name=>({vdd:'pwr',vcc:'pwr',vee:'ret',vss:'ret'})[localName(name)]||'unknown';
+const interfaceRole=name=>{const role=namingRole(name);return role!=='unknown'?role:({in:'in',input:'in',out:'out',output:'out'})[String(name).toLowerCase()]||legacyRail(name);};
 
 /** Only constant ideal voltage-source equations are evidence, not an operating point. */
 export function dcPotentials(devices) {
@@ -48,20 +51,36 @@ export function dcPotentials(devices) {
 
 export function analyzeLayout(tree,circuit) {
   const dc=dcPotentials(leafDevices(tree.root)),nodes=Object.create(null),cells=Object.create(null);
-  for(const n of Object.values(circuit.nodes))nodes[n.name]={role:namingRole(n.name),potential:dc.nodes[n.name]?.known?dc.nodes[n.name].value:null};
+  for(const n of Object.values(circuit.nodes)) {
+    const named=namingRole(n.name),legacy=legacyRail(n.name);
+    nodes[n.name]={role:named!=='unknown'?named:legacy,roleSource:named!=='unknown'?'node-name':legacy!=='unknown'?'legacy-rail-name':'unknown',potential:dc.nodes[n.name]?.known?dc.nodes[n.name].value:null};
+  }
   const roleAt=(c,pin,node)=>{
-    if(c.block){const formal=c.block.ports.find(p=>p.pin===pin);return formal?.implicit?(node==='0'?'ret':nodes[node].role):namingRole(formal?.name||formal?.label);}
-    return c.synthetic?namingRole(c.value):nodes[node].role;
+    const base={role:nodes[node].role,roleSource:nodes[node].roleSource};
+    const formal=c.block?.ports.find(p=>p.pin===pin);
+    if(formal?.implicit||!c.block&&!c.synthetic)return base;
+    const name=c.synthetic?c.value:formal?.name||formal?.label,role=interfaceRole(name);
+    if(role!=='unknown')return {role,roleSource:namingRole(name)!=='unknown'?'formal-prefix':'legacy-interface-name'};
+    return rail(base.role)?{...base,roleSource:'bound-rail'}:{role:'unknown',roleSource:'unknown'};
   };
   for(const c of circuit.components) {
-    const ports=Object.fromEntries(Object.entries(c.terminals).map(([pin,node])=>[pin,{...nodes[node],role:roleAt(c,pin,node)}]));
+    const ports=Object.fromEntries(Object.entries(c.terminals).map(([pin,node])=>[pin,{...nodes[node],...roleAt(c,pin,node)}]));
     const values=Object.values(ports);
-    const horizontal=['R','L','C','D'].includes(c.kind)&&values.length===2&&values.every(p=>!rail(p.role)&&(p.potential===null||p.role!=='unknown'));
+    const passive=['r_v','spice_br','l_v','c_v','d_v'].includes(c.type);
+    const horizontal=passive&&values.length===2&&values.every(p=>!rail(p.role)&&(p.potential===null||p.role!=='unknown'));
     const plus=c.terminals['+'],minus=c.terminals['-'];
     const nonGround=[plus,minus].filter(n=>n&&n!=='0');
     const supply=c.kind==='V'&&nonGround.some(n=>rail(nodes[n]?.role))&&!nonGround.some(n=>['in','out','io','fb'].includes(nodes[n]?.role))&&[plus,minus].every(n=>dc.nodes[n]?.known);
     const referenceNode=plus==='0'?minus:plus;
-    cells[c.name]={version:layoutRulesVersion,ports,horizontal,supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
+    const pinNames=Object.keys(c.terminals),side=p=>!rail(p.role)?'signal':p.potential!==null?(p.potential>0?'high':'low'):p.role==='ret'?'low':'high';
+    let reverse=false;
+    if(pinNames.length===2) {
+      if(c.terminals[pinNames[0]]==='0')reverse=true;
+      else if(c.terminals[pinNames[1]]==='0')reverse=false;
+      else if(values.every(p=>p.potential!==null))reverse=values[0].potential<values[1].potential;
+      else reverse=side(values[0])==='low'||side(values[1])==='high'&&side(values[0])==='signal';
+    }
+    cells[c.name]={version:layoutRulesVersion,kind:c.kind,passive,source:['V','I','E','F','G','H'].includes(c.kind)||c.kind==='B'&&!passive,ports,horizontal,orientation:horizontal?'horizontal':reverse?'vertical-reversed':'vertical',flexible:pinNames.length===2&&(passive||['V','I','B','F','H'].includes(c.kind)),supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
   }
   return {version:layoutRulesVersion,nodes,cells,diagnostics:dc.diagnostics};
 }

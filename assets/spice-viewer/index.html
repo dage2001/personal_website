@@ -2,11 +2,11 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPICE Netlist Viewer</title>
 <style>body{margin:0;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif}main{max-width:1440px;margin:40px auto;padding:0 24px}h1{font-size:32px;letter-spacing:-1px}a{color:#344b40}header p{color:#74776e}</style>
 <link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer.js"></script>
-</head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>Explore nested circuits. Complete and hierarchical schematics, ready to export as SVG.</p></header>
+</head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>Explore nested circuits. Expand blocks or open an instance sheet, then export the schematic as SVG.</p></header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
   <div class="spice-hierarchy-bar">
-    <label for="spice-mode">View <select id="spice-mode"><option value="hierarchical">Hierarchical</option><option value="flat">Flat</option></select></label>
+    <span>Hierarchical view</span>
     <nav id="spice-breadcrumbs" aria-label="Circuit hierarchy"></nav>
     <span id="spice-focus-title">Top-level schematic</span>
   </div>
@@ -53,7 +53,7 @@
     <label for="spice-conventional"><input type="checkbox" id="spice-conventional" checked> Circuit layout rules</label>
     <span class="spice-help">Change settings, then Generate to apply.</span>
   </div>
-  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces, PWR_/RET_/BIAS_ rails and horizontal signal flow. Known DC supplies prefer a descending source column; full-sheet voltage bands remain a layout preference. Unnamed interfaces retain their connections.</p>
+  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces and PWR_/RET_/BIAS_ rails. Component orientation and spacing adapt to the connections. Expand a block or open its instance sheet to inspect a circuit.</p>
   <details id="spice-messages"><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
   <details><summary>Node connections</summary><p class="spice-help">Each row is one electrical net. Node 0 is ground; other names, including GND, remain distinct. Hover a wire or component to inspect it.</p><div class="spice-table-wrap"><table><thead><tr><th>Node</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div></details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>
