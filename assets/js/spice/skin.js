@@ -7,7 +7,7 @@ const originals = onml.parse(analog);
 const find = alias => originals.find(n => Array.isArray(n) && n.some?.(c => Array.isArray(c) && c[0] === 's:alias' && c[1].val === alias));
 const escape = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 
-export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b29', detailed = false} = {}) {
+export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b29', detailed = false, conventional = true} = {}) {
   if (!['Arial', 'Helvetica', 'Times New Roman', 'monospace'].includes(font)) font = 'Arial';
   fontSize = Math.max(8, Math.min(24, Number(fontSize) || 12));
   if (!/^#[0-9a-f]{6}$/i.test(color)) color = '#292b29';
@@ -29,27 +29,60 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       pins.push(['g', {'s:pid': name, 's:x': x, 's:y': y, 's:position': side, 's:dir': 'lateral'}]);
     };
     if (['spice_subckt','spice_device','spice_coupling'].includes(type)) {
-      const ports=(cell.spiceBlock||cell.spiceSymbol).ports,left=Math.ceil(ports.length/2),rows=Math.max(left,ports.length-left);
-      const blockWidth=Math.max(200,labelWidth+70,...ports.map(p=>p.label.length*fontSize*.68*2+100));
-      const blockHeight=Math.max(105,70+rows*(fontSize+18));
+      const ports=(cell.spiceBlock||cell.spiceSymbol).ports,left=Math.ceil(ports.length/2);
+      const sides={left:[],right:[],top:[],bottom:[]};
+      ports.forEach((p,i)=>{
+        const meta=conventional?cell.spiceLayout?.ports[p.pin]:null,role=meta?.role;
+        let side=i<left?'left':'right';
+        if(role==='in')side='left';else if(role==='out')side='right';
+        else if(['pwr','bias','ret'].includes(role))side=meta.potential!==null&&meta.potential!==undefined?(meta.potential>0?'top':'bottom'):(role==='ret'?'bottom':'top');
+        sides[side].push(p);
+      });
+      const rows=Math.max(sides.left.length,sides.right.length);
+      const railWidth=Math.max(0,...[sides.top,sides.bottom].map(ps=>ps.length*(Math.max(0,...ps.map(p=>p.label.length))*fontSize*.68+25)));
+      const blockWidth=Math.max(200,labelWidth+70,railWidth+60,...ports.map(p=>p.label.length*fontSize*.68*2+100));
+      const blockHeight=Math.max(155,120+rows*(fontSize+18));
       group[1]['s:width']=blockWidth;group[1]['s:height']=blockHeight;
       geometry.push(['rect',{x:25,y:8,width:blockWidth-50,height:blockHeight-16,rx:6,class:'subckt-body'}]);
       const caption=type==='spice_subckt'?cell.attributes.value:cell.spiceSymbol.label;
-      geometry.push(['text',{x:40,y:32,'s:attribute':'displayRef',class:'ref'},'ref'],txt(40,52,caption));
+      geometry.push(['text',{x:40,y:62,'s:attribute':'displayRef',class:'ref'},'ref'],txt(40,82,caption));
       if(type!=='spice_subckt')lines.forEach((line,i)=>geometry.push(txt(40,blockHeight+12+i*(fontSize+4),line)));
       if(type!=='spice_subckt')group[1]['s:height']=blockHeight+lines.length*(fontSize+4)+12;
-      ports.forEach((p,i)=>{
-        const isLeft=i<left,row=isLeft?i:i-left,y=76+row*(fontSize+18),x=isLeft?0:blockWidth,edge=isLeft?25:blockWidth-25;
-        terminal(p.pin,x,y,isLeft?'left':'right',edge,y);
-        geometry.push(['text',{x:isLeft?32:blockWidth-32,y:y-5,'text-anchor':isLeft?'start':'end',class:'pin-label'},p.label]);
+      for(const [side,ps]of Object.entries(sides))ps.forEach((p,i)=>{
+        if(side==='left'||side==='right') {
+          const isLeft=side==='left',y=110+i*(fontSize+18),x=isLeft?0:blockWidth;
+          terminal(p.pin,x,y,side,isLeft?25:blockWidth-25,y);
+          geometry.push(['text',{x:isLeft?32:blockWidth-32,y:y-5,'text-anchor':isLeft?'start':'end',class:'pin-label'},p.label]);
+        }else {
+          const x=(i+1)*blockWidth/(ps.length+1),top=side==='top',y=top?0:blockHeight;
+          terminal(p.pin,x,y,side,x,top?8:blockHeight-8);
+          geometry.push(['text',{x,y:top?30:blockHeight-20,'text-anchor':'middle',class:'pin-label'},p.label]);
+        }
       });
     } else if(type==='spice_port') {
       group[1]['s:width']=Math.max(80,labelWidth+30);group[1]['s:height']=40;
-      terminal('A',0,20,'left',20,20);geometry.push(path('M20,14 L30,20 20,26 Z'),txt(35,24,cell.attributes.value));
+      const role=conventional?cell.spiceLayout?.ports.A?.role:null;
+      if(role==='in'){terminal('A',group[1]['s:width'],20,'right',group[1]['s:width']-20,20);geometry.push(txt(5,15,cell.attributes.value));}
+      else if(['pwr','ret','bias'].includes(role)) {
+        const potential=cell.spiceLayout.ports.A.potential,low=potential!==null?potential<=0:role==='ret',x=group[1]['s:width']/2;
+        terminal('A',x,low?0:40,low?'top':'bottom',x,20);geometry.push(txt(5,low?35:15,cell.attributes.value));
+      }
+      else {terminal('A',0,20,'left',20,20);geometry.push(path('M20,14 L30,20 20,26 Z'),txt(35,24,cell.attributes.value));}
     } else if (type === 'gnd') {
       group[1]['s:width'] = 55; group[1]['s:height'] = 50;
       geometry.push(path('M25,0 V25 M10,25 H40 M15,31 H35 M21,37 H29'), txt(35,18,'0'));
       terminal('A',25,0,'top',25,0);
+    } else if(conventional&&cell.spiceLayout?.horizontal&&['r_v','l_v','c_v','d_v'].includes(type)) {
+      const original=structuredClone(find(type));
+      const baseline=Math.max(100,45+lines.length*(fontSize+4)+35);
+      group[1]['s:height']=baseline+25;
+      for(const n of original.slice(2)) {
+        if(n[0]==='s:alias'||n[0]==='text')continue;
+        if(n[0]==='g'&&n[1]['s:pid']) {
+          const a=n[1],left=Number(a['s:y'])===0,y=baseline-Number(a['s:x']);
+          terminal(a['s:pid'],left?0:width,y,left?'left':'right',left?25:75,y);
+        }else {n[1].transform=`translate(25,${baseline}) rotate(-90)`;geometry.push(n);}
+      }
     } else if (['r_v','spice_br', 'l_v', 'c_v', 'd_v', 'q_npn', 'q_pnp'].includes(type) || type.startsWith('spice_q4_')) {
       const original = structuredClone(find(type==='spice_br'?'r_v':type.startsWith('spice_q4_') ? 'q_' + type.slice(9) : type));
       const ox = 30, oy = 30;
@@ -105,15 +138,16 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     }
     group.push(...geometry);
     if (!['gnd','spice_subckt','spice_device','spice_coupling','spice_port'].includes(type)) {
-      group.push(['text',{x:95,y:24,'s:attribute':'displayRef',class:'ref'},'ref']);
+      const labelX=conventional&&cell.spiceLayout?.horizontal?25:95;
+      group.push(['text',{x:labelX,y:24,'s:attribute':'displayRef',class:'ref'},'ref']);
       // Literal text is escaped by onml; no expressions are ever evaluated.
-      lines.forEach((line,i) => group.push(['text',{x:95,y:46+i*(fontSize+4)},line]));
+      lines.forEach((line,i) => group.push(['text',{x:labelX,y:46+i*(fontSize+4)},line]));
     }
     group.push(...pins); templates.push(onml.stringify(group));
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:s="https://github.com/nturley/netlistsvg">
   <s:properties constants="false" splitsAndJoins="false" genericsLaterals="true"><s:layoutEngine
-  org.eclipse.elk.algorithm="layered" org.eclipse.elk.direction="DOWN"
+  org.eclipse.elk.algorithm="layered" org.eclipse.elk.direction="${conventional?'RIGHT':'DOWN'}"
   org.eclipse.elk.edgeRouting="ORTHOGONAL" org.eclipse.elk.spacing.nodeNode="40"
   ${large?'org.eclipse.elk.layered.layering.strategy="COFFMAN_GRAHAM" org.eclipse.elk.layered.layering.coffmanGraham.layerBound="14"':''}
   org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers="55"

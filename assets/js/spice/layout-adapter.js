@@ -1,8 +1,9 @@
 import {indexNodes,record,nodeName} from './circuit-ir.js';
 import {leafDevices,topologySignature} from './flatten.js';
+import {analyzeLayout} from './layout-semantics.js';
 
 export function blockInterface(tree,context) {
-  const pins=context.ports.map((p,i)=>({pin:'P'+i,label:p.label||p.name,node:p.node,implicit:false}));
+  const pins=context.ports.map((p,i)=>({pin:'P'+i,name:p.name,label:p.label||p.name,node:p.node,implicit:false}));
   const used=new Set(leafDevices(context).flatMap(c=>Object.values(c.terminals)));
   for(const global of tree.ir.globals) {
     const node=nodeName([],global);
@@ -27,7 +28,7 @@ export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),fo
   if(components.length>1500)throw Error('This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.');
   const models=Object.assign(record(),...Object.values(tree.contexts).map(c=>c.models));
   const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,extraNodes),models,diagnostics:tree.ir.diagnostics,mode,focus};
-  circuit.topology=auditProjection(tree,circuit);return circuit;
+  circuit.topology=auditProjection(tree,circuit);circuit.layout=analyzeLayout(tree,circuit);return circuit;
 }
 export function auditProjection(tree,view) {
   const represented=[],seen=new Set();
@@ -51,6 +52,7 @@ export function toNetlistsvg(circuit) {
     const connections=record(),port_directions=record();
     for(const [pin,node]of Object.entries(c.terminals)){connections[pin]=[circuit.nodes[node].bit];port_directions[pin]='input';}
     cells[c.name]={type:c.type,port_directions,connections,parameters:{},attributes:{ref:c.name,displayRef:c.layoutLabel||c.name,value:c.value,spice:c.raw}};
+    cells[c.name].spiceLayout=circuit.layout?.cells[c.name];
     if(c.block)cells[c.name].spiceBlock={ports:c.block.ports.map(p=>({pin:p.pin,label:p.label})),definitionId:c.block.definitionId};
     if(c.type==='spice_device'||c.type==='spice_coupling')cells[c.name].spiceSymbol={label:c.symbol||c.kind,ports:Object.keys(c.terminals).map((pin,i)=>({pin,label:c.pinLabels?.[i]||pin})),references:c.coupledInductors?.length?c.coupledInductors:c.controlSources||[]};
   }
