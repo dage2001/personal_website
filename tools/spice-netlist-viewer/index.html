@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793202724">
+  <link rel="stylesheet" href="/assets/main.css?v=1793205210">
   <link rel="canonical" href="https://jordan-wang.win/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793202724" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793205210" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793202724">
-  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793202724"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793205210">
+  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793205210"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -126,10 +126,20 @@
 <header class="category-header">
   <p class="section-label">Circuits &amp; electronics</p>
   <h1>SPICE Netlist Viewer</h1>
-  <p class="notes-intro">From netlist to schematic. Connected wires, automatic layout, and a full-sheet SVG to keep.</p>
+  <p class="notes-intro">Explore nested circuits. Switch between complete and hierarchical schematics, then keep the view as SVG.</p>
 </header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
+  <div class="spice-hierarchy-bar">
+    <label for="spice-mode">View <select id="spice-mode"><option value="hierarchical">Hierarchical</option><option value="flat">Flat</option></select></label>
+    <nav id="spice-breadcrumbs" aria-label="Circuit hierarchy"></nav>
+    <span id="spice-focus-title">Top-level schematic</span>
+  </div>
+  <details id="spice-hierarchy-panel" hidden open>
+    <summary>Instance hierarchy</summary>
+    <div class="spice-toolbar"><button type="button" id="spice-collapse-all">Collapse all</button><button type="button" id="spice-expand-all">Expand all</button><span class="spice-help">Click a block to expand it. Use − to collapse; open an instance name to view its own sheet.</span></div>
+    <div id="spice-instances"></div>
+  </details>
   <div class="spice-workspace">
     <section class="spice-panel">
       <div class="spice-panel-header"><label for="spice-input">SPICE netlist</label><span class="spice-caption">01 / Circuit</span></div>
@@ -137,6 +147,7 @@
       <div class="spice-toolbar">
         <button type="button" data-example="filter">RLC filter</button>
         <button type="button" data-example="mixed">Mixed analog</button>
+        <button type="button" data-example="hierarchy">Nested channels</button>
         <button type="button" id="spice-generate">Generate ↗</button>
       </div>
       <div class="spice-file-row"><label for="spice-file">Open .cir file </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,text/plain"></div>
@@ -152,6 +163,7 @@
         <button type="button" id="spice-download" disabled>Download SVG ↓</button>
       </div>
       <p id="spice-selection">Click a component to inspect its pins.</p>
+      <div id="spice-selection-actions" class="spice-toolbar" hidden><button type="button" id="spice-toggle-instance">Collapse instance</button><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
   <p id="spice-status" role="status" aria-live="polite">Loading schematic viewer…</p>
@@ -166,7 +178,7 @@
   <details><summary>Node connections</summary><p class="spice-help">Each row is one electrical net. Node 0 is ground; other names, including GND, remain distinct. Hover a wire or component to inspect it.</p><div class="spice-table-wrap"><table><thead><tr><th>Node</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div></details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>
   <details><summary>Parsed circuit &amp; netlistsvg JSON</summary><textarea id="spice-json" readonly aria-label="Parsed JSON" spellcheck="false"></textarea></details>
-  <p class="spice-help">Phase 1 · R, L, C, D, Q, M, V, I, E, G, F, H and B sources. Values, models and expressions are preserved; this viewer does not simulate circuits. Subcircuit expansion, library loading and POLY/LAPLACE sources are not supported. Review warnings for omitted statements.</p>
+  <p class="spice-help">Phase 2 · Nested .SUBCKT / X instances, scoped nodes and symbolic parameters. Flat and mixed hierarchical views share the same verified primitive topology. Values and expressions are preserved without simulation. External libraries and POLY/LAPLACE sources remain unsupported; review warnings for omitted statements.</p>
   <p class="spice-help">Automatic wiring by <a href="https://github.com/nturley/netlistsvg">netlistsvg</a> and <a href="https://github.com/kieler/elkjs">ELK.js</a>, using an extended analog skin. All viewer dependencies are bundled locally; netlists stay in your browser. <a href="../../assets/spice-viewer/THIRD-PARTY.txt">Open-source licenses</a>.</p>
 </div>
 
@@ -209,7 +221,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793202724"></script>
+<script src="/assets/js/site.js?v=1793205210"></script>
 
 
 

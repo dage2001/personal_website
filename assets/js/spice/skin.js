@@ -17,7 +17,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     const type = cell.type, alias = 'spice_cell_' + index++;
     cell.type = alias;
     const lines = (cell.attributes.value || '').match(/.{1,32}(?:\s|$)|.{1,32}/g)?.map(s => s.trim()) || [];
-    const labelWidth = Math.max(cell.attributes.ref?.length || 0, ...lines.map(s => s.length)) * fontSize * .68;
+    const labelWidth = Math.max((cell.attributes.displayRef||cell.attributes.ref)?.length || 0, ...lines.map(s => s.length)) * fontSize * .68;
     const width = Math.max(150, 100 + labelWidth), height = Math.max(120, 45 + lines.length * (fontSize + 4));
     const group = ['g', {'s:type': alias, 's:width': width, 's:height': height}, ['s:alias', {val: alias}]];
     const pins = [], geometry = [];
@@ -25,7 +25,22 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       geometry.push(path(`M${x},${y} L${sx},${sy}`));
       pins.push(['g', {'s:pid': name, 's:x': x, 's:y': y, 's:position': side, 's:dir': 'lateral'}]);
     };
-    if (type === 'gnd') {
+    if (type === 'spice_subckt') {
+      const ports=cell.spiceBlock.ports,left=Math.ceil(ports.length/2),rows=Math.max(left,ports.length-left);
+      const blockWidth=Math.max(200,labelWidth+70,...ports.map(p=>p.label.length*fontSize*.68*2+100));
+      const blockHeight=Math.max(105,70+rows*(fontSize+18));
+      group[1]['s:width']=blockWidth;group[1]['s:height']=blockHeight;
+      geometry.push(['rect',{x:25,y:8,width:blockWidth-50,height:blockHeight-16,rx:6,class:'subckt-body'}]);
+      geometry.push(['text',{x:40,y:32,'s:attribute':'displayRef',class:'ref'},'ref'],txt(40,52,cell.attributes.value));
+      ports.forEach((p,i)=>{
+        const isLeft=i<left,row=isLeft?i:i-left,y=76+row*(fontSize+18),x=isLeft?0:blockWidth,edge=isLeft?25:blockWidth-25;
+        terminal(p.pin,x,y,isLeft?'left':'right',edge,y);
+        geometry.push(['text',{x:isLeft?32:blockWidth-32,y:y-5,'text-anchor':isLeft?'start':'end',class:'pin-label'},p.label]);
+      });
+    } else if(type==='spice_port') {
+      group[1]['s:width']=Math.max(80,labelWidth+30);group[1]['s:height']=40;
+      terminal('A',0,20,'left',20,20);geometry.push(path('M20,14 L30,20 20,26 Z'),txt(35,24,cell.attributes.value));
+    } else if (type === 'gnd') {
       group[1]['s:width'] = 55; group[1]['s:height'] = 50;
       geometry.push(path('M25,0 V25 M10,25 H40 M15,31 H35 M21,37 H29'), txt(35,18,'0'));
       terminal('A',25,0,'top',25,0);
@@ -74,8 +89,8 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       if (type === 'spice_b') geometry.push(txt(72,60,'B'));
     }
     group.push(...geometry);
-    if (type !== 'gnd') {
-      group.push(['text',{x:95,y:24,'s:attribute':'ref',class:'ref'},'ref']);
+    if (!['gnd','spice_subckt','spice_port'].includes(type)) {
+      group.push(['text',{x:95,y:24,'s:attribute':'displayRef',class:'ref'},'ref']);
       // Literal text is escaped by onml; no expressions are ever evaluated.
       lines.forEach((line,i) => group.push(['text',{x:95,y:46+i*(fontSize+4)},line]));
     }
@@ -90,6 +105,6 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
   </s:properties><style>svg{stroke:${color};fill:none;stroke-width:1.4}
   text{font-family:'${escape(font)}',Arial,sans-serif;font-size:${fontSize}px;fill:${color};stroke:none;font-weight:normal}
   .ref{font-weight:bold}.pin-label{font-size:${Math.max(8,fontSize-2)}px}.symbol{stroke-linejoin:round;stroke-linecap:round}
-  .detail{fill:${color}} circle[class^="net_"]{fill:${color}!important}
+  .detail{fill:${color}} .subckt-body{fill:#f3f6f1;stroke:${color}} circle[class^="net_"]{fill:${color}!important}
   </style>${templates.join('\n')}</svg>`;
 }
