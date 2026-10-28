@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793205210">
+  <link rel="stylesheet" href="/assets/main.css?v=1793208765">
   <link rel="canonical" href="/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793205210" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793208765" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793205210">
-  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793205210"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793208765">
+  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793208765"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -165,9 +165,11 @@
         <button type="button" data-example="filter">RLC filter</button>
         <button type="button" data-example="mixed">Mixed analog</button>
         <button type="button" data-example="hierarchy">Nested channels</button>
+        <button type="button" data-example="ltspice">LTspice families</button>
         <button type="button" id="spice-generate">Generate ↗</button>
       </div>
       <div class="spice-file-row"><label for="spice-file">Open .cir file </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,text/plain"></div>
+      <div class="spice-file-row"><label for="spice-libraries">Library files </label><input type="file" id="spice-libraries" accept=".lib,.sub,.mod,.cir,.txt" multiple><p class="spice-help" id="spice-library-status">For .include / .lib dependencies</p></div>
     </section>
     <section class="spice-panel">
       <div class="spice-panel-header"><h2>Schematic</h2><span class="spice-caption">02 / Connected SVG</span></div>
@@ -189,13 +191,14 @@
     <label for="spice-font">Font <select id="spice-font"><option>Arial</option><option>Helvetica</option><option>Times New Roman</option><option>monospace</option></select></label>
     <label for="spice-size">Size <input type="number" id="spice-size" min="8" max="24" step="1" value="12"> px</label>
     <label for="spice-color">Color <input type="color" id="spice-color" value="#292b29"></label>
+    <label for="spice-detailed"><input type="checkbox" id="spice-detailed"> Detailed parameter labels</label>
     <span class="spice-help">Change settings, then Generate to apply.</span>
   </div>
   <details id="spice-messages"><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
   <details><summary>Node connections</summary><p class="spice-help">Each row is one electrical net. Node 0 is ground; other names, including GND, remain distinct. Hover a wire or component to inspect it.</p><div class="spice-table-wrap"><table><thead><tr><th>Node</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div></details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>
   <details><summary>Parsed circuit &amp; netlistsvg JSON</summary><textarea id="spice-json" readonly aria-label="Parsed JSON" spellcheck="false"></textarea></details>
-  <p class="spice-help">Phase 2 · Nested .SUBCKT / X instances, scoped nodes and symbolic parameters. Flat and mixed hierarchical views share the same verified primitive topology. Values and expressions are preserved without simulation. External libraries and POLY/LAPLACE sources remain unsupported; review warnings for omitted statements.</p>
+  <p class="spice-help">LTspice · A, B, C, D, E, F, G, H, I, J, K, L, M, O, Q, R, S, T, U, V, W, X, Z, @, &amp; and library-native Ö. Includes VDMOS, POLY/TABLE/LAPLACE and nested subcircuits. Add .lib/.sub files for external dependencies. Long labels use …; hover or enable Detailed parameter labels for full values. K elements retain magnetic references and mark the dotted inductor terminals; they never create electrical shorts. This is a topology viewer, not a simulator.</p>
   <p class="spice-help">Automatic wiring by <a href="https://github.com/nturley/netlistsvg">netlistsvg</a> and <a href="https://github.com/kieler/elkjs">ELK.js</a>, using an extended analog skin. All viewer dependencies are bundled locally; netlists stay in your browser. <a href="../../assets/spice-viewer/THIRD-PARTY.txt">Open-source licenses</a>.</p>
 </div>
 
@@ -238,7 +241,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793205210"></script>
+<script src="/assets/js/site.js?v=1793208765"></script>
 
 
 

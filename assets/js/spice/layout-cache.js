@@ -7,6 +7,7 @@ export function normalizeLayout(netlist) {
     const connections=Object.fromEntries(Object.entries(cell.connections).map(([pin,values])=>[pin,values.map(normalizeBit)]));
     cells[id]={type:cell.type,connections,port_directions:cell.port_directions,attributes:{displayRef:cell.attributes.displayRef||cell.attributes.ref||'',value:cell.attributes.value||'',name:cell.attributes.name||''}};
     if(cell.spiceBlock)cells[id].spiceBlock=cell.spiceBlock;
+    if(cell.spiceSymbol)cells[id].spiceSymbol=cell.spiceSymbol;
   });
   return {netlist:{modules:{circuit:{attributes:{top:1},ports:{},cells}}},ids,bits:new Map([...bits].map(([old,canonical])=>[canonical,old]))};
 }

@@ -2,7 +2,7 @@ import {indexNodes,record,nodeName} from './circuit-ir.js';
 import {leafDevices,topologySignature} from './flatten.js';
 
 export function blockInterface(tree,context) {
-  const pins=context.ports.map((p,i)=>({pin:'P'+i,label:p.name,node:p.node,implicit:false}));
+  const pins=context.ports.map((p,i)=>({pin:'P'+i,label:p.label||p.name,node:p.node,implicit:false}));
   const used=new Set(leafDevices(context).flatMap(c=>Object.values(c.terminals)));
   for(const global of tree.ir.globals) {
     const node=nodeName([],global);
@@ -12,21 +12,21 @@ export function blockInterface(tree,context) {
 }
 export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),focus=''}={}) {
   const context=tree.contexts[focus];if(!context)throw Error('Unknown instance: '+focus);
-  const components=[];
-  const relative=name=>focus?name.slice(focus.length+1):name;
+  const components=[],extraNodes=[];
   function visit(current) {
-    components.push(...current.devices.map(c=>({...c,layoutLabel:relative(c.name)})));
+    extraNodes.push(...Object.values(current.nodes),...current.ports.map(p=>p.node));
+    components.push(...current.devices.map(c=>({...c,layoutLabel:[...current.path.slice(context.path.length),c.localName].join('/')})));
     for(const child of current.children) {
       if(mode==='flat'||expanded.has(child.id)){visit(child);continue;}
       const pins=blockInterface(tree,child),terminals=record();pins.forEach(p=>{terminals[p.pin]=p.node;});
-      components.push({name:child.id,kind:'X',type:'spice_subckt',terminals,value:child.definition,raw:child.raw,line:child.line,instanceId:child.id,layoutLabel:relative(child.id),block:{definitionId:child.scopeId,ports:pins,parameters:child.params}});
+      components.push({name:child.id,kind:'X',type:'spice_subckt',terminals,value:child.definition,raw:child.raw,line:child.line,instanceId:child.id,layoutLabel:child.path.slice(context.path.length).join('/'),block:{definitionId:child.scopeId,ports:pins,parameters:child.params}});
     }
   }
   visit(context);
   for(const [i,p]of context.ports.entries())components.push({name:'@port/'+focus+'/'+i,kind:'PORT',type:'spice_port',terminals:{A:p.node},layoutLabel:p.name,value:p.name,raw:'Interface port '+p.name,synthetic:true});
-  if(components.length>300)throw Error('This sheet exceeds 300 symbols. Collapse instances or open a subcircuit.');
+  if(components.length>1500)throw Error('This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.');
   const models=Object.assign(record(),...Object.values(tree.contexts).map(c=>c.models));
-  const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,context.ports.map(p=>p.node)),models,diagnostics:tree.ir.diagnostics,mode,focus};
+  const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,extraNodes),models,diagnostics:tree.ir.diagnostics,mode,focus};
   circuit.topology=auditProjection(tree,circuit);return circuit;
 }
 export function auditProjection(tree,view) {
@@ -52,6 +52,7 @@ export function toNetlistsvg(circuit) {
     for(const [pin,node]of Object.entries(c.terminals)){connections[pin]=[circuit.nodes[node].bit];port_directions[pin]='input';}
     cells[c.name]={type:c.type,port_directions,connections,parameters:{},attributes:{ref:c.name,displayRef:c.layoutLabel||c.name,value:c.value,spice:c.raw}};
     if(c.block)cells[c.name].spiceBlock={ports:c.block.ports.map(p=>({pin:p.pin,label:p.label})),definitionId:c.block.definitionId};
+    if(c.type==='spice_device'||c.type==='spice_coupling')cells[c.name].spiceSymbol={label:c.symbol||c.kind,ports:Object.keys(c.terminals).map((pin,i)=>({pin,label:c.pinLabels?.[i]||pin})),references:c.coupledInductors?.length?c.coupledInductors:c.controlSources||[]};
   }
   for(const n of Object.values(circuit.nodes))netnames[n.name]={hide_name:0,bits:[n.bit],attributes:{}};
   if(circuit.nodes['0']) {

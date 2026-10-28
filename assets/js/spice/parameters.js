@@ -6,10 +6,10 @@ const identifiers=/(?<![\w.$])[a-z_][\w.$]*/gi;
 export function substituteExpression(text,lookup,node=n=>n,device=n=>n) {
   const references=[];
   text=text.replace(/"(?:\\.|[^"\\])*"/g,value=>{references.push(value);return '@@'+(references.length-1)+'@@';});
-  text=text.replace(/\b([vi])\s*\(([^()]*)\)/gi,(all,type,args)=>{
+  text=text.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi,(all,type,args)=>{
     const parts=args.split(',').map(s=>s.trim());
     if(parts.some(n=>!n||/[\s{}+*()]/.test(n)))throw Error('Unsupported dynamic voltage/current reference: '+all);
-    const value=type.toUpperCase()+'('+parts.map(type.toLowerCase()==='v'?node:device).join(',')+')';
+    const value=type.toUpperCase()+'('+parts.map(n=>type.toLowerCase()==='v'?node(n):device(n,type)).join(',')+')';
     references.push(value);return '@@'+(references.length-1)+'@@';
   });
   let budget=text.length;
@@ -60,9 +60,19 @@ export function bindValue(text,params,node,device) {
     if(depth)throw Error('Unclosed parameter expression.');
     result+=open+substituteExpression(text.slice(start+1,i-1),n=>params[n],node,device)+(open==='{'?'}':"'");
   }
-  // Behavioral sources can also use unbraced V=/I= expressions.
-  if(!text.includes('{')&&!text.includes("'")&&/^(?:[VI]|VALUE|VOL|CUR)\s*=/i.test(text)) {
-    const equal=text.indexOf('=');result=text.slice(0,equal+1)+substituteExpression(text.slice(equal+1),n=>params[n],node,device);
-  } else if(Object.hasOwn(params,text.toLowerCase()))result='{'+params[text.toLowerCase()]+'}';
+  // Unbraced LTspice Q=/Flux=/R=/P=/VALUE= and numeric instance fields.
+  const fields=[];let depth=0,quoted='';
+  for(let i=0;i<result.length;i++) {
+    const c=result[i];if(quoted){if(c===quoted&&result[i-1]!=='\\')quoted='';continue;}
+    if(c==='"'||c==="'"){quoted=c;continue;}if('({'.includes(c))depth++;if(')}'.includes(c))depth--;
+    if(!depth&&(i===0||/\s/.test(result[i-1]))) {
+      const match=/^([a-z_][\w.$]*)\s*=(?!=)/i.exec(result.slice(i));if(match){fields.push({start:i,end:i+match[0].length,key:match[1].toLowerCase()});i+=match[0].length-1;}
+    }
+  }
+  if(fields.length) {
+    let bound=result.slice(0,fields[0].start);
+    fields.forEach((field,i)=>{const end=fields[i+1]?.start??result.length,value=result.slice(field.end,end);bound+=result.slice(field.start,field.end)+(value.includes('{')||['refnode','intnode'].includes(field.key)?value:substituteExpression(value,n=>params[n],node,device));});
+    result=bound;
+  }else if(Object.hasOwn(params,text.toLowerCase()))result='{'+params[text.toLowerCase()]+'}';
   return result;
 }
