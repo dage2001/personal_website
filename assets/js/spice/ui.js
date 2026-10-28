@@ -1,18 +1,24 @@
-import {parseCir, toNetlistsvg} from './cir2json.js';
+import {parseHierarchy} from './hierarchy-parser.js';
+import {elaborateCircuit} from './elaborate.js';
+import {projectHierarchy,toNetlistsvg} from './layout-adapter.js';
 import {renderSchematic} from './renderer.js';
 import mixed from './examples/mixed.cir?raw';
 import filter from './examples/filter.cir?raw';
+import hierarchy from './examples/hierarchy.cir?raw';
 import './viewer.css';
 
 const $ = id => document.getElementById('spice-' + id);
 const root = $('app');
 if (root) {
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
-  let svgText = '', circuit, busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
+  let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
+  const expanded=new Set();let pendingRoute=false;
+  root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value});
   function invalidate() { svgText = ''; exports(); status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
+  try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   input.addEventListener('input', invalidate);
   for (const id of ['font','size','color']) $(id).addEventListener('input', invalidate);
   function showDiagnostics(items) {
@@ -56,11 +62,62 @@ if (root) {
     if (!moved) {
       const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-component]');
       const component=circuit?.components.find(c => c.name === target?.dataset.component);
-      if (component) $('selection').textContent = `${component.raw}\n${Object.entries(component.terminals).map(([p,n])=>`${p} → ${n}`).join('   ')}`;
+      if (component) {
+        selectedInstance=component.instanceId||'';
+        $('selection').textContent = `${component.raw}\n${Object.entries(component.terminals).map(([p,n])=>`${p} → ${n}`).join('   ')}`;
+        if(component.kind==='X'&&$('mode').value==='hierarchical'){expandInstance(component.instanceId);generate();}
+        else updateSelection();
+      }
     }
   });
+  function route(instance) {
+    const query=new URLSearchParams();if(instance)query.set('instance',instance);
+    const hash=query.toString();
+    if(location.hash.slice(1)===hash){focus=instance;generate();}else location.hash=hash;
+  }
+  function readRoute(){focus=new URLSearchParams(location.hash.slice(1)).get('instance')||'';}
+  function expandInstance(id){const path=tree.contexts[id].path;for(let i=1;i<=path.length;i++)expanded.add(path.slice(0,i).map(encodeURIComponent).join('/'));}
+  window.addEventListener('hashchange',()=>{if(busy){pendingRoute=true;return;}readRoute();selectedInstance='';generate();});
+  function updateSelection() {
+    const valid=Boolean(selectedInstance&&selectedInstance!==focus&&tree?.contexts[selectedInstance]);
+    $('selection-actions').hidden=!valid;
+    $('toggle-instance').textContent=expanded.has(selectedInstance)?'Collapse instance':'Expand instance';
+    $('toggle-instance').disabled=$('mode').value==='flat';
+    $('open-instance').href='#'+new URLSearchParams({instance:selectedInstance});
+  }
+  function updateHierarchy() {
+    $('breadcrumbs').replaceChildren();
+    const addCrumb=(label,id)=>{const button=document.createElement('button');button.type='button';button.textContent=label;button.onclick=()=>route(id);button.disabled=id===focus;$('breadcrumbs').append(button);};
+    addCrumb('Top','');
+    if(focus) {
+      const path=tree.contexts[focus].path;
+      for(let i=0;i<path.length;i++)addCrumb(path[i],path.slice(0,i+1).map(encodeURIComponent).join('/'));
+    }
+    $('instances').replaceChildren();
+    const walk=(current,depth)=>{
+      for(const child of current.children) {
+        const row=document.createElement('div');row.className='spice-instance-row';row.style.setProperty('--depth',Math.min(depth,8));row.dataset.instance=child.id;
+        const toggle=document.createElement('button');toggle.type='button';toggle.textContent=expanded.has(child.id)?'−':'+';toggle.title=(expanded.has(child.id)?'Collapse ':'Expand ')+child.id;
+        toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(expanded.has(child.id)));toggle.disabled=$('mode').value==='flat';toggle.onclick=()=>{expanded.has(child.id)?expanded.delete(child.id):expandInstance(child.id);selectedInstance=child.id;generate();};
+        const link=document.createElement('a');link.href='#'+new URLSearchParams({instance:child.id});link.textContent=child.name+' · '+child.definition;link.title='Open '+child.id+' as its own sheet';
+        const params=document.createElement('span');params.className='spice-help';params.textContent=Object.entries(child.params).map(([k,v])=>k+'='+v).join(' · ');
+        row.append(toggle,link);if(params.textContent){const detail=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Parameters';detail.append(summary,params);row.append(detail);}
+        $('instances').append(row);walk(child,depth+1);
+      }
+    };
+    walk(tree.contexts[focus],0);
+    $('hierarchy-panel').hidden=!tree.contexts[focus].children.length;
+    $('focus-title').textContent=focus?focus+' / '+tree.contexts[focus].definition:'Top-level schematic';
+    updateSelection();
+  }
+  $('mode').onchange=()=>generate();
+  $('collapse-all').onclick=()=>{expanded.clear();generate();};
+  $('expand-all').onclick=()=>{for(const id of Object.keys(tree?.contexts||{}))if(id)expanded.add(id);generate();};
+  $('toggle-instance').onclick=()=>{expanded.has(selectedInstance)?expanded.delete(selectedInstance):expandInstance(selectedInstance);generate();};
   preview.addEventListener('pointercancel', () => {drag=null;});
   preview.addEventListener('keydown', event => {
+    const block=event.target.closest('[data-instance]');
+    if(block&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;expandInstance(selectedInstance);generate();return;}
     if (event.key === '+' || event.key === '=') zoom(.8);
     else if (event.key === '-') zoom(1.25);
     else if (event.key.toLowerCase() === 'f') {view={...full};setView();}
@@ -70,12 +127,22 @@ if (root) {
     if (busy) return;
     busy=true; svgText=''; exports(); $('generate').disabled=true;
     input.readOnly=true; $('file').disabled=true;
-    for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color]')) element.disabled=true;
+    for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance')) element.disabled=true;
     status.textContent='Parsing netlist and routing wires…'; preview.setAttribute('aria-busy','true');
     let items=[];
     try {
-      circuit=parseCir(input.value); items=circuit.diagnostics; showDiagnostics(items);
+      if(lastSource!==input.value||!tree) {
+        ir=parseHierarchy(input.value);items=ir.diagnostics;
+        if(items.some(d=>d.severity==='error')){tree=null;throw Error('Fix the parser errors below before generating.');}
+        tree=elaborateCircuit(ir);
+        if(lastSource&&lastSource!==input.value){expanded.clear();focus='';selectedInstance='';history.replaceState(null,'',location.pathname+location.search);}
+        else readRoute();
+        lastSource=input.value;
+        try{sessionStorage.setItem('spice-netlist-v2',input.value);}catch{}
+      }
+      items=ir.diagnostics;showDiagnostics(items);
       if (items.some(d=>d.severity==='error')) throw Error('Fix the parser errors below before generating.');
+      circuit=projectHierarchy(tree,{mode:$('mode').value,expanded,focus});
       const netlist=toNetlistsvg(circuit);
       const rendered=await renderSchematic(netlist,settings());
       const documentSVG=new DOMParser().parseFromString(rendered,'image/svg+xml');
@@ -92,6 +159,7 @@ if (root) {
         const element=documentSVG.getElementById('cell_'+c.name);
         if (!element) throw Error('Renderer omitted component '+c.name);
         element.setAttribute('data-component',c.name);
+        if(c.kind==='X'){element.setAttribute('data-instance',c.instanceId);element.setAttribute('role','button');element.setAttribute('tabindex','0');element.setAttribute('aria-label','Expand '+c.name);}
         const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=c.raw+'\n'+Object.entries(c.terminals).map(([p,n])=>p+': '+n).join(', ');element.prepend(title);
       }
       for (const n of Object.values(circuit.nodes)) {
@@ -104,26 +172,32 @@ if (root) {
       svgText=new XMLSerializer().serializeToString(svg); $('source').value=svgText;
       preview.replaceChildren(document.importNode(svg,true)); setView();
       const warnings=items.filter(d=>d.severity==='warning').length;
-      status.textContent=`${circuit.components.length} components · ${Object.keys(circuit.nodes).length} nodes${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
+      status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
       const rows=Object.values(circuit.nodes).map(n => {
         const tr=document.createElement('tr');
         for (const text of [n.displayName,n.terminals.map(t=>t.component+'.'+t.pin).join(', ')]) {const td=document.createElement('td');td.textContent=text;tr.append(td);} return tr;
       });
-      $('nets').replaceChildren(...rows); $('json').value=JSON.stringify({circuit,netlist},null,2);
+      $('nets').replaceChildren(...rows); $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);
       $('selection').textContent='Click a component to inspect its original statement and pin connections.';
+      updateHierarchy();
     } catch(error) {
       preview.replaceChildren(); svgText=''; $('source').value=''; $('json').value=''; $('nets').replaceChildren();
       $('selection').textContent=''; status.textContent=error.message;
+      if(!tree){$('hierarchy-panel').hidden=true;$('selection-actions').hidden=true;$('breadcrumbs').replaceChildren();}
+      else if(!tree.contexts[focus]){const home=document.createElement('button');home.type='button';home.textContent='Return to Top';home.onclick=()=>route('');$('breadcrumbs').replaceChildren(home);}
+      if(error.diagnostics)items=error.diagnostics;
       if (!items.some(d=>d.severity==='error')) items.push({severity:'error',line:0,message:error.message});
       showDiagnostics(items);
     } finally {
       busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;
-      for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color]')) element.disabled=false;
+      for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], #spice-instances button, #spice-collapse-all, #spice-expand-all')) element.disabled=false;
+      if(tree&&tree.contexts[focus])updateHierarchy();
       preview.setAttribute('aria-busy','false');exports();
+      if(pendingRoute){pendingRoute=false;readRoute();queueMicrotask(generate);}
     }
   }
   $('generate').onclick=generate;
-  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=button.dataset.example==='mixed'?mixed:filter;invalidate();generate();};
+  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=({mixed,filter,hierarchy})[button.dataset.example];invalidate();generate();};
   $('file').onchange=async event=>{
     const file=event.target.files[0];if (!file)return;
     if (file.size>500000) {status.textContent='File exceeds 500 kB.';return;}
