@@ -16,8 +16,12 @@ export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),fo
   const components=[],extraNodes=[];
   function visit(current) {
     extraNodes.push(...Object.values(current.nodes),...current.ports.map(p=>p.node));
-    components.push(...current.devices.map(c=>({...c,layoutLabel:[...current.path.slice(context.path.length),c.localName].join('/')})));
-    for(const child of current.children) {
+    // Keep devices and instances in the same source order. A block must not be
+    // given a separate placement phase ahead of its surrounding discrete parts.
+    const statements=[...current.devices.map(device=>({line:device.line,device})),...current.children.map(child=>({line:child.line,child}))].sort((a,b)=>a.line-b.line);
+    for(const entry of statements) {
+      if(entry.device) {const c=entry.device;components.push({...c,layoutLabel:[...current.path.slice(context.path.length),c.localName].join('/')});continue;}
+      const child=entry.child;
       if(mode==='flat'||expanded.has(child.id)){visit(child);continue;}
       const pins=blockInterface(tree,child),terminals=record();pins.forEach(p=>{terminals[p.pin]=p.node;});
       components.push({name:child.id,kind:'X',type:'spice_subckt',terminals,value:child.definition,raw:child.raw,line:child.line,instanceId:child.id,layoutLabel:child.path.slice(context.path.length).join('/'),block:{definitionId:child.scopeId,ports:pins,parameters:child.params}});

@@ -68,7 +68,7 @@ if (root) {
       if (component) {
         selectedInstance=component.instanceId||'';
         $('selection').textContent = `${component.raw}\n${Object.entries(component.terminals).map(([p,n])=>`${p} → ${n}`).join('   ')}`;
-        if(component.kind==='X'&&$('mode').value==='hierarchical'){expandInstance(component.instanceId);generate();}
+        if(component.kind==='X'){expandInstance(component.instanceId);generate();}
         else updateSelection();
       }
     }
@@ -85,7 +85,7 @@ if (root) {
     const valid=Boolean(selectedInstance&&selectedInstance!==focus&&tree?.contexts[selectedInstance]);
     $('selection-actions').hidden=!valid;
     $('toggle-instance').textContent=expanded.has(selectedInstance)?'Collapse instance':'Expand instance';
-    $('toggle-instance').disabled=$('mode').value==='flat';
+    $('toggle-instance').disabled=false;
     $('open-instance').href='#'+new URLSearchParams({instance:selectedInstance});
   }
   function updateHierarchy() {
@@ -101,7 +101,7 @@ if (root) {
       for(const child of current.children) {
         const row=document.createElement('div');row.className='spice-instance-row';row.style.setProperty('--depth',Math.min(depth,8));row.dataset.instance=child.id;
         const toggle=document.createElement('button');toggle.type='button';toggle.textContent=expanded.has(child.id)?'−':'+';toggle.title=(expanded.has(child.id)?'Collapse ':'Expand ')+child.id;
-        toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(expanded.has(child.id)));toggle.disabled=$('mode').value==='flat';toggle.onclick=()=>{expanded.has(child.id)?expanded.delete(child.id):expandInstance(child.id);selectedInstance=child.id;generate();};
+        toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(expanded.has(child.id)));toggle.onclick=()=>{expanded.has(child.id)?expanded.delete(child.id):expandInstance(child.id);selectedInstance=child.id;generate();};
         const link=document.createElement('a');link.href='#'+new URLSearchParams({instance:child.id});link.textContent=child.name+' · '+child.definition;link.title='Open '+child.id+' as its own sheet';
         const params=document.createElement('span');params.className='spice-help';params.textContent=Object.entries(child.params).map(([k,v])=>k+'='+v).join(' · ');
         row.append(toggle,link);if(params.textContent){const detail=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Parameters';detail.append(summary,params);row.append(detail);}
@@ -113,7 +113,6 @@ if (root) {
     $('focus-title').textContent=focus?focus+' / '+tree.contexts[focus].definition:'Top-level schematic';
     updateSelection();
   }
-  $('mode').onchange=()=>generate();
   $('collapse-all').onclick=()=>{expanded.clear();generate();};
   $('expand-all').onclick=()=>{for(const id of Object.keys(tree?.contexts||{}))if(id)expanded.add(id);generate();};
   $('toggle-instance').onclick=()=>{expanded.has(selectedInstance)?expanded.delete(selectedInstance):expandInstance(selectedInstance);generate();};
@@ -145,7 +144,7 @@ if (root) {
       }
       items=[...ir.diagnostics];showDiagnostics(items);
       if (items.some(d=>d.severity==='error')) throw Error('Fix the parser errors below before generating.');
-      circuit=projectHierarchy(tree,{mode:$('mode').value,expanded,focus});
+      circuit=projectHierarchy(tree,{expanded,focus});
       const netlist=toNetlistsvg(circuit);
       if(settings().conventional)items.push(...circuit.layout.diagnostics);
       const rendered=await renderSchematic(netlist,settings());
@@ -156,7 +155,7 @@ if (root) {
       if(layoutReport) {
         circuit.layout.report=JSON.parse(layoutReport.textContent);
         const r=circuit.layout.report;
-        items.push({severity:'info',message:`Layout: left-to-right signal guide; ${r.powerSourcesChecked} DC/ground symbols checked, ${r.powerOrderViolations} source-column order violation(s). ${r.powerPass}. Global voltage bands are a preference.`});
+        items.push({severity:'info',message:`Layout: compact signal flow; ${r.powerSourcesChecked} DC/ground symbols checked, ${r.powerOrderViolations} DC order preference(s) unmet. ${r.powerPass}. Global voltage bands are a preference.`});
         if(r.groundPlacement)items.push({severity:'info',message:`Ground: ${r.groundPlacement}; ${r.straightenedGroundDrops||0} return-path simplification(s).`});
         showDiagnostics(items);
       }
@@ -187,8 +186,8 @@ if (root) {
           const group=documentSVG.getElementById('cell_'+name);if(!group)continue;
           const dot=documentSVG.createElementNS(svg.namespaceURI,'circle');
           const firstPort=[...group.children].find(p=>p.getAttribute('s:pid')==='A');
-          const horizontal=firstPort?.getAttribute('s:position')==='left';
-          for(const [key,value]of Object.entries({cx:horizontal?20:24,cy:horizontal?Number(firstPort.getAttribute('s:y'))-8:38,r:3,fill:settings().color,stroke:'none','data-coupling':coupling.name}))dot.setAttribute(key,String(value));
+          const side=firstPort?.getAttribute('s:position'),offset={left:[6,-8],right:[-6,-8],top:[-8,6],bottom:[-8,-6]}[side]||[0,0];
+          for(const [key,value]of Object.entries({cx:Number(firstPort?.getAttribute('s:x'))+offset[0],cy:Number(firstPort?.getAttribute('s:y'))+offset[1],r:3,fill:settings().color,stroke:'none','data-coupling':coupling.name}))dot.setAttribute(key,String(value));
           const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=coupling.name+' · dotted terminal: '+coupling.inductors.join(', ');dot.append(title);group.append(dot);
         }
       }

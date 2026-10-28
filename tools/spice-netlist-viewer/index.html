@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793220734">
+  <link rel="stylesheet" href="/assets/main.css?v=1793225292">
   <link rel="canonical" href="/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793220734" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793225292" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793220734">
-  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793220734"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793225292">
+  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793225292"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -143,12 +143,12 @@
 <header class="category-header">
   <p class="section-label">Circuits &amp; electronics</p>
   <h1>SPICE Netlist Viewer</h1>
-  <p class="notes-intro">Explore nested circuits. Switch between complete and hierarchical schematics, then keep the view as SVG.</p>
+  <p class="notes-intro">Explore nested circuits. Expand blocks or open an instance sheet, then keep the view as SVG.</p>
 </header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
   <div class="spice-hierarchy-bar">
-    <label for="spice-mode">View <select id="spice-mode"><option value="hierarchical">Hierarchical</option><option value="flat">Flat</option></select></label>
+    <span>Hierarchical view</span>
     <nav id="spice-breadcrumbs" aria-label="Circuit hierarchy"></nav>
     <span id="spice-focus-title">Top-level schematic</span>
   </div>
@@ -195,7 +195,7 @@
     <label for="spice-conventional"><input type="checkbox" id="spice-conventional" checked> Circuit layout rules</label>
     <span class="spice-help">Change settings, then Generate to apply.</span>
   </div>
-  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces, PWR_/RET_/BIAS_ rails and horizontal signal flow. Known DC supplies prefer a descending source column; full-sheet voltage bands remain a layout preference. Unnamed interfaces retain their connections.</p>
+  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces and PWR_/RET_/BIAS_ rails. Component orientation and spacing adapt to the connections. Expand a block or open its instance sheet to inspect a circuit.</p>
   <details id="spice-messages"><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
   <details><summary>Node connections</summary><p class="spice-help">Each row is one electrical net. Node 0 is ground; other names, including GND, remain distinct. Hover a wire or component to inspect it.</p><div class="spice-table-wrap"><table><thead><tr><th>Node</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div></details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>
@@ -243,7 +243,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793220734"></script>
+<script src="/assets/js/site.js?v=1793225292"></script>
 
 
 
