@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPICE Netlist Viewer</title>
+<style>body{margin:0;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif}main{max-width:1440px;margin:40px auto;padding:0 24px}h1{font-size:32px;letter-spacing:-1px}a{color:#344b40}header p{color:#74776e}</style>
+<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer.js"></script>
+</head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>From netlist to schematic. Connected wires, automatic layout, and a full-sheet SVG to keep.</p></header>
+<div class="spice-app" id="spice-app">
+  <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
+  <div class="spice-workspace">
+    <section class="spice-panel">
+      <div class="spice-panel-header"><label for="spice-input">SPICE netlist</label><span class="spice-caption">01 / Circuit</span></div>
+      <textarea id="spice-input" spellcheck="false" aria-label="SPICE netlist" aria-describedby="spice-input-help"></textarea>
+      <div class="spice-toolbar">
+        <button type="button" data-example="filter">RLC filter</button>
+        <button type="button" data-example="mixed">Mixed analog</button>
+        <button type="button" id="spice-generate">Generate ↗</button>
+      </div>
+      <div class="spice-file-row"><label for="spice-file">Open .cir file </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,text/plain"></div>
+    </section>
+    <section class="spice-panel">
+      <div class="spice-panel-header"><h2>Schematic</h2><span class="spice-caption">02 / Connected SVG</span></div>
+      <div class="spice-preview" id="spice-preview" tabindex="0" role="region" aria-label="Schematic preview. Scroll to zoom, drag to pan, F to fit." aria-busy="false"></div>
+      <div class="spice-toolbar">
+        <button type="button" id="spice-zoom-out" aria-label="Zoom out">−</button>
+        <button type="button" id="spice-zoom-in" aria-label="Zoom in">+</button>
+        <button type="button" id="spice-fit">Fit</button><span id="spice-zoom-level">100%</span>
+        <button type="button" id="spice-copy" disabled>Copy SVG</button>
+        <button type="button" id="spice-download" disabled>Download SVG ↓</button>
+      </div>
+      <p id="spice-selection">Click a component to inspect its pins.</p>
+    </section>
+  </div>
+  <p id="spice-status" role="status" aria-live="polite">Loading schematic viewer…</p>
+  <p class="spice-help" id="spice-input-help">Paste a netlist or open a file. Scroll to zoom · Drag to pan · + / − to zoom · F to fit. SVG exports always include the full drawing.</p>
+  <div class="spice-settings" role="group" aria-label="Schematic appearance">
+    <label for="spice-font">Font <select id="spice-font"><option>Arial</option><option>Helvetica</option><option>Times New Roman</option><option>monospace</option></select></label>
+    <label for="spice-size">Size <input type="number" id="spice-size" min="8" max="24" step="1" value="12"> px</label>
+    <label for="spice-color">Color <input type="color" id="spice-color" value="#292b29"></label>
+    <span class="spice-help">Change settings, then Generate to apply.</span>
+  </div>
+  <details id="spice-messages"><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
+  <details><summary>Node connections</summary><p class="spice-help">Each row is one electrical net. Node 0 is ground; other names, including GND, remain distinct. Hover a wire or component to inspect it.</p><div class="spice-table-wrap"><table><thead><tr><th>Node</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div></details>
+  <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>
+  <details><summary>Parsed circuit &amp; netlistsvg JSON</summary><textarea id="spice-json" readonly aria-label="Parsed JSON" spellcheck="false"></textarea></details>
+  <p class="spice-help">Phase 1 · R, L, C, D, Q, M, V, I, E, G, F, H and B sources. Values, models and expressions are preserved; this viewer does not simulate circuits. Subcircuit expansion, library loading and POLY/LAPLACE sources are not supported. Review warnings for omitted statements.</p>
+  <p class="spice-help">Automatic wiring by <a href="https://github.com/nturley/netlistsvg">netlistsvg</a> and <a href="https://github.com/kieler/elkjs">ELK.js</a>, using an extended analog skin. All viewer dependencies are bundled locally; netlists stay in your browser. <a href="./THIRD-PARTY.txt">Open-source licenses</a>.</p>
+</div>
+
+</main></body></html>
