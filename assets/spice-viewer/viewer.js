@@ -31,11 +31,11 @@ function Ye(t, e) {
     if (u && E && g !== "VDMOS") throw Error("Monolithic NMOS/PMOS requires a bulk terminal; three-terminal form requires VDMOS.");
     if (!u && g === "VDMOS") throw Error("VDMOS requires exactly D/G/S terminals.");
     I = ["NMOS", "PMOS", "VDMOS"].includes(g);
-    let x = null, C = E;
+    let v = null, x = E;
     const w = /* @__PURE__ */ new Set();
-    for (; C && !w.has(C.name) && (w.add(C.name), x = /\bpchan(?:\s*=\s*([+\-\d.e]+))?/i.exec(C.raw), !x); )
-      C = n(C.baseModel);
-    const R = g === "PMOS" || g === "VDMOS" && x && (x[1] === void 0 || Number(x[1]) >= 0.5);
+    for (; x && !w.has(x.name) && (w.add(x.name), v = /\bpchan(?:\s*=\s*([+\-\d.e]+))?/i.exec(x.raw), !v); )
+      x = n(x.baseModel);
+    const R = g === "PMOS" || g === "VDMOS" && v && (v[1] === void 0 || Number(v[1]) >= 0.5);
     r = I ? "spice_" + (R ? "pmos" : "nmos") + (u ? "3" : "") : "spice_m";
   } else if ("JZ".includes(o)) {
     s = t[4] || "";
@@ -50,14 +50,14 @@ function Ye(t, e) {
       const u = Number(h[1]);
       if (u > 128) throw Error("POLY supports at most 128 controlling variables.");
       let E = b + 1, g = [];
-      const x = "EG".includes(o), C = u * (x ? 2 : 1);
-      for (; g.length < C && E < t.length; ) g.push(...We(t[E++]));
-      if (g.length !== C || E >= t.length) throw Error("POLY control count or coefficient list is incomplete.");
-      if (x) {
+      const v = "EG".includes(o), x = u * (v ? 2 : 1);
+      for (; g.length < x && E < t.length; ) g.push(...We(t[E++]));
+      if (g.length !== x || E >= t.length) throw Error("POLY control count or coefficient list is incomplete.");
+      if (v) {
         for (let w = 0; w < u; w++) i.push("C" + (w + 1) + "+", "C" + (w + 1) + "-");
         l = [t[1], t[2], ...g];
       } else c = g;
-      f = E, m = "POLY(" + u + ") " + (x ? "" : g.join(" ") + " "), d = "POLY", x && (r = "spice_device");
+      f = E, m = "POLY(" + u + ") " + (v ? "" : g.join(" ") + " "), d = "POLY", v && (r = "spice_device");
     } else /^(?:value|vol|cur|table|laplace|[VI]\s*=)/i.test(t[3] || "") || t[3]?.startsWith("{") ? d = "BEHAVIORAL" : "EG".includes(o) ? (i.push("C+", "C-"), d = /\blaplace\s*=/i.test(t.slice(5).join(" ")) ? "LAPLACE" : /\btable\s*=/i.test(t.slice(5).join(" ")) ? "TABLE" : "LINEAR") : (c = [t[3]], f = 4, m = t[3] + " ");
     y = { E: "VCVS", G: "VCCS", F: "CCCS", H: "CCVS" }[o] + (d ? " · " + d : "");
   } else if (o === "S")
@@ -189,13 +189,13 @@ function et(t, e = {}) {
       o.push({ line: h, text: u }), g === ".title" ? m = E.slice(1).join(" ") : [".protect", ".unprotect", ".prot", ".unprot"].includes(g) ? r("error", h, "Protected/encrypted model bodies cannot be expanded. Provide an unencrypted definition.") : [".if", ".elseif", ".else", ".endif", ".connect", ".alias"].includes(g) ? r("error", h, "Topology-changing directive is unsupported: " + u) : b.has(g) || r("warning", h, "Directive retained but not resolved: " + u);
       continue;
     }
-    const x = E[0][0].toUpperCase();
-    if (!Je.has(x)) {
-      h === 1 && !/\d/.test(E[0]) && E.length > 1 && x !== "X" ? (m = u, r("warning", h, "First line treated as a SPICE title; use .title for an unambiguous title.")) : r("warning", h, `Unsupported ${x} device was not rendered: ${u}`);
+    const v = E[0][0].toUpperCase();
+    if (!Je.has(v)) {
+      h === 1 && !/\d/.test(E[0]) && E.length > 1 && v !== "X" ? (m = u, r("warning", h, "First line treated as a SPICE title; use .title for an unambiguous title.")) : r("warning", h, `Unsupported ${v} device was not rendered: ${u}`);
       continue;
     }
-    const C = x === "M" || x === "Q" ? 5 : 4;
-    if (h === 1 && !/\d/.test(E[0]) && (E.length < C || x === "T" && !/\b(?:zo|z0)\s*=/i.test(u))) {
+    const x = v === "M" || v === "Q" ? 5 : 4;
+    if (h === 1 && !/\d/.test(E[0]) && (E.length < x || v === "T" && !/\b(?:zo|z0)\s*=/i.test(u))) {
       m = u, r("info", h, "SPICE title: " + u);
       continue;
     }
@@ -237,37 +237,37 @@ function tt(t, { files: e = {}, filename: n = "input.cir" } = {}) {
     if (y.length > 32) throw Error("Library nesting exceeds 32 levels.");
     const N = [], b = /^\s*\.endl\b/im.test(f);
     let h = !d;
-    const u = (g, x) => {
+    const u = (g, v) => {
       if (r += g.length, r > 16e6) throw Error("Expanded library input exceeds 16 MB.");
-      s.push(g), l.push({ file: m, line: x + 1 });
+      s.push(g), l.push({ file: m, line: v + 1 });
     };
-    if (f.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((g, x) => {
-      const C = g.trim();
-      if (/^\.lib\b/i.test(C) && b) {
-        const w = de(C);
+    if (f.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((g, v) => {
+      const x = g.trim();
+      if (/^\.lib\b/i.test(x) && b) {
+        const w = de(x);
         if (w.length === 2 && !/[.\\/]/.test(w[1])) {
-          N.push(w[1].toLowerCase()), w[1].toLowerCase() === d.toLowerCase() && (h = !0), u("* Library section " + w[1], x);
+          N.push(w[1].toLowerCase()), w[1].toLowerCase() === d.toLowerCase() && (h = !0), u("* Library section " + w[1], v);
           return;
         }
       }
-      if (/^\.endl\b/i.test(C)) {
-        N.pop(), u("* End library section", x);
+      if (/^\.endl\b/i.test(x)) {
+        N.pop(), u("* End library section", v);
         return;
       }
       if (d && N.length && !N.includes(d.toLowerCase())) {
-        u("* Unselected library section", x);
+        u("* Unselected library section", v);
         return;
       }
-      if (/^\.(?:include|inc|lib)\b/i.test(C))
+      if (/^\.(?:include|inc|lib)\b/i.test(x))
         try {
-          const w = de(C);
+          const w = de(x);
           if (!w[1]) throw Error("Include requires a filename.");
           const [R, P] = c(w[1], m);
-          u("* Included " + R, x), a(P, R, w[2] || "", [...y, I]);
+          u("* Included " + R, v), a(P, R, w[2] || "", [...y, I]);
         } catch (w) {
-          i.push({ severity: "error", line: x + 1, source: m, message: w.message }), u("* Unresolved include", x);
+          i.push({ severity: "error", line: v + 1, source: m, message: w.message }), u("* Unresolved include", v);
         }
-      else u(g, x);
+      else u(g, v);
     }), !h) throw Error("Library section " + d + " not found in " + m);
   }
   try {
@@ -339,21 +339,21 @@ function nt(t) {
       }
     };
     for (const w of E.keys()) g(w);
-    const x = /* @__PURE__ */ new Map();
+    const v = /* @__PURE__ */ new Map();
     for (const w of a) {
       if (w.a.toLowerCase() === w.b.toLowerCase()) throw Error("Self-relative layout constraint.");
-      x.has(w.a.toLowerCase()) || x.set(w.a.toLowerCase(), []), x.get(w.a.toLowerCase()).push(w.b.toLowerCase());
+      v.has(w.a.toLowerCase()) || v.set(w.a.toLowerCase(), []), v.get(w.a.toLowerCase()).push(w.b.toLowerCase());
     }
     h.clear(), u.clear();
-    const C = (w) => {
+    const x = (w) => {
       if (h.has(w)) throw Error("Circular place constraints.");
       if (!u.has(w)) {
         h.add(w);
-        for (const R of x.get(w) || []) C(R);
+        for (const R of v.get(w) || []) x(R);
         h.delete(w), u.add(w);
       }
     };
-    for (const w of x.keys()) C(w);
+    for (const w of v.keys()) x(w);
   } catch (b) {
     e.push({ severity: "error", line: l, message: "Layout description: " + b.message });
   }
@@ -420,8 +420,8 @@ function ot(t, e = {}) {
   if (t.length > 2e6) throw Error("Netlist exceeds the limit of 2 MB.");
   const n = nt(t), o = tt(t, e);
   t = o.source;
-  const i = [...o.diagnostics, ...n.diagnostics], l = ne(), s = /* @__PURE__ */ new Set(["0"]), r = (u, E, g) => i.push({ severity: u, line: E, message: g }), c = (u, E, g, x = [], C = ne(), w = 0) => {
-    const R = { id: u, name: E, parent: g, ports: x, defaults: C, parameters: ne(), definitions: ne(), devices: [], instances: [], directives: [], line: w, statements: [] };
+  const i = [...o.diagnostics, ...n.diagnostics], l = ne(), s = /* @__PURE__ */ new Set(["0"]), r = (u, E, g) => i.push({ severity: u, line: E, message: g }), c = (u, E, g, v = [], x = ne(), w = 0) => {
+    const R = { id: u, name: E, parent: g, ports: v, defaults: x, parameters: ne(), definitions: ne(), devices: [], instances: [], directives: [], line: w, statements: [] };
     return l[u] = R, R;
   }, a = c("root", "Top", null), f = [a], m = [];
   let d = !1, y = !1;
@@ -433,60 +433,60 @@ function ot(t, e = {}) {
     try {
       const g = de(u);
       if (!g.length) continue;
-      const x = $(g[0]), C = f.at(-1);
+      const v = $(g[0]), x = f.at(-1);
       if (y) {
         r("warning", E, "Statement after .end is not rendered: " + u);
         continue;
       }
-      if (x === ".control") {
+      if (v === ".control") {
         d = !0, r("warning", E, ".control script retained but not executed or rendered.");
         continue;
       }
-      if (x === ".endc") {
+      if (v === ".endc") {
         d = !1;
         continue;
       }
       if (d) continue;
-      if (x === ".subckt") {
+      if (v === ".subckt") {
         if (g.length < 2) throw Error(".SUBCKT requires a name.");
         const [w, R] = xe(g.slice(2)), P = $(g[1]);
-        if (Object.hasOwn(C.definitions, P)) throw Error("Duplicate subcircuit definition: " + g[1]);
+        if (Object.hasOwn(x.definitions, P)) throw Error("Duplicate subcircuit definition: " + g[1]);
         const U = w.map($);
         if (new Set(U).size !== w.length || U.includes("0")) throw Error("Subcircuit formal ports must be unique and cannot be ground 0.");
         if (w.some((K) => /[{}()=]/.test(K))) throw Error("Invalid formal port.");
         if (f.length > 64) throw Error("Definition nesting exceeds 64 levels.");
-        const D = C.id + "/" + encodeURIComponent(P);
-        C.definitions[P] = D, f.push(c(D, g[1], C.id, w, R, E));
+        const D = x.id + "/" + encodeURIComponent(P);
+        x.definitions[P] = D, f.push(c(D, g[1], x.id, w, R, E));
         continue;
       }
-      if (x === ".ends") {
+      if (v === ".ends") {
         if (f.length === 1) throw Error("Unmatched .ENDS.");
-        if (g[1] && $(g[1]) !== $(C.name)) throw Error(".ENDS name does not match " + C.name);
+        if (g[1] && $(g[1]) !== $(x.name)) throw Error(".ENDS name does not match " + x.name);
         f.pop();
         continue;
       }
-      if (x === ".end") {
+      if (v === ".end") {
         if (f.length > 1) throw Error(".END inside a subcircuit; expected .ENDS.");
         y = !0;
         continue;
       }
-      if (x === ".param") {
+      if (v === ".param") {
         const w = Re(g.slice(1));
         for (const [R, P] of Object.entries(w)) {
-          if (Object.hasOwn(C.parameters, R)) throw Error("Repeated .param assignment requires simulator ordering semantics: " + R);
-          C.parameters[R] = P;
+          if (Object.hasOwn(x.parameters, R)) throw Error("Repeated .param assignment requires simulator ordering semantics: " + R);
+          x.parameters[R] = P;
         }
       }
-      if (x === ".global") {
+      if (v === ".global") {
         if (g.length < 2) throw Error(".GLOBAL requires nodes.");
         for (const w of g.slice(1)) s.add($(w));
       }
-      if (x.startsWith(".") && C.directives.push({ line: E, text: u }), x.startsWith("x")) {
+      if (v.startsWith(".") && x.directives.push({ line: E, text: u }), v.startsWith("x")) {
         const [w, R] = xe(g.slice(1));
         if (!w.length) throw Error("X instance requires a subcircuit name.");
         const P = /;§pnba\s+(.+)$/i.exec(u)?.[1].split(")");
-        C.instances.push({ name: g[0], nodes: w.slice(0, -1).map($), definitionName: w.at(-1), definitionId: null, parameters: R, line: E, raw: u, pinNames: P });
-      } else C.statements.push({ line: E, text: u });
+        x.instances.push({ name: g[0], nodes: w.slice(0, -1).map($), definitionName: w.at(-1), definitionId: null, parameters: R, line: E, raw: u, pinNames: P });
+      } else x.statements.push({ line: E, text: u });
     } catch (g) {
       r("error", E, g.message + " Statement: " + u);
     }
@@ -499,15 +499,15 @@ function ot(t, e = {}) {
     return null;
   }
   for (const u of Object.values(l)) {
-    const E = [...u.statements[0]?.line === 1 ? [] : [{ line: 0, text: "* Scope" }], ...u.statements], g = et(E.map((C) => C.text).join(`
+    const E = [...u.statements[0]?.line === 1 ? [] : [{ line: 0, text: "* Scope" }], ...u.statements], g = et(E.map((x) => x.text).join(`
 `), { models: l[u.parent]?.models });
-    u.devices = g.components.map((C) => ({ ...C, line: E[C.line - 1]?.line || u.line })), u.models = g.models, u === a && (a.title = g.title), i.push(...g.diagnostics.filter((C) => !C.message.includes("No supported components to render.") && !C.message.includes("300 components")).map((C) => ({ ...C, line: E[C.line - 1]?.line || u.line })));
-    const x = new Set(u.devices.map((C) => $(C.name)));
-    for (const C of u.instances)
-      if (x.has($(C.name)) && r("error", C.line, "Duplicate instance/device name: " + C.name), x.add($(C.name)), C.definitionId = I(u, C.definitionName), !C.definitionId && !/^\{[\s\S]*\}$/.test(C.definitionName)) r("error", C.line, "Undefined subcircuit: " + C.definitionName + " in " + C.name);
-      else if (C.definitionId) {
-        const w = l[C.definitionId];
-        w.ports.length !== C.nodes.length && r("error", C.line, `${C.name}: ${w.name} expects ${w.ports.length} ports; got ${C.nodes.length}.`);
+    u.devices = g.components.map((x) => ({ ...x, line: E[x.line - 1]?.line || u.line })), u.models = g.models, u === a && (a.title = g.title), i.push(...g.diagnostics.filter((x) => !x.message.includes("No supported components to render.") && !x.message.includes("300 components")).map((x) => ({ ...x, line: E[x.line - 1]?.line || u.line })));
+    const v = new Set(u.devices.map((x) => $(x.name)));
+    for (const x of u.instances)
+      if (v.has($(x.name)) && r("error", x.line, "Duplicate instance/device name: " + x.name), v.add($(x.name)), x.definitionId = I(u, x.definitionName), !x.definitionId && !/^\{[\s\S]*\}$/.test(x.definitionName)) r("error", x.line, "Undefined subcircuit: " + x.definitionName + " in " + x.name);
+      else if (x.definitionId) {
+        const w = l[x.definitionId];
+        w.ports.length !== x.nodes.length && r("error", x.line, `${x.name}: ${w.name} expects ${w.ports.length} ports; got ${x.nodes.length}.`);
       }
   }
   for (const u of Object.values(l)) delete u.statements;
@@ -1487,62 +1487,62 @@ function Et(t) {
     if (r.length > 64) throw Error("Instance nesting exceeds 64 levels.");
     if (++o > 2e3) throw Error("Elaboration exceeds 2000 instances.");
     const y = t.scopes[s], I = r.length ? te(r.slice(0, -1), r.at(-1)) : "", N = _();
-    if (d.some((x) => x.scopeId === s)) throw Error("Circular subcircuit reference at " + I);
+    if (d.some((v) => v.scopeId === s)) throw Error("Circular subcircuit reference at " + I);
     const b = ct(a, y.defaults, y.parameters, f);
-    function h(x) {
-      if (/^\{[\s\S]*\}$/.test(x)) {
-        const w = ae(x, b);
-        x = String(typeof w == "boolean" ? Number(w) : w);
+    function h(v) {
+      if (/^\{[\s\S]*\}$/.test(v)) {
+        const w = ae(v, b);
+        v = String(typeof w == "boolean" ? Number(w) : w);
       }
-      /^"[\s\S]*"$/.test(x) && (x = x.slice(1, -1));
-      const C = x.toLowerCase();
-      return Object.hasOwn(c, C) ? c[C] : t.globals.includes(C) ? ge([], C) : N[C] || (N[C] = ge(r, C));
+      /^"[\s\S]*"$/.test(v) && (v = v.slice(1, -1));
+      const x = v.toLowerCase();
+      return Object.hasOwn(c, x) ? c[x] : t.globals.includes(x) ? ge([], x) : N[x] || (N[x] = ge(r, x));
     }
-    const u = { id: I, path: r, scopeId: s, name: m?.name || "Top", definition: y.name, ports: y.ports.map((x) => ({ name: x, node: h(x) })), params: b, nodes: N, models: _(), devices: [], children: [], raw: m?.raw || "", line: m?.line || 0 };
+    const u = { id: I, path: r, scopeId: s, name: m?.name || "Top", definition: y.name, ports: y.ports.map((v) => ({ name: v, node: h(v) })), params: b, nodes: N, models: _(), devices: [], children: [], raw: m?.raw || "", line: m?.line || 0 };
     e[I] = u, n.set(I, h);
     const E = [...d, u];
-    function g(x) {
-      if (!x) return "";
-      let C = y;
-      for (; C; ) {
-        if (C.directives.some((w) => new RegExp("^\\.model\\s+" + x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:\\.\\d+)?(?:\\s|$)", "i").test(w.text))) {
-          const w = [...E].reverse().find((R) => R.scopeId === C.id);
-          return te(w?.path || [], x.toLowerCase());
+    function g(v) {
+      if (!v) return "";
+      let x = y;
+      for (; x; ) {
+        if (x.directives.some((w) => new RegExp("^\\.model\\s+" + v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:\\.\\d+)?(?:\\s|$)", "i").test(w.text))) {
+          const w = [...E].reverse().find((R) => R.scopeId === x.id);
+          return te(w?.path || [], v.toLowerCase());
         }
-        C = t.scopes[C.parent];
+        x = t.scopes[x.parent];
       }
-      return x;
+      return v;
     }
-    for (const x of y.directives.filter((C) => /^\.model\b/i.test(C.text))) {
-      const C = /^\.model\s+(\S+)/i.exec(x.text)?.[1];
-      if (!C) continue;
-      const w = g(C), R = y.models[C.toLowerCase()], P = Oe(x.text, b, h, (U) => te(r, U));
+    for (const v of y.directives.filter((x) => /^\.model\b/i.test(x.text))) {
+      const x = /^\.model\s+(\S+)/i.exec(v.text)?.[1];
+      if (!x) continue;
+      const w = g(x), R = y.models[x.toLowerCase()], P = Oe(v.text, b, h, (U) => te(r, U));
       u.models[w] = { ...R, name: w, raw: P.replace(/^(\.model\s+)\S+/i, (U, D) => D + w), instanceId: I, parameters: b };
     }
-    for (const x of y.devices) {
+    for (const v of y.devices) {
       if (++i > 3e3) throw Error("Elaboration exceeds 3000 primitive devices.");
-      const C = _();
-      for (const [R, P] of Object.entries(x.terminals)) C[R] = h(P);
-      const w = g(x.model);
-      u.devices.push({ ...x, name: te(r, x.name), localName: x.name, instanceId: I, terminals: C, model: w, parameters: b });
+      const x = _();
+      for (const [R, P] of Object.entries(v.terminals)) x[R] = h(P);
+      const w = g(v.model);
+      u.devices.push({ ...v, name: te(r, v.name), localName: v.name, instanceId: I, terminals: x, model: w, parameters: b });
     }
-    for (const x of y.instances) {
-      let C = x.definitionId;
-      if (!C) {
-        const U = String(ae(x.definitionName, b)).toLowerCase();
+    for (const v of y.instances) {
+      let x = v.definitionId;
+      if (!x) {
+        const U = String(ae(v.definitionName, b)).toLowerCase();
         let D = y;
-        for (; D && !C; )
-          C = D.definitions[U], D = t.scopes[D.parent];
-        if (!C) throw Error("Undefined selected subcircuit: " + U);
+        for (; D && !x; )
+          x = D.definitions[U], D = t.scopes[D.parent];
+        if (!x) throw Error("Undefined selected subcircuit: " + U);
       }
-      const w = t.scopes[C], R = _();
-      if (w.ports.length !== x.nodes.length) throw Error(x.name + ": expected " + w.ports.length + " ports; got " + x.nodes.length);
+      const w = t.scopes[x], R = _();
+      if (w.ports.length !== v.nodes.length) throw Error(v.name + ": expected " + w.ports.length + " ports; got " + v.nodes.length);
       w.ports.forEach((U, D) => {
-        R[U.toLowerCase()] = h(x.nodes[D]);
+        R[U.toLowerCase()] = h(v.nodes[D]);
       });
-      const P = l(C, [...r, x.name], R, b, x.parameters, x, E);
-      x.pinNames?.length === P.ports.length && P.ports.forEach((U, D) => {
-        U.label = x.pinNames[D];
+      const P = l(x, [...r, v.name], R, b, v.parameters, v, E);
+      v.pinNames?.length === P.ports.length && P.ports.forEach((U, D) => {
+        U.label = v.pinNames[D];
       }), u.children.push(P);
     }
     return u;
@@ -1564,10 +1564,10 @@ function Et(t) {
         const h = f(m, b);
         return n.get(h.owner.id)(h.name);
       }, N = (b, h = "", u = "") => {
-        const E = f(m, b), g = E.owner.devices.find((x) => x.localName.toLowerCase() === E.name.toLowerCase());
+        const E = f(m, b), g = E.owner.devices.find((v) => v.localName.toLowerCase() === E.name.toLowerCase());
         if (h.toLowerCase() === "ix") {
-          const x = E.owner.ports.find((C, w) => C.name.toLowerCase() === E.name.toLowerCase() || String(w + 1) === E.name);
-          if (x) return E.owner.id + ":" + x.name;
+          const v = E.owner.ports.find((x, w) => x.name.toLowerCase() === E.name.toLowerCase() || String(w + 1) === E.name);
+          if (v) return E.owner.id + ":" + v.name;
         }
         if (!g) {
           if (u) throw Error(d.name + ": referenced " + u + " device " + b + " was not found.");
@@ -1608,7 +1608,7 @@ function ce(t) {
 function Ie(t) {
   return JSON.stringify(t.map((e) => [e.name, e.kind, Object.entries(e.terminals).sort(), e.value, e.model, e.controlSource, e.controlSources || [], e.coupledInductors || []]).sort((e, n) => e[0].localeCompare(n[0])));
 }
-const Ne = 4;
+const Ne = 5;
 function be(t) {
   const e = String(t).split("/").at(-1);
   let n;
@@ -1668,9 +1668,9 @@ function xt(t, e) {
     return d !== "unknown" ? { role: d, roleSource: be(m) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : le(a.role) ? { ...a, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
   };
   for (const s of e.components) {
-    const r = Object.fromEntries(Object.entries(s.terminals).map(([g, x]) => [g, { ...o[x], ...l(s, g, x) }])), c = Object.values(r), a = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(s.type), f = a && c.length === 2 && c.every((g) => !le(g.role) && (g.potential === null || g.role !== "unknown")), m = s.terminals["+"], d = s.terminals["-"], y = [m, d].filter((g) => g && g !== "0"), I = s.kind === "V" && y.some((g) => le(o[g]?.role)) && !y.some((g) => ["in", "out", "io", "fb"].includes(o[g]?.role)) && [m, d].every((g) => n.nodes[g]?.known), N = m === "0" ? d : m, b = Object.keys(s.terminals), h = (g) => le(g.role) ? g.potential !== null ? g.potential > 0 ? "high" : "low" : g.role === "ret" ? "low" : "high" : "signal";
+    const r = Object.fromEntries(Object.entries(s.terminals).map(([g, v]) => [g, { ...o[v], ...l(s, g, v) }])), c = Object.values(r), a = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(s.type), f = a && c.length === 2 && c.every((g) => !le(g.role) && (g.potential === null || g.role !== "unknown")), m = s.terminals["+"], d = s.terminals["-"], y = [m, d].filter((g) => g && g !== "0"), I = s.kind === "V" && y.some((g) => le(o[g]?.role)) && !y.some((g) => ["in", "out", "io", "fb"].includes(o[g]?.role)) && [m, d].every((g) => n.nodes[g]?.known), N = m === "0" ? d : m, b = Object.keys(s.terminals), h = (g) => le(g.role) ? g.potential !== null ? g.potential > 0 ? "high" : "low" : g.role === "ret" ? "low" : "high" : "signal";
     let u = !1;
-    b.length === 2 && (s.terminals[b[0]] === "0" ? u = !0 : s.terminals[b[1]] === "0" ? u = !1 : c.every((g) => g.potential !== null) ? u = c[0].potential < c[1].potential : u = h(c[0]) === "low" || h(c[1]) === "high" && h(c[0]) === "signal");
+    b.length === 2 && (s.kind === "V" && c.every((g) => g.potential !== null) ? u = c[0].potential < c[1].potential : s.terminals[b[0]] === "0" ? u = !0 : s.terminals[b[1]] === "0" ? u = !1 : c.every((g) => g.potential !== null) ? u = c[0].potential < c[1].potential : u = h(c[0]) === "low" || h(c[1]) === "high" && h(c[0]) === "signal");
     const E = s.synthetic ? "" : s.name.startsWith(e.focus + "/") ? s.name.slice(e.focus.length + 1) : s.name;
     i[s.name] = { version: Ne, kind: s.kind, owner: E.includes("/") ? E.slice(0, E.lastIndexOf("/")) : "", passive: a, source: ["V", "I", "E", "F", "G", "H"].includes(s.kind) || s.kind === "B" && !a, ports: r, horizontal: f, orientation: f ? "horizontal" : u ? "vertical-reversed" : "vertical", flexible: b.length === 2 && (a || ["V", "I", "B", "F", "H"].includes(s.kind)), supply: !!I, voltage: I ? n.nodes[N].value : null };
   }
@@ -1778,7 +1778,7 @@ async function Nt(t, e) {
 function Lt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("assets/render-worker-CnSf-L4p.js", import.meta.url).href,
+    "" + new URL("assets/render-worker-D3rXHC5P.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((o, i) => {
@@ -2139,67 +2139,67 @@ async function Le(t) {
 }
 const ke = ue.filter.source, S = (t) => document.getElementById("spice-" + t), se = S("app");
 if (se) {
-  let g = function(v) {
+  let g = function(C) {
     const O = S("example-info");
-    if (O && (O.replaceChildren(), !!v && (O.append(document.createTextNode(v.description + " ")), v.url))) {
+    if (O && (O.replaceChildren(), !!C && (O.append(document.createTextNode(C.description + " ")), C.url))) {
       const A = document.createElement("a");
-      A.href = v.url, A.target = "_blank", A.rel = "noopener noreferrer", A.textContent = v.reference, O.append(A);
+      A.href = C.url, A.target = "_blank", A.rel = "noopener noreferrer", A.textContent = C.reference, O.append(A);
     }
-  }, x = function() {
-    i = "", u(), g(Object.values(ue).find((v) => v.source === t.value)), n.textContent = "Input changed — generate to refresh the schematic.";
-  }, C = function(v) {
+  }, v = function() {
+    i = "", u(), g(Object.values(ue).find((C) => C.source === t.value)), n.textContent = "Input changed — generate to refresh the schematic.";
+  }, x = function(C) {
     o.replaceChildren();
-    for (const { severity: O, line: A, message: M, source: L } of v) {
+    for (const { severity: O, line: A, message: M, source: k } of C) {
       const V = document.createElement("li");
-      V.className = O, V.textContent = `${O.toUpperCase()}${L && L !== "input.cir" ? " · " + L : ""}${A ? " · line " + A : ""}: ${M}`, o.append(V);
+      V.className = O, V.textContent = `${O.toUpperCase()}${k && k !== "input.cir" ? " · " + k : ""}${A ? " · line " + A : ""}: ${M}`, o.append(V);
     }
-    S("messages").open = v.some((O) => O.severity !== "info"), S("message-count").textContent = `${v.length} message${v.length === 1 ? "" : "s"}`;
+    S("messages").open = C.some((O) => O.severity !== "info"), S("message-count").textContent = `${C.length} message${C.length === 1 ? "" : "s"}`;
   }, w = function() {
     e.querySelector("svg")?.setAttribute("viewBox", `${d.x} ${d.y} ${d.w} ${d.h}`), S("zoom-level").textContent = Math.round(y.w / d.w * 100) + "%";
-  }, R = function(v, O = d.x + d.w / 2, A = d.y + d.h / 2) {
+  }, R = function(C, O = d.x + d.w / 2, A = d.y + d.h / 2) {
     if (!e.querySelector("svg")) return;
-    const M = Math.max(0.05, Math.min(10, d.w * v / y.w)) * y.w / d.w;
+    const M = Math.max(0.05, Math.min(10, d.w * C / y.w)) * y.w / d.w;
     d = { x: O + (d.x - O) * M, y: A + (d.y - A) * M, w: d.w * M, h: d.h * M }, w();
-  }, U = function(v) {
+  }, U = function(C) {
     const O = new URLSearchParams();
-    v && O.set("instance", v);
+    C && O.set("instance", C);
     const A = O.toString();
-    location.hash.slice(1) === A ? (a = v, j()) : location.hash = A;
+    location.hash.slice(1) === A ? (a = C, j()) : location.hash = A;
   }, D = function() {
     a = new URLSearchParams(location.hash.slice(1)).get("instance") || "";
-  }, K = function(v) {
-    const O = s.contexts[v].path;
+  }, K = function(C) {
+    const O = s.contexts[C].path;
     for (let A = 1; A <= O.length; A++) N.add(O.slice(0, A).map(encodeURIComponent).join("/"));
   }, oe = function() {
-    const v = !!(f && f !== a && s?.contexts[f]);
-    S("selection-actions").hidden = !v, S("toggle-instance").textContent = N.has(f) ? "Collapse instance" : "Expand instance", S("toggle-instance").disabled = !1, S("open-instance").href = "#" + new URLSearchParams({ instance: f });
+    const C = !!(f && f !== a && s?.contexts[f]);
+    S("selection-actions").hidden = !C, S("toggle-instance").textContent = N.has(f) ? "Collapse instance" : "Expand instance", S("toggle-instance").disabled = !1, S("open-instance").href = "#" + new URLSearchParams({ instance: f });
   }, q = function() {
     S("breadcrumbs").replaceChildren();
-    const v = (A, M) => {
-      const L = document.createElement("button");
-      L.type = "button", L.textContent = A, L.onclick = () => U(M), L.disabled = M === a, S("breadcrumbs").append(L);
+    const C = (A, M) => {
+      const k = document.createElement("button");
+      k.type = "button", k.textContent = A, k.onclick = () => U(M), k.disabled = M === a, S("breadcrumbs").append(k);
     };
-    if (v("Top", ""), a) {
+    if (C("Top", ""), a) {
       const A = s.contexts[a].path;
-      for (let M = 0; M < A.length; M++) v(A[M], A.slice(0, M + 1).map(encodeURIComponent).join("/"));
+      for (let M = 0; M < A.length; M++) C(A[M], A.slice(0, M + 1).map(encodeURIComponent).join("/"));
     }
     S("instances").replaceChildren();
     const O = (A, M) => {
-      for (const L of A.children) {
+      for (const k of A.children) {
         const V = document.createElement("div");
-        V.className = "spice-instance-row", V.style.setProperty("--depth", Math.min(M, 8)), V.dataset.instance = L.id;
+        V.className = "spice-instance-row", V.style.setProperty("--depth", Math.min(M, 8)), V.dataset.instance = k.id;
         const G = document.createElement("button");
-        G.type = "button", G.textContent = N.has(L.id) ? "−" : "+", G.title = (N.has(L.id) ? "Collapse " : "Expand ") + L.id, G.setAttribute("aria-label", G.title), G.setAttribute("aria-expanded", String(N.has(L.id))), G.onclick = () => {
-          N.has(L.id) ? N.delete(L.id) : K(L.id), f = L.id, j();
+        G.type = "button", G.textContent = N.has(k.id) ? "−" : "+", G.title = (N.has(k.id) ? "Collapse " : "Expand ") + k.id, G.setAttribute("aria-label", G.title), G.setAttribute("aria-expanded", String(N.has(k.id))), G.onclick = () => {
+          N.has(k.id) ? N.delete(k.id) : K(k.id), f = k.id, j();
         };
         const Z = document.createElement("a");
-        Z.href = "#" + new URLSearchParams({ instance: L.id }), Z.textContent = L.name + " · " + L.definition, Z.title = "Open " + L.id + " as its own sheet";
+        Z.href = "#" + new URLSearchParams({ instance: k.id }), Z.textContent = k.name + " · " + k.definition, Z.title = "Open " + k.id + " as its own sheet";
         const Q = document.createElement("span");
-        if (Q.className = "spice-help", Q.textContent = Object.entries(L.params).map(([H, J]) => H + "=" + J).join(" · "), V.append(G, Z), Q.textContent) {
+        if (Q.className = "spice-help", Q.textContent = Object.entries(k.params).map(([H, J]) => H + "=" + J).join(" · "), V.append(G, Z), Q.textContent) {
           const H = document.createElement("details"), J = document.createElement("summary");
           J.textContent = "Parameters", H.append(J, Q), V.append(H);
         }
-        S("instances").append(V), O(L, M + 1);
+        S("instances").append(V), O(k, M + 1);
       }
     };
     O(s.contexts[a], 0), S("hierarchy-panel").hidden = !s.contexts[a].children.length, S("focus-title").textContent = a ? a + " / " + s.contexts[a].definition : "Top-level schematic", oe();
@@ -2212,8 +2212,8 @@ if (se) {
     h = JSON.parse(sessionStorage.getItem("spice-libraries-v3") || "{}");
   } catch {
   }
-  se.addEventListener("click", (v) => {
-    m && v.target.closest('a[href^="#"]') && v.preventDefault();
+  se.addEventListener("click", (C) => {
+    m && C.target.closest('a[href^="#"]') && C.preventDefault();
   });
   const u = () => {
     S("copy").disabled = S("download").disabled = !i || m;
@@ -2223,31 +2223,31 @@ if (se) {
     t.value = sessionStorage.getItem("spice-netlist-v2") || ke;
   } catch {
   }
-  g(Object.values(ue).find((v) => v.source === t.value)), t.addEventListener("input", x);
-  for (const v of ["font", "size", "color", "detailed", "conventional"]) S(v).addEventListener("input", x);
+  g(Object.values(ue).find((C) => C.source === t.value)), t.addEventListener("input", v);
+  for (const C of ["font", "size", "color", "detailed", "conventional"]) S(C).addEventListener("input", v);
   S("zoom-in").onclick = () => R(0.8), S("zoom-out").onclick = () => R(1.25), S("fit").onclick = () => {
     d = { ...y }, w();
   };
-  const P = (v) => {
+  const P = (C) => {
     const O = e.querySelector("svg");
-    return O ? new DOMPoint(v.clientX, v.clientY).matrixTransform(O.getScreenCTM().inverse()) : null;
+    return O ? new DOMPoint(C.clientX, C.clientY).matrixTransform(O.getScreenCTM().inverse()) : null;
   };
-  e.addEventListener("wheel", (v) => {
-    const O = P(v);
-    O && (v.preventDefault(), R(v.deltaY > 0 ? 1.12 : 1 / 1.12, O.x, O.y));
-  }, { passive: !1 }), e.addEventListener("pointerdown", (v) => {
-    v.button !== 0 || !e.querySelector("svg") || (I = { start: P(v), x: v.clientX, y: v.clientY, view: { ...d }, moved: !1 }, e.setPointerCapture(v.pointerId));
-  }), e.addEventListener("pointermove", (v) => {
+  e.addEventListener("wheel", (C) => {
+    const O = P(C);
+    O && (C.preventDefault(), R(C.deltaY > 0 ? 1.12 : 1 / 1.12, O.x, O.y));
+  }, { passive: !1 }), e.addEventListener("pointerdown", (C) => {
+    C.button !== 0 || !e.querySelector("svg") || (I = { start: P(C), x: C.clientX, y: C.clientY, view: { ...d }, moved: !1 }, e.setPointerCapture(C.pointerId));
+  }), e.addEventListener("pointermove", (C) => {
     if (!I) return;
-    const O = P(v);
-    Math.hypot(v.clientX - I.x, v.clientY - I.y) > 4 && (I.moved = !0), d.x += I.start.x - O.x, d.y += I.start.y - O.y, w();
-  }), e.addEventListener("pointerup", (v) => {
+    const O = P(C);
+    Math.hypot(C.clientX - I.x, C.clientY - I.y) > 4 && (I.moved = !0), d.x += I.start.x - O.x, d.y += I.start.y - O.y, w();
+  }), e.addEventListener("pointerup", (C) => {
     if (!I) return;
     const O = I.moved;
-    if (I = null, e.hasPointerCapture(v.pointerId) && e.releasePointerCapture(v.pointerId), !O) {
-      const A = document.elementFromPoint(v.clientX, v.clientY)?.closest("[data-component]"), M = l?.components.find((L) => L.name === A?.dataset.component);
+    if (I = null, e.hasPointerCapture(C.pointerId) && e.releasePointerCapture(C.pointerId), !O) {
+      const A = document.elementFromPoint(C.clientX, C.clientY)?.closest("[data-component]"), M = l?.components.find((k) => k.name === A?.dataset.component);
       M && (f = M.instanceId || "", S("selection").textContent = `${M.raw}
-${Object.entries(M.terminals).map(([L, V]) => `${L} → ${V}`).join("   ")}`, M.kind === "X" ? (K(M.instanceId), j()) : oe());
+${Object.entries(M.terminals).map(([k, V]) => `${k} → ${V}`).join("   ")}`, M.kind === "X" ? (K(M.instanceId), j()) : oe());
     }
   }), window.addEventListener("hashchange", () => {
     if (m) {
@@ -2258,29 +2258,29 @@ ${Object.entries(M.terminals).map(([L, V]) => `${L} → ${V}`).join("   ")}`, M.
   }), S("collapse-all").onclick = () => {
     N.clear(), j();
   }, S("expand-all").onclick = () => {
-    for (const v of Object.keys(s?.contexts || {})) v && N.add(v);
+    for (const C of Object.keys(s?.contexts || {})) C && N.add(C);
     j();
   }, S("toggle-instance").onclick = () => {
     N.has(f) ? N.delete(f) : K(f), j();
   }, e.addEventListener("pointercancel", () => {
     I = null;
-  }), e.addEventListener("keydown", (v) => {
-    const O = v.target.closest("[data-instance]");
-    if (O && (v.key === "Enter" || v.key === " ")) {
-      v.preventDefault(), f = O.dataset.instance, K(f), j();
+  }), e.addEventListener("keydown", (C) => {
+    const O = C.target.closest("[data-instance]");
+    if (O && (C.key === "Enter" || C.key === " ")) {
+      C.preventDefault(), f = O.dataset.instance, K(f), j();
       return;
     }
-    v.key === "+" || v.key === "=" ? R(0.8) : v.key === "-" ? R(1.25) : v.key.toLowerCase() === "f" ? (d = { ...y }, w()) : v.key.startsWith("Arrow") && (v.preventDefault(), d.x += ({ ArrowLeft: -0.08, ArrowRight: 0.08 }[v.key] || 0) * d.w, d.y += ({ ArrowUp: -0.08, ArrowDown: 0.08 }[v.key] || 0) * d.h, w());
+    C.key === "+" || C.key === "=" ? R(0.8) : C.key === "-" ? R(1.25) : C.key.toLowerCase() === "f" ? (d = { ...y }, w()) : C.key.startsWith("Arrow") && (C.preventDefault(), d.x += ({ ArrowLeft: -0.08, ArrowRight: 0.08 }[C.key] || 0) * d.w, d.y += ({ ArrowUp: -0.08, ArrowDown: 0.08 }[C.key] || 0) * d.h, w());
   });
   async function j() {
     if (m) return;
     m = !0, i = "", u(), S("generate").disabled = !0, t.readOnly = !0, S("file").disabled = !0, S("libraries").disabled = !0;
     for (const O of se.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance")) O.disabled = !0;
     n.textContent = "Parsing netlist and routing wires…", e.setAttribute("aria-busy", "true");
-    let v = [];
+    let C = [];
     try {
       if (c !== t.value || !s) {
-        if (r = ot(t.value, { files: h }), v = [...r.diagnostics], v.some((k) => k.severity === "error"))
+        if (r = ot(t.value, { files: h }), C = [...r.diagnostics], C.some((L) => L.severity === "error"))
           throw s = null, Error("Fix the parser errors below before generating.");
         s = Et(r), c && c !== t.value ? (N.clear(), a = "", f = "", history.replaceState(null, "", location.pathname + location.search)) : D(), c = t.value;
         try {
@@ -2288,55 +2288,55 @@ ${Object.entries(M.terminals).map(([L, V]) => `${L} → ${V}`).join("   ")}`, M.
         } catch {
         }
       }
-      if (v = [...r.diagnostics], C(v), v.some((k) => k.severity === "error")) throw Error("Fix the parser errors below before generating.");
+      if (C = [...r.diagnostics], x(C), C.some((L) => L.severity === "error")) throw Error("Fix the parser errors below before generating.");
       l = vt(s, { expanded: N, focus: a });
       const O = St(l);
-      E().conventional && v.push(...l.layout.diagnostics);
+      E().conventional && C.push(...l.layout.diagnostics);
       const A = await Nt(O, E()), M = new DOMParser().parseFromString(A, "image/svg+xml");
       if (M.querySelector("parsererror")) throw Error("Renderer produced invalid SVG.");
-      const L = M.documentElement, V = L.querySelector("#spice-layout-report");
+      const k = M.documentElement, V = k.querySelector("#spice-layout-report");
       if (V) {
         l.layout.report = JSON.parse(V.textContent);
-        const k = l.layout.report;
-        v.push({ severity: "info", message: `Layout: compact signal flow; ${k.powerSourcesChecked} DC/ground symbols checked, ${k.powerOrderViolations} DC order preference(s) unmet. ${k.powerPass}. Global voltage bands are a preference.` }), k.groundPlacement && v.push({ severity: "info", message: `Ground: ${k.groundPlacement}; ${k.straightenedGroundDrops || 0} return-path simplification(s).` }), k.explicitGroups && v.push({ severity: "info", message: `Layout comments: ${k.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), k.classicRails && v.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${k.railCount} shared voltage rails.` }), k.geometricConnectivityVerified && v.push({ severity: "info", message: `Net geometry verified; ${k.cyclesRemoved} same-net loop(s) and ${k.leavesRemoved} unused wire branch(es) removed.` }), C(v);
+        const L = l.layout.report;
+        C.push({ severity: "info", message: `Layout: compact signal flow; ${L.powerSourcesChecked} DC/ground symbols checked, ${L.powerOrderViolations} DC order preference(s) unmet. ${L.powerPass}. ${L.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), L.classicTemplateFallback && C.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), L.groundPlacement && C.push({ severity: "info", message: `Ground: ${L.groundPlacement}; ${L.straightenedGroundDrops || 0} return-path simplification(s).` }), L.explicitGroups && C.push({ severity: "info", message: `Layout comments: ${L.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), L.classicRails && C.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${L.railCount} shared voltage rails.` }), L.localClassicInstances?.length && C.push({ severity: "info", message: `${L.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), L.geometricConnectivityVerified && C.push({ severity: "info", message: `Net geometry verified; ${L.cyclesRemoved} same-net loop(s) and ${L.leavesRemoved} unused wire branch(es) removed.` }), x(C);
       }
-      if (L.localName !== "svg" || L.querySelector("script,foreignObject")) throw Error("Invalid schematic output.");
-      const G = Number(L.getAttribute("width")), Z = Number(L.getAttribute("height"));
-      y = { x: -20, y: -20, w: G + 40, h: Z + 40 }, d = { ...y }, L.setAttribute("viewBox", `${y.x} ${y.y} ${y.w} ${y.h}`), L.setAttribute("width", String(y.w)), L.setAttribute("height", String(y.h)), L.setAttribute("role", "img"), L.setAttribute("aria-label", l.title || "SPICE schematic"), L.setAttribute("style", "background:white");
-      for (const k of l.components) {
-        const T = M.getElementById("cell_" + k.name);
-        if (!T) throw Error("Renderer omitted component " + k.name);
-        T.setAttribute("data-component", k.name), k.kind === "X" && (T.setAttribute("data-instance", k.instanceId), T.setAttribute("role", "button"), T.setAttribute("tabindex", "0"), T.setAttribute("aria-label", "Expand " + k.name));
-        const z = M.createElementNS(L.namespaceURI, "title");
-        z.textContent = k.raw + `
-Resolved: ` + k.value + `
-` + Object.entries(k.terminals).map(([B, ie]) => B + ": " + ie).join(", "), T.prepend(z);
+      if (k.localName !== "svg" || k.querySelector("script,foreignObject")) throw Error("Invalid schematic output.");
+      const G = Number(k.getAttribute("width")), Z = Number(k.getAttribute("height"));
+      y = { x: -20, y: -20, w: G + 40, h: Z + 40 }, d = { ...y }, k.setAttribute("viewBox", `${y.x} ${y.y} ${y.w} ${y.h}`), k.setAttribute("width", String(y.w)), k.setAttribute("height", String(y.h)), k.setAttribute("role", "img"), k.setAttribute("aria-label", l.title || "SPICE schematic"), k.setAttribute("style", "background:white");
+      for (const L of l.components) {
+        const T = M.getElementById("cell_" + L.name);
+        if (!T) throw Error("Renderer omitted component " + L.name);
+        T.setAttribute("data-component", L.name), L.kind === "X" && (T.setAttribute("data-instance", L.instanceId), T.setAttribute("role", "button"), T.setAttribute("tabindex", "0"), T.setAttribute("aria-label", "Expand " + L.name));
+        const z = M.createElementNS(k.namespaceURI, "title");
+        z.textContent = L.raw + `
+Resolved: ` + L.value + `
+` + Object.entries(L.terminals).map(([B, ie]) => B + ": " + ie).join(", "), T.prepend(z);
       }
-      for (const k of Object.values(l.nodes))
-        for (const T of L.querySelectorAll(".net_" + k.bit)) {
-          T.setAttribute("data-net", k.name);
-          const z = M.createElementNS(L.namespaceURI, "title");
-          z.textContent = "Node " + k.displayName, T.append(z);
+      for (const L of Object.values(l.nodes))
+        for (const T of k.querySelectorAll(".net_" + L.bit)) {
+          T.setAttribute("data-net", L.name);
+          const z = M.createElementNS(k.namespaceURI, "title");
+          z.textContent = "Node " + L.displayName, T.append(z);
         }
-      const Q = l.components.filter((k) => k.kind === "K").map((k) => ({ name: k.name, inductors: k.coupledInductors, value: k.value }));
+      const Q = l.components.filter((L) => L.kind === "K").map((L) => ({ name: L.name, inductors: L.coupledInductors, value: L.value }));
       if (Q.length) {
-        const k = M.createElementNS(L.namespaceURI, "metadata");
-        k.setAttribute("id", "spice-magnetic-couplings"), k.textContent = JSON.stringify(Q), L.append(k);
+        const L = M.createElementNS(k.namespaceURI, "metadata");
+        L.setAttribute("id", "spice-magnetic-couplings"), L.textContent = JSON.stringify(Q), k.append(L);
         for (const T of Q) for (const z of T.inductors) {
           const B = M.getElementById("cell_" + z);
           if (!B) continue;
-          const ie = M.createElementNS(L.namespaceURI, "circle"), fe = [...B.children].find((he) => he.getAttribute("s:pid") === "A"), Pe = fe?.getAttribute("s:position"), Ee = { left: [6, -8], right: [-6, -8], top: [-8, 6], bottom: [-8, -6] }[Pe] || [0, 0];
+          const ie = M.createElementNS(k.namespaceURI, "circle"), fe = [...B.children].find((he) => he.getAttribute("s:pid") === "A"), Pe = fe?.getAttribute("s:position"), Ee = { left: [6, -8], right: [-6, -8], top: [-8, 6], bottom: [-8, -6] }[Pe] || [0, 0];
           for (const [he, De] of Object.entries({ cx: Number(fe?.getAttribute("s:x")) + Ee[0], cy: Number(fe?.getAttribute("s:y")) + Ee[1], r: 3, fill: E().color, stroke: "none", "data-coupling": T.name })) ie.setAttribute(he, String(De));
-          const we = M.createElementNS(L.namespaceURI, "title");
+          const we = M.createElementNS(k.namespaceURI, "title");
           we.textContent = T.name + " · dotted terminal: " + T.inductors.join(", "), ie.append(we), B.append(ie);
         }
       }
-      i = new XMLSerializer().serializeToString(L), S("source").value = i, e.replaceChildren(document.importNode(L, !0)), w();
-      const H = v.filter((k) => k.severity === "warning").length;
-      n.textContent = `${l.components.filter((k) => !k.synthetic).length} components · ${Object.keys(l.nodes).length} nodes · ${l.topology.leafCount} primitive devices verified${H ? " · Review " + H + " warning(s); drawing may be partial." : " · Schematic ready."}`, l.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${l.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), l.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found.");
-      const J = Object.values(l.nodes).map((k) => {
+      i = new XMLSerializer().serializeToString(k), S("source").value = i, e.replaceChildren(document.importNode(k, !0)), w();
+      const H = C.filter((L) => L.severity === "warning").length;
+      n.textContent = `${l.components.filter((L) => !L.synthetic).length} components · ${Object.keys(l.nodes).length} nodes · ${l.topology.leafCount} primitive devices verified${H ? " · Review " + H + " warning(s); drawing may be partial." : " · Schematic ready."}`, l.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${l.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), l.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found.");
+      const J = Object.values(l.nodes).map((L) => {
         const T = document.createElement("tr");
-        for (const z of [k.displayName, k.terminals.map((B) => B.component + "." + B.pin).join(", ")]) {
+        for (const z of [L.displayName, L.terminals.map((B) => B.component + "." + B.pin).join(", ")]) {
           const B = document.createElement("td");
           B.textContent = z, T.append(B);
         }
@@ -2350,7 +2350,7 @@ Resolved: ` + k.value + `
         const A = document.createElement("button");
         A.type = "button", A.textContent = "Return to Top", A.onclick = () => U(""), S("breadcrumbs").replaceChildren(A);
       }
-      O.diagnostics && (v = O.diagnostics), v.some((A) => A.severity === "error") || v.push({ severity: "error", line: 0, message: O.message }), C(v);
+      O.diagnostics && (C = O.diagnostics), C.some((A) => A.severity === "error") || C.push({ severity: "error", line: 0, message: O.message }), x(C);
     } finally {
       m = !1, S("generate").disabled = !1, t.readOnly = !1, S("file").disabled = !1, S("libraries").disabled = !1;
       for (const O of se.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-collapse-all, #spice-expand-all")) O.disabled = !1;
@@ -2358,28 +2358,28 @@ Resolved: ` + k.value + `
     }
   }
   S("generate").onclick = j;
-  for (const v of se.querySelectorAll("[data-example]")) v.onclick = () => {
-    const O = ue[v.dataset.example];
-    t.value = O.source, x(), g(O), j();
+  for (const C of se.querySelectorAll("[data-example]")) C.onclick = () => {
+    const O = ue[C.dataset.example];
+    t.value = O.source, v(), g(O), j();
   };
-  S("file").onchange = async (v) => {
-    const O = v.target.files[0];
+  S("file").onchange = async (C) => {
+    const O = C.target.files[0];
     if (O) {
       if (O.size > 2e6) {
         n.textContent = "File exceeds 2 MB.";
         return;
       }
       try {
-        t.value = await Le(O), x(), j();
+        t.value = await Le(O), v(), j();
       } catch (A) {
         n.textContent = "File could not be read: " + A.message;
       } finally {
-        v.target.value = "";
+        C.target.value = "";
       }
     }
-  }, S("libraries").onchange = async (v) => {
+  }, S("libraries").onchange = async (C) => {
     try {
-      for (const O of v.target.files) {
+      for (const O of C.target.files) {
         if (O.size > 16e6) throw Error("Library exceeds 16 MB: " + O.name);
         h[O.webkitRelativePath || O.name] = await Le(O);
       }
@@ -2391,11 +2391,11 @@ Resolved: ` + k.value + `
     } catch (O) {
       n.textContent = O.message;
     } finally {
-      v.target.value = "";
+      C.target.value = "";
     }
   }, S("library-status").textContent = Object.keys(h).length ? "Libraries restored from this session." : "For .include / .lib dependencies", S("download").onclick = () => {
-    const v = URL.createObjectURL(new Blob([i], { type: "image/svg+xml;charset=utf-8" })), O = document.createElement("a");
-    O.href = v, O.download = "spice-schematic.svg", O.click(), setTimeout(() => URL.revokeObjectURL(v), 1e3);
+    const C = URL.createObjectURL(new Blob([i], { type: "image/svg+xml;charset=utf-8" })), O = document.createElement("a");
+    O.href = C, O.download = "spice-schematic.svg", O.click(), setTimeout(() => URL.revokeObjectURL(C), 1e3);
   }, S("copy").onclick = async () => {
     try {
       await navigator.clipboard.writeText(i), n.textContent = "SVG source copied to clipboard.";
