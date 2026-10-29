@@ -1,4 +1,5 @@
 import {transistorCurrentRank} from './transistor-flow.js';
+import {applyMotifPreferences} from './motif-layout.js';
 const option='org.eclipse.elk.';
 const known=p=>p?.potential!==null&&p?.potential!==undefined;
 const pointOn=(p,a,b)=>Math.abs(a.x-b.x)<.002?Math.abs(p.x-a.x)<.002&&p.y>=Math.min(a.y,b.y)-.002&&p.y<=Math.max(a.y,b.y)+.002:Math.abs(p.y-a.y)<.002&&p.x>=Math.min(a.x,b.x)-.002&&p.x<=Math.max(a.x,b.x)+.002;
@@ -14,7 +15,7 @@ export function prepareSharedClassicRails(graph,cells,lookup,description) {
 }
 
 /** ELK lays out the transistor/signal skeleton; simple rail branches use local templates. */
-export function prepareClassicLayout(graph,cells,lookup,description,{maxActive=32,currentFlow=false}={}) {
+export function prepareClassicLayout(graph,cells,lookup,description,{maxActive=32,currentFlow=false,motifs=[]}={}) {
   if(description?.groups.some(g=>g.members.length)||description?.relations.length)return null;
   const active=Object.entries(cells).filter(([,c])=>['Q','M','J','Z'].includes(c.spiceLayout?.kind));
   if(!active.length||active.length>maxActive||Object.keys(cells).length>80||Object.values(cells).some(c=>c.spiceBlock||Object.keys(c.connections).length>4||c.spiceLayout&&!['Q','M','J','Z','R','L','C','D','V','I','PORT'].includes(c.spiceLayout.kind)))return null;
@@ -36,7 +37,8 @@ export function prepareClassicLayout(graph,cells,lookup,description,{maxActive=3
   for(const [net,pins]of signalNets){const kept=[...pins].filter(p=>core.has(p.slice(0,p.lastIndexOf('.')))).sort((a,b)=>rank(a)-rank(b));for(const target of kept.slice(1)){const source=kept[0],id='__classic_'+serial++;lookup[id]=net;graph.edges.push({id,source:source.slice(0,source.lastIndexOf('.')),sourcePort:source,target:target.slice(0,target.lastIndexOf('.')),targetPort:target});}}
   const controls=new Set(active.map(([,c])=>c.connections[c.spiceLayout.kind==='Q'?'B':'G']?.[0])),columns=new Map();
   for(const branch of branches){const bits=Object.values(cells[branch.id].connections).map(b=>b[0]),signal=bits.find(b=>!rails.has(b)),rail=bits.find(b=>rails.has(b));if(controls.has(signal)){const key=signal+':'+(rails.get(rail)>0?'upper':'lower');columns.set(key,(columns.get(key)||0)+branch.width+24);}}
-  return {rails,railEdges,sources,railPorts,unusedPorts,branches,signalNets,core,original,options:{[option+'direction']:dense?'DOWN':'RIGHT',[option+'layered.layering.strategy']:'NETWORK_SIMPLEX',[option+'layered.spacing.nodeNodeBetweenLayers']:dense?32:Math.max(120,...[...columns.values()].map(w=>w+36)),...dense?{[option+'spacing.nodeNode']:Math.max(32,...branches.map(n=>n.width+24))}:{}}};
+  const appliedMotifs=applyMotifPreferences(graph,motifs);
+  return {rails,railEdges,sources,railPorts,unusedPorts,branches,signalNets,core,original,appliedMotifs,options:{[option+'direction']:dense?'DOWN':'RIGHT',[option+'layered.layering.strategy']:'NETWORK_SIMPLEX',...appliedMotifs.length?{[option+'layered.considerModelOrder.strategy']:'NODES_AND_EDGES'}:{},[option+'layered.spacing.nodeNodeBetweenLayers']:dense?32:Math.max(120,...[...columns.values()].map(w=>w+36)),...dense?{[option+'spacing.nodeNode']:Math.max(32,...branches.map(n=>n.width+24))}:{}}};
 }
 
 /** Specialized supply-rail geometry; signal placement/routing remains ELK's job. */

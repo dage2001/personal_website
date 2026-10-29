@@ -1,6 +1,7 @@
 import {indexNodes,record,nodeName} from './circuit-ir.js';
 import {leafDevices,topologySignature} from './flatten.js';
 import {analyzeLayout} from './layout-semantics.js';
+import {mapTransistorMotifs} from './transistor-motifs.js';
 import {bindLayoutDescription} from './layout-description.js';
 
 export function blockInterface(tree,context) {
@@ -66,5 +67,5 @@ export function toNetlistsvg(circuit) {
     let ground='__ground';while(Object.hasOwn(cells,ground))ground+='_';
     cells[ground]={type:'gnd',connections:{A:[circuit.nodes['0'].bit]},port_directions:{A:'input'},attributes:{name:'0'},parameters:{}};
   }
-  return {modules:{circuit:{attributes:{top:1},ports:{},cells,netnames,spiceLayoutDescription:circuit.layout?.description||null}}};
+  return {modules:{circuit:{attributes:{top:1},ports:{},cells,netnames,spiceMotifs:mapTransistorMotifs(circuit.layout?.motifs||[],x=>x,n=>circuit.nodes[n].bit),spiceLayoutDescription:circuit.layout?.description||null}}};
 }

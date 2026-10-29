@@ -2,8 +2,9 @@ import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
 import {classicPassiveOrientations} from './classic-orientation.js';
 import {currentLimiterTransistors} from './transistor-flow.js';
+import {recognizeTransistorMotifs} from './transistor-motifs.js';
 
-export const layoutRulesVersion = 9;
+export const layoutRulesVersion = 10;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -57,7 +58,7 @@ export function analyzeLayout(tree,circuit) {
     const named=namingRole(n.name),legacy=legacyRail(n.name);
     nodes[n.name]={role:named!=='unknown'?named:legacy,roleSource:named!=='unknown'?'node-name':legacy!=='unknown'?'legacy-rail-name':'unknown',potential:dc.nodes[n.name]?.known?dc.nodes[n.name].value:null};
   }
-  const orientations=classicPassiveOrientations(circuit,nodes),limiters=currentLimiterTransistors(circuit);
+  const motifs=recognizeTransistorMotifs(circuit,nodes),orientations=classicPassiveOrientations(circuit,nodes,motifs),limiters=currentLimiterTransistors(circuit);
   const roleAt=(c,pin,node)=>{
     const base={role:nodes[node].role,roleSource:nodes[node].roleSource};
     const formal=c.block?.ports.find(p=>p.pin===pin);
@@ -88,5 +89,5 @@ export function analyzeLayout(tree,circuit) {
     const relative=c.synthetic?'':c.name.startsWith(circuit.focus+'/')?c.name.slice(circuit.focus.length+1):c.name;
     cells[c.name]={version:layoutRulesVersion,kind:c.kind,polarity:c.type.endsWith('pnp')?'p':c.type.endsWith('npn')?'n':null,currentLimiter:limiters.has(c.name),orientationReason:orientations.get(c.name)?.reason||null,owner:relative.includes('/')?relative.slice(0,relative.lastIndexOf('/')):'',passive,source:['V','I','E','F','G','H'].includes(c.kind)||c.kind==='B'&&!passive,ports,horizontal,orientation:horizontal?'horizontal':reverse?'vertical-reversed':'vertical',flexible:pinNames.length===2&&(passive||['V','I','B','F','H'].includes(c.kind)),supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
   }
-  return {version:layoutRulesVersion,nodes,cells,diagnostics:dc.diagnostics};
+  return {version:layoutRulesVersion,nodes,cells,motifs,diagnostics:dc.diagnostics};
 }
