@@ -1,6 +1,6 @@
 import {parsePrimitiveCir, tokenize} from './primitive-parser.js';
 import {loadSources} from './source-loader.js';
-import {parseLayoutDescription} from './layout-description.js';
+import {scopedLayoutDescriptions} from './layout-description.js';
 
 const rec = () => Object.create(null);
 const lower = s => s.toLowerCase();
@@ -33,11 +33,11 @@ function splitParameters(tokens) {
 export function parseHierarchy(source,options={}) {
   if (typeof source !== 'string') throw TypeError('Netlist must be a string.');
   if (source.length > 2000000) throw Error('Netlist exceeds the limit of 2 MB.');
-  const described=parseLayoutDescription(source),loaded=loadSources(source,options);source=loaded.source;
+  const loaded=loadSources(source,options);source=loaded.source;const described=scopedLayoutDescriptions(source);
   const diagnostics=[...loaded.diagnostics,...described.diagnostics], scopes=rec(), globals=new Set(['0']);
   const report=(severity,line,message)=>diagnostics.push({severity,line,message});
   const makeScope=(id,name,parent,ports=[],defaults=rec(),line=0)=>{
-    const scope={id,name,parent,ports,defaults,parameters:rec(),definitions:rec(),devices:[],instances:[],directives:[],line,statements:[]};
+    const scope={id,name,parent,ports,defaults,parameters:rec(),definitions:rec(),devices:[],instances:[],directives:[],line,statements:[],layoutDescription:described.scopes.get(line)||null};
     scopes[id]=scope;return scope;
   };
   const root=makeScope('root','Top',null),stack=[root],lines=[];

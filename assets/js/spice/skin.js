@@ -136,9 +136,11 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
         if (n[0] === 'g' && n[1]['s:pid']) {
           const a = n[1], sx = Number(a['s:x']) + ox, sy = Number(a['s:y']) + oy;
           const side = a['s:position'];
-          const pid=type==='spice_br'?(a['s:pid']==='A'?'+':'-'):a['s:pid'];
+          // The analog PNP glyph has its emitter arrow on the upper branch.
+          const pnp=type==='q_pnp'||type==='spice_q4_pnp';
+          const pid=type==='spice_br'?(a['s:pid']==='A'?'+':'-'):pnp&&a['s:pid']==='C'?'E':pnp&&a['s:pid']==='E'?'C':a['s:pid'];
           terminal(pid, side === 'left' ? 0 : side === 'right' ? width : sx, side === 'top' ? 0 : side === 'bottom' ? height : sy, side, sx, sy);
-          if (type.startsWith('q') || type.startsWith('spice_q4_')) geometry.push(txt(sx + 5, sy - 5, a['s:pid']));
+          if (type.startsWith('q') || type.startsWith('spice_q4_')) geometry.push(txt(sx + 5, sy - 5, pid));
         } else { n[1].transform = `translate(${ox},${oy})`; if (n[1].style) n[1].style = n[1].style.replace(/#000000/g,color); geometry.push(n); }
       }
       if (type.startsWith('spice_q4_')) {

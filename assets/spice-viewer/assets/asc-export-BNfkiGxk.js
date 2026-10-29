@@ -1,4 +1,4 @@
-import { l as ge, n as Ie, b as Se, p as Tt } from "./ui-CTKne_h0.js";
+import { l as ge, n as Ie, b as Se, p as Tt } from "./ui-CwLuwVZA.js";
 var J = Uint8Array, ne = Uint16Array, Ve = Int32Array, ke = new J([
   0,
   0,
@@ -232,9 +232,9 @@ var _t = /* @__PURE__ */ Ee(fe, 9, 0), bt = /* @__PURE__ */ Ee(xe, 5, 0), ct = f
   var b = N + 5 << 3, M = Te(f, fe) + Te(l, xe) + m, G = Te(f, A) + Te(l, I) + m + 14 + 3 * W + Te(B, s) + 2 * B[16] + 3 * B[17] + 7 * B[18];
   if (E >= 0 && b <= M && b <= G)
     return ft(n, p, o.subarray(E, E + N));
-  var $, i, v, w;
+  var $, r, v, w;
   if (se(n, p, 1 + (G < M)), p += 2, G < M) {
-    $ = Ee(A, h, 0), i = A, v = Ee(I, j, 0), w = I;
+    $ = Ee(A, h, 0), r = A, v = Ee(I, j, 0), w = I;
     var U = Ee(s, H, 0);
     se(n, p, g - 257), se(n, p + 5, O - 1), se(n, p + 10, W - 4), p += 14;
     for (var D = 0; D < W; ++D)
@@ -246,18 +246,18 @@ var _t = /* @__PURE__ */ Ee(fe, 9, 0), bt = /* @__PURE__ */ Ee(xe, 5, 0), ct = f
         se(n, p, U[S]), p += s[S], S > 15 && (se(n, p, V[D] >> 5 & 127), p += V[D] >> 12);
       }
   } else
-    $ = _t, i = fe, v = bt, w = xe;
+    $ = _t, r = fe, v = bt, w = xe;
   for (var D = 0; D < x; ++D) {
     var k = c[D];
     if (k > 255) {
       var S = k >> 18 & 31;
-      ve(n, p, $[S + 257]), p += i[S + 257], S > 7 && (se(n, p, k >> 23 & 31), p += ke[S]);
+      ve(n, p, $[S + 257]), p += r[S + 257], S > 7 && (se(n, p, k >> 23 & 31), p += ke[S]);
       var Y = k & 31;
       ve(n, p, v[Y]), p += w[Y], Y > 3 && (ve(n, p, k >> 5 & 8191), p += Ge[Y]);
     } else
-      ve(n, p, $[k]), p += i[k];
+      ve(n, p, $[k]), p += r[k];
   }
-  return ve(n, p, $[256]), p + i[256];
+  return ve(n, p, $[256]), p + r[256];
 }, wt = /* @__PURE__ */ new Ve([65540, 131080, 131088, 131104, 262176, 1048704, 1048832, 2114560, 2117632]), ut = /* @__PURE__ */ new J(0), Nt = function(o, n, a, c, f, l) {
   var m = l.z || o.length, x = new J(c + m + 5 * (1 + Math.ceil(m / 7e3)) + f), E = x.subarray(c, x.length - f), N = l.l, p = (l.r || 0) & 7;
   if (n) {
@@ -270,10 +270,10 @@ var _t = /* @__PURE__ */ Ee(fe, 9, 0), bt = /* @__PURE__ */ Ee(xe, 5, 0), ct = f
         var $ = m - R;
         if ((B > 7e3 || s > 24576) && ($ > 423 || !N)) {
           p = ze(o, E, 0, d, _, O, D, s, W, R - W, p), s = B = D = 0, W = R;
-          for (var i = 0; i < 286; ++i)
-            _[i] = 0;
-          for (var i = 0; i < 30; ++i)
-            O[i] = 0;
+          for (var r = 0; r < 286; ++r)
+            _[r] = 0;
+          for (var r = 0; r < 30; ++r)
+            O[r] = 0;
         }
         var v = 2, w = 0, U = h, L = M - G & 32767;
         if ($ > 2 && b == g(R - L))
@@ -284,9 +284,9 @@ var _t = /* @__PURE__ */ Ee(fe, 9, 0), bt = /* @__PURE__ */ Ee(xe, 5, 0), ct = f
               if (k > v) {
                 if (v = k, w = L, k > C)
                   break;
-                for (var Y = Math.min(L, k - 2), oe = 0, i = 0; i < Y; ++i) {
-                  var ie = R - L + i & 32767, ue = I[ie], pe = ie - ue & 32767;
-                  pe > oe && (oe = pe, G = ie);
+                for (var Y = Math.min(L, k - 2), oe = 0, r = 0; r < Y; ++r) {
+                  var re = R - L + r & 32767, ue = I[re], pe = re - ue & 32767;
+                  pe > oe && (oe = pe, G = re);
                 }
               }
             }
@@ -513,21 +513,21 @@ function jt() {
         return e;
       });
       function f(t) {
-        for (var e = Math.max(n.MAX_BUFFER_LENGTH, 10), u = 0, r = 0, q = a.length; r < q; r++) {
-          var z = t[a[r]].length;
+        for (var e = Math.max(n.MAX_BUFFER_LENGTH, 10), u = 0, i = 0, q = a.length; i < q; i++) {
+          var z = t[a[i]].length;
           if (z > e)
-            switch (a[r]) {
+            switch (a[i]) {
               case "textNode":
                 v(t);
                 break;
               case "cdata":
-                i(t, "oncdata", t.cdata), t.cdata = "";
+                r(t, "oncdata", t.cdata), t.cdata = "";
                 break;
               case "script":
-                i(t, "onscript", t.script), t.script = "";
+                r(t, "onscript", t.script), t.script = "";
                 break;
               default:
-                U(t, "Max buffer length exceeded: " + a[r]);
+                U(t, "Max buffer length exceeded: " + a[i]);
             }
           u = Math.max(u, z);
         }
@@ -539,7 +539,7 @@ function jt() {
           t[a[e]] = "";
       }
       function m(t) {
-        v(t), t.cdata !== "" && (i(t, "oncdata", t.cdata), t.cdata = ""), t.script !== "" && (i(t, "onscript", t.script), t.script = "");
+        v(t), t.cdata !== "" && (r(t, "oncdata", t.cdata), t.cdata = ""), t.script !== "" && (r(t, "onscript", t.script), t.script = "");
       }
       c.prototype = {
         end: function() {
@@ -587,17 +587,17 @@ function jt() {
         var u = this;
         this._parser.onend = function() {
           u.emit("end");
-        }, this._parser.onerror = function(r) {
-          u.emit("error", r), u._parser.error = null;
-        }, this._decoder = null, this._decoderBuffer = null, E.forEach(function(r) {
-          Object.defineProperty(u, "on" + r, {
+        }, this._parser.onerror = function(i) {
+          u.emit("error", i), u._parser.error = null;
+        }, this._decoder = null, this._decoderBuffer = null, E.forEach(function(i) {
+          Object.defineProperty(u, "on" + i, {
             get: function() {
-              return u._parser["on" + r];
+              return u._parser["on" + i];
             },
             set: function(q) {
               if (!q)
-                return u.removeAllListeners(r), u._parser["on" + r] = q, q;
-              u.on(r, q);
+                return u.removeAllListeners(i), u._parser["on" + i] = q, q;
+              u.on(i, q);
             },
             enumerable: !0,
             configurable: !1
@@ -636,8 +636,8 @@ function jt() {
       }, y.prototype.on = function(t, e) {
         var u = this;
         return !u._parser["on" + t] && E.indexOf(t) !== -1 && (u._parser["on" + t] = function() {
-          var r = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
-          r.splice(0, 0, t), u.emit.apply(u, r);
+          var i = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
+          i.splice(0, 0, t), u.emit.apply(u, i);
         }), x.prototype.on.call(u, t, e);
       };
       var A = /^\[CDATA\[$/i, h = /^DOCTYPE$/i, T = "http://www.w3.org/XML/1998/namespace", I = "http://www.w3.org/2000/xmlns/", j = { xml: T, xmlns: I }, F = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/, P = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/, g = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/, d = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
@@ -1009,8 +1009,8 @@ function jt() {
         return t ? t.toLowerCase().replace(/[^a-z0-9]/g, "") : null;
       }
       function G(t, e) {
-        const u = M(t), r = M(e);
-        return !u || !r ? !0 : r === "utf16" ? u === "utf16le" || u === "utf16be" : u === r;
+        const u = M(t), i = M(e);
+        return !u || !i ? !0 : i === "utf16" ? u === "utf16le" || u === "utf16be" : u === i;
       }
       function $(t, e) {
         if (!(!t.strict || !t.encoding || !e || e.name !== "xml")) {
@@ -1021,7 +1021,7 @@ function jt() {
           );
         }
       }
-      function i(t, e, u) {
+      function r(t, e, u) {
         t.textNode && v(t), W(t, e, u);
       }
       function v(t) {
@@ -1047,10 +1047,10 @@ Char: ` + t.c), e = new Error(e), t.error = e, W(t, "onerror", e), t;
       function V(t) {
         t.strict || (t.tagName = t.tagName[t.looseCase]());
         var e = t.tags[t.tags.length - 1] || t, u = t.tag = { name: t.tagName, attributes: {} };
-        t.opt.xmlns && (u.ns = e.ns), t.attribList.length = 0, i(t, "onopentagstart", u);
+        t.opt.xmlns && (u.ns = e.ns), t.attribList.length = 0, r(t, "onopentagstart", u);
       }
       function S(t, e) {
-        var u = t.indexOf(":"), r = u < 0 ? ["", t] : t.split(":"), q = r[0], z = r[1];
+        var u = t.indexOf(":"), i = u < 0 ? ["", t] : t.split(":"), q = i[0], z = i[1];
         return e && t === "xmlns" && (q = "xmlns", z = ""), { prefix: q, local: z };
       }
       function k(t) {
@@ -1059,15 +1059,15 @@ Char: ` + t.c), e = new Error(e), t.error = e, W(t, "onerror", e), t;
           return;
         }
         if (t.opt.xmlns) {
-          var e = S(t.attribName, !0), u = e.prefix, r = e.local;
+          var e = S(t.attribName, !0), u = e.prefix, i = e.local;
           if (u === "xmlns")
-            if (r === "xml" && t.attribValue !== T)
+            if (i === "xml" && t.attribValue !== T)
               C(
                 t,
                 "xml: prefix must be bound to " + T + `
 Actual: ` + t.attribValue
               );
-            else if (r === "xmlns" && t.attribValue !== I)
+            else if (i === "xmlns" && t.attribValue !== I)
               C(
                 t,
                 "xmlns: prefix must be bound to " + I + `
@@ -1075,11 +1075,11 @@ Actual: ` + t.attribValue
               );
             else {
               var q = t.tag, z = t.tags[t.tags.length - 1] || t;
-              q.ns === z.ns && (q.ns = Object.create(z.ns)), q.ns[r] = t.attribValue;
+              q.ns === z.ns && (q.ns = Object.create(z.ns)), q.ns[i] = t.attribValue;
             }
           t.attribList.push([t.attribName, t.attribValue]);
         } else
-          t.tag.attributes[t.attribName] = t.attribValue, i(t, "onattribute", {
+          t.tag.attributes[t.attribName] = t.attribValue, r(t, "onattribute", {
             name: t.attribName,
             value: t.attribValue
           });
@@ -1087,22 +1087,22 @@ Actual: ` + t.attribValue
       }
       function Y(t, e) {
         if (t.opt.xmlns) {
-          var u = t.tag, r = S(t.tagName);
-          u.prefix = r.prefix, u.local = r.local, u.uri = u.ns[r.prefix] || "", u.prefix && !u.uri && (C(
+          var u = t.tag, i = S(t.tagName);
+          u.prefix = i.prefix, u.local = i.local, u.uri = u.ns[i.prefix] || "", u.prefix && !u.uri && (C(
             t,
             "Unbound namespace prefix: " + JSON.stringify(t.tagName)
-          ), u.uri = r.prefix);
+          ), u.uri = i.prefix);
           var q = t.tags[t.tags.length - 1] || t;
           u.ns && q.ns !== u.ns && Object.keys(u.ns).forEach(function(qe) {
-            i(t, "onopennamespace", {
+            r(t, "onopennamespace", {
               prefix: qe,
               uri: u.ns[qe]
             });
           });
           for (var z = 0, Q = t.attribList.length; z < Q; z++) {
-            var ee = t.attribList[z], te = ee[0], re = ee[1], K = S(te, !0), ae = K.prefix, vt = K.local, $e = ae === "" ? "" : u.ns[ae] || "", Ce = {
+            var ee = t.attribList[z], te = ee[0], ie = ee[1], K = S(te, !0), ae = K.prefix, vt = K.local, $e = ae === "" ? "" : u.ns[ae] || "", Ce = {
               name: te,
-              value: re,
+              value: ie,
               prefix: ae,
               local: vt,
               uri: $e
@@ -1110,11 +1110,11 @@ Actual: ` + t.attribValue
             ae && ae !== "xmlns" && !$e && (C(
               t,
               "Unbound namespace prefix: " + JSON.stringify(ae)
-            ), Ce.uri = ae), t.tag.attributes[te] = Ce, i(t, "onattribute", Ce);
+            ), Ce.uri = ae), t.tag.attributes[te] = Ce, r(t, "onattribute", Ce);
           }
           t.attribList.length = 0;
         }
-        t.tag.isSelfClosing = !!e, t.sawRoot = !0, t.tags.push(t.tag), i(t, "onopentag", t.tag), e || (!t.noscript && t.tagName.toLowerCase() === "script" ? t.state = s.SCRIPT : t.state = s.TEXT, t.tag = null, t.tagName = ""), t.attribName = t.attribValue = "", t.attribList.length = 0;
+        t.tag.isSelfClosing = !!e, t.sawRoot = !0, t.tags.push(t.tag), r(t, "onopentag", t.tag), e || (!t.noscript && t.tagName.toLowerCase() === "script" ? t.state = s.SCRIPT : t.state = s.TEXT, t.tag = null, t.tagName = ""), t.attribName = t.attribValue = "", t.attribList.length = 0;
       }
       function oe(t) {
         if (!t.tagName) {
@@ -1126,13 +1126,13 @@ Actual: ` + t.attribValue
             t.script += "</" + t.tagName + ">", t.tagName = "", t.state = s.SCRIPT;
             return;
           }
-          i(t, "onscript", t.script), t.script = "";
+          r(t, "onscript", t.script), t.script = "";
         }
         var e = t.tags.length, u = t.tagName;
         t.strict || (u = u[t.looseCase]());
-        for (var r = u; e--; ) {
+        for (var i = u; e--; ) {
           var q = t.tags[e];
-          if (q.name !== r)
+          if (q.name !== i)
             C(t, "Unexpected close tag");
           else
             break;
@@ -1144,21 +1144,21 @@ Actual: ` + t.attribValue
         t.tagName = u;
         for (var z = t.tags.length; z-- > e; ) {
           var Q = t.tag = t.tags.pop();
-          t.tagName = t.tag.name, i(t, "onclosetag", t.tagName);
+          t.tagName = t.tag.name, r(t, "onclosetag", t.tagName);
           var ee = {};
           for (var te in Q.ns)
             ee[te] = Q.ns[te];
-          var re = t.tags[t.tags.length - 1] || t;
-          t.opt.xmlns && Q.ns !== re.ns && Object.keys(Q.ns).forEach(function(K) {
+          var ie = t.tags[t.tags.length - 1] || t;
+          t.opt.xmlns && Q.ns !== ie.ns && Object.keys(Q.ns).forEach(function(K) {
             var ae = Q.ns[K];
-            i(t, "onclosenamespace", { prefix: K, uri: ae });
+            r(t, "onclosenamespace", { prefix: K, uri: ae });
           });
         }
         e === 0 && (t.closedRoot = !0), t.tagName = t.attribValue = t.attribName = "", t.attribList.length = 0, t.state = s.TEXT;
       }
-      function ie(t) {
-        var e = t.entity, u = e.toLowerCase(), r, q = "";
-        return t.ENTITIES[e] ? t.ENTITIES[e] : t.ENTITIES[u] ? t.ENTITIES[u] : (e = u, e.charAt(0) === "#" && (e.charAt(1) === "x" ? (e = e.slice(2), r = parseInt(e, 16), q = r.toString(16)) : (e = e.slice(1), r = parseInt(e, 10), q = r.toString(10))), e = e.replace(/^0+/, ""), isNaN(r) || q.toLowerCase() !== e || r < 0 || r > 1114111 || !ue(r) ? (C(t, "Invalid character entity"), "&" + t.entity + ";") : String.fromCodePoint(r));
+      function re(t) {
+        var e = t.entity, u = e.toLowerCase(), i, q = "";
+        return t.ENTITIES[e] ? t.ENTITIES[e] : t.ENTITIES[u] ? t.ENTITIES[u] : (e = u, e.charAt(0) === "#" && (e.charAt(1) === "x" ? (e = e.slice(2), i = parseInt(e, 16), q = i.toString(16)) : (e = e.slice(1), i = parseInt(e, 10), q = i.toString(10))), e = e.replace(/^0+/, ""), isNaN(i) || q.toLowerCase() !== e || i < 0 || i > 1114111 || !ue(i) ? (C(t, "Invalid character entity"), "&" + t.entity + ";") : String.fromCodePoint(i));
       }
       function ue(t) {
         return t === 9 || t === 10 || t === 13 || t >= 32 && t <= 55295 || t >= 57344 && t <= 65533 || t >= 65536 && t <= 1114111;
@@ -1182,177 +1182,177 @@ Actual: ` + t.attribValue
         if (t === null)
           return L(e);
         typeof t == "object" && (t = t.toString());
-        for (var u = 0, r = ""; r = de(t, u++), e.c = r, !!r; )
-          switch (e.trackPosition && (e.position++, r === `
+        for (var u = 0, i = ""; i = de(t, u++), e.c = i, !!i; )
+          switch (e.trackPosition && (e.position++, i === `
 ` ? (e.line++, e.column = 0) : e.column++), e.state) {
             case s.BEGIN:
-              if (e.state = s.BEGIN_WHITESPACE, r === "\uFEFF")
+              if (e.state = s.BEGIN_WHITESPACE, i === "\uFEFF")
                 continue;
-              pe(e, r);
+              pe(e, i);
               continue;
             case s.BEGIN_WHITESPACE:
-              pe(e, r);
+              pe(e, i);
               continue;
             case s.TEXT:
               if (e.sawRoot && !e.closedRoot) {
-                for (var z = u - 1; r && r !== "<" && r !== "&"; )
-                  r = de(t, u++), r && e.trackPosition && (e.position++, r === `
+                for (var z = u - 1; i && i !== "<" && i !== "&"; )
+                  i = de(t, u++), i && e.trackPosition && (e.position++, i === `
 ` ? (e.line++, e.column = 0) : e.column++);
                 e.textNode += t.substring(z, u - 1);
               }
-              r === "<" && !(e.sawRoot && e.closedRoot && !e.strict) ? (e.state = s.OPEN_WAKA, e.startTagPosition = e.position) : (!_(r) && (!e.sawRoot || e.closedRoot) && C(e, "Text data outside of root node."), r === "&" ? e.state = s.TEXT_ENTITY : e.textNode += r);
+              i === "<" && !(e.sawRoot && e.closedRoot && !e.strict) ? (e.state = s.OPEN_WAKA, e.startTagPosition = e.position) : (!_(i) && (!e.sawRoot || e.closedRoot) && C(e, "Text data outside of root node."), i === "&" ? e.state = s.TEXT_ENTITY : e.textNode += i);
               continue;
             case s.SCRIPT:
-              r === "<" ? e.state = s.SCRIPT_ENDING : e.script += r;
+              i === "<" ? e.state = s.SCRIPT_ENDING : e.script += i;
               continue;
             case s.SCRIPT_ENDING:
-              r === "/" ? e.state = s.CLOSE_TAG : (e.script += "<" + r, e.state = s.SCRIPT);
+              i === "/" ? e.state = s.CLOSE_TAG : (e.script += "<" + i, e.state = s.SCRIPT);
               continue;
             case s.OPEN_WAKA:
-              if (r === "!")
+              if (i === "!")
                 e.state = s.SGML_DECL, e.sgmlDecl = "";
-              else if (!_(r)) if (D(F, r))
-                e.state = s.OPEN_TAG, e.tagName = r;
-              else if (r === "/")
+              else if (!_(i)) if (D(F, i))
+                e.state = s.OPEN_TAG, e.tagName = i;
+              else if (i === "/")
                 e.state = s.CLOSE_TAG, e.tagName = "";
-              else if (r === "?")
+              else if (i === "?")
                 e.state = s.PROC_INST, e.procInstName = e.procInstBody = "";
               else {
                 if (C(e, "Unencoded <"), e.startTagPosition + 1 < e.position) {
                   var q = e.position - e.startTagPosition;
-                  r = new Array(q).join(" ") + r;
+                  i = new Array(q).join(" ") + i;
                 }
-                e.textNode += "<" + r, e.state = s.TEXT;
+                e.textNode += "<" + i, e.state = s.TEXT;
               }
               continue;
             case s.SGML_DECL:
-              if (e.sgmlDecl + r === "--") {
+              if (e.sgmlDecl + i === "--") {
                 e.state = s.COMMENT, e.comment = "", e.sgmlDecl = "";
                 continue;
               }
-              e.doctype && e.doctype !== !0 && e.sgmlDecl ? (e.state = s.DOCTYPE_DTD, e.doctype += "<!" + e.sgmlDecl + r, e.sgmlDecl = "") : A.test(e.sgmlDecl + r) ? (i(e, "onopencdata"), e.state = s.CDATA, e.sgmlDecl = "", e.cdata = "") : h.test(e.sgmlDecl + r) ? (e.state = s.DOCTYPE, (e.doctype || e.sawRoot) && C(
+              e.doctype && e.doctype !== !0 && e.sgmlDecl ? (e.state = s.DOCTYPE_DTD, e.doctype += "<!" + e.sgmlDecl + i, e.sgmlDecl = "") : A.test(e.sgmlDecl + i) ? (r(e, "onopencdata"), e.state = s.CDATA, e.sgmlDecl = "", e.cdata = "") : h.test(e.sgmlDecl + i) ? (e.state = s.DOCTYPE, (e.doctype || e.sawRoot) && C(
                 e,
                 "Inappropriately located doctype declaration"
-              ), e.doctype = "", e.sgmlDecl = "") : r === ">" ? (i(e, "onsgmldeclaration", e.sgmlDecl), e.sgmlDecl = "", e.state = s.TEXT) : (O(r) && (e.state = s.SGML_DECL_QUOTED), e.sgmlDecl += r);
+              ), e.doctype = "", e.sgmlDecl = "") : i === ">" ? (r(e, "onsgmldeclaration", e.sgmlDecl), e.sgmlDecl = "", e.state = s.TEXT) : (O(i) && (e.state = s.SGML_DECL_QUOTED), e.sgmlDecl += i);
               continue;
             case s.SGML_DECL_QUOTED:
-              r === e.q && (e.state = s.SGML_DECL, e.q = ""), e.sgmlDecl += r;
+              i === e.q && (e.state = s.SGML_DECL, e.q = ""), e.sgmlDecl += i;
               continue;
             case s.DOCTYPE:
-              r === ">" ? (e.state = s.TEXT, i(e, "ondoctype", e.doctype), e.doctype = !0) : (e.doctype += r, r === "[" ? e.state = s.DOCTYPE_DTD : O(r) && (e.state = s.DOCTYPE_QUOTED, e.q = r));
+              i === ">" ? (e.state = s.TEXT, r(e, "ondoctype", e.doctype), e.doctype = !0) : (e.doctype += i, i === "[" ? e.state = s.DOCTYPE_DTD : O(i) && (e.state = s.DOCTYPE_QUOTED, e.q = i));
               continue;
             case s.DOCTYPE_QUOTED:
-              e.doctype += r, r === e.q && (e.q = "", e.state = s.DOCTYPE);
+              e.doctype += i, i === e.q && (e.q = "", e.state = s.DOCTYPE);
               continue;
             case s.DOCTYPE_DTD:
-              r === "]" ? (e.doctype += r, e.state = s.DOCTYPE) : r === "<" ? (e.state = s.OPEN_WAKA, e.startTagPosition = e.position) : O(r) ? (e.doctype += r, e.state = s.DOCTYPE_DTD_QUOTED, e.q = r) : e.doctype += r;
+              i === "]" ? (e.doctype += i, e.state = s.DOCTYPE) : i === "<" ? (e.state = s.OPEN_WAKA, e.startTagPosition = e.position) : O(i) ? (e.doctype += i, e.state = s.DOCTYPE_DTD_QUOTED, e.q = i) : e.doctype += i;
               continue;
             case s.DOCTYPE_DTD_QUOTED:
-              e.doctype += r, r === e.q && (e.state = s.DOCTYPE_DTD, e.q = "");
+              e.doctype += i, i === e.q && (e.state = s.DOCTYPE_DTD, e.q = "");
               continue;
             case s.COMMENT:
-              r === "-" ? e.state = s.COMMENT_ENDING : e.comment += r;
+              i === "-" ? e.state = s.COMMENT_ENDING : e.comment += i;
               continue;
             case s.COMMENT_ENDING:
-              r === "-" ? (e.state = s.COMMENT_ENDED, e.comment = w(e.opt, e.comment), e.comment && i(e, "oncomment", e.comment), e.comment = "") : (e.comment += "-" + r, e.state = s.COMMENT);
+              i === "-" ? (e.state = s.COMMENT_ENDED, e.comment = w(e.opt, e.comment), e.comment && r(e, "oncomment", e.comment), e.comment = "") : (e.comment += "-" + i, e.state = s.COMMENT);
               continue;
             case s.COMMENT_ENDED:
-              r !== ">" ? (C(e, "Malformed comment"), e.comment += "--" + r, e.state = s.COMMENT) : e.doctype && e.doctype !== !0 ? e.state = s.DOCTYPE_DTD : e.state = s.TEXT;
+              i !== ">" ? (C(e, "Malformed comment"), e.comment += "--" + i, e.state = s.COMMENT) : e.doctype && e.doctype !== !0 ? e.state = s.DOCTYPE_DTD : e.state = s.TEXT;
               continue;
             case s.CDATA:
-              for (var z = u - 1; r && r !== "]"; )
-                r = de(t, u++), r && e.trackPosition && (e.position++, r === `
+              for (var z = u - 1; i && i !== "]"; )
+                i = de(t, u++), i && e.trackPosition && (e.position++, i === `
 ` ? (e.line++, e.column = 0) : e.column++);
-              e.cdata += t.substring(z, u - 1), r === "]" && (e.state = s.CDATA_ENDING);
+              e.cdata += t.substring(z, u - 1), i === "]" && (e.state = s.CDATA_ENDING);
               continue;
             case s.CDATA_ENDING:
-              r === "]" ? e.state = s.CDATA_ENDING_2 : (e.cdata += "]" + r, e.state = s.CDATA);
+              i === "]" ? e.state = s.CDATA_ENDING_2 : (e.cdata += "]" + i, e.state = s.CDATA);
               continue;
             case s.CDATA_ENDING_2:
-              r === ">" ? (e.cdata && i(e, "oncdata", e.cdata), i(e, "onclosecdata"), e.cdata = "", e.state = s.TEXT) : r === "]" ? e.cdata += "]" : (e.cdata += "]]" + r, e.state = s.CDATA);
+              i === ">" ? (e.cdata && r(e, "oncdata", e.cdata), r(e, "onclosecdata"), e.cdata = "", e.state = s.TEXT) : i === "]" ? e.cdata += "]" : (e.cdata += "]]" + i, e.state = s.CDATA);
               continue;
             case s.PROC_INST:
-              r === "?" ? e.state = s.PROC_INST_ENDING : _(r) ? e.state = s.PROC_INST_BODY : e.procInstName += r;
+              i === "?" ? e.state = s.PROC_INST_ENDING : _(i) ? e.state = s.PROC_INST_BODY : e.procInstName += i;
               continue;
             case s.PROC_INST_BODY:
-              if (!e.procInstBody && _(r))
+              if (!e.procInstBody && _(i))
                 continue;
-              r === "?" ? e.state = s.PROC_INST_ENDING : e.procInstBody += r;
+              i === "?" ? e.state = s.PROC_INST_ENDING : e.procInstBody += i;
               continue;
             case s.PROC_INST_ENDING:
-              if (r === ">") {
-                const re = {
+              if (i === ">") {
+                const ie = {
                   name: e.procInstName,
                   body: e.procInstBody
                 };
-                $(e, re), i(e, "onprocessinginstruction", re), e.procInstName = e.procInstBody = "", e.state = s.TEXT;
+                $(e, ie), r(e, "onprocessinginstruction", ie), e.procInstName = e.procInstBody = "", e.state = s.TEXT;
               } else
-                e.procInstBody += "?" + r, e.state = s.PROC_INST_BODY;
+                e.procInstBody += "?" + i, e.state = s.PROC_INST_BODY;
               continue;
             case s.OPEN_TAG:
-              D(P, r) ? e.tagName += r : (V(e), r === ">" ? Y(e) : r === "/" ? e.state = s.OPEN_TAG_SLASH : (_(r) || C(e, "Invalid character in tag name"), e.state = s.ATTRIB));
+              D(P, i) ? e.tagName += i : (V(e), i === ">" ? Y(e) : i === "/" ? e.state = s.OPEN_TAG_SLASH : (_(i) || C(e, "Invalid character in tag name"), e.state = s.ATTRIB));
               continue;
             case s.OPEN_TAG_SLASH:
-              r === ">" ? (Y(e, !0), oe(e)) : (C(
+              i === ">" ? (Y(e, !0), oe(e)) : (C(
                 e,
                 "Forward-slash in opening tag not followed by >"
               ), e.state = s.ATTRIB);
               continue;
             case s.ATTRIB:
-              if (_(r))
+              if (_(i))
                 continue;
-              r === ">" ? Y(e) : r === "/" ? e.state = s.OPEN_TAG_SLASH : D(F, r) ? (e.attribName = r, e.attribValue = "", e.state = s.ATTRIB_NAME) : C(e, "Invalid attribute name");
+              i === ">" ? Y(e) : i === "/" ? e.state = s.OPEN_TAG_SLASH : D(F, i) ? (e.attribName = i, e.attribValue = "", e.state = s.ATTRIB_NAME) : C(e, "Invalid attribute name");
               continue;
             case s.ATTRIB_NAME:
-              r === "=" ? e.state = s.ATTRIB_VALUE : r === ">" ? (C(e, "Attribute without value"), e.attribValue = e.attribName, k(e), Y(e)) : _(r) ? e.state = s.ATTRIB_NAME_SAW_WHITE : D(P, r) ? e.attribName += r : C(e, "Invalid attribute name");
+              i === "=" ? e.state = s.ATTRIB_VALUE : i === ">" ? (C(e, "Attribute without value"), e.attribValue = e.attribName, k(e), Y(e)) : _(i) ? e.state = s.ATTRIB_NAME_SAW_WHITE : D(P, i) ? e.attribName += i : C(e, "Invalid attribute name");
               continue;
             case s.ATTRIB_NAME_SAW_WHITE:
-              if (r === "=")
+              if (i === "=")
                 e.state = s.ATTRIB_VALUE;
               else {
-                if (_(r))
+                if (_(i))
                   continue;
-                C(e, "Attribute without value"), e.tag.attributes[e.attribName] = "", e.attribValue = "", i(e, "onattribute", {
+                C(e, "Attribute without value"), e.tag.attributes[e.attribName] = "", e.attribValue = "", r(e, "onattribute", {
                   name: e.attribName,
                   value: ""
-                }), e.attribName = "", r === ">" ? Y(e) : D(F, r) ? (e.attribName = r, e.state = s.ATTRIB_NAME) : (C(e, "Invalid attribute name"), e.state = s.ATTRIB);
+                }), e.attribName = "", i === ">" ? Y(e) : D(F, i) ? (e.attribName = i, e.state = s.ATTRIB_NAME) : (C(e, "Invalid attribute name"), e.state = s.ATTRIB);
               }
               continue;
             case s.ATTRIB_VALUE:
-              if (_(r))
+              if (_(i))
                 continue;
-              O(r) ? (e.q = r, e.state = s.ATTRIB_VALUE_QUOTED) : (e.opt.unquotedAttributeValues || U(e, "Unquoted attribute value"), e.state = s.ATTRIB_VALUE_UNQUOTED, e.attribValue = r);
+              O(i) ? (e.q = i, e.state = s.ATTRIB_VALUE_QUOTED) : (e.opt.unquotedAttributeValues || U(e, "Unquoted attribute value"), e.state = s.ATTRIB_VALUE_UNQUOTED, e.attribValue = i);
               continue;
             case s.ATTRIB_VALUE_QUOTED:
-              if (r !== e.q) {
-                r === "&" ? e.state = s.ATTRIB_VALUE_ENTITY_Q : e.attribValue += r;
+              if (i !== e.q) {
+                i === "&" ? e.state = s.ATTRIB_VALUE_ENTITY_Q : e.attribValue += i;
                 continue;
               }
               k(e), e.q = "", e.state = s.ATTRIB_VALUE_CLOSED;
               continue;
             case s.ATTRIB_VALUE_CLOSED:
-              _(r) ? e.state = s.ATTRIB : r === ">" ? Y(e) : r === "/" ? e.state = s.OPEN_TAG_SLASH : D(F, r) ? (C(e, "No whitespace between attributes"), e.attribName = r, e.attribValue = "", e.state = s.ATTRIB_NAME) : C(e, "Invalid attribute name");
+              _(i) ? e.state = s.ATTRIB : i === ">" ? Y(e) : i === "/" ? e.state = s.OPEN_TAG_SLASH : D(F, i) ? (C(e, "No whitespace between attributes"), e.attribName = i, e.attribValue = "", e.state = s.ATTRIB_NAME) : C(e, "Invalid attribute name");
               continue;
             case s.ATTRIB_VALUE_UNQUOTED:
-              if (!B(r)) {
-                r === "&" ? e.state = s.ATTRIB_VALUE_ENTITY_U : e.attribValue += r;
+              if (!B(i)) {
+                i === "&" ? e.state = s.ATTRIB_VALUE_ENTITY_U : e.attribValue += i;
                 continue;
               }
-              k(e), r === ">" ? Y(e) : e.state = s.ATTRIB;
+              k(e), i === ">" ? Y(e) : e.state = s.ATTRIB;
               continue;
             case s.CLOSE_TAG:
               if (e.tagName)
-                r === ">" ? oe(e) : D(P, r) ? e.tagName += r : e.script ? (e.script += "</" + e.tagName + r, e.tagName = "", e.state = s.SCRIPT) : (_(r) || C(e, "Invalid tagname in closing tag"), e.state = s.CLOSE_TAG_SAW_WHITE);
+                i === ">" ? oe(e) : D(P, i) ? e.tagName += i : e.script ? (e.script += "</" + e.tagName + i, e.tagName = "", e.state = s.SCRIPT) : (_(i) || C(e, "Invalid tagname in closing tag"), e.state = s.CLOSE_TAG_SAW_WHITE);
               else {
-                if (_(r))
+                if (_(i))
                   continue;
-                R(F, r) ? e.script ? (e.script += "</" + r, e.state = s.SCRIPT) : C(e, "Invalid tagname in closing tag.") : e.tagName = r;
+                R(F, i) ? e.script ? (e.script += "</" + i, e.state = s.SCRIPT) : C(e, "Invalid tagname in closing tag.") : e.tagName = i;
               }
               continue;
             case s.CLOSE_TAG_SAW_WHITE:
-              if (_(r))
+              if (_(i))
                 continue;
-              r === ">" ? oe(e) : C(e, "Invalid characters in closing tag");
+              i === ">" ? oe(e) : C(e, "Invalid characters in closing tag");
               continue;
             case s.TEXT_ENTITY:
             case s.ATTRIB_VALUE_ENTITY_Q:
@@ -1369,8 +1369,8 @@ Actual: ` + t.attribValue
                   Q = s.ATTRIB_VALUE_UNQUOTED, ee = "attribValue";
                   break;
               }
-              if (r === ";") {
-                var te = ie(e);
+              if (i === ";") {
+                var te = re(e);
                 e.opt.unparsedEntities && !Object.values(n.XML_ENTITIES).includes(te) ? ((e.entityCount += 1) > e.opt.maxEntityCount && U(
                   e,
                   "Parsed entity count exceeds max entity count"
@@ -1378,7 +1378,7 @@ Actual: ` + t.attribValue
                   e,
                   "Parsed entity depth exceeds max entity depth"
                 ), e.entity = "", e.state = Q, e.write(te), e.entityDepth -= 1) : (e[ee] += te, e.entity = "", e.state = Q);
-              } else D(e.entity.length ? d : g, r) ? e.entity += r : (C(e, "Invalid character in entity name"), e[ee] += "&" + e.entity + r, e.entity = "", e.state = Q);
+              } else D(e.entity.length ? d : g, i) ? e.entity += i : (C(e, "Invalid character in entity name"), e[ee] += "&" + e.entity + i, e.entity = "", e.state = Q);
               continue;
             default:
               throw new Error(e, "Unknown state: " + e.state);
@@ -1387,19 +1387,19 @@ Actual: ` + t.attribValue
       }
       String.fromCodePoint || (function() {
         var t = String.fromCharCode, e = Math.floor, u = function() {
-          var r = 16384, q = [], z, Q, ee = -1, te = arguments.length;
+          var i = 16384, q = [], z, Q, ee = -1, te = arguments.length;
           if (!te)
             return "";
-          for (var re = ""; ++ee < te; ) {
+          for (var ie = ""; ++ee < te; ) {
             var K = Number(arguments[ee]);
             if (!isFinite(K) || // `NaN`, `+Infinity`, or `-Infinity`
             K < 0 || // not a valid Unicode code point
             K > 1114111 || // not a valid Unicode code point
             e(K) !== K)
               throw RangeError("Invalid code point: " + K);
-            K <= 65535 ? q.push(K) : (K -= 65536, z = (K >> 10) + 55296, Q = K % 1024 + 56320, q.push(z, Q)), (ee + 1 === te || q.length > r) && (re += t.apply(null, q), q.length = 0);
+            K <= 65535 ? q.push(K) : (K -= 65536, z = (K >> 10) + 55296, Q = K % 1024 + 56320, q.push(z, Q)), (ee + 1 === te || q.length > i) && (ie += t.apply(null, q), q.length = 0);
           }
-          return re;
+          return ie;
         };
         Object.defineProperty ? Object.defineProperty(String, "fromCodePoint", {
           value: u,
@@ -1574,127 +1574,127 @@ function Gt(o, n = [], a = []) {
 }
 const ht = (o) => o.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), _e = (o, n, a) => o.replace(new RegExp("(?<![\\w./%:$])" + ht(n) + "(?![\\w./%:$])", "gi"), () => a);
 function $t(o, n) {
-  const a = n.components.filter((i) => !i.synthetic), c = ge(o.root), f = /* @__PURE__ */ new Map(), l = /* @__PURE__ */ new Map(), m = a.filter((i) => i.kind === "X"), x = /* @__PURE__ */ new Set(), E = (i, v) => {
-    let w = v.includes("/") ? i + "_" + v.replaceAll("/", "_") : v;
-    w = w.replace(/[^a-z0-9_.$@&Ö]/gi, "_"), w.toUpperCase().startsWith(i) || (w = i + "_" + w);
+  const a = n.components.filter((r) => !r.synthetic), c = ge(o.root), f = /* @__PURE__ */ new Map(), l = /* @__PURE__ */ new Map(), m = a.filter((r) => r.kind === "X"), x = /* @__PURE__ */ new Set(), E = (r, v) => {
+    let w = v.includes("/") ? r + "_" + v.replaceAll("/", "_") : v;
+    w = w.replace(/[^a-z0-9_.$@&Ö]/gi, "_"), w.toUpperCase().startsWith(r) || (w = r + "_" + w);
     const U = w;
     let L = 1;
     for (; x.has(w.toLowerCase()); ) w = U + "_" + L++;
     return x.add(w.toLowerCase()), w;
   };
-  c.forEach((i) => f.set(i.name, E(i.kind, i.name)));
-  const N = new Map(m.map((i) => [i.name, E("X", i.name)])), p = new Map(m.map((i, v) => [i.name, "CV_BLOCK_" + v]));
-  c.forEach((i) => l.set(i.name, ""));
-  for (const i of m) for (const v of ge(o.contexts[i.instanceId])) l.set(v.name, i.name);
-  const y = (i) => /^(?:[a-z_][\w.$-]*|\d+)$/i.test(i), A = new Set([...c.flatMap((i) => Object.values(i.terminals)), ...Object.keys(n.nodes)].filter(y).map((i) => i.toLowerCase())), h = /* @__PURE__ */ new Map([["0", "0"]]), T = /* @__PURE__ */ new Set(["0"]);
+  c.forEach((r) => f.set(r.name, E(r.kind, r.name)));
+  const N = new Map(m.map((r) => [r.name, E("X", r.name)])), p = new Map(m.map((r, v) => [r.name, "CV_BLOCK_" + v]));
+  c.forEach((r) => l.set(r.name, ""));
+  for (const r of m) for (const v of ge(o.contexts[r.instanceId])) l.set(v.name, r.name);
+  const y = (r) => /^(?:[a-z_][\w.$-]*|\d+)$/i.test(r), A = new Set([...c.flatMap((r) => Object.values(r.terminals)), ...Object.keys(n.nodes)].filter(y).map((r) => r.toLowerCase())), h = /* @__PURE__ */ new Map([["0", "0"]]), T = /* @__PURE__ */ new Set(["0"]);
   let I = 1;
-  const j = (i) => {
-    if (!h.has(i)) {
-      let v = i;
-      if (!y(i) || T.has(i.toLowerCase()))
+  const j = (r) => {
+    if (!h.has(r)) {
+      let v = r;
+      if (!y(r) || T.has(r.toLowerCase()))
         do
           v = "N_cv" + I++;
         while (A.has(v.toLowerCase()) || T.has(v.toLowerCase()));
-      h.set(i, v), T.add(v.toLowerCase());
+      h.set(r, v), T.add(v.toLowerCase());
     }
-    return h.get(i);
+    return h.get(r);
   };
-  for (const i of c) Object.values(i.terminals).forEach(j);
+  for (const r of c) Object.values(r.terminals).forEach(j);
   Object.keys(n.nodes).forEach(j);
   const F = /* @__PURE__ */ new Map();
-  for (const i of m) {
-    const v = new Set(i.block.ports.map((w) => w.node));
-    for (const w of ge(o.contexts[i.instanceId])) for (const U of Object.values(w.terminals)) !v.has(U) && U !== "0" && !o.ir.globals.some((L) => Ie([], L) === U) && F.set(U, i.name);
+  for (const r of m) {
+    const v = new Set(r.block.ports.map((w) => w.node));
+    for (const w of ge(o.contexts[r.instanceId])) for (const U of Object.values(w.terminals)) !v.has(U) && U !== "0" && !o.ir.globals.some((L) => Ie([], L) === U) && F.set(U, r.name);
   }
-  const P = new Map(m.map((i) => [i.name, new Map(i.block.ports.map((v, w) => [v.node, "p" + w]).reverse())])), g = (i, v = "") => {
-    if (i === "0") return "0";
-    if (P.get(v)?.has(i)) return P.get(v).get(i);
-    const w = F.get(i);
-    if (v && w && w !== v) throw Error("ASC export: cross-block internal node probe requires expanding both instances: " + i);
-    return w && w !== v ? N.get(w) + ":" + j(i) : j(i);
-  }, d = (i, v = "") => {
-    if (!f.has(i)) throw Error("ASC: unresolved device reference " + i);
-    const w = l.get(i);
-    if (v && w !== v) throw Error("ASC export: cross-block current probe requires expanding both instances: " + i);
-    return w && w !== v ? N.get(w) + ":" + f.get(i) : f.get(i);
+  const P = new Map(m.map((r) => [r.name, new Map(r.block.ports.map((v, w) => [v.node, "p" + w]).reverse())])), g = (r, v = "") => {
+    if (r === "0") return "0";
+    if (P.get(v)?.has(r)) return P.get(v).get(r);
+    const w = F.get(r);
+    if (v && w && w !== v) throw Error("ASC export: cross-block internal node probe requires expanding both instances: " + r);
+    return w && w !== v ? N.get(w) + ":" + j(r) : j(r);
+  }, d = (r, v = "") => {
+    if (!f.has(r)) throw Error("ASC: unresolved device reference " + r);
+    const w = l.get(r);
+    if (v && w !== v) throw Error("ASC export: cross-block current probe requires expanding both instances: " + r);
+    return w && w !== v ? N.get(w) + ":" + f.get(r) : f.get(r);
   }, _ = /* @__PURE__ */ new Map();
-  function O(i, v = {}) {
-    const w = o.ir.scopes[i.scopeId];
+  function O(r, v = {}) {
+    const w = o.ir.scopes[r.scopeId];
     let U;
-    if (!i.id) U = Object.fromEntries(Object.keys(i.params).map((L) => [L, L]));
+    if (!r.id) U = Object.fromEntries(Object.keys(r.params).map((L) => [L, L]));
     else {
-      const L = o.contexts[i.path.slice(0, -1).map(encodeURIComponent).join("/")], C = o.ir.scopes[L.scopeId].instances.find((V) => V.name === i.path.at(-1));
+      const L = o.contexts[r.path.slice(0, -1).map(encodeURIComponent).join("/")], C = o.ir.scopes[L.scopeId].instances.find((V) => V.name === r.path.at(-1));
       U = Tt(v, w.defaults, w.parameters, C.parameters);
     }
-    _.set(i.id, U), i.children.forEach((L) => O(L, U));
+    _.set(r.id, U), r.children.forEach((L) => O(L, U));
   }
   O(o.root);
-  const B = (i, v) => {
-    const w = i.ports.find((C) => C.name.toLowerCase() === v.toLowerCase());
+  const B = (r, v) => {
+    const w = r.ports.find((C) => C.name.toLowerCase() === v.toLowerCase());
     if (w) return w.node;
-    const U = i.nodes[v.toLowerCase()];
+    const U = r.nodes[v.toLowerCase()];
     if (U) return U;
     if (o.ir.globals.includes(v.toLowerCase())) return Ie([], v);
     const L = v.split(":");
     if (L.length > 1) {
-      const C = L.pop(), V = [...i.path, ...L].map(encodeURIComponent).join("/"), S = o.contexts[V] || o.contexts[L.map(encodeURIComponent).join("/")];
+      const C = L.pop(), V = [...r.path, ...L].map(encodeURIComponent).join("/"), S = o.contexts[V] || o.contexts[L.map(encodeURIComponent).join("/")];
       if (S) return B(S, C);
     }
-    return Ie(i.path, v);
-  }, D = (i, v) => {
-    const w = i.devices.find((L) => L.localName.toLowerCase() === v.toLowerCase());
+    return Ie(r.path, v);
+  }, D = (r, v) => {
+    const w = r.devices.find((L) => L.localName.toLowerCase() === v.toLowerCase());
     if (w) return w.name;
     const U = v.split(":");
     if (U.length > 1) {
-      const L = U.pop(), C = [...i.path, ...U].map(encodeURIComponent).join("/"), S = (o.contexts[C] || o.contexts[U.map(encodeURIComponent).join("/")])?.devices.find((k) => k.localName.toLowerCase() === L.toLowerCase());
+      const L = U.pop(), C = [...r.path, ...U].map(encodeURIComponent).join("/"), S = (o.contexts[C] || o.contexts[U.map(encodeURIComponent).join("/")])?.devices.find((k) => k.localName.toLowerCase() === L.toLowerCase());
       if (S) return S.name;
     }
     throw Error("ASC: unsupported device reference " + v);
-  }, R = new Map(Object.keys(n.models).map((i, v) => [i, "CV_MODEL_" + v]));
-  function s(i, v) {
-    const w = o.contexts[i.instanceId], U = o.ir.scopes[w.scopeId].devices.find((S) => S.name === i.localName), L = [], C = (S) => "__CV_PROBE_" + (L.push(S) - 1) + "__";
+  }, R = new Map(Object.keys(n.models).map((r, v) => [r, "CV_MODEL_" + v]));
+  function s(r, v) {
+    const w = o.contexts[r.instanceId], U = o.ir.scopes[w.scopeId].devices.find((S) => S.name === r.localName), L = [], C = (S) => "__CV_PROBE_" + (L.push(S) - 1) + "__";
     let V = Se(U.value, _.get(w.id), (S) => C(g(B(w, S), v)), (S) => C(d(D(w, S), v)));
-    if (U.model && (V = _e(V, U.model, R.get(i.model) || i.model)), V = V.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi, (S, k, Y) => k + "(" + Y.split(",").map((oe) => {
-      const ie = oe.trim(), ue = /^__CV_PROBE_(\d+)__$/.exec(ie);
-      return ue ? L[+ue[1]] : k.toLowerCase() === "v" ? g(B(w, ie), v) : d(D(w, ie), v);
+    if (U.model && (V = _e(V, U.model, R.get(r.model) || r.model)), V = V.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi, (S, k, Y) => k + "(" + Y.split(",").map((oe) => {
+      const re = oe.trim(), ue = /^__CV_PROBE_(\d+)__$/.exec(re);
+      return ue ? L[+ue[1]] : k.toLowerCase() === "v" ? g(B(w, re), v) : d(D(w, re), v);
     }).join(",") + ")"), (U.controlSources || []).forEach((S, k) => {
-      V = _e(V, S, d(i.controlSources[k], v));
-    }), i.kind === "@") for (const [S, k] of Object.entries(i.terminals)) ["REFNODE", "INTNODE"].includes(S) && (V = V.replace(new RegExp("\\b" + S + "\\s*=\\s*[^\\s]+", "i"), S.toLowerCase() + "=" + g(k, v)));
+      V = _e(V, S, d(r.controlSources[k], v));
+    }), r.kind === "@") for (const [S, k] of Object.entries(r.terminals)) ["REFNODE", "INTNODE"].includes(S) && (V = V.replace(new RegExp("\\b" + S + "\\s*=\\s*[^\\s]+", "i"), S.toLowerCase() + "=" + g(k, v)));
     return V;
   }
-  const H = /* @__PURE__ */ new Map(), W = o.ir.diagnostics.filter((i) => i.severity === "warning").map((i) => i.message);
-  function b(i, v = "") {
-    if (i.kind === "X") {
-      const S = i.block.ports.map((k) => g(k.node, v));
-      return { ref: N.get(i.name), kind: "X", pins: i.block.ports.map((k) => k.pin), nodes: S, value: p.get(i.name), line: [N.get(i.name), ...S, p.get(i.name)].join(" ") };
+  const H = /* @__PURE__ */ new Map(), W = o.ir.diagnostics.filter((r) => r.severity === "warning").map((r) => r.message);
+  function b(r, v = "") {
+    if (r.kind === "X") {
+      const S = r.block.ports.map((k) => g(k.node, v));
+      return { ref: N.get(r.name), kind: "X", pins: r.block.ports.map((k) => k.pin), nodes: S, value: p.get(r.name), line: [N.get(r.name), ...S, p.get(r.name)].join(" ") };
     }
-    const w = f.get(i.name), U = Object.entries(i.terminals);
-    if (i.kind === "K") {
-      const S = s(i, v).split(" · k=").at(-1), k = [w, ...i.coupledInductors.map((Y) => d(Y, v)), S].join(" ");
+    const w = f.get(r.name), U = Object.entries(r.terminals);
+    if (r.kind === "K") {
+      const S = s(r, v).split(" · k=").at(-1), k = [w, ...r.coupledInductors.map((Y) => d(Y, v)), S].join(" ");
       return { ref: w, kind: "K", pins: [], nodes: [], value: S, line: k, directive: !0 };
     }
-    let L = s(i, v), C = U.map(([S]) => S), V = U.map(([, S]) => g(S, v));
-    if (["E", "G"].includes(i.kind) && i.sourceMode === "POLY") {
+    let L = s(r, v), C = U.map(([S]) => S), V = U.map(([, S]) => g(S, v));
+    if (["E", "G"].includes(r.kind) && r.sourceMode === "POLY") {
       const S = /^POLY\(\d+\)\s*/i.exec(L);
-      if (!S) throw Error("ASC: invalid POLY source " + i.name);
-      L = S[0] + V.slice(2).join(" ") + " " + L.slice(S[0].length), C = C.slice(0, 2), V = V.slice(0, 2), W.push(i.name + ": POLY control nodes remain explicit in the editable Value expression.");
+      if (!S) throw Error("ASC: invalid POLY source " + r.name);
+      L = S[0] + V.slice(2).join(" ") + " " + L.slice(S[0].length), C = C.slice(0, 2), V = V.slice(0, 2), W.push(r.name + ": POLY control nodes remain explicit in the editable Value expression.");
     }
-    return i.kind === "@" && (C = C.slice(0, 2), V = V.slice(0, 2)), { ref: w, kind: i.kind, prefix: i.kind === "M" ? i.type.includes("pmos") ? "MP" : "MN" : i.kind, pins: C, nodes: V, electricalNodes: U.map(([, S]) => g(S, v)), value: L, line: [w, ...V, L].filter(Boolean).join(" ") };
+    return r.kind === "@" && (C = C.slice(0, 2), V = V.slice(0, 2)), { ref: w, kind: r.kind, prefix: r.kind === "M" ? r.type.includes("pmos") ? "MP" : "MN" : r.kind, pins: C, nodes: V, electricalNodes: U.map(([, S]) => g(S, v)), value: L, line: [w, ...V, L].filter(Boolean).join(" ") };
   }
-  a.forEach((i) => H.set(i.name, b(i)));
+  a.forEach((r) => H.set(r.name, b(r)));
   const M = [], G = [];
-  for (const i of m) {
-    M.push(".subckt " + p.get(i.name) + " " + i.block.ports.map((v, w) => "p" + w).join(" "));
-    for (const v of ge(o.contexts[i.instanceId])) {
-      const w = b(v, i.name);
-      M.push(w.line), G.push({ original: v.name, scope: i.name, ...w });
+  for (const r of m) {
+    M.push(".subckt " + p.get(r.name) + " " + r.block.ports.map((v, w) => "p" + w).join(" "));
+    for (const v of ge(o.contexts[r.instanceId])) {
+      const w = b(v, r.name);
+      M.push(w.line), G.push({ original: v.name, scope: r.name, ...w });
     }
-    M.push(".ends " + p.get(i.name));
+    M.push(".ends " + p.get(r.name));
   }
-  for (const [i, v] of Object.entries(n.models)) {
-    const w = o.contexts[v.instanceId], U = o.ir.scopes[w.scopeId], L = decodeURIComponent(i.split("/").at(-1)), C = U.models[L];
+  for (const [r, v] of Object.entries(n.models)) {
+    const w = o.contexts[v.instanceId], U = o.ir.scopes[w.scopeId], L = decodeURIComponent(r.split("/").at(-1)), C = U.models[L];
     let V = C ? Se(C.raw, _.get(w.id), (S) => g(B(w, S)), (S) => d(D(w, S))) : v.raw;
-    V = V.replace(/^(\.model\s+)\S+/i, (S, k) => k + R.get(i));
+    V = V.replace(/^(\.model\s+)\S+/i, (S, k) => k + R.get(r));
     for (const [S, k] of R) V = _e(V, S, k);
     if (v.baseModel) {
       const S = w.path.length ? w.path.map(encodeURIComponent).join("/") + "/" : "";
@@ -1703,21 +1703,21 @@ function $t(o, n) {
     M.push(V);
   }
   const $ = [];
-  for (const i of Object.values(o.contexts))
-    if (!(i.id && !ge(i).some((v) => l.has(v.name) && (a.some((w) => w.name === v.name) || m.some((w) => w.name === l.get(v.name))))))
-      for (const v of o.ir.scopes[i.scopeId].directives) {
-        if (/^\.(?:model|param|global|title)\b/i.test(v.text) && i.id || /^\.(?:model|title)\b/i.test(v.text)) continue;
-        if (i.id && !/^\.(?:func|ic|nodeset)\b/i.test(v.text)) throw Error("ASC export: local directive requires scope-preserving export (" + i.id + "): " + v.text);
-        if (i.id && /^\.func\b/i.test(v.text)) throw Error("ASC export: local .func requires scope-preserving export (" + i.id + ").");
+  for (const r of Object.values(o.contexts))
+    if (!(r.id && !ge(r).some((v) => l.has(v.name) && (a.some((w) => w.name === v.name) || m.some((w) => w.name === l.get(v.name))))))
+      for (const v of o.ir.scopes[r.scopeId].directives) {
+        if (/^\.(?:model|param|global|title)\b/i.test(v.text) && r.id || /^\.(?:model|title)\b/i.test(v.text)) continue;
+        if (r.id && !/^\.(?:func|ic|nodeset)\b/i.test(v.text)) throw Error("ASC export: local directive requires scope-preserving export (" + r.id + "): " + v.text);
+        if (r.id && /^\.func\b/i.test(v.text)) throw Error("ASC export: local .func requires scope-preserving export (" + r.id + ").");
         const w = [], U = (C) => "__CV_PROBE_" + (w.push(C) - 1) + "__";
-        let L = i.id ? Se(v.text, _.get(i.id), (C) => U(g(B(i, C))), (C) => U(d(D(i, C)))) : v.text;
+        let L = r.id ? Se(v.text, _.get(r.id), (C) => U(g(B(r, C))), (C) => U(d(D(r, C)))) : v.text;
         if (L = L.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi, (C, V, S) => V + "(" + S.split(",").map((k) => {
           const Y = k.trim(), oe = /^__CV_PROBE_(\d+)__$/.exec(Y);
           if (oe) return w[+oe[1]];
           if (Y === "*") return Y;
           if (/[*?]/.test(Y)) throw Error("ASC export: wildcard probe cannot be renamed reliably: " + Y);
-          return V.toLowerCase() === "v" ? g(B(i, Y)) : d(D(i, Y));
-        }).join(",") + ")"), /^\.global\b/i.test(L) && (L = ".global " + L.split(/\s+/).slice(1).map((C) => g(B(i, C))).join(" ")), /^\.(?:dc|tf|noise|sens)\b/i.test(L)) for (const C of i.devices) L = _e(L, C.localName, d(C.name));
+          return V.toLowerCase() === "v" ? g(B(r, Y)) : d(D(r, Y));
+        }).join(",") + ")"), /^\.global\b/i.test(L) && (L = ".global " + L.split(/\s+/).slice(1).map((C) => g(B(r, C))).join(" ")), /^\.(?:dc|tf|noise|sens)\b/i.test(L)) for (const C of r.devices) L = _e(L, C.localName, d(C.name));
         $.push(L);
       }
   return { cards: H, library: M, directives: $, nodeNames: h, refs: f, expected: G, warnings: [...new Set(W)], node: g, blockRefs: N, definitions: p };
@@ -1784,7 +1784,7 @@ function Wt(o, n, a) {
   return { verified: !0, symbols: f.length, directiveDevices: a.components.length - f.length, pins: l, wires: c.wires.length, namedNets: new Set(c.flags.map((m) => m.name)).size };
 }
 const zt = (o) => o.x + "," + o.y, ot = (o) => Math.round(o * 1e3) / 1e3, pt = new Map(Array.from({ length: 256 }, (o, n) => [new TextDecoder("windows-1252").decode(new Uint8Array([n])), n]));
-function it(o) {
+function rt(o) {
   const n = [];
   for (const a of o) {
     const c = pt.get(a);
@@ -1794,7 +1794,7 @@ function it(o) {
   return new Uint8Array(n);
 }
 const gt = (o) => [...String(o)].map((n) => pt.has(n) ? n : n === "⏚" ? "GND" : "[U+" + n.codePointAt(0).toString(16) + "]").join(""), Ne = (o) => String(o).replace(/[\r\n]/g, " ");
-function rt(o) {
+function it(o) {
   const n = [...new Set(o.map(ot))].sort((f, l) => f - l), a = /* @__PURE__ */ new Map();
   let c = -1 / 0;
   for (const f of n) {
@@ -1852,7 +1852,7 @@ function Kt({ tree: o, circuit: n, drawing: a, source: c = "", libraries: f = {}
   a.segments.forEach((b) => {
     N(b.a), N(b.b);
   });
-  const p = { x: rt(x), y: rt(E) }, y = (b) => ({ x: p.x(b.x), y: p.y(b.y) }), A = /* @__PURE__ */ new Map(), h = /* @__PURE__ */ new Map();
+  const p = { x: it(x), y: it(E) }, y = (b) => ({ x: p.x(b.x), y: p.y(b.y) }), A = /* @__PURE__ */ new Map(), h = /* @__PURE__ */ new Map();
   for (const b of a.components) for (const M of b.ports)
     h.has(M.bit) || h.set(M.bit, []), h.get(M.bit).push(M);
   for (const b of a.segments)
@@ -1888,19 +1888,19 @@ function Kt({ tree: o, circuit: n, drawing: a, source: c = "", libraries: f = {}
       continue;
     }
     const $ = Ht(b, M, G, p);
-    let i = D.get($);
-    i || (i = "cv_symbol_" + B++, D.set($, i), g[i + ".asy"] = it($)), F.push(`SYMBOL ${i} ${p.x(b.x)} ${p.y(b.y)} R0`, "SYMATTR InstName " + G.ref, "SYMATTR Value " + Ne(G.value)), d.components.push({ id: M.name, ...G, symbol: i, ports: b.ports.map((v) => ({ pin: v.pin, ...y(v), node: l.node(M.terminals[v.pin]) })) });
+    let r = D.get($);
+    r || (r = "cv_symbol_" + B++, D.set($, r), g[r + ".asy"] = rt($)), F.push(`SYMBOL ${r} ${p.x(b.x)} ${p.y(b.y)} R0`, "SYMATTR InstName " + G.ref, "SYMATTR Value " + Ne(G.value)), d.components.push({ id: M.name, ...G, symbol: r, ports: b.ports.map((v) => ({ pin: v.pin, ...y(v), node: l.node(M.terminals[v.pin]) })) });
   }
   const R = [...l.directives, ...l.library];
   if (R.some((b) => b.includes("\\n"))) throw Error("ASC export: a literal backslash-n in directive text cannot be represented safely. Use forward slashes for file paths.");
-  const s = [c, ...Object.values(f)].flatMap((b) => b.split(/\r?\n/).filter((M) => /^\s*\*/.test(M))).map((b) => gt(b).replaceAll("\\", "/"));
+  const s = [c, ...Object.values(f)].flatMap((b) => b.split(/\r?\n/).filter((M) => /^\s*\*/.test(M))).map((b) => gt(b).replaceAll("\\", "/").replace(/^(\s*\*\s*)@layout\b/i, "$1source @layout"));
   (R.length || s.length) && F.push(`TEXT 64 ${j + 160} Left 2 !` + [...R, ...s].map((b) => b.replace(/\r?\n/g, "\\n")).join("\\n"));
   const H = F.join(`\r
 `) + `\r
 `;
   d.nodes = [...l.nodeNames].map(([b, M]) => ({ original: b, exported: M })), d.leaves = [...l.expected, ...n.components.filter((b) => !b.synthetic && b.kind !== "X").map((b) => ({ original: b.name, scope: "", ...l.cards.get(b.name) }))], d.blocks = [...l.blockRefs].map(([b, M]) => ({ original: b, ref: M, ltspiceRef: "X§" + M }));
   const W = Wt(H, g, d);
-  d.audit = W, g["spice-schematic.asc"] = it(H), g["manifest.json"] = he(JSON.stringify(d, null, 2)), g["source.cir"] = he(c);
+  d.audit = W, g["spice-schematic.asc"] = rt(H), g["manifest.json"] = he(JSON.stringify(d, null, 2)), g["source.cir"] = he(c);
   for (const [b, M] of Object.entries(f)) {
     const G = b.replaceAll("\\", "/").split("/").filter(($) => $ && $ !== "." && $ !== "..").join("/");
     G && (g["source-libraries/" + G] = he(M));
@@ -1917,5 +1917,5 @@ Simulation behavior depends on LTspice model support; connectivity validation is
 }
 export {
   Kt as exportAsc,
-  it as ltspiceBytes
+  rt as ltspiceBytes
 };

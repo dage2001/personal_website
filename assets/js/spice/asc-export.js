@@ -71,7 +71,7 @@ export function exportAsc({tree,circuit,drawing,source='',libraries={}}) {
   const directives=[...compiled.directives,...compiled.library];
   if(directives.some(s=>s.includes('\\n')))throw Error('ASC export: a literal backslash-n in directive text cannot be represented safely. Use forward slashes for file paths.');
   // Retain source/model notices in the standalone ASC as SPICE comments too.
-  const comments=[source,...Object.values(libraries)].flatMap(text=>text.split(/\r?\n/).filter(l=>/^\s*\*/.test(l))).map(s=>annotation(s).replaceAll('\\','/'));
+  const comments=[source,...Object.values(libraries)].flatMap(text=>text.split(/\r?\n/).filter(l=>/^\s*\*/.test(l))).map(s=>annotation(s).replaceAll('\\','/').replace(/^(\s*\*\s*)@layout\b/i,'$1source @layout'));
   if(directives.length||comments.length)lines.push(`TEXT 64 ${maxY+160} Left 2 !`+[...directives,...comments].map(s=>s.replace(/\r?\n/g,'\\n')).join('\\n'));
   const asc=lines.join('\r\n')+'\r\n';
   manifest.nodes=[...compiled.nodeNames].map(([original,exported])=>({original,exported}));

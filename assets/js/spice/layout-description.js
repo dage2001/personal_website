@@ -1,4 +1,18 @@
 /** Small, declarative comment language. It never creates electrical edges. */
+export function scopedLayoutDescriptions(source) {
+  const root=[],locals=new Map(),stack=[0],diagnostics=[];
+  source.split(/\r?\n/).forEach((raw,i)=>{
+    const text=raw.trim();
+    if(/^\.subckt\b/i.test(text)){stack.push(i+1);locals.set(i+1,[]);}
+    if(stack.at(-1))locals.get(stack.at(-1)).push({raw,line:i+1});else root[i]=raw;
+    if(/^\.ends\b/i.test(text)&&stack.length>1)stack.pop();
+  });
+  const top=parseLayoutDescription(Array.from({length:source.split(/\r?\n/).length},(_,i)=>root[i]||'').join('\n'));
+  diagnostics.push(...top.diagnostics);const scopes=new Map();
+  for(const [line,comments]of locals){const parsed=parseLayoutDescription(comments.map(c=>c.raw).join('\n'));scopes.set(line,parsed.layout);diagnostics.push(...parsed.diagnostics.map(d=>({...d,line:comments[d.line-1]?.line||line})));}
+  return {layout:top.layout,scopes,diagnostics};
+}
+
 export function parseLayoutDescription(source) {
   const diagnostics=[],body=[];let open=false,found=false,start=0;
   source.split(/\r?\n/).forEach((raw,i)=>{
@@ -50,15 +64,20 @@ export function parseLayoutDescription(source) {
 
 /** Resolve physical instances once; expanded leaves keep their visual ownership. */
 export function bindLayoutDescription(tree,circuit) {
-  const description=tree.ir.layoutDescription;if(!description)return null;
+  // A definition may describe its own sheet; ancestor constraints never leak in.
+  const local=circuit.focus?tree.ir.scopes[tree.contexts[circuit.focus].scopeId].layoutDescription:null;
+  let description=circuit.focus?local:tree.ir.layoutDescription;if(!description)return null;
+  if(local){const groups=new Set(local.groups.map(g=>g.id.toLowerCase())),resolve=name=>{
+    if(groups.has(name.toLowerCase()))return name;
+    const port=circuit.components.find(c=>c.synthetic&&c.value.toLowerCase()===name.toLowerCase());return port?.name||circuit.focus+'/'+name;
+  };description={...local,groups:local.groups.map(g=>({...g,members:g.members.map(resolve)})),relations:local.relations.map(r=>({...r,a:resolve(r.a),b:resolve(r.b)}))};}
   const groups=new Map(description.groups.map(g=>[g.id.toLowerCase(),g])),allDevices=Object.values(tree.contexts).flatMap(c=>c.devices.map(d=>d.name));
-  const known=new Set([...Object.keys(tree.contexts),...allDevices].map(n=>n.toLowerCase()));
-  for(const g of groups.values())if(known.has(g.id.toLowerCase()))throw Error('Layout group name conflicts with a circuit instance/device: '+g.id);
+  const known=new Set([...Object.keys(tree.contexts),...allDevices,...circuit.components.map(c=>c.name)].map(n=>n.toLowerCase()));
+  for(const g of groups.values())if(known.has((local?circuit.focus+'/'+g.id:g.id).toLowerCase()))throw Error('Layout group name conflicts with a circuit instance/device: '+g.id);
   for(const g of groups.values())for(const member of g.members)if(!groups.has(member.toLowerCase())&&!known.has(member.toLowerCase()))throw Error('Unknown @layout instance/device: '+member);
   for(const r of description.relations)for(const member of [r.a,r.b])if(!groups.has(member.toLowerCase())&&!known.has(member.toLowerCase()))throw Error('Unknown @layout place target: '+member);
   // The header describes the top-level sheet. Opening an instance starts a new
   // layout scope; ancestor rows, columns, ordering and priority caps stop here.
-  if(circuit.focus)return null;
   const owners=new Map(),output=[];
   for(const g of description.groups) {
     const members=[];
