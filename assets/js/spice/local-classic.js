@@ -1,6 +1,6 @@
 import {prepareClassicLayout,installClassicRails} from './classic-layout.js';
 import {transistorCurrentRank} from './transistor-flow.js';
-import {tileDifferentialPairs} from './paired-layout.js';
+import {tileTransistorPairs} from './paired-layout.js';
 const option='org.eclipse.elk.';
 const netOf=(e,lookup)=>Number(lookup[e.id]?.replaceAll(',',''));
 const onSegment=(p,a,b)=>Math.abs(a.x-b.x)<.002?Math.abs(p.x-a.x)<.002&&p.y>=Math.min(a.y,b.y)-.002&&p.y<=Math.max(a.y,b.y)+.002:Math.abs(p.y-a.y)<.002&&p.x>=Math.min(a.x,b.x)-.002&&p.x<=Math.max(a.x,b.x)+.002;
@@ -39,7 +39,7 @@ export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=
       for(const [bit,meta]of selected)if(!Object.values(localCells).some(c=>Object.values(c.connections).some(b=>b[0]===bit))){const id=node.id+'_reference_'+bit;localCells[id]={connections:{A:[bit]},attributes:{value:''},spiceLayout:{kind:'PORT',ports:{A:meta}}};children.push({id,width:0,height:0,ports:[{id:id+'.A',x:0,y:0,width:0,height:0,layoutOptions:{[option+'port.side']:meta.potential>0?'SOUTH':'NORTH'}}]});}
     }
     const local={id:node.id+'_local',children,edges},classic=prepareClassicLayout(local,localCells,lookup,null,{maxActive:node.spiceClassic?12:8,currentFlow:!!node.spiceClassic,motifs});if(!classic){if(node.spiceClassic)failures.push({stage:node.spiceGroup,reason:'Ineligible classic stage'});return;}
-    const tiled=tileDifferentialPairs(local,pairs);
+    const tiled=tileTransistorPairs(local,pairs);
     let installed;try {const placed=tiled.restore(await elk.layout(local,{layoutOptions:{[option+'algorithm']:'layered',[option+'edgeRouting']:'ORTHOGONAL',[option+'separateConnectedComponents']:false,[option+'hierarchyHandling']:'SEPARATE_CHILDREN',...classic.options,...node.spiceClassic?{[option+'direction']:'DOWN',[option+'layered.spacing.nodeNodeBetweenLayers']:32,[option+'spacing.nodeNode']:Math.max(32,...classic.branches.map(n=>n.width+24))}:{}}}));installed=installClassicRails(placed,classic,localCells,lookup);}catch(error){failures.push({stage:node.spiceGroup,reason:error.message});return;}
     if(!installed){if(node.spiceClassic)failures.push({stage:node.spiceGroup,reason:classic.failure});return;}
     if(node.spiceClassic){const wires=segments(installed.graph,lookup);for(let i=0;i<wires.length;i++)for(let j=i+1;j<wires.length;j++)if(wires[i].bit!==wires[j].bit&&contact(wires[i],wires[j])){failures.push({stage:node.spiceGroup,reason:'Internal wire contact',a:wires[i],b:wires[j]});return;}}

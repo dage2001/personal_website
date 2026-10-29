@@ -36,3 +36,8 @@ Three-pin BJT differential branch pairs within one explicit scope now use invisi
 Small classic sheets test each free transistor mirror through an actual layout. Bounded coordinate-improvement sweeps update their baseline immediately after accepting a better result. Pair pins are locked, so a single-device candidate cannot undo pair placement. The report exposes `pairConstraints`, `orientationDevicesTested` and actual mirrored device identities.
 
 `net-shortcuts.js` optimizes existing routed net trees before both SVG and ASC capture: branch junctions can slide onto a clear same-net spine, and short staircases can lose an unnecessary elbow. Fixed pins, voltage rails and straight multi-pin spines remain protected. Foreign endpoints/T contacts and symbol interiors are obstacles; clean interior crossings do not join nets. The pass is bounded and is not a general router. See `scripts/test-spice-layout-v11.mjs` for direct-branch, staircase, obstacle, crossing, scope and 741 regressions.
+
+
+## v12: 双管电流镜进入硬约束放置
+
+识别结果不变。与差分对共用不可拆分放置单元；双管电流镜按 reference / output 顺序并排，B/G 相向。差分对拥有重叠优先级；低置信度、多输出、跨显式区域的电流镜继续使用软偏好。LM741 的 Q8/Q9、Q5/Q6、Q11/Q10 并排，Q12/Q13 因跨 BIAS/OUTPUT 区域不强制配对。辅助 Q7 不纳入 Q5/Q6 的单元。
