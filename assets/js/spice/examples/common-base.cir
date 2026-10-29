@@ -1,0 +1,15 @@
+* Common-base current follower; emitter input and collector output.
+* Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.3.
+V1 vcc 0 12
+VIN in 0 AC 1
+CIN in e 1u
+R1 vcc b 47k
+R2 b 0 10k
+CB b 0 100u
+RC vcc c 4.7k
+RE e 0 1k
+Q1 c b e QN
+COUT c out 1u
+RL out 0 100k
+.model QN NPN(BF=150)
+.end

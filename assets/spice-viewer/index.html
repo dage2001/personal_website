@@ -24,6 +24,7 @@
         <button type="button" data-example="mixed">Mixed analog</button>
         <button type="button" data-example="hierarchy">Nested channels</button>
         <button type="button" data-example="ltspice">LTspice families</button>
+        <button type="button" data-example="amplifier">BJT amplifier</button>
         <button type="button" id="spice-generate">Generate ↗</button>
       </div>
       <div class="spice-file-row"><label for="spice-file">Open .cir file </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,text/plain"></div>
@@ -53,7 +54,7 @@
     <label for="spice-conventional"><input type="checkbox" id="spice-conventional" checked> Circuit layout rules</label>
     <span class="spice-help">Change settings, then Generate to apply.</span>
   </div>
-  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces and PWR_/RET_/BIAS_ rails. Component orientation and spacing adapt to the connections. Expand a block or open its instance sheet to inspect a circuit.</p>
+  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces and PWR_/RET_/BIAS_ rails. Optional * @layout comments describe rows, columns and visual groups. <a href="/circuit_pin_naming_convention.md">Naming and layout syntax</a>. Expand a block or open its instance sheet to inspect a circuit.</p>
   <details id="spice-messages"><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
   <details><summary>Node connections</summary><p class="spice-help">Each row is one electrical net. Node 0 is ground; other names, including GND, remain distinct. Hover a wire or component to inspect it.</p><div class="spice-table-wrap"><table><thead><tr><th>Node</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div></details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>

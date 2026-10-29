@@ -6,6 +6,7 @@ import mixed from './examples/mixed.cir?raw';
 import filter from './examples/filter.cir?raw';
 import hierarchy from './examples/hierarchy.cir?raw';
 import ltspice from './examples/ltspice-elements.cir?raw';
+import amplifier from './examples/common-emitter.cir?raw';
 import {readSpiceFile} from './file-text.js';
 import './viewer.css';
 
@@ -157,6 +158,9 @@ if (root) {
         const r=circuit.layout.report;
         items.push({severity:'info',message:`Layout: compact signal flow; ${r.powerSourcesChecked} DC/ground symbols checked, ${r.powerOrderViolations} DC order preference(s) unmet. ${r.powerPass}. Global voltage bands are a preference.`});
         if(r.groundPlacement)items.push({severity:'info',message:`Ground: ${r.groundPlacement}; ${r.straightenedGroundDrops||0} return-path simplification(s).`});
+        if(r.explicitGroups)items.push({severity:'info',message:`Layout comments: ${r.explicitGroups} visual groups; nested row/column placement retained on expansion.`});
+        if(r.classicRails)items.push({severity:'info',message:`Transistor layout: local load/bias branches; ${r.railCount} shared voltage rails.`});
+        if(r.geometricConnectivityVerified)items.push({severity:'info',message:`Net geometry verified; ${r.cyclesRemoved} same-net loop(s) and ${r.leavesRemoved} unused wire branch(es) removed.`});
         showDiagnostics(items);
       }
       if (svg.localName!=='svg' || svg.querySelector('script,foreignObject')) throw Error('Invalid schematic output.');
@@ -222,7 +226,7 @@ if (root) {
     }
   }
   $('generate').onclick=generate;
-  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=({mixed,filter,hierarchy,ltspice})[button.dataset.example];invalidate();generate();};
+  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=({mixed,filter,hierarchy,ltspice,amplifier})[button.dataset.example];invalidate();generate();};
   $('file').onchange=async event=>{
     const file=event.target.files[0];if (!file)return;
     if (file.size>2000000) {status.textContent='File exceeds 2 MB.';return;}

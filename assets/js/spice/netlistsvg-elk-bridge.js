@@ -6,7 +6,11 @@ import skinPackage from 'netlistsvg/built/Skin.js';
 import graphPackage from 'netlistsvg/built/elkGraph.js';
 import drawPackage from 'netlistsvg/built/drawModule.js';
 import {alignGroundBus,straightenGroundDrops,attachGroundSymbol,refreshGroundJunctions,validateGroundAttachment} from './ground-layout.js';
-import {groupParallelCells,flattenElkGroups} from './compact-groups.js';
+import {flattenElkGroups} from './compact-groups.js';
+import {planLayoutGroups,removeLayoutGuides} from './layout-planner.js';
+import {normalizeSvgNets} from './net-geometry.js';
+import {prepareClassicLayout,installClassicRails} from './classic-layout.js';
+import {splitHierarchyEdges,reuniteHierarchyEdges} from './hierarchy-routing.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
 const option='org.eclipse.elk.';
@@ -22,6 +26,7 @@ function portRole(port,cells) {
   if(cell?.attributes.value&&Object.keys(cell.connections).length===1)return meta?.role==='in'?'driver':meta?.role==='out'?'sink':'neutral';
   if(cell?.connections['+']&&meta?.role==='in'&&port.key==='+')return 'driver';
   if(cell?.spiceLayout?.source&&['+','-'].includes(port.key))return 'driver';
+  if(['Q','M','J','Z'].includes(cell?.spiceLayout?.kind)&&['E','S'].includes(port.key))return 'driver';
   if(port.key==='G'&&['M','J','Z'].includes(cell?.spiceLayout?.kind)||port.key==='B'&&cell?.spiceLayout?.kind==='Q'||['C+','C-'].includes(port.key))return 'sink';
   // This is a geometric reading direction, not an electrical pin declaration.
   // Apply it uniformly to blocks and discrete series parts, rather than giving
@@ -34,7 +39,7 @@ function portRole(port,cells) {
   return 'neutral';
 }
 
-export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,onLayout=null}={}) {
+export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,onLayout=null,onRawLayout=null}={}) {
   Skin.skin=onml.parse(skin);
   const flat=new FlatModule(netlist);flat.createWires();
   const cells=netlist.modules.circuit.cells;
@@ -97,7 +102,10 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     const a=pairOf.get(edge.source),b=pairOf.get(edge.target),paired=a&&a===b&&parallel.get(a)?.length>1;
     edge.layoutOptions={...edge.layoutOptions,[option+'layered.priority.direction']:isRail?0:10,[option+'layered.priority.shortness']:isRail?0:paired?20:1,[option+'layered.priority.straightness']:paired?20:1};
   }
-  const affinityGroups=groupParallel?groupParallelCells(graph,parallel):0;
+  const classic=classicLayout?prepareClassicLayout(graph,cells,graphPackage.ElkModel.wireNameLookup,netlist.modules.circuit.spiceLayoutDescription):null;
+  const plan=classic?{explicitGroups:0,inferredGroups:0,parallelGroups:0,guideCount:0}:planLayoutGroups(graph,cells,netlist.modules.circuit.spiceLayoutDescription,groupParallel?parallel:new Map());
+  const affinityGroups=plan.parallelGroups+plan.explicitGroups+plan.inferredGroups;
+  const split=plan.explicitGroups?splitHierarchyEdges(graph,graphPackage.ElkModel.wireNameLookup):null;
   const elk=new ELK();
   const options={...Skin.getProperties().layoutEngine,
     [option+'randomSeed']:1,
@@ -115,8 +123,15 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     options[option+'layered.layering.coffmanGraham.layerBound']=Math.max(3,Math.ceil(Math.sqrt(graph.children.length)));
   }
   if(wrapping)options[option+'layered.wrapping.strategy']='MULTI_EDGE';
+  if(classic)Object.assign(options,classic.options);
+  if(split)options[option+'hierarchyHandling']='SEPARATE_CHILDREN';
   let layout=graph.children.length?await elk.layout(graph,{layoutOptions:options}):{...graph,width:0,height:0};
-  layout=flattenElkGroups(layout);
+  const visualGroups=[];const recordGroups=(n,x=0,y=0)=>{for(const c of n.children||[]){const cx=x+c.x,cy=y+c.y;if(c.spiceGroup&&!c.spiceGroup.startsWith('@'))visualGroups.push({name:c.spiceGroup,x:cx,y:cy,width:c.width,height:c.height});recordGroups(c,cx,cy);}};recordGroups(layout);
+  onRawLayout?.(layout);removeLayoutGuides(layout);layout=flattenElkGroups(layout);
+  if(split)layout=reuniteHierarchyEdges(layout,split);
+  const railLayout=classic?installClassicRails(layout,classic,cells,graphPackage.ElkModel.wireNameLookup):null;
+  if(classic&&!railLayout)return renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,onLayout});
+  if(railLayout)layout=railLayout.graph;
   const powerPass=balanced?'compact balanced':'compact signal flow';
   const lookup=graphPackage.ElkModel.wireNameLookup,attachments=[];let straightened=0;
   for(const ground of groundNodes) {
@@ -124,7 +139,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     straightened+=alignGroundBus(layout,lookup,bit);
     straightened+=straightenGroundDrops(layout,lookup,bit);
     const attached=attachGroundSymbol(layout,lookup,ground,netlist);
-    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,onLayout});
+    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,classicLayout,onLayout});
     attachments.push(attached);power.push({child:attached.node,voltage:0});
     refreshGroundJunctions(layout,lookup,bit,attached);
   }
@@ -144,7 +159,9 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     const a=edge.sections?.[0]?.startPoint,b=edge.sections?.at(-1)?.endPoint;
     wireLength+=length;if(a&&b)detourLength+=Math.max(0,length-Math.abs(a.x-b.x)-Math.abs(a.y-b.y));
   }
-  const report={version:3,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,
+  const report={version:4,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,...plan,
+    visualGroups,
+    classicRails:!!railLayout,railCount:railLayout?.railCount||0,railPitch:railLayout?.railPitch||null,
     width:layout.width,height:layout.height,wireLength,bends,detourLength,affinityGroups,nodeCount:Object.keys(cells).length,aspectRatio:Math.max(layout.width/layout.height,layout.height/layout.width),
     groundPlacement:attachments.some(a=>a.anchor)?'rail-attached':attachments.length?'isolated':Object.values(cells).some(c=>c.attributes.name==='0')?'ELK fallback (no clear ground attachment)':'not-present',groundAttachments:attachments.length,straightenedGroundDrops:straightened,
     powerPlacement:'local rail roles; global voltage bands are not guaranteed',verifiedTerminals:true};
@@ -152,7 +169,8 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   const decorations=attachments.filter(a=>a.anchor).flatMap(a=>[
     ['line',{x1:a.anchor.x,y1:a.anchor.y,x2:a.end.x,y2:a.end.y,class:'net_'+a.bit,'data-ground-attachment':'true'}],
   ]);
-  return svg.replace('</svg>',decorations.map(n=>onml.stringify(n)).join('')+onml.stringify(['metadata',{id:'spice-layout-report'},JSON.stringify(report)])+'</svg>');
+  const normalized=normalizeSvgNets(svg.replace('</svg>',decorations.map(n=>onml.stringify(n)).join('')+'</svg>'),netlist);
+  return normalized.svg.replace('</svg>',onml.stringify(['metadata',{id:'spice-layout-report'},JSON.stringify({...report,...normalized.report})])+'</svg>');
 }
 
 /** Reject omitted/misrouted terminal endpoints before rendering or caching. */
@@ -177,7 +195,7 @@ export function validateLayoutEndpoints(graph,netlist,lookup,groundAttachments=[
     join(source,target);
     for(const [endpoint,point]of [[source,e.sections?.[0]?.startPoint],[target,e.sections?.at(-1)?.endPoint]]) {
       const split=endpoint.lastIndexOf('.'),node=nodes.get(endpoint.slice(0,split)),port=node?.ports.find(p=>p.id===endpoint);
-      if(!point||!port||Math.abs(node.x+port.x-point.x)>.02||Math.abs(node.y+port.y-point.y)>.02)throw Error('Layout wire misses its electrical terminal.');
+      if(!point||!port||Math.abs(node.x+port.x-point.x)>.02||Math.abs(node.y+port.y-point.y)>.02)throw Error('Layout wire misses its electrical terminal: '+endpoint+' '+JSON.stringify({wire:point,pin:port?{x:node.x+port.x,y:node.y+port.y}:null,edge:e.id}));
       touched.add(endpoint);
     }
     for(let i=1;i<(e.sections?.length||0);i++) {

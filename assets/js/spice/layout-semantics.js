@@ -1,7 +1,7 @@
 import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
 
-export const layoutRulesVersion = 3;
+export const layoutRulesVersion = 4;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -80,7 +80,8 @@ export function analyzeLayout(tree,circuit) {
       else if(values.every(p=>p.potential!==null))reverse=values[0].potential<values[1].potential;
       else reverse=side(values[0])==='low'||side(values[1])==='high'&&side(values[0])==='signal';
     }
-    cells[c.name]={version:layoutRulesVersion,kind:c.kind,passive,source:['V','I','E','F','G','H'].includes(c.kind)||c.kind==='B'&&!passive,ports,horizontal,orientation:horizontal?'horizontal':reverse?'vertical-reversed':'vertical',flexible:pinNames.length===2&&(passive||['V','I','B','F','H'].includes(c.kind)),supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
+    const relative=c.synthetic?'':c.name.startsWith(circuit.focus+'/')?c.name.slice(circuit.focus.length+1):c.name;
+    cells[c.name]={version:layoutRulesVersion,kind:c.kind,owner:relative.includes('/')?relative.slice(0,relative.lastIndexOf('/')):'',passive,source:['V','I','E','F','G','H'].includes(c.kind)||c.kind==='B'&&!passive,ports,horizontal,orientation:horizontal?'horizontal':reverse?'vertical-reversed':'vertical',flexible:pinNames.length===2&&(passive||['V','I','B','F','H'].includes(c.kind)),supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
   }
   return {version:layoutRulesVersion,nodes,cells,diagnostics:dc.diagnostics};
 }

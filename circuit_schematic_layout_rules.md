@@ -286,3 +286,14 @@ SVG 检查除了“导线端点落在正确引脚”，还要检查同网分支�
 - [ELK Port Constraints](https://eclipse.dev/elk/reference/options/org-eclipse-elk-portConstraints.html)：端口位置与顺序约束。
 - [ELK Layer Constraint](https://eclipse.dev/elk/reference/options/org-eclipse-elk-layered-layering-layerConstraint.html)：主布局方向上的层次约束。
 - [netlistsvg](https://github.com/nturley/netlistsvg)：复用的图构建、skin 和 SVG 绘制框架；具体接入以仓库锁定版本源码为准。
+
+## 九、2026-10-29：显式层级与网络级导线整理
+
+1. `.cir` 头部的 `* @layout begin v1` 注释独立解析为布局 IR，语法见命名规范第 10 节。视觉组及其 row/column 顺序优先于自动推断，不能创建或删除电气连接。
+2. 展开的实例继续归属于其视觉组。ELK 的 INCLUDE_CHILDREN 会统一布局方向；显式布局改用 SEPARATE_CHILDREN，在组边界建立临时电气网络端口，将真实边拆段后逐层布局，再转换为全局坐标并拼接。虚拟排列边不进入最终 SVG，也不进入电气网络。row 顶部对齐，column 左侧对齐；保留组坐标供验收检查。
+3. 无显式描述时，按有效端口数建立骨架，默认在 10 处截断优先级；同级优先选择与既有骨架相连的器件，供电网络不贡献邻近吸引力。展开实例保留局部归属；二端器件较灵活。端口优先级影响 ELK 输入与局部分组，不逐个锁死坐标。
+4. 可识别的晶体管级小图以 ELK 布置信号骨架，负载、偏置及旁路支路按其真实相连的 C/D、B/G、E/S 引脚加入局部模板。B/G 保持水平；供电支路优先竖直。正供电轨在上、0 和负电位轨在下；每个已确认网络一条水平主干，轨间距一致，恒定电压源靠左。局部模板和轨道线须通过元件避障检查，否则回退到正常 ELK 布局。
+5. 当前经典模板适用于最多 8 个晶体管、80 个符号、2–5 个已知电位网络且无大型 block/复杂多端源的图；这不是对任意模拟电路的模板完备性承诺。大层级图仍按局部端口角色处理电源，全局严格电位分层仍是后续目标。
+6. 绘制前检查 ELK 路径端点、固定引脚、分段连续性和同网整体连通性；绘制后按网号拆分真实交点、合并重叠线、保留连接所有真实引脚的几何树、裁去非端口叶枝并重算接点。此步骤只删除已有导线中的冗余路径，保留器件构成的真实反馈环、并联支路和所有电气引脚。
+
+经典拓扑参考 [Analog Devices 第 9 章](https://wiki.analog.com/university/courses/electronics/text/chapter-9)：9.2 共射/共源，9.3 共基/共栅，9.4 射极/源极跟随器。回归网表采用独立示例数值与简化器件模型，验证图形布局和拓扑，不据此宣称放大性能已仿真验证。

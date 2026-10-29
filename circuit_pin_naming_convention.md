@@ -99,3 +99,39 @@ viewer 的前缀识别忽略大小写，仅匹配完整前缀边界（如 `IN_`�
 对未采用本规范的名称正常解析和渲染，角色保持未知或使用可解释的弱提示。对不完整差分对、名称与确定电位矛盾等情况给出可审阅提示；不自动重命名、交换端口、合并网络或补造连接。
 
 布局实现细节见 [circuit_schematic_layout_rules.md](circuit_schematic_layout_rules.md)。本规范只增加一份便于生成与审阅的契约，不改变 SPICE 电气语义。
+
+## 10. 可选的布局描述注释 v1
+
+在 `.cir` 标题之后、器件语句之前放置一个注释块。每行均以 SPICE 注释符 `*` 开头；普通 SPICE 软件会忽略整个块。它描述视觉包含和相对位置，不定义连接，不实例化子电路，不改变 `.SUBCKT` 端口顺序，也不代表时间顺序。
+
+```spice
+* @layout begin v1
+* priority-cap 10
+* group CHANNELS row {
+*   group CHANNEL1 column { XOSC1 XFRONT1 XIQ1 }
+*   group CHANNEL2 column { XOSC2 XFRONT2 XIQ2 }
+*   group CHANNEL3 column { XOSC3 XFRONT3 XIQ3 }
+* }
+* group FEEDBACK row { XFB1 XFB2 XFB3 }
+* place CHANNELS above FEEDBACK
+* @layout end
+```
+
+以上实例名是语法示意，必须替换为网表中实际存在的位号。
+
+| 语句 | 含义 |
+| --- | --- |
+| `group NAME row { MEMBERS }` | 命名视觉组，成员按书写顺序从左到右排列 |
+| `group NAME column { MEMBERS }` | 命名视觉组，成员按书写顺序从上到下排列 |
+| `row { MEMBERS }` / `column { MEMBERS }` | 匿名视觉组，可嵌套在组中 |
+| `place A left-of B` | A 位于 B 左侧 |
+| `place A above B` | A 位于 B 上方 |
+| `priority-cap N` | 有效端口优先级上限，默认 10，允许整数 3–64 |
+
+`MEMBERS` 可以是实际器件名、实际子电路实例路径或视觉组名，以空白分隔；允许多行书写和大括号嵌套。关键字使用表中的小写形式，引用名称匹配忽略大小写。标识符以字母、`_` 或 `@` 开头，后续允许字母、数字、`_ . / % : @ -`；不支持带空格的名字、通配符、箭头、电气连线声明或 JavaScript 表达式。嵌套实例使用 viewer 的完整实例路径，如 `XAMP/XBIAS`；遇到特殊字符时采用 viewer 导出的路径编码。
+
+只允许一个 `@layout begin v1` / `@layout end` 块，最多 256 个视觉组。实例与器件只能属于一个叶级视觉组，视觉组只能有一个父组；组名应避免与器件/实例名重名。循环包含、重复归属、不存在的位号、未知语句和循环相对约束均报错，不静默忽略。`place` 用于互不包含的组或实例，不允许将祖先与后代互相定位；多个 `place` 应写成一致的排列链，优先用嵌套 row/column 表达复杂关系。
+
+引用一个折叠实例时，排列其 block；展开后，内部器件继续属于该实例的视觉区域。进入实例内部页面时，仅保留当前页面实际存在的成员与关系。没有描述块时，采用自动器件骨架、实例局部分组和经典晶体管级规则。布局描述不是完整 ELKT，而是转换为 ELK 图约束的专用小语言；不暴露底层 ELK 参数。
+
+大模型生成要求补充：先按真实电路理解功能链与反馈，再写视觉分组。重复通道通常放在同一个 row；每个通道内部可用 column 表达振荡器、缓冲、采样和处理的层级。反馈通路仍由真实器件语句连接，禁止为满足视觉排列改写节点或补造器件。

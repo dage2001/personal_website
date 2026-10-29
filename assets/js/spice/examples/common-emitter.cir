@@ -1,0 +1,14 @@
+* Voltage-divider biased common-emitter amplifier; layout regression.
+* Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.2.
+V1 vcc 0 12
+V2 in 0 SINE(0 10m 1k) AC 1
+C1 in b 1u
+R1 vcc b 47k
+R2 b 0 10k
+RC vcc c 4.7k
+RE e 0 1k
+CE e 0 100u
+Q1 c b e 2N3904
+.model 2N3904 NPN(IS=6.7f BF=200 VAF=100)
+.tran 5m
+.end

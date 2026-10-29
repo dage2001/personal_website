@@ -1,5 +1,6 @@
 import {parsePrimitiveCir, tokenize} from './primitive-parser.js';
 import {loadSources} from './source-loader.js';
+import {parseLayoutDescription} from './layout-description.js';
 
 const rec = () => Object.create(null);
 const lower = s => s.toLowerCase();
@@ -32,8 +33,8 @@ function splitParameters(tokens) {
 export function parseHierarchy(source,options={}) {
   if (typeof source !== 'string') throw TypeError('Netlist must be a string.');
   if (source.length > 2000000) throw Error('Netlist exceeds the limit of 2 MB.');
-  const loaded=loadSources(source,options);source=loaded.source;
-  const diagnostics=[...loaded.diagnostics], scopes=rec(), globals=new Set(['0']);
+  const described=parseLayoutDescription(source),loaded=loadSources(source,options);source=loaded.source;
+  const diagnostics=[...loaded.diagnostics,...described.diagnostics], scopes=rec(), globals=new Set(['0']);
   const report=(severity,line,message)=>diagnostics.push({severity,line,message});
   const makeScope=(id,name,parent,ports=[],defaults=rec(),line=0)=>{
     const scope={id,name,parent,ports,defaults,parameters:rec(),definitions:rec(),devices:[],instances:[],directives:[],line,statements:[]};
@@ -126,5 +127,5 @@ export function parseHierarchy(source,options={}) {
   for(const id of Object.keys(scopes))visit(id);
   if(!root.devices.length&&!root.instances.length)report('error',0,'No supported components or instances to render.');
   for(const d of diagnostics)if(!d.source&&d.line&&loaded.origins[d.line-1]){d.source=loaded.origins[d.line-1].file;d.line=loaded.origins[d.line-1].line;}
-  return {kind:'HierarchicalCircuit',version:2,rootId:'root',title:root.title||'',scopes,globals:[...globals],diagnostics};
+  return {kind:'HierarchicalCircuit',version:2,rootId:'root',title:root.title||'',scopes,globals:[...globals],diagnostics,layoutDescription:described.layout};
 }
