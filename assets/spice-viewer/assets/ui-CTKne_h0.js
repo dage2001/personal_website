@@ -2410,7 +2410,7 @@ Resolved: ` + k.value + `
     if (!(!O || N || a)) {
       a = !0, C(), n.textContent = "Generating ASC from the selected layout and checking connections…";
       try {
-        const { exportAsc: R } = await import("./asc-export-BkvH6CEy.js");
+        const { exportAsc: R } = await import("./asc-export-MuPKVdWr.js");
         if (i !== O) throw Error("Schematic changed. Generate again before exporting ASC.");
         d ||= R({ tree: c, circuit: s, drawing: O, source: t.value, libraries: b });
         const M = w ? d.zip : d.ascBytes, L = URL.createObjectURL(new Blob([M], { type: w ? "application/zip" : "application/octet-stream" })), T = document.createElement("a");
