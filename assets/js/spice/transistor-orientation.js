@@ -23,6 +23,7 @@ export function controlSideChoices(graph,cells) {
 export function mirrorTransistorSkin(source,cells,ids) {
   const skin=onml.parse(source),types=new Set(ids.map(id=>cells[id].type));
   for(const g of skin){if(!Array.isArray(g)||!types.has(g[1]?.['s:type']))continue;
+    g[1]['data-control-mirrored']=g[1]['data-control-mirrored']==='true'?'false':'true';
     const width=Number(g[1]['s:width']);
     for(let i=2;i<g.length;i++){const child=g[i];if(!Array.isArray(child)||child[0]==='s:alias')continue;
       if(child[1]?.['s:pid']){const a=child[1];a['s:x']=width-Number(a['s:x']);if(a['s:position']==='left')a['s:position']='right';else if(a['s:position']==='right')a['s:position']='left';}

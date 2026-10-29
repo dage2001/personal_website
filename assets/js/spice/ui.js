@@ -172,6 +172,8 @@ if (root) {
         if(r.mirroredTransistors?.length)items.push({severity:'info',message:`Control-pin mirror choices: ${r.mirroredTransistors.join(', ')}.`});
         if(r.recognizedMotifs?.length)items.push({severity:'info',message:`Transistor structures: ${r.recognizedMotifs.map(m=>`${m.kind} (${m.members.join(', ')}; ${m.confidence})`).join('; ')}.`});
         if(r.appliedMotifs?.length)items.push({severity:'info',message:`Topology preferences applied to ${r.appliedMotifs.length} local structure(s); ELK still determines placement and routing.`});
+        if(r.pairConstraints?.length)items.push({severity:'info',message:`${r.pairConstraints.length} differential branch pair(s) placed together; unrelated devices cannot enter the pair.`});
+        if(r.netShortcuts)items.push({severity:'info',message:`${r.netShortcuts} safe straight net shortcut(s); ${r.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.`});
         if(r.sharedRailFallback)items.push({severity:'warning',message:`Shared rail layout uses an automatic fallback: ${r.sharedRailFallback}.`});
         for(const f of r.localClassicFallbacks||[])if(f.stage)items.push({severity:'info',message:`Classic stage ${f.stage} uses automatic layout: ${f.reason||'No unobstructed local template'}.`});
         if(r.geometricConnectivityVerified)items.push({severity:'info',message:`Net geometry verified; ${r.cyclesRemoved} same-net loop(s) and ${r.leavesRemoved} unused wire branch(es) removed.`});

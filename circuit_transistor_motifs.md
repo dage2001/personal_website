@@ -28,3 +28,11 @@ A motif crossing an explicit functional-stage boundary is reported, but the boun
 Run `node --test scripts/test-spice-motifs.mjs` for the focused tests, or `npm run test:spice` for the complete suite. Tests include near-match negative cases, multi-output loads, resistor endpoint reversal, model polarity, MOS body mismatch, renamed devices, overlapping motifs, scoped cache equivalence and measured layout comparison. Evidence is exposed in the JSON view and SVG layout metadata.
 
 Matching uses device, node-pin, shared-control and shared-source/collector indexes. Multi-input tail candidates are reported as one medium-confidence structure, rather than enumerating every pair. Multiple diode references on one control node remain ambiguous in this first pass and are not forced into a basic mirror match.
+
+## v11: paired placement and net-tree simplification
+
+Three-pin BJT differential branch pairs within one explicit scope now use invisible atomic placement tiles. ELK sees the true pin coordinates and routes the tile; the two original devices and original edge identities are restored before drawing. Pair base pins face outward. No proxy wires, extra schematic block or electrical device is exported. Four-pin devices and cross-scope pairs retain the earlier soft handling.
+
+Small classic sheets test each free transistor mirror through an actual layout. Bounded coordinate-improvement sweeps update their baseline immediately after accepting a better result. Pair pins are locked, so a single-device candidate cannot undo pair placement. The report exposes `pairConstraints`, `orientationDevicesTested` and actual mirrored device identities.
+
+`net-shortcuts.js` optimizes existing routed net trees before both SVG and ASC capture: branch junctions can slide onto a clear same-net spine, and short staircases can lose an unnecessary elbow. Fixed pins, voltage rails and straight multi-pin spines remain protected. Foreign endpoints/T contacts and symbol interiors are obstacles; clean interior crossings do not join nets. The pass is bounded and is not a general router. See `scripts/test-spice-layout-v11.mjs` for direct-branch, staircase, obstacle, crossing, scope and 741 regressions.
