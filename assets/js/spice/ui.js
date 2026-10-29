@@ -4,6 +4,7 @@ import {projectHierarchy,toNetlistsvg} from './layout-adapter.js';
 import {renderSchematic} from './renderer.js';
 import {examples} from './examples.js';
 import {readSpiceFile} from './file-text.js';
+import {layoutRulesVersion} from './layout-semantics.js';
 import './viewer.css';
 const filter=examples.filter.source;
 
@@ -211,6 +212,7 @@ if (root) {
       preview.replaceChildren(document.importNode(svg,true)); setView();
       const warnings=items.filter(d=>d.severity==='warning').length;
       status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
+      status.textContent+=` Layout rules v${layoutRulesVersion}.`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
       const rows=Object.values(circuit.nodes).map(n => {
