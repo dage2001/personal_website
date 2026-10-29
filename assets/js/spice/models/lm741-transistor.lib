@@ -1,0 +1,65 @@
+* 741-style transistor-level teaching circuit, transcribed from the TI LM741
+* internal schematic supplied with the viewer discussion (datasheet section 7.2).
+* https://www.ti.com/lit/ds/symlink/lm741.pdf
+* Independent SPICE transcription; not the manufacturer's behavioral macromodel.
+* Generic BJT parameters below illustrate topology; not a calibrated LM741 model.
+* Interface order: IN+ (3), IN- (2), V+ (7), V- (4), OUT (6), NULL (1), NULL (5).
+* The source diagram repeats Q15 and leaves the VBE multiplier unnumbered:
+* Q16 denotes the gain input follower; Q18 denotes the VBE multiplier here.
+.subckt LM741_TL IN_P IN_N PWR_VCC RET_VEE OUT_SIG IO_NULL1 IO_NULL5
+* Local visual constraints apply only when this instance sheet is opened.
+* @layout begin v1
+* group SUPPLY row { PWR_VCC }
+* group CORE row {
+*   group INPUT row {
+*     column { Q8 row { IN_P Q1 } Q3 Q7 Q5 R1 IO_NULL1 }
+*     column { Q9 row { IN_N Q2 } Q4 Q6 R2 IO_NULL5 }
+*     column { R3 }
+*   }
+*   group BIAS column { Q12 R5 Q11 Q10 R4 }
+*   group GAIN row { column { Q18 Q16 Q17 R11 } column { R7 R8 R12 Q22 C1 } }
+*   group OUTPUT row { column { Q13 Q14 R9 OUT_SIG R10 Q20 } column { Q15 } }
+* }
+* group RETURN row { RET_VEE }
+* place SUPPLY above CORE
+* place CORE above RETURN
+* @layout end
+* Differential input and active-load mirror.
+Q1 N_INPUT_COL IN_P N_INPUT_EP Q741_N
+Q2 N_INPUT_COL IN_N N_INPUT_EN Q741_N
+Q3 N_MIRROR_LEFT N_PNP_BASE N_INPUT_EP Q741_P
+Q4 N_GAIN_IN N_PNP_BASE N_INPUT_EN Q741_P
+Q5 N_MIRROR_LEFT N_MIRROR_BASE IO_NULL1 Q741_N
+Q6 N_GAIN_IN N_MIRROR_BASE IO_NULL5 Q741_N
+Q7 PWR_VCC N_MIRROR_LEFT N_MIRROR_BASE Q741_N
+Q8 N_INPUT_COL N_INPUT_COL PWR_VCC Q741_P
+Q9 N_PNP_BASE N_INPUT_COL PWR_VCC Q741_P
+R1 IO_NULL1 RET_VEE 1k
+R2 IO_NULL5 RET_VEE 1k
+R3 N_MIRROR_BASE RET_VEE 50k
+* Self-biased current reference. No ideal current sources.
+Q10 N_PNP_BASE N_BIAS_LOW N_BIAS_EMIT Q741_N
+Q11 N_BIAS_LOW N_BIAS_LOW RET_VEE Q741_N
+Q12 N_BIAS_HIGH N_BIAS_HIGH PWR_VCC Q741_P
+Q13 N_DRIVE_HIGH N_BIAS_HIGH PWR_VCC Q741_P
+R4 N_BIAS_EMIT RET_VEE 5k
+R5 N_BIAS_HIGH N_BIAS_LOW 39k
+* Darlington voltage-gain stage and Miller compensation.
+Q16 N_DRIVE_LOW N_GAIN_IN N_GAIN_BASE Q741_N
+Q17 N_DRIVE_LOW N_GAIN_BASE N_GAIN_EMIT Q741_N
+Q18 N_DRIVE_HIGH N_CLASS_AB N_DRIVE_LOW Q741_N
+R7 N_DRIVE_HIGH N_CLASS_AB 4.5k
+R8 N_CLASS_AB N_DRIVE_LOW 7.5k
+R11 N_GAIN_EMIT RET_VEE 50
+R12 N_GAIN_BASE RET_VEE 50k
+C1 N_GAIN_IN N_DRIVE_HIGH 30p
+* Complementary emitter followers and protection transistors.
+Q14 PWR_VCC N_DRIVE_HIGH N_OUTPUT_HIGH Q741_N
+Q15 N_DRIVE_HIGH N_OUTPUT_HIGH OUT_SIG Q741_N
+Q20 RET_VEE N_DRIVE_LOW N_OUTPUT_LOW Q741_P
+Q22 N_GAIN_IN N_GAIN_EMIT RET_VEE Q741_N
+R9 N_OUTPUT_HIGH OUT_SIG 25
+R10 OUT_SIG N_OUTPUT_LOW 50
+.ends LM741_TL
+.model Q741_N NPN(IS=10f BF=200 BR=2 VAF=100 CJE=2p CJC=1p TF=350p)
+.model Q741_P PNP(IS=10f BF=50 BR=4 VAF=50 CJE=1p CJC=2p TF=30n)

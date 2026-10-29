@@ -1,8 +1,8 @@
 // Local improvement of ELK's result: a leaf load belongs beside its output,
 // not in a common layer with unrelated input-to-ground branches.
+import {simplifyNetGeometry} from './net-geometry.js';
 const side='org.eclipse.elk.port.side',eps=.02;
 const path=e=>[e.sections[0].startPoint,...e.sections[0].bendPoints||[],e.sections[0].endPoint];
-const length=ps=>ps.slice(1).reduce((sum,p,i)=>sum+Math.abs(p.x-ps[i].x)+Math.abs(p.y-ps[i].y),0);
 const hit=(a,b,n,margin=0)=>Math.max(a.x,b.x)>n.x-margin+eps&&Math.min(a.x,b.x)<n.x+n.width+margin-eps&&Math.max(a.y,b.y)>n.y-margin+eps&&Math.min(a.y,b.y)<n.y+n.height+margin-eps;
 const clean=ps=>ps.filter((p,i)=>!i||Math.abs(p.x-ps[i-1].x)>eps||Math.abs(p.y-ps[i-1].y)>eps);
 const bit=(e,lookup)=>Number(lookup[e.id]?.replaceAll(',',''));
@@ -20,6 +20,13 @@ export function placeOutputShunts(graph,cells,lookup) {
     if(incident.length!==2||incident.some(e=>e.sections?.length!==1))continue; // Only a true leaf on each drawing tree.
     const se=incident.find(e=>bit(e,lookup)===signal[1][0]),ge=incident.find(e=>bit(e,lookup)===ground[1][0]);if(!se||!ge)continue;
     const anchors=graph.children.filter(n=>cells[n.id]?.spiceBlock&&cells[n.id].spiceLayout?.owner===cell.spiceLayout.owner).flatMap(n=>n.ports.filter(p=>p.layoutOptions?.[side]==='EAST'&&cells[n.id].connections[p.id.slice(n.id.length+1)]?.[0]===signal[1][0]).map(p=>({n,p,x:n.x+p.x,y:n.y+p.y})));
+    if(!anchors.length)continue;
+    const netCost=(candidate,replacements=new Map())=>[signal[1][0],ground[1][0]].reduce((total,net)=>{
+      const segments=graph.edges.filter(e=>bit(e,lookup)===net).flatMap(e=>{const ps=replacements.get(e)||path(e);return ps.slice(1).map((b,i)=>({a:ps[i],b}));});
+      const terminals=graph.children.flatMap(n=>n.ports.filter(p=>cells[n.id]?.connections[p.id.slice(n.id.length+1)]?.[0]===net).map(p=>({x:(n===node?candidate:n).x+p.x,y:(n===node?candidate:n).y+p.y})));
+      return total+simplifyNetGeometry(segments,terminals).wireLength;
+    },0);
+    let oldCost;try{oldCost=netCost(node);}catch{continue;}
     let best;
     for(const anchor of anchors)for(const gap of [24,40,64])for(const drop of [24,40]) {
       const candidate={...node,x:anchor.n.x+anchor.n.width+gap,y:anchor.y+drop};
@@ -34,8 +41,10 @@ export function placeOutputShunts(graph,cells,lookup) {
         // Reuse a prefix of the already routed ground edge and extend its
         // horizontal rail; the load then reaches it with one vertical drop.
         const groundPath=[...gp.slice(0,i),{x:b.x,y:gp[i].y},b];if(!clear(groundPath))continue;
-        const score=length(signalPath)+length(groundPath),old=length(path(se))+length(path(ge));
-        if(score>=old-1||best&&score>=best.score)continue;
+        // Compare real shared-wire length, not star-edge lengths: a ground
+        // prefix may be counted several times by ELK's per-terminal tree.
+        let score;try{score=netCost(candidate,new Map([[se,signalPath],[ge,ge.target===node.id?groundPath:groundPath.slice().reverse()]]));}catch{continue;}
+        if(score>=oldCost-1||best&&score>=best.score)continue;
         best={candidate,anchor,signalPath,groundPath,score};
       }
     }
