@@ -70,6 +70,8 @@ export function planLayoutGroups(graph,cells,description,parallel) {
     graph.children=[...roots,...skeletonOrder(graph.children.filter(n=>!used.has(n.id)),cells)];
   }
   function parallelInside(container) {
+    const localCells=(container.children||[]).filter(n=>!n.children).map(n=>cells[n.id]);
+    if(container.spiceGroup?.startsWith('@instance_')&&localCells.length===(container.children||[]).length&&localCells.length<=80&&localCells.filter(c=>['Q','M','J','Z'].includes(c?.spiceLayout?.kind)).length===1&&localCells.every(c=>c&&!c.spiceBlock&&['Q','M','J','Z','R','L','C','D','V','I','PORT'].includes(c.spiceLayout?.kind)))return;
     for(const child of container.children||[])if(child.children)parallelInside(child);
     const ids=new Set((container.children||[]).filter(n=>!n.children).map(n=>n.id)),local=new Map([...parallel].map(([key,members])=>[key,members.filter(id=>ids.has(id))]));
     parallelGroups+=groupParallelCells(container,local);

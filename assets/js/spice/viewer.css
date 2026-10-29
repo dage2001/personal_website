@@ -20,6 +20,7 @@
 .spice-settings input[type=number]{width:55px}.spice-settings input[type=color]{padding:2px;width:38px;height:29px}
 .spice-app #spice-status{font-size:13px;line-height:1.6;min-height:24px;margin:14px 0;color:var(--text-secondary,#566359)}
 .spice-help{font:12px/1.7 Arial,sans-serif;color:var(--text-muted,#71756e);margin:10px 0}
+.spice-app #spice-example-info{padding:0 16px;overflow-wrap:anywhere}
 .spice-app details{border-block-start:1px solid var(--spice-border);padding:13px 0;font-size:13px}.spice-app summary{cursor:pointer;font-weight:600}.spice-app details textarea{margin-top:12px;height:230px}
 .spice-app #spice-selection{white-space:pre-wrap;font:12px/1.6 Arial,sans-serif;overflow-wrap:anywhere;padding:0 16px;min-height:34px}
 .spice-app #spice-diagnostics{padding-left:22px;line-height:1.8;overflow-wrap:anywhere}.spice-app .error{color:#b13830}.spice-app .warning{color:#916516}.spice-app .info{color:var(--text-muted,#777)}

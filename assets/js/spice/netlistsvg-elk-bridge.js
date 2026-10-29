@@ -11,6 +11,7 @@ import {planLayoutGroups,removeLayoutGuides} from './layout-planner.js';
 import {normalizeSvgNets} from './net-geometry.js';
 import {prepareClassicLayout,installClassicRails} from './classic-layout.js';
 import {splitHierarchyEdges,reuniteHierarchyEdges} from './hierarchy-routing.js';
+import {layoutLocalClassicInstances} from './local-classic.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
 const option='org.eclipse.elk.';
@@ -39,7 +40,7 @@ function portRole(port,cells) {
   return 'neutral';
 }
 
-export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,onLayout=null,onRawLayout=null}={}) {
+export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,onLayout=null,onRawLayout=null}={}) {
   Skin.skin=onml.parse(skin);
   const flat=new FlatModule(netlist);flat.createWires();
   const cells=netlist.modules.circuit.cells;
@@ -107,6 +108,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   const affinityGroups=plan.parallelGroups+plan.explicitGroups+plan.inferredGroups;
   const split=plan.explicitGroups?splitHierarchyEdges(graph,graphPackage.ElkModel.wireNameLookup):null;
   const elk=new ELK();
+  const localPlan=split&&localClassics?await layoutLocalClassicInstances(graph,cells,graphPackage.ElkModel.wireNameLookup,elk):null,localClassicInstances=localPlan?.instances||[];
   const options={...Skin.getProperties().layoutEngine,
     [option+'randomSeed']:1,
     // ELK's model-order port sorter is not reliable for cross-container edges.
@@ -126,18 +128,18 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(classic)Object.assign(options,classic.options);
   if(split)options[option+'hierarchyHandling']='SEPARATE_CHILDREN';
   let layout=graph.children.length?await elk.layout(graph,{layoutOptions:options}):{...graph,width:0,height:0};
+  if(localPlan)layout=localPlan.restore(layout);
   const visualGroups=[];const recordGroups=(n,x=0,y=0)=>{for(const c of n.children||[]){const cx=x+c.x,cy=y+c.y;if(c.spiceGroup&&!c.spiceGroup.startsWith('@'))visualGroups.push({name:c.spiceGroup,x:cx,y:cy,width:c.width,height:c.height});recordGroups(c,cx,cy);}};recordGroups(layout);
   onRawLayout?.(layout);removeLayoutGuides(layout);layout=flattenElkGroups(layout);
   if(split)layout=reuniteHierarchyEdges(layout,split);
   const railLayout=classic?installClassicRails(layout,classic,cells,graphPackage.ElkModel.wireNameLookup):null;
-  if(classic&&!railLayout)return renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,onLayout});
+  if(classic&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,onLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),classicTemplateFallback:classic.failure||'Local template unavailable'});return onml.stringify(fallback);}
   if(railLayout)layout=railLayout.graph;
   const powerPass=balanced?'compact balanced':'compact signal flow';
   const lookup=graphPackage.ElkModel.wireNameLookup,attachments=[];let straightened=0;
   for(const ground of groundNodes) {
     const bit=cells[ground.id].connections.A[0];
-    straightened+=alignGroundBus(layout,lookup,bit);
-    straightened+=straightenGroundDrops(layout,lookup,bit);
+    if(!railLayout){straightened+=alignGroundBus(layout,lookup,bit);straightened+=straightenGroundDrops(layout,lookup,bit);}
     const attached=attachGroundSymbol(layout,lookup,ground,netlist);
     if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,classicLayout,onLayout});
     attachments.push(attached);power.push({child:attached.node,voltage:0});
@@ -160,11 +162,13 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     wireLength+=length;if(a&&b)detourLength+=Math.max(0,length-Math.abs(a.x-b.x)-Math.abs(a.y-b.y));
   }
   const report={version:4,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,...plan,
+    localClassicInstances,
+    localClassicFallbacks:localPlan?.failures||[],
     visualGroups,
-    classicRails:!!railLayout,railCount:railLayout?.railCount||0,railPitch:railLayout?.railPitch||null,
+    classicRails:!!railLayout,railCount:railLayout?.railCount||0,railPitch:railLayout?.railPitch||null,voltageRails:railLayout?.railBands||[],
     width:layout.width,height:layout.height,wireLength,bends,detourLength,affinityGroups,nodeCount:Object.keys(cells).length,aspectRatio:Math.max(layout.width/layout.height,layout.height/layout.width),
     groundPlacement:attachments.some(a=>a.anchor)?'rail-attached':attachments.length?'isolated':Object.values(cells).some(c=>c.attributes.name==='0')?'ELK fallback (no clear ground attachment)':'not-present',groundAttachments:attachments.length,straightenedGroundDrops:straightened,
-    powerPlacement:'local rail roles; global voltage bands are not guaranteed',verifiedTerminals:true};
+    powerPlacement:railLayout?'fixed local voltage rails':'local rail roles; global voltage bands are not guaranteed',verifiedTerminals:true};
   const svg=drawModule(layout,flat);
   const decorations=attachments.filter(a=>a.anchor).flatMap(a=>[
     ['line',{x1:a.anchor.x,y1:a.anchor.y,x2:a.end.x,y2:a.end.y,class:'net_'+a.bit,'data-ground-attachment':'true'}],

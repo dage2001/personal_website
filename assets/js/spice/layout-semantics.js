@@ -1,7 +1,7 @@
 import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
 
-export const layoutRulesVersion = 4;
+export const layoutRulesVersion = 5;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -75,7 +75,8 @@ export function analyzeLayout(tree,circuit) {
     const pinNames=Object.keys(c.terminals),side=p=>!rail(p.role)?'signal':p.potential!==null?(p.potential>0?'high':'low'):p.role==='ret'?'low':'high';
     let reverse=false;
     if(pinNames.length===2) {
-      if(c.terminals[pinNames[0]]==='0')reverse=true;
+      if(c.kind==='V'&&values.every(p=>p.potential!==null))reverse=values[0].potential<values[1].potential;
+      else if(c.terminals[pinNames[0]]==='0')reverse=true;
       else if(c.terminals[pinNames[1]]==='0')reverse=false;
       else if(values.every(p=>p.potential!==null))reverse=values[0].potential<values[1].potential;
       else reverse=side(values[0])==='low'||side(values[1])==='high'&&side(values[0])==='signal';
