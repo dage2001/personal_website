@@ -366,6 +366,7 @@ function tt(t, e) {
   for (const a of o.values()) if (l.has(a.id.toLowerCase())) throw Error("Layout group name conflicts with a circuit instance/device: " + a.id);
   for (const a of o.values()) for (const h of a.members) if (!o.has(h.toLowerCase()) && !l.has(h.toLowerCase())) throw Error("Unknown @layout instance/device: " + h);
   for (const a of n.relations) for (const h of [a.a, a.b]) if (!o.has(h.toLowerCase()) && !l.has(h.toLowerCase())) throw Error("Unknown @layout place target: " + h);
+  if (e.focus) return null;
   const s = /* @__PURE__ */ new Map(), r = [];
   for (const a of n.groups) {
     const h = [];
@@ -1777,7 +1778,7 @@ async function St(t, e) {
 function kt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("assets/render-worker-BLKsB-Iq.js", import.meta.url).href,
+    "" + new URL("assets/render-worker-CnSf-L4p.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((o, i) => {

@@ -6,22 +6,22 @@ function kRe(Tn) {
   if (Object.prototype.hasOwnProperty.call(Tn, "__esModule")) return Tn;
   var qn = Tn.default;
   if (typeof qn == "function") {
-    var R = function Qn() {
+    var R = function Vn() {
       var zn = !1;
       try {
-        zn = this instanceof Qn;
+        zn = this instanceof Vn;
       } catch {
       }
       return zn ? Reflect.construct(qn, arguments, this.constructor) : qn.apply(this, arguments);
     };
     R.prototype = qn.prototype;
   } else R = {};
-  return Object.defineProperty(R, "__esModule", { value: !0 }), Object.keys(Tn).forEach(function(Qn) {
-    var zn = Object.getOwnPropertyDescriptor(Tn, Qn);
-    Object.defineProperty(R, Qn, zn.get ? zn : {
+  return Object.defineProperty(R, "__esModule", { value: !0 }), Object.keys(Tn).forEach(function(Vn) {
+    var zn = Object.getOwnPropertyDescriptor(Tn, Vn);
+    Object.defineProperty(R, Vn, zn.get ? zn : {
       enumerable: !0,
       get: function() {
-        return Tn[Qn];
+        return Tn[Vn];
       }
     });
   }), R;
@@ -37,29 +37,29 @@ function cde() {
       Tn.exports = R();
     })(function() {
       return (/* @__PURE__ */ (function() {
-        function R(Qn, zn, Xn) {
+        function R(Vn, zn, Xn) {
           function E(Gn, fe) {
             if (!zn[Gn]) {
-              if (!Qn[Gn]) {
+              if (!Vn[Gn]) {
                 var cn = typeof gun == "function" && gun;
                 if (!fe && cn) return cn(Gn, !0);
-                if (Vn) return Vn(Gn, !0);
+                if (Qn) return Qn(Gn, !0);
                 var U = new Error("Cannot find module '" + Gn + "'");
                 throw U.code = "MODULE_NOT_FOUND", U;
               }
               var q = zn[Gn] = { exports: {} };
-              Qn[Gn][0].call(q.exports, function(wn) {
-                var kn = Qn[Gn][1][wn];
+              Vn[Gn][0].call(q.exports, function(wn) {
+                var kn = Vn[Gn][1][wn];
                 return E(kn || wn);
-              }, q, q.exports, R, Qn, zn, Xn);
+              }, q, q.exports, R, Vn, zn, Xn);
             }
             return zn[Gn].exports;
           }
-          for (var Vn = typeof gun == "function" && gun, we = 0; we < Xn.length; we++) E(Xn[we]);
+          for (var Qn = typeof gun == "function" && gun, we = 0; we < Xn.length; we++) E(Xn[we]);
           return E;
         }
         return R;
-      })())({ 1: [function(R, Qn, zn) {
+      })())({ 1: [function(R, Vn, zn) {
         Object.defineProperty(zn, "__esModule", {
           value: !0
         }), zn.default = void 0;
@@ -74,14 +74,14 @@ function cde() {
         function E(U, q) {
           if (!(U instanceof q)) throw new TypeError("Cannot call a class as a function");
         }
-        function Vn(U, q) {
+        function Qn(U, q) {
           for (var wn = 0; wn < q.length; wn++) {
             var kn = q[wn];
             kn.enumerable = kn.enumerable || !1, kn.configurable = !0, "value" in kn && (kn.writable = !0), Object.defineProperty(U, Gn(kn.key), kn);
           }
         }
         function we(U, q, wn) {
-          return q && Vn(U.prototype, q), Object.defineProperty(U, "prototype", { writable: !1 }), U;
+          return q && Qn(U.prototype, q), Object.defineProperty(U, "prototype", { writable: !1 }), U;
         }
         function Gn(U) {
           var q = fe(U, "string");
@@ -202,12 +202,12 @@ function cde() {
             }
           }]);
         })();
-      }, {}], 2: [function(R, Qn, zn) {
+      }, {}], 2: [function(R, Vn, zn) {
         (function(Xn) {
           (function() {
             var E;
             typeof window < "u" ? E = window : typeof Xn < "u" ? E = Xn : typeof self < "u" && (E = self);
-            var Vn;
+            var Qn;
             function we() {
             }
             function Gn() {
@@ -25040,7 +25040,7 @@ function cde() {
             }
             function NXn(n, e, t, i, r) {
               var c, s, f, l, h, a, d, p, v, y, T, M, P, L, F, K;
-              v = Y6e(n, Can(e), r), oan(v, la(r, l1)), Vn = null, y = r, T = E7(y, GZn), M = new jjn(v), sUn(M.a, T), P = E7(y, "endPoint"), L = new Sjn(v), uUn(L.a, P), F = Jw(y, JF), K = new Ijn(v), IGn(K.a, F), d = la(r, d3n), c = new JSn(n, v), CIn(c.a, c.b, d), p = la(r, a3n), s = new VSn(n, v), AIn(s.a, s.b, p), h = Jw(r, w3n), f = new QSn(t, v), eGn(f.b, f.a, h), a = Jw(r, b3n), l = new YSn(i, v), tGn(l.b, l.a, a);
+              v = Y6e(n, Can(e), r), oan(v, la(r, l1)), Qn = null, y = r, T = E7(y, GZn), M = new jjn(v), sUn(M.a, T), P = E7(y, "endPoint"), L = new Sjn(v), uUn(L.a, P), F = Jw(y, JF), K = new Ijn(v), IGn(K.a, F), d = la(r, d3n), c = new JSn(n, v), CIn(c.a, c.b, d), p = la(r, a3n), s = new VSn(n, v), AIn(s.a, s.b, p), h = Jw(r, w3n), f = new QSn(t, v), eGn(f.b, f.a, h), a = Jw(r, b3n), l = new YSn(i, v), tGn(l.b, l.a, a);
             }
             function DXn(n, e, t) {
               var i, r, c, s, f, l, h, a;
@@ -28947,7 +28947,7 @@ function cde() {
             function DDe(n, e, t, i) {
               var r, c, s, f, l, h, a, d, p, v;
               for (c = new gzn(e), d = n_e(n, e, c), v = E.Math.max(B(H(k(e, (gn(), Ed)))), 1), a = new A(d.a); a.a < a.c.c.length; )
-                h = u(C(a), 43), l = eqn(u(h.a, 8), u(h.b, 8), v), Vn = !0, Vn = Vn & Rw(t, new fn(l.c, l.d)), Vn = Vn & Rw(t, $w(new fn(l.c, l.d), l.b, 0)), Vn = Vn & Rw(t, $w(new fn(l.c, l.d), 0, l.a)), Vn & Rw(t, $w(new fn(l.c, l.d), l.b, l.a));
+                h = u(C(a), 43), l = eqn(u(h.a, 8), u(h.b, 8), v), Qn = !0, Qn = Qn & Rw(t, new fn(l.c, l.d)), Qn = Qn & Rw(t, $w(new fn(l.c, l.d), l.b, 0)), Qn = Qn & Rw(t, $w(new fn(l.c, l.d), 0, l.a)), Qn & Rw(t, $w(new fn(l.c, l.d), l.b, l.a));
               switch (p = c.d, f = eqn(u(d.b.a, 8), u(d.b.b, 8), v), p == (yn(), Ne) || p == $e ? (i.c[p.g] = E.Math.min(i.c[p.g], f.d), i.b[p.g] = E.Math.max(i.b[p.g], f.d + f.a)) : (i.c[p.g] = E.Math.min(i.c[p.g], f.c), i.b[p.g] = E.Math.max(i.b[p.g], f.c + f.b)), r = gr, s = c.c.i.d, p.g) {
                 case 4:
                   r = s.c;
@@ -30956,7 +30956,7 @@ function cde() {
                   }, 0);
                 };
               }
-              if (typeof Qn !== KZ && Qn.exports && (Object.defineProperty(zn, "__esModule", { value: !0 }), Qn.exports = { default: e, Worker: e }), typeof document === KZ && typeof self !== KZ) {
+              if (typeof Vn !== KZ && Vn.exports && (Object.defineProperty(zn, "__esModule", { value: !0 }), Vn.exports = { default: e, Worker: e }), typeof document === KZ && typeof self !== KZ) {
                 var t = new n(self);
                 self.onmessage = t.saveDispatch;
               }
@@ -48199,7 +48199,7 @@ function cde() {
             o9e(Tde), _9e("permProps", [[["locale", "default"], [Cee, "gecko1_8"]], [["locale", "default"], [Cee, "safari"]]]), yRe(null, "elk");
           }).call(this);
         }).call(this, typeof xP < "u" ? xP : typeof self < "u" ? self : typeof window < "u" ? window : {});
-      }, {}], 3: [function(R, Qn, zn) {
+      }, {}], 3: [function(R, Vn, zn) {
         function Xn(vn) {
           "@babel/helpers - typeof";
           return Xn = typeof Symbol == "function" && typeof Symbol.iterator == "symbol" ? function(An) {
@@ -48211,7 +48211,7 @@ function cde() {
         function E(vn, An, Bn) {
           return Object.defineProperty(vn, "prototype", { writable: !1 }), vn;
         }
-        function Vn(vn, An) {
+        function Qn(vn, An) {
           if (!(vn instanceof An)) throw new TypeError("Cannot call a class as a function");
         }
         function we(vn, An, Bn) {
@@ -48253,7 +48253,7 @@ function cde() {
         var kn = R("./elk-api.js").default, Kn = /* @__PURE__ */ (function(vn) {
           function An() {
             var Bn = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : {};
-            Vn(this, An);
+            Qn(this, An);
             var ee = Object.assign({}, Bn), re = !1;
             try {
               R.resolve("web-worker"), re = !0;
@@ -48279,12 +48279,12 @@ Consider installing the package or pass your own 'workerFactory' to ELK's constr
           }
           return q(An, vn), E(An);
         })(kn);
-        Object.defineProperty(Qn.exports, "__esModule", {
+        Object.defineProperty(Vn.exports, "__esModule", {
           value: !0
-        }), Qn.exports = Kn, Kn.default = Kn;
-      }, { "./elk-api.js": 1, "./elk-worker.min.js": 2, "web-worker": 4 }], 4: [function(R, Qn, zn) {
+        }), Vn.exports = Kn, Kn.default = Kn;
+      }, { "./elk-api.js": 1, "./elk-worker.min.js": 2, "web-worker": 4 }], 4: [function(R, Vn, zn) {
         var Xn = typeof Worker < "u" ? Worker : void 0;
-        Qn.exports = Xn;
+        Vn.exports = Xn;
       }, {}] }, {}, [3])(3);
     });
   })(jkn)), jkn.exports;
@@ -48297,8 +48297,8 @@ function MRe() {
   return $ae || ($ae = 1, (function(Tn) {
     (function(qn) {
       qn.parser = function(nn, W) {
-        return new Qn(nn, W);
-      }, qn.SAXParser = Qn, qn.SAXStream = cn, qn.createStream = Gn, qn.MAX_BUFFER_LENGTH = 64 * 1024;
+        return new Vn(nn, W);
+      }, qn.SAXParser = Vn, qn.SAXStream = cn, qn.createStream = Gn, qn.MAX_BUFFER_LENGTH = 64 * 1024;
       var R = [
         "comment",
         "sgmlDecl",
@@ -48333,9 +48333,9 @@ function MRe() {
         "opennamespace",
         "closenamespace"
       ];
-      function Qn(nn, W) {
-        if (!(this instanceof Qn))
-          return new Qn(nn, W);
+      function Vn(nn, W) {
+        if (!(this instanceof Vn))
+          return new Vn(nn, W);
         var je = this;
         Xn(je), je.q = je.c = "", je.bufferCheckPosition = qn.MAX_BUFFER_LENGTH, je.encoding = null, je.opt = W || {}, je.opt.lowercase = je.opt.lowercase || je.opt.lowercasetags, je.looseCase = je.opt.lowercase ? "toLowerCase" : "toUpperCase", je.opt.maxEntityCount = je.opt.maxEntityCount || 512, je.opt.maxEntityDepth = je.opt.maxEntityDepth || 4, je.entityCount = je.entityDepth = 0, je.tags = [], je.closed = je.closedRoot = je.sawRoot = !1, je.tag = je.error = null, je.strict = !!nn, je.noscript = !!(nn || je.opt.noscript), je.state = jn.BEGIN, je.strictEntities = je.opt.strictEntities, je.ENTITIES = je.strictEntities ? Object.create(qn.XML_ENTITIES) : Object.create(qn.ENTITIES), je.attribList = [], je.opt.xmlns && (je.ns = Object.create(Kn)), je.opt.unquotedAttributeValues === void 0 && (je.opt.unquotedAttributeValues = !nn), je.trackPosition = je.opt.position !== !1, je.trackPosition && (je.position = je.line = je.column = 0), Kt(je, "onready");
       }
@@ -48379,7 +48379,7 @@ function MRe() {
       function E(nn) {
         gi(nn), nn.cdata !== "" && (wi(nn, "oncdata", nn.cdata), nn.cdata = ""), nn.script !== "" && (wi(nn, "onscript", nn.script), nn.script = "");
       }
-      Qn.prototype = {
+      Vn.prototype = {
         end: function() {
           Wi(this);
         },
@@ -48394,14 +48394,14 @@ function MRe() {
           E(this);
         }
       };
-      var Vn;
+      var Qn;
       try {
-        Vn = jRe.Stream;
+        Qn = jRe.Stream;
       } catch {
-        Vn = function() {
+        Qn = function() {
         };
       }
-      Vn || (Vn = function() {
+      Qn || (Qn = function() {
       });
       var we = qn.EVENTS.filter(function(nn) {
         return nn !== "error" && nn !== "end";
@@ -48421,7 +48421,7 @@ function MRe() {
       function cn(nn, W) {
         if (!(this instanceof cn))
           return new cn(nn, W);
-        Vn.apply(this), this._parser = new Qn(nn, W), this.writable = !0, this.readable = !0;
+        Qn.apply(this), this._parser = new Vn(nn, W), this.writable = !0, this.readable = !0;
         var je = this;
         this._parser.onend = function() {
           je.emit("end");
@@ -48442,7 +48442,7 @@ function MRe() {
           });
         });
       }
-      cn.prototype = Object.create(Vn.prototype, {
+      cn.prototype = Object.create(Qn.prototype, {
         constructor: {
           value: cn
         }
@@ -48476,7 +48476,7 @@ function MRe() {
         return !je._parser["on" + nn] && we.indexOf(nn) !== -1 && (je._parser["on" + nn] = function() {
           var ue = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
           ue.splice(0, 0, nn), je.emit.apply(je, ue);
-        }), Vn.prototype.on.call(je, nn, W);
+        }), Qn.prototype.on.call(je, nn, W);
       };
       var U = /^\[CDATA\[$/i, q = /^DOCTYPE$/i, wn = "http://www.w3.org/XML/1998/namespace", kn = "http://www.w3.org/2000/xmlns/", Kn = { xml: wn, xmlns: kn }, vn = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/, An = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/, Bn = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/, ee = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
       function re(nn) {
@@ -48875,10 +48875,10 @@ Column: ` + nn.column + `
 Char: ` + nn.c), W = new Error(W), nn.error = W, Kt(nn, "onerror", W), nn;
       }
       function Wi(nn) {
-        return nn.sawRoot && !nn.closedRoot && hr(nn, "Unclosed root tag"), nn.state !== jn.BEGIN && nn.state !== jn.BEGIN_WHITESPACE && nn.state !== jn.TEXT && jr(nn, "Unexpected end"), gi(nn), nn.c = "", nn.closed = !0, Kt(nn, "onend"), Qn.call(nn, nn.strict, nn.opt), nn;
+        return nn.sawRoot && !nn.closedRoot && hr(nn, "Unclosed root tag"), nn.state !== jn.BEGIN && nn.state !== jn.BEGIN_WHITESPACE && nn.state !== jn.TEXT && jr(nn, "Unexpected end"), gi(nn), nn.c = "", nn.closed = !0, Kt(nn, "onend"), Vn.call(nn, nn.strict, nn.opt), nn;
       }
       function hr(nn, W) {
-        if (typeof nn != "object" || !(nn instanceof Qn))
+        if (typeof nn != "object" || !(nn instanceof Vn))
           throw new Error("bad call to strictFail");
         nn.strict && jr(nn, W);
       }
@@ -49254,15 +49254,15 @@ function CRe() {
   Rae = 1;
   var Tn = MRe().parser;
   function qn(R) {
-    var Qn = [], zn = [], Xn = Qn, E;
-    return E = Tn(!0), E.ontext = function(Vn) {
-      Vn.trim() !== "" && Xn.push(Vn);
-    }, E.onopentag = function(Vn) {
+    var Vn = [], zn = [], Xn = Vn, E;
+    return E = Tn(!0), E.ontext = function(Qn) {
+      Qn.trim() !== "" && Xn.push(Qn);
+    }, E.onopentag = function(Qn) {
       var we;
-      we = [Vn.name, Vn.attributes], zn.push(Xn), Xn.push(we), Xn = we;
+      we = [Qn.name, Qn.attributes], zn.push(Xn), Xn.push(we), Xn = we;
     }, E.onclosetag = function() {
       Xn = zn.pop();
-    }, E.write(R).close(), Qn[0];
+    }, E.write(R).close(), Vn[0];
   }
   return Ckn = qn, Ckn;
 }
@@ -49271,12 +49271,12 @@ function ARe() {
   if (Bae) return Akn;
   Bae = 1;
   function Tn(qn, R) {
-    var Qn = function() {
-    }, zn = Qn, Xn = Qn;
+    var Vn = function() {
+    }, zn = Vn, Xn = Vn;
     function E() {
       this._skip = !0;
     }
-    function Vn() {
+    function Qn() {
       this._remove = !0;
     }
     function we(cn) {
@@ -49290,7 +49290,7 @@ function ARe() {
         name: we,
         skip: E,
         // break: breakFn,
-        remove: Vn,
+        remove: Qn,
         replace: Gn,
         _name: void 0,
         _skip: !1,
@@ -49340,18 +49340,18 @@ function UB() {
   if (Kae) return Skn;
   Kae = 1;
   const Tn = CRe(), qn = ARe(), R = (zn) => String(zn).replace(/[&<>"']/g, (Xn) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[Xn]);
-  function Qn(zn) {
-    const [Xn, ...E] = zn, Vn = E[0] && typeof E[0] == "object" && !Array.isArray(E[0]) ? E.shift() : {}, we = "<" + Xn + Object.entries(Vn).map(([Gn, fe]) => " " + Gn + '="' + R(fe) + '"').join("");
-    return E.length ? we + ">" + E.map((Gn) => Array.isArray(Gn) ? Qn(Gn) : R(Gn)).join("") + "</" + Xn + ">" : we + "/>";
+  function Vn(zn) {
+    const [Xn, ...E] = zn, Qn = E[0] && typeof E[0] == "object" && !Array.isArray(E[0]) ? E.shift() : {}, we = "<" + Xn + Object.entries(Qn).map(([Gn, fe]) => " " + Gn + '="' + R(fe) + '"').join("");
+    return E.length ? we + ">" + E.map((Gn) => Array.isArray(Gn) ? Vn(Gn) : R(Gn)).join("") + "</" + Xn + ">" : we + "/>";
   }
-  return Skn = { parse: Tn, p: Tn, traverse: qn, t: qn, stringify: Qn, s: Qn }, Skn;
+  return Skn = { parse: Tn, p: Tn, traverse: qn, t: qn, stringify: Vn, s: Vn }, Skn;
 }
 var jT = {}, Pkn = {}, qB = { exports: {} };
 var SRe = qB.exports, Hae;
 function NP() {
   return Hae || (Hae = 1, (function(Tn, qn) {
     (function() {
-      var R, Qn = "4.18.1", zn = 200, Xn = "Unsupported core-js use. Try https://npms.io/search?q=ponyfill.", E = "Expected a function", Vn = "Invalid `variable` option passed into `_.template`", we = "Invalid `imports` option passed into `_.template`", Gn = "__lodash_hash_undefined__", fe = 500, cn = "__lodash_placeholder__", U = 1, q = 2, wn = 4, kn = 1, Kn = 2, vn = 1, An = 2, Bn = 4, ee = 8, re = 16, ze = 32, Ie = 64, At = 128, bi = 256, jn = 512, N = 30, Kt = "...", lt = 800, dt = 16, xi = 1, Ri = 2, wi = 3, gi = 1 / 0, Xt = 9007199254740991, jr = 17976931348623157e292, Wi = NaN, hr = 4294967295, so = hr - 1, Zc = hr >>> 1, pt = [
+      var R, Vn = "4.18.1", zn = 200, Xn = "Unsupported core-js use. Try https://npms.io/search?q=ponyfill.", E = "Expected a function", Qn = "Invalid `variable` option passed into `_.template`", we = "Invalid `imports` option passed into `_.template`", Gn = "__lodash_hash_undefined__", fe = 500, cn = "__lodash_placeholder__", U = 1, q = 2, wn = 4, kn = 1, Kn = 2, vn = 1, An = 2, Bn = 4, ee = 8, re = 16, ze = 32, Ie = 64, At = 128, bi = 256, jn = 512, N = 30, Kt = "...", lt = 800, dt = 16, xi = 1, Ri = 2, wi = 3, gi = 1 / 0, Xt = 9007199254740991, jr = 17976931348623157e292, Wi = NaN, hr = 4294967295, so = hr - 1, Zc = hr >>> 1, pt = [
         ["ary", At],
         ["bind", vn],
         ["bindKey", An],
@@ -52680,7 +52680,7 @@ __p += '`), zr && (Mt += `' +
 }
 `;
           else if (RP.test(_r))
-            throw new Zr(Vn);
+            throw new Zr(Qn);
           Mt = (de ? Mt.replace(XB, "") : Mt).replace(JB, "$1").replace(VB, "$1;"), Mt = "function(" + (_r || "obj") + `) {
 ` + (_r ? "" : `obj || (obj = {});
 `) + "var __t, __p = ''" + (Yn ? ", __e = _.escape" : "") + (de ? `, __j = Array.prototype.join;
@@ -52931,7 +52931,7 @@ function print() { __p += __j.call(arguments, '') }
           return Y0(en, function(m, j) {
             zu.call(en.prototype, j) || (w[j] = m);
           }), w;
-        })(), { chain: !1 }), en.VERSION = Qn, J1(["bind", "bindKey", "curry", "curryRight", "partial", "partialRight"], function(w) {
+        })(), { chain: !1 }), en.VERSION = Vn, J1(["bind", "bindKey", "curry", "curryRight", "partial", "partialRight"], function(w) {
           en[w].placeholder = en;
         }), J1(["drop", "take"], function(w, m) {
           nu.prototype[w] = function(j) {
@@ -53030,7 +53030,7 @@ var qae;
 function zB() {
   return qae || (qae = 1, (function(Tn) {
     Object.defineProperty(Tn, "__esModule", { value: !0 });
-    var qn = UB(), R = NP(), Qn;
+    var qn = UB(), R = NP(), Vn;
     (function(zn) {
       zn.skin = null;
       function Xn(q, wn) {
@@ -53054,12 +53054,12 @@ function zB() {
           return Kn[1]["s:pid"];
         });
       }
-      function Vn(q) {
+      function Qn(q) {
         return E(q, function(wn) {
           return wn["s:position"] ? wn["s:position"] === "top" : !1;
         });
       }
-      zn.getInputPids = Vn;
+      zn.getInputPids = Qn;
       function we(q) {
         return E(q, function(wn) {
           return wn["s:position"] ? wn["s:position"] === "bottom" : !1;
@@ -53105,7 +53105,7 @@ function zB() {
         }), q.layoutEngine || (q.layoutEngine = {}), q;
       }
       zn.getProperties = U;
-    })(Qn = Tn.Skin || (Tn.Skin = {})), Tn.default = Qn;
+    })(Vn = Tn.Skin || (Tn.Skin = {})), Tn.default = Vn;
   })(Pkn)), Pkn;
 }
 var pun = {}, mun = {}, Gae;
@@ -53115,28 +53115,28 @@ function PRe() {
   var Tn;
   return (function(qn) {
     var R;
-    (function(Vn) {
-      Vn.Zero = "0", Vn.One = "1", Vn.X = "x";
+    (function(Qn) {
+      Qn.Zero = "0", Qn.One = "1", Qn.X = "x";
     })(R || (R = {}));
-    var Qn;
-    (function(Vn) {
-      Vn.Input = "input", Vn.Output = "output";
-    })(Qn = qn.Direction || (qn.Direction = {}));
-    function zn(Vn) {
-      return Vn.port_directions ? Object.keys(Vn.port_directions).filter(function(we) {
-        return Vn.port_directions[we] === Qn.Input;
+    var Vn;
+    (function(Qn) {
+      Qn.Input = "input", Qn.Output = "output";
+    })(Vn = qn.Direction || (qn.Direction = {}));
+    function zn(Qn) {
+      return Qn.port_directions ? Object.keys(Qn.port_directions).filter(function(we) {
+        return Qn.port_directions[we] === Vn.Input;
       }) : [];
     }
     qn.getInputPortPids = zn;
-    function Xn(Vn) {
-      return Vn.port_directions ? Object.keys(Vn.port_directions).filter(function(we) {
-        return Vn.port_directions[we] === Qn.Output;
+    function Xn(Qn) {
+      return Qn.port_directions ? Object.keys(Qn.port_directions).filter(function(we) {
+        return Qn.port_directions[we] === Vn.Output;
       }) : [];
     }
     qn.getOutputPortPids = Xn;
     var E;
-    (function(Vn) {
-      Vn[Vn.Hide = 0] = "Hide", Vn[Vn.NoHide = 1] = "NoHide";
+    (function(Qn) {
+      Qn[Qn.Hide = 0] = "Hide", Qn[Qn.NoHide = 1] = "NoHide";
     })(E || (E = {}));
   })(Tn || (Tn = {})), mun.default = Tn, mun;
 }
@@ -53147,47 +53147,47 @@ function ORe() {
   var Tn = ude(), qn = NP(), R = (
     /** @class */
     (function() {
-      function Qn(zn, Xn) {
+      function Vn(zn, Xn) {
         this.key = zn, this.value = Xn;
       }
-      return Object.defineProperty(Qn.prototype, "Key", {
+      return Object.defineProperty(Vn.prototype, "Key", {
         get: function() {
           return this.key;
         },
         enumerable: !0,
         configurable: !0
-      }), Qn.prototype.keyIn = function(zn) {
+      }), Vn.prototype.keyIn = function(zn) {
         return qn.includes(zn, this.key);
-      }, Qn.prototype.maxVal = function() {
+      }, Vn.prototype.maxVal = function() {
         return qn.max(qn.map(this.value, function(zn) {
           return Number(zn);
         }));
-      }, Qn.prototype.valString = function() {
+      }, Vn.prototype.valString = function() {
         return "," + this.value.join() + ",";
-      }, Qn.prototype.findConstants = function(zn, Xn, E) {
-        var Vn = this, we = "", Gn = [], fe = this.value;
+      }, Vn.prototype.findConstants = function(zn, Xn, E) {
+        var Qn = this, we = "", Gn = [], fe = this.value;
         return fe.forEach(function(cn, U) {
-          cn === "0" || cn === "1" ? (Xn += 1, we += cn, fe[U] = Xn, Gn.push(Xn)) : Gn.length > 0 && (Vn.assignConstant(we, Gn, U, zn, E), we = "", Gn = []);
+          cn === "0" || cn === "1" ? (Xn += 1, we += cn, fe[U] = Xn, Gn.push(Xn)) : Gn.length > 0 && (Qn.assignConstant(we, Gn, U, zn, E), we = "", Gn = []);
         }), Gn.length > 0 && this.assignConstant(we, Gn, fe.length, zn, E), Xn;
-      }, Qn.prototype.getGenericElkPort = function(zn, Xn, E) {
-        var Vn = this.parentNode.Key, we = this.parentNode.getTemplate()[1]["s:type"];
+      }, Vn.prototype.getGenericElkPort = function(zn, Xn, E) {
+        var Qn = this.parentNode.Key, we = this.parentNode.getTemplate()[1]["s:type"];
         if (zn === 0) {
           var Gn = {
-            id: Vn + "." + this.key,
+            id: Qn + "." + this.key,
             width: 1,
             height: 1,
             x: Number(Xn[0][1]["s:x"]),
             y: Number(Xn[0][1]["s:y"])
           };
           return (we === "generic" || we === "join") && E === "in" && (Gn.labels = [{
-            id: Vn + "." + this.key + ".label",
+            id: Qn + "." + this.key + ".label",
             text: this.key,
             x: Number(Xn[0][2][1].x) - 10,
             y: Number(Xn[0][2][1].y) - 6,
             width: 6 * this.key.length,
             height: 11
           }]), (we === "generic" || we === "split") && E === "out" && (Gn.labels = [{
-            id: Vn + "." + this.key + ".label",
+            id: Qn + "." + this.key + ".label",
             text: this.key,
             x: Number(Xn[0][2][1].x) - 10,
             y: Number(Xn[0][2][1].y) - 6,
@@ -53196,14 +53196,14 @@ function ORe() {
           }]), Gn;
         } else {
           var fe = Number(Xn[1][1]["s:y"]) - Number(Xn[0][1]["s:y"]), Gn = {
-            id: Vn + "." + this.key,
+            id: Qn + "." + this.key,
             width: 1,
             height: 1,
             x: Number(Xn[0][1]["s:x"]),
             y: zn * fe + Number(Xn[0][1]["s:y"])
           };
           return we === "generic" && (Gn.labels = [{
-            id: Vn + "." + this.key + ".label",
+            id: Qn + "." + this.key + ".label",
             text: this.key,
             x: Number(Xn[0][2][1].x) - 10,
             y: Number(Xn[0][2][1].y) - 6,
@@ -53211,17 +53211,17 @@ function ORe() {
             height: 11
           }]), Gn;
         }
-      }, Qn.prototype.assignConstant = function(zn, Xn, E, Vn, we) {
+      }, Vn.prototype.assignConstant = function(zn, Xn, E, Qn, we) {
         var Gn = this, fe = zn.split("").reverse().join("");
-        if (Vn.hasOwnProperty(fe)) {
-          var cn = Vn[fe], U = cn.length;
+        if (Qn.hasOwnProperty(fe)) {
+          var cn = Qn[fe], U = cn.length;
           cn.forEach(function(q, wn) {
             var kn = E - U + wn;
             Gn.value[kn] = q;
           });
         } else
-          we.push(Tn.default.fromConstantInfo(fe, Xn)), Vn[fe] = Xn;
-      }, Qn;
+          we.push(Tn.default.fromConstantInfo(fe, Xn)), Qn[fe] = Xn;
+      }, Vn;
     })()
   );
   return vun.Port = R, vun;
@@ -53233,11 +53233,11 @@ function IRe() {
       function R(U, q) {
         return q != null && U instanceof q;
       }
-      var Qn;
+      var Vn;
       try {
-        Qn = Map;
+        Vn = Map;
       } catch {
-        Qn = function() {
+        Vn = function() {
         };
       }
       var zn;
@@ -53266,8 +53266,8 @@ function IRe() {
           var Ie, At;
           if (typeof re != "object")
             return re;
-          if (R(re, Qn))
-            Ie = new Qn();
+          if (R(re, Vn))
+            Ie = new Vn();
           else if (R(re, zn))
             Ie = new zn();
           else if (R(re, Xn))
@@ -53295,7 +53295,7 @@ function IRe() {
               return An[bi];
             vn.push(re), An.push(Ie);
           }
-          R(re, Qn) && re.forEach(function(wi, gi) {
+          R(re, Vn) && re.forEach(function(wi, gi) {
             var Xt = ee(gi, ze - 1), jr = ee(wi, ze - 1);
             Ie.set(Xt, jr);
           }), R(re, zn) && re.forEach(function(wi) {
@@ -53331,20 +53331,20 @@ function IRe() {
         };
         return wn.prototype = q, new wn();
       };
-      function Vn(U) {
+      function Qn(U) {
         return Object.prototype.toString.call(U);
       }
-      E.__objToStr = Vn;
+      E.__objToStr = Qn;
       function we(U) {
-        return typeof U == "object" && Vn(U) === "[object Date]";
+        return typeof U == "object" && Qn(U) === "[object Date]";
       }
       E.__isDate = we;
       function Gn(U) {
-        return typeof U == "object" && Vn(U) === "[object Array]";
+        return typeof U == "object" && Qn(U) === "[object Array]";
       }
       E.__isArray = Gn;
       function fe(U) {
-        return typeof U == "object" && Vn(U) === "[object RegExp]";
+        return typeof U == "object" && Qn(U) === "[object RegExp]";
       }
       E.__isRegExp = fe;
       function cn(U) {
@@ -53360,7 +53360,7 @@ var Wae;
 function ude() {
   if (Wae) return pun;
   Wae = 1, Object.defineProperty(pun, "__esModule", { value: !0 });
-  var Tn = Fkn(), qn = PRe(), R = zB(), Qn = ORe(), zn = NP(), Xn = IRe(), E = UB(), Vn = (
+  var Tn = Fkn(), qn = PRe(), R = zB(), Vn = ORe(), zn = NP(), Xn = IRe(), E = UB(), Qn = (
     /** @class */
     (function() {
       function U(q, wn, kn, Kn, vn) {
@@ -53373,10 +53373,10 @@ function ude() {
       }
       return U.fromPort = function(q, wn) {
         var kn = q.direction === qn.default.Direction.Input;
-        return kn ? new U(wn, "$_inputExt_", [], [new Qn.Port("Y", q.bits)], {}) : new U(wn, "$_outputExt_", [new Qn.Port("A", q.bits)], [], {});
+        return kn ? new U(wn, "$_inputExt_", [], [new Vn.Port("Y", q.bits)], {}) : new U(wn, "$_outputExt_", [new Vn.Port("A", q.bits)], [], {});
       }, U.fromYosysCell = function(q, wn) {
         var kn = R.default.findSkinType(q.type), Kn = R.default.getInputPids(kn), vn = R.default.getOutputPids(kn), An = zn.map(q.connections, function(Ie, At) {
-          return new Qn.Port(At, Ie);
+          return new Vn.Port(At, Ie);
         }), Bn = An.filter(function(Ie) {
           return Ie.keyIn(Kn);
         }), ee = An.filter(function(Ie) {
@@ -53392,20 +53392,20 @@ function ude() {
         }
         return new U(wn, q.type, Bn, ee, q.attributes);
       }, U.fromConstantInfo = function(q, wn) {
-        return new U(q, "$_constant_", [], [new Qn.Port("Y", wn)], {});
+        return new U(q, "$_constant_", [], [new Vn.Port("Y", wn)], {});
       }, U.fromJoinInfo = function(q, wn) {
         var kn = q.slice(1, -1).split(","), Kn = kn.map(function(Bn) {
           return Number(Bn);
-        }), vn = [new Qn.Port("Y", Kn)], An = wn.map(function(Bn) {
-          return new Qn.Port(Bn, cn(Kn, Bn));
+        }), vn = [new Vn.Port("Y", Kn)], An = wn.map(function(Bn) {
+          return new Vn.Port(Bn, cn(Kn, Bn));
         });
         return new U("$join$" + q, "$_join_", An, vn, {});
       }, U.fromSplitInfo = function(q, wn) {
         var kn = q.slice(1, -1).split(","), Kn = kn.map(function(Bn) {
           return Number(Bn);
-        }), vn = [new Qn.Port("A", Kn)], An = wn.map(function(Bn) {
+        }), vn = [new Vn.Port("A", Kn)], An = wn.map(function(Bn) {
           var ee = cn(Kn, Bn);
-          return new Qn.Port(Bn, ee);
+          return new Vn.Port(Bn, ee);
         });
         return new U("$split$" + q, "$_split_", vn, An, {});
       }, Object.defineProperty(U.prototype, "Type", {
@@ -53588,7 +53588,7 @@ function ude() {
       }, U;
     })()
   );
-  pun.default = Vn;
+  pun.default = Qn;
   function we(U, q) {
     E.traverse(U, {
       enter: function(wn) {
@@ -53624,7 +53624,7 @@ var Xae;
 function Fkn() {
   if (Xae) return jT;
   Xae = 1, Object.defineProperty(jT, "__esModule", { value: !0 });
-  var Tn = zB(), qn = ude(), R = NP(), Qn = (
+  var Tn = zB(), qn = ude(), R = NP(), Vn = (
     /** @class */
     (function() {
       function cn(U) {
@@ -53672,7 +53672,7 @@ function Fkn() {
       }, cn;
     })()
   );
-  jT.FlatModule = Qn;
+  jT.FlatModule = Vn;
   function zn(cn) {
     var U = "";
     return cn.forEach(function(q) {
@@ -53689,10 +53689,10 @@ function Fkn() {
       return Xn(cn, q);
     });
   }
-  function Vn(cn, U, q) {
+  function Qn(cn, U, q) {
     cn[U] === void 0 ? cn[U] = [q] : cn[U].push(q);
   }
-  jT.addToDefaultDict = Vn;
+  jT.addToDefaultDict = Qn;
   function we(cn, U, q) {
     var wn = R.max([cn.indexOf(U), q]), kn = cn.substring(0, wn).split(",").length - 1, Kn = kn + U.split(",").length - 3;
     return kn === Kn ? String(kn) : String(kn) + ":" + String(Kn);
@@ -53702,16 +53702,16 @@ function Fkn() {
     if (An !== -1 && U.splice(An, 1), !(wn >= q.length || kn - wn < 2)) {
       var Bn = q.slice(wn, kn);
       if (Xn(Bn, cn)) {
-        Bn !== q && Vn(vn, q, we(q, Bn, wn)), Gn(cn, U, q, kn - 1, q.length, Kn, vn);
+        Bn !== q && Qn(vn, q, we(q, Bn, wn)), Gn(cn, U, q, kn - 1, q.length, Kn, vn);
         return;
       }
       var ee = E(Bn, cn);
       if (ee !== -1) {
-        Bn !== q && Vn(vn, q, we(q, Bn, wn)), Vn(Kn, cn[ee], we(cn[ee], Bn, 0)), cn.push(Bn), Gn(cn, U, q, kn - 1, q.length, Kn, vn);
+        Bn !== q && Qn(vn, q, we(q, Bn, wn)), Qn(Kn, cn[ee], we(cn[ee], Bn, 0)), cn.push(Bn), Gn(cn, U, q, kn - 1, q.length, Kn, vn);
         return;
       }
       if (E(Bn, U) !== -1) {
-        Bn !== q && Vn(vn, q, we(q, Bn, wn)), Gn(cn, [], Bn, 0, Bn.length, Kn, vn), cn.push(Bn);
+        Bn !== q && Qn(vn, q, we(q, Bn, wn)), Gn(cn, [], Bn, 0, Bn.length, Kn, vn), cn.push(Bn);
         return;
       }
       Gn(cn, U, q, wn, wn + Bn.slice(0, -1).lastIndexOf(",") + 1, Kn, vn);
@@ -53733,8 +53733,8 @@ function $kn() {
     (function(E) {
       E.wireNameLookup = {}, E.dummyNum = 0, E.edgeIndex = 0;
     })(R = Tn.ElkModel || (Tn.ElkModel = {}));
-    function Qn(E) {
-      var Vn = E.nodes.map(function(Gn) {
+    function Vn(E) {
+      var Qn = E.nodes.map(function(Gn) {
         return Gn.buildElkChild();
       });
       R.edgeIndex = 0, R.dummyNum = 0;
@@ -53746,7 +53746,7 @@ function $kn() {
           var fe = [];
           return Xn(Gn.drivers, Gn.laterals, fe), Xn(Gn.laterals, Gn.riders, fe), fe;
         } else if (Gn.riders.length === 0 && Gn.drivers.length > 1) {
-          var cn = zn(Vn);
+          var cn = zn(Qn);
           R.dummyNum += 1;
           var U = Gn.drivers.map(function(vn) {
             var An = vn.parentNode.Key, Bn = "e" + String(R.edgeIndex);
@@ -53762,7 +53762,7 @@ function $kn() {
           });
           return U;
         } else if (Gn.riders.length > 1 && Gn.drivers.length === 0) {
-          var q = zn(Vn);
+          var q = zn(Qn);
           R.dummyNum += 1;
           var U = Gn.riders.map(function(An) {
             var Bn = An.parentNode.Key, ee = "e" + String(R.edgeIndex);
@@ -53796,29 +53796,29 @@ function $kn() {
       });
       return {
         id: E.moduleName,
-        children: Vn,
+        children: Qn,
         edges: we
       };
     }
-    Tn.buildElkGraph = Qn;
+    Tn.buildElkGraph = Vn;
     function zn(E) {
-      var Vn = "$d_" + String(R.dummyNum), we = {
-        id: Vn,
+      var Qn = "$d_" + String(R.dummyNum), we = {
+        id: Qn,
         width: 0,
         height: 0,
         ports: [{
-          id: Vn + ".p",
+          id: Qn + ".p",
           width: 0,
           height: 0
         }],
         layoutOptions: { "org.eclipse.elk.portConstraints": "FIXED_SIDE" }
       };
-      return E.push(we), Vn;
+      return E.push(we), Qn;
     }
-    function Xn(E, Vn, we) {
+    function Xn(E, Qn, we) {
       var Gn = qn.flatMap(E, function(fe) {
         var cn = fe.parentNode.key, U = cn + "." + fe.key;
-        return Vn.map(function(q) {
+        return Qn.map(function(q) {
           var wn = q.parentNode.key, kn = wn + "." + q.key, Kn = "e" + R.edgeIndex, vn = {
             id: Kn,
             sources: [U],
@@ -53843,21 +53843,21 @@ function sde() {
     return U;
   };
   Object.defineProperty(MT, "__esModule", { value: !0 });
-  var qn = $kn(), R = zB(), Qn = NP(), zn = UB(), Xn;
+  var qn = $kn(), R = zB(), Vn = NP(), zn = UB(), Xn;
   (function(Gn) {
     Gn[Gn.Up = 0] = "Up", Gn[Gn.Down = 1] = "Down", Gn[Gn.Left = 2] = "Left", Gn[Gn.Right = 3] = "Right";
   })(Xn || (Xn = {}));
   function E(Gn, fe) {
     var cn = fe.nodes.map(function(vn) {
-      var An = Qn.find(Gn.children, function(Bn) {
+      var An = Vn.find(Gn.children, function(Bn) {
         return Bn.id === vn.Key;
       });
       return vn.render(An);
     });
     we(Gn);
-    var U = Qn.flatMap(Gn.edges, function(vn) {
+    var U = Vn.flatMap(Gn.edges, function(vn) {
       var An = qn.ElkModel.wireNameLookup[vn.id], Bn = "net_" + An.slice(1, An.length - 1);
-      return Qn.flatMap(vn.sections, function(ee) {
+      return Vn.flatMap(vn.sections, function(ee) {
         var re = ee.startPoint;
         ee.bendPoints = ee.bendPoints || [];
         var ze = ee.bendPoints.map(function(bi) {
@@ -53903,39 +53903,39 @@ function sde() {
     return zn.s(Kn);
   }
   MT.default = E;
-  function Vn(Gn, fe, cn) {
+  function Qn(Gn, fe, cn) {
     var U = Gn.map(function(q) {
       var wn = q.sections[0].bendPoints || [null];
-      return fe ? Qn.first(wn) : Qn.last(wn);
+      return fe ? Vn.first(wn) : Vn.last(wn);
     }).filter(function(q) {
       return q !== null;
     });
-    return Qn.minBy(U, function(q) {
+    return Vn.minBy(U, function(q) {
       return Math.abs(cn.x - q.x) + Math.abs(cn.y - q.y);
     });
   }
   function we(Gn) {
     for (var fe = 0, cn = function() {
-      var q = "$d_" + String(fe), wn = Qn.filter(Gn.edges, function(bi) {
+      var q = "$d_" + String(fe), wn = Vn.filter(Gn.edges, function(bi) {
         return bi.source === q || bi.target === q;
       });
       if (wn.length === 0)
         return "break";
       var kn, Kn = void 0, vn = wn[0];
       vn.source === q ? (kn = !0, Kn = vn.sections[0].startPoint) : (kn = !1, Kn = vn.sections[0].endPoint);
-      for (var An = Vn(wn, kn, Kn), Bn = 0, ee = wn; Bn < ee.length; Bn++) {
+      for (var An = Qn(wn, kn, Kn), Bn = 0, ee = wn; Bn < ee.length; Bn++) {
         var re = ee[Bn], ze = re, Ie = ze.sections[0];
         kn ? (Ie.startPoint = An, Ie.bendPoints && Ie.bendPoints.shift()) : (Ie.endPoint = An, Ie.bendPoints && Ie.bendPoints.pop());
       }
-      var At = new Set(Qn.flatMap(wn, function(bi) {
+      var At = new Set(Vn.flatMap(wn, function(bi) {
         var jn = bi.sections[0];
-        return kn ? jn.bendPoints && jn.bendPoints.length > 0 ? [jn.bendPoints[0]] : jn.endPoint : jn.bendPoints && jn.bendPoints.length > 0 ? [Qn.last(jn.bendPoints)] : jn.startPoint;
+        return kn ? jn.bendPoints && jn.bendPoints.length > 0 ? [jn.bendPoints[0]] : jn.endPoint : jn.bendPoints && jn.bendPoints.length > 0 ? [Vn.last(jn.bendPoints)] : jn.startPoint;
       }).map(function(bi) {
         return bi.x > An.x ? Xn.Right : bi.x < An.x ? Xn.Left : bi.y > An.y ? Xn.Down : Xn.Up;
       }));
       At.size < 3 && wn.forEach(function(bi) {
         bi.junctionPoints && (bi.junctionPoints = bi.junctionPoints.filter(function(jn) {
-          return !Qn.isEqual(jn, An);
+          return !Vn.isEqual(jn, An);
         }));
       }), fe += 1;
     }; fe < 1e4; ) {
@@ -53950,19 +53950,19 @@ var Qae;
 function _Re() {
   if (Qae) return HB;
   Qae = 1, Object.defineProperty(HB, "__esModule", { value: !0 });
-  var Tn = cde(), qn = UB(), R = Fkn(), Qn = zB(), zn = $kn(), Xn = sde(), E = new Tn();
-  function Vn(fe, cn) {
-    Qn.default.skin = qn.p(fe);
-    var U = Qn.default.getProperties(), q = new R.FlatModule(cn);
+  var Tn = cde(), qn = UB(), R = Fkn(), Vn = zB(), zn = $kn(), Xn = sde(), E = new Tn();
+  function Qn(fe, cn) {
+    Vn.default.skin = qn.p(fe);
+    var U = Vn.default.getProperties(), q = new R.FlatModule(cn);
     return U.constants !== !1 && q.addConstants(), U.splitsAndJoins !== !1 && q.addSplitsJoins(), q.createWires(), q;
   }
   function we(fe, cn, U, q) {
-    var wn = Vn(fe, cn), kn = zn.buildElkGraph(wn);
+    var wn = Qn(fe, cn), kn = zn.buildElkGraph(wn);
     if (U) {
       q(null, JSON.stringify(kn, null, 2));
       return;
     }
-    var Kn = Qn.default.getProperties(), vn = E.layout(kn, { layoutOptions: Kn.layoutEngine });
+    var Kn = Vn.default.getProperties(), vn = E.layout(kn, { layoutOptions: Kn.layoutEngine });
     vn.then(function(An) {
       q(null, JSON.stringify(An, null, 2));
     }).catch(function(An) {
@@ -53971,7 +53971,7 @@ function _Re() {
   }
   HB.dumpLayout = we;
   function Gn(fe, cn, U, q) {
-    var wn = Vn(fe, cn), kn = zn.buildElkGraph(wn), Kn = Qn.default.getProperties(), vn;
+    var wn = Qn(fe, cn), kn = zn.buildElkGraph(wn), Kn = Vn.default.getProperties(), vn;
     return q ? vn = new Promise(function(An) {
       Xn.default(q, wn), An();
     }) : vn = E.layout(kn, { layoutOptions: Kn.layoutEngine }).then(function(An) {
@@ -54320,9 +54320,9 @@ text {
 </svg>
 `;
 const Fd = (Tn) => ["path", { d: Tn, class: "symbol" }], fl = (Tn, qn, R) => ["text", { x: Tn, y: qn, class: "pin-label" }, R], DRe = Gp.parse(NRe), Yae = (Tn) => DRe.find((qn) => Array.isArray(qn) && qn.some?.((R) => Array.isArray(R) && R[0] === "s:alias" && R[1].val === Tn)), FRe = (Tn) => Tn.replace(/[&<>"']/g, (qn) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[qn]);
-function Zae(Tn, { font: qn = "Arial", fontSize: R = 12, color: Qn = "#292b29", detailed: zn = !1, conventional: Xn = !0, orientationStrategy: E = "signal" } = {}) {
-  ["Arial", "Helvetica", "Times New Roman", "monospace"].includes(qn) || (qn = "Arial"), R = Math.max(8, Math.min(24, Number(R) || 12)), /^#[0-9a-f]{6}$/i.test(Qn) || (Qn = "#292b29");
-  const Vn = [], we = Object.keys(Tn.modules.circuit.cells).length > 120, Gn = /* @__PURE__ */ new Map(), fe = /* @__PURE__ */ new Set();
+function Zae(Tn, { font: qn = "Arial", fontSize: R = 12, color: Vn = "#292b29", detailed: zn = !1, conventional: Xn = !0, orientationStrategy: E = "signal" } = {}) {
+  ["Arial", "Helvetica", "Times New Roman", "monospace"].includes(qn) || (qn = "Arial"), R = Math.max(8, Math.min(24, Number(R) || 12)), /^#[0-9a-f]{6}$/i.test(Vn) || (Vn = "#292b29");
+  const Qn = [], we = Object.keys(Tn.modules.circuit.cells).length > 120, Gn = /* @__PURE__ */ new Map(), fe = /* @__PURE__ */ new Set();
   for (const U of Object.values(Tn.modules.circuit.cells)) {
     const q = (U.spiceLayout?.source && U.connections["+"] && U.connections["-"] ? [U.connections["+"], U.connections["-"]] : Object.values(U.connections)).map((kn) => kn[0]);
     if (q.length !== 2 || q[0] === q[1]) continue;
@@ -54419,7 +54419,7 @@ function Zae(Tn, { font: qn = "Arial", fontSize: R = 12, color: Qn = "#292b29", 
             const wi = Ri[1], gi = Number(wi["s:x"]) + dt, Xt = Number(wi["s:y"]) + xi, jr = wi["s:position"], Wi = q === "spice_br" ? wi["s:pid"] === "A" ? "+" : "-" : wi["s:pid"];
             Kt(Wi, jr === "left" ? 0 : jr === "right" ? Bn : gi, jr === "top" ? 0 : jr === "bottom" ? ee : Xt, jr, gi, Xt), (q.startsWith("q") || q.startsWith("spice_q4_")) && Ie.push(fl(gi + 5, Xt - 5, wi["s:pid"]));
           } else
-            Ri[1].transform = `translate(${dt},${xi})`, Ri[1].style && (Ri[1].style = Ri[1].style.replace(/#000000/g, Qn)), Ie.push(Ri);
+            Ri[1].transform = `translate(${dt},${xi})`, Ri[1].style && (Ri[1].style = Ri[1].style.replace(/#000000/g, Vn)), Ie.push(Ri);
       q.startsWith("spice_q4_") && (Ie.push(Fd(`M62,46 H80 V${ee - 15}`), fl(Bn - 20, ee - 21, "S")), Kt("S", Bn, ee - 15, "right", 80, ee - 15));
     } else if (/^spice_(?:jfet|mesfet|igbt)_/.test(q)) {
       const lt = q.includes("igbt"), dt = q.endsWith("_p");
@@ -54440,7 +54440,7 @@ function Zae(Tn, { font: qn = "Arial", fontSize: R = 12, color: Qn = "#292b29", 
       const dt = q === "i" || /^spice_[fg]$/.test(q) || q === "spice_b" && /^[IP]\s*=/i.test(U.attributes.value);
       Ie.push(Fd(dt ? "M45,42 V68 M40,61 L45,68 50,61" : "M39,45 H51 M45,39 V51 M39,66 H51")), Kt("+", 45, 0, "top", 45, lt ? 25 : 33), Kt("-", 45, ee, "bottom", 45, lt ? 85 : 77), Ie.push(fl(53, 19, "+"), fl(53, ee - 8, "−")), U.connections["C+"] && (Kt("C+", 0, 40, "left", 35, 40), Kt("C-", 0, 75, "left", 38.33, 75), Ie.push(fl(2, 34, "C+"), fl(2, 91, "C−"))), q === "spice_b" && Ie.push(fl(72, 60, "B"));
     }
-    re.push(...Ie), !At && !["gnd", "spice_subckt", "spice_device", "spice_coupling", "spice_port"].includes(q) && (re.push(["text", { x: 82, y: R + 4, "s:attribute": "displayRef", class: "ref" }, "ref"]), vn.forEach((dt, xi) => re.push(["text", { x: 82, y: R + 4 + (xi + 1) * (R + 4) }, dt]))), re.push(...ze), Vn.push(Gp.stringify(re));
+    re.push(...Ie), !At && !["gnd", "spice_subckt", "spice_device", "spice_coupling", "spice_port"].includes(q) && (re.push(["text", { x: 82, y: R + 4, "s:attribute": "displayRef", class: "ref" }, "ref"]), vn.forEach((dt, xi) => re.push(["text", { x: 82, y: R + 4 + (xi + 1) * (R + 4) }, dt]))), re.push(...ze), Qn.push(Gp.stringify(re));
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:s="https://github.com/nturley/netlistsvg">
   <s:properties constants="false" splitsAndJoins="false" genericsLaterals="true"><s:layoutEngine
@@ -54449,11 +54449,11 @@ function Zae(Tn, { font: qn = "Arial", fontSize: R = 12, color: Qn = "#292b29", 
   ${we ? 'org.eclipse.elk.layered.layering.strategy="COFFMAN_GRAHAM" org.eclipse.elk.layered.layering.coffmanGraham.layerBound="14"' : ""}
   org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers="24"
   org.eclipse.elk.spacing.componentComponent="30" org.eclipse.elk.separateConnectedComponents="false"/>
-  </s:properties><style>svg{stroke:${Qn};fill:none;stroke-width:1.4}
-  text{font-family:'${FRe(qn)}',Arial,sans-serif;font-size:${R}px;fill:${Qn};stroke:none;font-weight:normal}
+  </s:properties><style>svg{stroke:${Vn};fill:none;stroke-width:1.4}
+  text{font-family:'${FRe(qn)}',Arial,sans-serif;font-size:${R}px;fill:${Vn};stroke:none;font-weight:normal}
   .ref{font-weight:bold}.pin-label{font-size:${Math.max(8, R - 2)}px}.symbol{stroke-linejoin:round;stroke-linecap:round}
-  .detail{fill:${Qn}} .subckt-body{fill:#f3f6f1;stroke:${Qn}} circle[class^="net_"]{fill:${Qn}!important}
-  </style>${Vn.join(`
+  .detail{fill:${Vn}} .subckt-body{fill:#f3f6f1;stroke:${Vn}} circle[class^="net_"]{fill:${Vn}!important}
+  </style>${Qn.join(`
 `)}</svg>`;
 }
 var $Re = cde(), RRe = /* @__PURE__ */ LP($Re), BRe = Fkn(), KRe = /* @__PURE__ */ LP(BRe), HRe = zB(), nde = /* @__PURE__ */ LP(HRe), qRe = $kn(), CT = /* @__PURE__ */ LP(qRe), GRe = sde(), ede = /* @__PURE__ */ LP(GRe);
@@ -54466,65 +54466,65 @@ function ode(Tn) {
   for (const R of Tn)
     if (!(qn.length && gf(R.x, qn.at(-1).x) && gf(R.y, qn.at(-1).y)))
       for (qn.push(R); qn.length >= 3; ) {
-        const [Qn, zn, Xn] = qn.slice(-3);
-        if (gf(Qn.x, zn.x) && gf(zn.x, Xn.x) && (zn.y - Qn.y) * (Xn.y - zn.y) >= 0 || gf(Qn.y, zn.y) && gf(zn.y, Xn.y) && (zn.x - Qn.x) * (Xn.x - zn.x) >= 0) qn.splice(-2, 1);
+        const [Vn, zn, Xn] = qn.slice(-3);
+        if (gf(Vn.x, zn.x) && gf(zn.x, Xn.x) && (zn.y - Vn.y) * (Xn.y - zn.y) >= 0 || gf(Vn.y, zn.y) && gf(zn.y, Xn.y) && (zn.x - Vn.x) * (Xn.x - zn.x) >= 0) qn.splice(-2, 1);
         else break;
       }
   return qn;
 }
 function WB(Tn, qn) {
-  return Tn.edges.flatMap((R) => (R.sections || []).flatMap((Qn) => {
-    const zn = Kkn(Qn);
+  return Tn.edges.flatMap((R) => (R.sections || []).flatMap((Vn) => {
+    const zn = Kkn(Vn);
     return zn.slice(1).map((Xn, E) => ({ a: zn[E], b: Xn, bit: jun(R, qn) })).filter((Xn) => !gf(Xn.a.x, Xn.b.x) || !gf(Xn.a.y, Xn.b.y));
   }));
 }
 function Lkn(Tn, qn, R = 0) {
-  const Qn = Math.min(Tn.a.x, Tn.b.x), zn = Math.max(Tn.a.x, Tn.b.x), Xn = Math.min(Tn.a.y, Tn.b.y), E = Math.max(Tn.a.y, Tn.b.y);
-  return zn > qn.x - R + ll && Qn < qn.x + qn.width + R - ll && E > qn.y - R + ll && Xn < qn.y + qn.height + R - ll;
+  const Vn = Math.min(Tn.a.x, Tn.b.x), zn = Math.max(Tn.a.x, Tn.b.x), Xn = Math.min(Tn.a.y, Tn.b.y), E = Math.max(Tn.a.y, Tn.b.y);
+  return zn > qn.x - R + ll && Vn < qn.x + qn.width + R - ll && E > qn.y - R + ll && Xn < qn.y + qn.height + R - ll;
 }
 function zRe(Tn, qn, R = 0) {
   return Tn.x + Tn.width > qn.x - R && Tn.x < qn.x + qn.width + R && Tn.y + Tn.height > qn.y - R && Tn.y < qn.y + qn.height + R;
 }
-function Eun(Tn, qn, R, Qn, zn, Xn) {
+function Eun(Tn, qn, R, Vn, zn, Xn) {
   const E = { a: Tn, b: qn };
-  return Qn.children.some((Vn) => Vn.id !== R && Lkn(E, Vn, 4)) ? !1 : !zn.some((Vn) => Vn.bit !== Xn && Lkn(E, { x: Math.min(Vn.a.x, Vn.b.x) - 3, y: Math.min(Vn.a.y, Vn.b.y) - 3, width: Math.abs(Vn.a.x - Vn.b.x) + 6, height: Math.abs(Vn.a.y - Vn.b.y) + 6 }));
+  return Vn.children.some((Qn) => Qn.id !== R && Lkn(E, Qn, 4)) ? !1 : !zn.some((Qn) => Qn.bit !== Xn && Lkn(E, { x: Math.min(Qn.a.x, Qn.b.x) - 3, y: Math.min(Qn.a.y, Qn.b.y) - 3, width: Math.abs(Qn.a.x - Qn.b.x) + 6, height: Math.abs(Qn.a.y - Qn.b.y) + 6 }));
 }
-function WRe(Tn, qn, R, Qn, zn) {
-  const Xn = Math.min(Qn, zn), E = Math.max(Qn, zn), Vn = Tn.filter((Gn) => Gn.bit === qn && gf(Gn.a.y, R) && gf(Gn.b.y, R)).map((Gn) => [Math.min(Gn.a.x, Gn.b.x), Math.max(Gn.a.x, Gn.b.x)]).sort((Gn, fe) => Gn[0] - fe[0]);
+function WRe(Tn, qn, R, Vn, zn) {
+  const Xn = Math.min(Vn, zn), E = Math.max(Vn, zn), Qn = Tn.filter((Gn) => Gn.bit === qn && gf(Gn.a.y, R) && gf(Gn.b.y, R)).map((Gn) => [Math.min(Gn.a.x, Gn.b.x), Math.max(Gn.a.x, Gn.b.x)]).sort((Gn, fe) => Gn[0] - fe[0]);
   let we = Xn;
-  for (const [Gn, fe] of Vn)
+  for (const [Gn, fe] of Qn)
     if (!(Gn > we + ll) && (fe >= we - ll && (we = Math.max(we, fe)), we >= E - ll))
       return !0;
   return !1;
 }
 function XRe(Tn, qn, R) {
-  const Qn = new Map(Tn.children.map((U) => [U.id, U])), zn = Tn.edges.filter((U) => jun(U, qn) === R), Xn = /* @__PURE__ */ new Map();
+  const Vn = new Map(Tn.children.map((U) => [U.id, U])), zn = Tn.edges.filter((U) => jun(U, qn) === R), Xn = /* @__PURE__ */ new Map();
   if (!zn.length) return 0;
   for (const U of zn) {
     if (U.sections?.length !== 1) return 0;
     for (const q of [U.sourcePort || U.sources?.[0], U.targetPort || U.targets?.[0]]) {
-      const wn = Qn.get(q.slice(0, q.lastIndexOf("."))), kn = wn?.ports.find((Kn) => Kn.id === q);
+      const wn = Vn.get(q.slice(0, q.lastIndexOf("."))), kn = wn?.ports.find((Kn) => Kn.id === q);
       if (kn?.layoutOptions?.[Rkn] !== "SOUTH") return 0;
       Xn.set(q, { ...Bkn(wn, kn), owner: wn.id });
     }
   }
-  const E = [...Xn.values()], Vn = Math.max(...E.map((U) => U.y)) + 20, we = Math.min(...E.map((U) => U.x)), Gn = Math.max(...E.map((U) => U.x)), fe = WB(Tn, qn);
-  if (!Eun({ x: we, y: Vn }, { x: Gn, y: Vn }, "", Tn, fe, R) || E.some((U) => !Eun(U, { x: U.x, y: Vn }, U.owner, Tn, fe, R))) return 0;
+  const E = [...Xn.values()], Qn = Math.max(...E.map((U) => U.y)) + 20, we = Math.min(...E.map((U) => U.x)), Gn = Math.max(...E.map((U) => U.x)), fe = WB(Tn, qn);
+  if (!Eun({ x: we, y: Qn }, { x: Gn, y: Qn }, "", Tn, fe, R) || E.some((U) => !Eun(U, { x: U.x, y: Qn }, U.owner, Tn, fe, R))) return 0;
   let cn = 0;
   for (const U of zn) {
-    const q = Xn.get(U.sourcePort || U.sources?.[0]), wn = Xn.get(U.targetPort || U.targets?.[0]), kn = ode([{ x: q.x, y: q.y }, { x: q.x, y: Vn }, { x: wn.x, y: Vn }, { x: wn.x, y: wn.y }]);
+    const q = Xn.get(U.sourcePort || U.sources?.[0]), wn = Xn.get(U.targetPort || U.targets?.[0]), kn = ode([{ x: q.x, y: q.y }, { x: q.x, y: Qn }, { x: wn.x, y: Qn }, { x: wn.x, y: wn.y }]);
     JSON.stringify(Kkn(U.sections[0])) !== JSON.stringify(kn) && cn++, U.sections[0] = { ...U.sections[0], startPoint: kn[0], bendPoints: kn.slice(1, -1), endPoint: kn.at(-1) };
   }
-  return Tn.height = Math.max(Tn.height, Vn + 12), cn;
+  return Tn.height = Math.max(Tn.height, Qn + 12), cn;
 }
 function JRe(Tn, qn, R) {
-  const Qn = new Map(Tn.children.map((Xn) => [Xn.id, Xn]));
+  const Vn = new Map(Tn.children.map((Xn) => [Xn.id, Xn]));
   let zn = 0;
   for (const Xn of Tn.edges)
     if (!(jun(Xn, qn) !== R || Xn.sections?.length !== 1))
       for (const E of [!1, !0]) {
-        const Vn = E ? Xn.targetPort || Xn.targets?.[0] : Xn.sourcePort || Xn.sources?.[0], we = Vn.slice(0, Vn.lastIndexOf("."));
-        if (Qn.get(we)?.ports.find((vn) => vn.id === Vn)?.layoutOptions?.[Rkn] !== "SOUTH") continue;
+        const Qn = E ? Xn.targetPort || Xn.targets?.[0] : Xn.sourcePort || Xn.sources?.[0], we = Qn.slice(0, Qn.lastIndexOf("."));
+        if (Vn.get(we)?.ports.find((vn) => vn.id === Qn)?.layoutOptions?.[Rkn] !== "SOUTH") continue;
         const cn = Kkn(Xn.sections[0]), U = E ? [...cn].reverse() : cn, q = U[0], wn = WB(Tn, qn), kn = [];
         for (let vn = 1; vn < U.length - 1; vn++) {
           const An = U[vn], Bn = U[vn + 1];
@@ -54540,24 +54540,24 @@ function JRe(Tn, qn, R) {
       }
   return zn;
 }
-function VRe(Tn, qn, R, Qn) {
-  const zn = Qn.modules.circuit.cells[R.id].connections.A[0], Xn = WB(Tn, qn), E = R.ports.find((we) => we.id === R.id + ".A"), Vn = [];
+function VRe(Tn, qn, R, Vn) {
+  const zn = Vn.modules.circuit.cells[R.id].connections.A[0], Xn = WB(Tn, qn), E = R.ports.find((we) => we.id === R.id + ".A"), Qn = [];
   for (const we of Xn) if (we.bit === zn)
     if (gf(we.a.y, we.b.y)) {
       const Gn = Math.min(we.a.x, we.b.x), fe = Math.max(we.a.x, we.b.x), cn = Math.min(8, (fe - Gn) / 4);
-      for (const U of [(Gn + fe) / 2, Gn + cn, fe - cn]) Vn.push({ anchor: { x: U, y: we.a.y }, owner: "", length: fe - Gn });
-    } else gf(we.a.x, we.b.x) && Vn.push({ anchor: { x: we.a.x, y: Math.max(we.a.y, we.b.y) }, owner: "", length: 0 });
+      for (const U of [(Gn + fe) / 2, Gn + cn, fe - cn]) Qn.push({ anchor: { x: U, y: we.a.y }, owner: "", length: fe - Gn });
+    } else gf(we.a.x, we.b.x) && Qn.push({ anchor: { x: we.a.x, y: Math.max(we.a.y, we.b.y) }, owner: "", length: 0 });
   for (const we of Tn.children) for (const Gn of we.ports || []) {
     const fe = Gn.id.slice(we.id.length + 1);
-    Qn.modules.circuit.cells[we.id]?.connections[fe]?.[0] === zn && Gn.layoutOptions?.[Rkn] === "SOUTH" && Vn.push({ anchor: Bkn(we, Gn), owner: we.id, pin: Gn.id, length: 0 });
+    Vn.modules.circuit.cells[we.id]?.connections[fe]?.[0] === zn && Gn.layoutOptions?.[Rkn] === "SOUTH" && Qn.push({ anchor: Bkn(we, Gn), owner: we.id, pin: Gn.id, length: 0 });
   }
-  Vn.sort((we, Gn) => Gn.anchor.y - we.anchor.y || Gn.length - we.length);
-  for (const we of Vn) {
+  Qn.sort((we, Gn) => Gn.anchor.y - we.anchor.y || Gn.length - we.length);
+  for (const we of Qn) {
     const Gn = { x: we.anchor.x, y: we.anchor.y + 22 }, fe = { ...R, x: Gn.x - E.x, y: Gn.y - E.y };
     if (!(fe.x < 0 || !Eun(we.anchor, Gn, we.owner, Tn, Xn, zn)) && !(Tn.children.some((cn) => zRe(fe, cn, 5)) || Xn.some((cn) => Lkn(cn, fe, 3))))
       return Tn.children.push(fe), Tn.width = Math.max(Tn.width, fe.x + fe.width + 12), Tn.height = Math.max(Tn.height, fe.y + fe.height + 12), { node: fe, bit: zn, groundPin: E.id, anchor: we.anchor, end: Gn, pin: we.pin || null };
   }
-  if (!Xn.some((we) => we.bit === zn) && !Vn.length && !Object.entries(Qn.modules.circuit.cells).some(([Gn, fe]) => Gn !== R.id && Object.values(fe.connections).some((cn) => cn[0] === zn))) {
+  if (!Xn.some((we) => we.bit === zn) && !Qn.length && !Object.entries(Vn.modules.circuit.cells).some(([Gn, fe]) => Gn !== R.id && Object.values(fe.connections).some((cn) => cn[0] === zn))) {
     const Gn = { ...R, x: 12, y: Tn.height + 12 };
     return Tn.children.push(Gn), Tn.width = Math.max(Tn.width, Gn.x + Gn.width + 12), Tn.height = Gn.y + Gn.height + 12, { node: Gn, bit: zn, groundPin: E.id, anchor: null, end: null, pin: null };
   }
@@ -54567,25 +54567,25 @@ function tde(Tn, qn) {
   const R = /* @__PURE__ */ new Map();
   for (const zn of Tn) {
     if (qn ? !gf(zn.a.y, zn.b.y) : !gf(zn.a.x, zn.b.x)) continue;
-    const Xn = qn ? zn.a.y : zn.a.x, E = Xn.toFixed(3), Vn = qn ? zn.a.x : zn.a.y, we = qn ? zn.b.x : zn.b.y;
-    R.has(E) || R.set(E, { axis: Xn, intervals: [] }), R.get(E).intervals.push([Math.min(Vn, we), Math.max(Vn, we)]);
+    const Xn = qn ? zn.a.y : zn.a.x, E = Xn.toFixed(3), Qn = qn ? zn.a.x : zn.a.y, we = qn ? zn.b.x : zn.b.y;
+    R.has(E) || R.set(E, { axis: Xn, intervals: [] }), R.get(E).intervals.push([Math.min(Qn, we), Math.max(Qn, we)]);
   }
-  const Qn = [];
+  const Vn = [];
   for (const { axis: zn, intervals: Xn } of R.values()) {
-    Xn.sort((Vn, we) => Vn[0] - we[0]);
+    Xn.sort((Qn, we) => Qn[0] - we[0]);
     let E;
-    for (const [Vn, we] of Xn)
-      E && Vn <= E.hi + ll ? E.hi = Math.max(E.hi, we) : (E = { axis: zn, lo: Vn, hi: we }, Qn.push(E));
+    for (const [Qn, we] of Xn)
+      E && Qn <= E.hi + ll ? E.hi = Math.max(E.hi, we) : (E = { axis: zn, lo: Qn, hi: we }, Vn.push(E));
   }
-  return Qn;
+  return Vn;
 }
-function QRe(Tn, qn, R, Qn) {
+function QRe(Tn, qn, R, Vn) {
   const zn = Tn.edges.filter((Gn) => jun(Gn, qn) === R);
   if (!zn.length) return;
   const Xn = WB(Tn, qn).filter((Gn) => Gn.bit === R);
-  Qn?.anchor && Xn.push({ a: Qn.anchor, b: Qn.end, bit: R });
-  const E = tde(Xn, !0), Vn = tde(Xn, !1), we = /* @__PURE__ */ new Map();
-  for (const Gn of E) for (const fe of Vn) {
+  Vn?.anchor && Xn.push({ a: Vn.anchor, b: Vn.end, bit: R });
+  const E = tde(Xn, !0), Qn = tde(Xn, !1), we = /* @__PURE__ */ new Map();
+  for (const Gn of E) for (const fe of Qn) {
     if (fe.axis < Gn.lo - ll || fe.axis > Gn.hi + ll || Gn.axis < fe.lo - ll || Gn.axis > fe.hi + ll) continue;
     const cn = +(fe.axis > Gn.lo + ll) + +(fe.axis < Gn.hi - ll) + +(Gn.axis > fe.lo + ll) + +(Gn.axis < fe.hi - ll), U = { x: fe.axis, y: Gn.axis };
     cn >= 3 && we.set(URe(U), U);
@@ -54593,73 +54593,73 @@ function QRe(Tn, qn, R, Qn) {
   for (const Gn of zn) Gn.junctionPoints = [];
   zn[0].junctionPoints = [...we.values()];
 }
-function YRe(Tn, qn, R, Qn) {
+function YRe(Tn, qn, R, Vn) {
   if (!R.anchor) return [];
-  const { anchor: zn, end: Xn, bit: E, node: Vn, groundPin: we, pin: Gn } = R, fe = Vn.ports.find((U) => U.id === we);
-  if (Qn.modules.circuit.cells[Vn.id]?.connections[we.slice(Vn.id.length + 1)]?.[0] !== E) throw Error("Ground symbol uses the wrong net.");
-  if (!gf(zn.x, Xn.x) || Xn.y <= zn.y || !gf(Vn.x + fe.x, Xn.x) || !gf(Vn.y + fe.y, Xn.y)) throw Error("Invalid ground symbol attachment.");
+  const { anchor: zn, end: Xn, bit: E, node: Qn, groundPin: we, pin: Gn } = R, fe = Qn.ports.find((U) => U.id === we);
+  if (Vn.modules.circuit.cells[Qn.id]?.connections[we.slice(Qn.id.length + 1)]?.[0] !== E) throw Error("Ground symbol uses the wrong net.");
+  if (!gf(zn.x, Xn.x) || Xn.y <= zn.y || !gf(Qn.x + fe.x, Xn.x) || !gf(Qn.y + fe.y, Xn.y)) throw Error("Invalid ground symbol attachment.");
   const cn = new Map(Tn.children.map((U) => [U.id, U]));
   if (Gn) {
     const U = cn.get(Gn.slice(0, Gn.lastIndexOf("."))), q = U?.ports.find((Kn) => Kn.id === Gn), wn = q && Bkn(U, q), kn = Gn.slice(U.id.length + 1);
-    if (!wn || !gf(zn.x, wn.x) || !gf(zn.y, wn.y) || Qn.modules.circuit.cells[U.id].connections[kn][0] !== E) throw Error("Ground symbol attached to the wrong pin.");
+    if (!wn || !gf(zn.x, wn.x) || !gf(zn.y, wn.y) || Vn.modules.circuit.cells[U.id].connections[kn][0] !== E) throw Error("Ground symbol attached to the wrong pin.");
   } else if (!WB(Tn, qn).some((U) => U.bit === E && (gf(U.a.y, U.b.y) && gf(zn.y, U.a.y) && zn.x >= Math.min(U.a.x, U.b.x) - ll && zn.x <= Math.max(U.a.x, U.b.x) + ll || gf(U.a.x, U.b.x) && gf(zn.x, U.a.x) && zn.y >= Math.min(U.a.y, U.b.y) - ll && zn.y <= Math.max(U.a.y, U.b.y) + ll))) throw Error("Ground symbol is not on the ground rail.");
   return Gn ? [we, Gn] : [we];
 }
 function ZRe(Tn, qn) {
-  const R = new Map(Tn.children.map((E) => [E.id, E])), Qn = /* @__PURE__ */ new Map(), zn = [];
+  const R = new Map(Tn.children.map((E) => [E.id, E])), Vn = /* @__PURE__ */ new Map(), zn = [];
   for (const E of qn.values()) {
     if (E.length < 2) continue;
-    const Vn = E.map((fe) => R.get(fe)).filter(Boolean);
-    if (Vn.length < 2) continue;
+    const Qn = E.map((fe) => R.get(fe)).filter(Boolean);
+    if (Qn.length < 2) continue;
     let we = "__layout_parallel_" + (Tn.id || "root") + "_" + zn.length;
     for (; R.has(we); ) we += "_";
-    const Gn = { id: we, children: Vn, layoutOptions: { "org.eclipse.elk.algorithm": "layered", "org.eclipse.elk.direction": "RIGHT", "org.eclipse.elk.edgeRouting": "ORTHOGONAL", "org.eclipse.elk.padding": "[top=8,left=8,bottom=8,right=8]", "org.eclipse.elk.spacing.nodeNode": 16, "org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers": 20 } };
-    Vn.length > 4 && Object.assign(Gn.layoutOptions, { "org.eclipse.elk.layered.layering.strategy": "COFFMAN_GRAHAM", "org.eclipse.elk.layered.layering.coffmanGraham.layerBound": Math.ceil(Math.sqrt(Vn.length)) }), zn.push(Gn);
-    for (const fe of Vn) Qn.set(fe.id, Gn);
+    const Gn = { id: we, children: Qn, layoutOptions: { "org.eclipse.elk.algorithm": "layered", "org.eclipse.elk.direction": "RIGHT", "org.eclipse.elk.edgeRouting": "ORTHOGONAL", "org.eclipse.elk.padding": "[top=8,left=8,bottom=8,right=8]", "org.eclipse.elk.spacing.nodeNode": 16, "org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers": 20 } };
+    Qn.length > 4 && Object.assign(Gn.layoutOptions, { "org.eclipse.elk.layered.layering.strategy": "COFFMAN_GRAHAM", "org.eclipse.elk.layered.layering.coffmanGraham.layerBound": Math.ceil(Math.sqrt(Qn.length)) }), zn.push(Gn);
+    for (const fe of Qn) Vn.set(fe.id, Gn);
   }
   const Xn = /* @__PURE__ */ new Set();
   return Tn.children = Tn.children.flatMap((E) => {
-    const Vn = Qn.get(E.id);
-    return Vn ? Xn.has(Vn.id) ? [] : (Xn.add(Vn.id), [Vn]) : [E];
+    const Qn = Vn.get(E.id);
+    return Qn ? Xn.has(Qn.id) ? [] : (Xn.add(Qn.id), [Qn]) : [E];
   }), zn.length;
 }
 function nBe(Tn) {
-  const qn = /* @__PURE__ */ new Map([[Tn.id, { x: 0, y: 0 }]]), R = [], Qn = [];
-  function zn(Vn, we, Gn) {
-    qn.set(Vn.id, { x: we, y: Gn });
-    for (const fe of Vn.edges || []) Qn.push({ edge: fe, container: Vn.id });
-    for (const fe of Vn.children || []) {
+  const qn = /* @__PURE__ */ new Map([[Tn.id, { x: 0, y: 0 }]]), R = [], Vn = [];
+  function zn(Qn, we, Gn) {
+    qn.set(Qn.id, { x: we, y: Gn });
+    for (const fe of Qn.edges || []) Vn.push({ edge: fe, container: Qn.id });
+    for (const fe of Qn.children || []) {
       const cn = we + fe.x, U = Gn + fe.y;
       fe.children ? zn(fe, cn, U) : R.push({ ...fe, x: cn, y: U });
     }
   }
   zn(Tn, 0, 0);
   const Xn = /* @__PURE__ */ new Set(), E = [];
-  for (const { edge: Vn, container: we } of Qn) {
-    if (Xn.has(Vn.id)) continue;
-    Xn.add(Vn.id);
-    const Gn = qn.get(Vn.container || we);
+  for (const { edge: Qn, container: we } of Vn) {
+    if (Xn.has(Qn.id)) continue;
+    Xn.add(Qn.id);
+    const Gn = qn.get(Qn.container || we);
     if (!Gn) throw Error("Unknown ELK edge coordinate container.");
     const fe = (cn) => ({ x: cn.x + Gn.x, y: cn.y + Gn.y });
-    E.push({ ...Vn, container: Tn.id, sections: Vn.sections?.map((cn) => ({ ...cn, startPoint: fe(cn.startPoint), endPoint: fe(cn.endPoint), bendPoints: cn.bendPoints?.map(fe) })), junctionPoints: Vn.junctionPoints?.map(fe) });
+    E.push({ ...Qn, container: Tn.id, sections: Qn.sections?.map((cn) => ({ ...cn, startPoint: fe(cn.startPoint), endPoint: fe(cn.endPoint), bendPoints: cn.bendPoints?.map(fe) })), junctionPoints: Qn.junctionPoints?.map(fe) });
   }
   return { ...Tn, children: R, edges: E };
 }
 const bw = "org.eclipse.elk.";
 function yun(Tn, qn, R = 10) {
-  const Qn = Tn.map((fe) => fe.id), zn = (fe) => Math.min(R, new Set(Object.values(qn[fe]?.connections || {}).map((cn) => cn[0])).size), Xn = (fe) => new Set(Object.entries(qn[fe]?.connections || {}).filter(([cn]) => {
+  const Vn = Tn.map((fe) => fe.id), zn = (fe) => Math.min(R, new Set(Object.values(qn[fe]?.connections || {}).map((cn) => cn[0])).size), Xn = (fe) => new Set(Object.entries(qn[fe]?.connections || {}).filter(([cn]) => {
     const U = qn[fe]?.spiceLayout?.ports[cn];
     return !["pwr", "ret", "bias"].includes(U?.role) && !(U?.role === "unknown" && U.potential !== null && U.potential !== void 0);
-  }).map(([, cn]) => cn[0])), E = [], Vn = /* @__PURE__ */ new Set(), we = new Set(Qn), Gn = new Map(Tn.map((fe) => [fe.id, fe]));
+  }).map(([, cn]) => cn[0])), E = [], Qn = /* @__PURE__ */ new Set(), we = new Set(Vn), Gn = new Map(Tn.map((fe) => [fe.id, fe]));
   for (; we.size; ) {
-    const fe = [...we].sort((cn, U) => zn(U) - zn(cn) || [...Xn(U)].filter((q) => Vn.has(q)).length - [...Xn(cn)].filter((q) => Vn.has(q)).length || Qn.indexOf(cn) - Qn.indexOf(U))[0];
+    const fe = [...we].sort((cn, U) => zn(U) - zn(cn) || [...Xn(U)].filter((q) => Qn.has(q)).length - [...Xn(cn)].filter((q) => Qn.has(q)).length || Vn.indexOf(cn) - Vn.indexOf(U))[0];
     we.delete(fe), E.push(Gn.get(fe));
-    for (const cn of Xn(fe)) Vn.add(cn);
+    for (const cn of Xn(fe)) Qn.add(cn);
   }
   return E;
 }
-function eBe(Tn, qn, R, Qn) {
-  const zn = R?.priorityCap || 10, Xn = new Map(Tn.children.map((vn) => [vn.id, vn])), E = /* @__PURE__ */ new Set(), Vn = /* @__PURE__ */ new Map(), we = [];
+function eBe(Tn, qn, R, Vn) {
+  const zn = R?.priorityCap || 10, Xn = new Map(Tn.children.map((vn) => [vn.id, vn])), E = /* @__PURE__ */ new Set(), Qn = /* @__PURE__ */ new Map(), we = [];
   let Gn = 0, fe = 0, cn = 0, U = 0;
   const q = (vn, An, Bn) => {
     vn !== An && we.push({ id: "__guide_" + Gn++, source: vn, target: An, layoutOptions: { [bw + "layered.priority.direction"]: 1e3, [bw + "direction"]: Bn } });
@@ -54671,11 +54671,11 @@ function eBe(Tn, qn, R, Qn) {
       });
       for (let ze = 1; ze < Bn.length; ze++) q(Bn[ze - 1].id, Bn[ze].id, re.layoutOptions[bw + "direction"]);
     }
-    return Vn.set(vn.toLowerCase(), re), re;
+    return Qn.set(vn.toLowerCase(), re), re;
   }, kn = /* @__PURE__ */ new Set();
   if (R) {
     const vn = new Map(R.groups.map((ze) => [ze.id.toLowerCase(), ze])), An = (ze) => {
-      if (Vn.has(ze)) return Vn.get(ze);
+      if (Qn.has(ze)) return Qn.get(ze);
       if (kn.has(ze)) throw Error("Circular visual containment.");
       kn.add(ze);
       const Ie = vn.get(ze), At = [], bi = /* @__PURE__ */ new Map();
@@ -54699,7 +54699,7 @@ function eBe(Tn, qn, R, Qn) {
     Tn.children = [...ee, ...yun(Tn.children.filter((ze) => !E.has(ze.id)), qn)];
     const re = (ze, Ie) => ze.id === Ie || ze.children?.some((At) => re(At, Ie));
     for (const ze of R.relations) {
-      const Ie = Vn.get(ze.a.toLowerCase()) || Vn.get(("@instance_" + ze.a).toLowerCase()) || Xn.get(ze.a), At = Vn.get(ze.b.toLowerCase()) || Vn.get(("@instance_" + ze.b).toLowerCase()) || Xn.get(ze.b);
+      const Ie = Qn.get(ze.a.toLowerCase()) || Qn.get(("@instance_" + ze.a).toLowerCase()) || Xn.get(ze.a), At = Qn.get(ze.b.toLowerCase()) || Qn.get(("@instance_" + ze.b).toLowerCase()) || Xn.get(ze.b);
       if (!Ie || !At || Ie.children && !Ie.children.length || At.children && !At.children.length) continue;
       const bi = (jn) => {
         const N = jn.children.find((dt) => re(dt, Ie.id)), Kt = jn.children.find((dt) => re(dt, At.id));
@@ -54740,7 +54740,7 @@ function eBe(Tn, qn, R, Qn) {
   }
   function Kn(vn) {
     for (const ee of vn.children || []) ee.children && Kn(ee);
-    const An = new Set((vn.children || []).filter((ee) => !ee.children).map((ee) => ee.id)), Bn = new Map([...Qn].map(([ee, re]) => [ee, re.filter((ze) => An.has(ze))]));
+    const An = new Set((vn.children || []).filter((ee) => !ee.children).map((ee) => ee.id)), Bn = new Map([...Vn].map(([ee, re]) => [ee, re.filter((ze) => An.has(ze))]));
     U += ZRe(vn, Bn);
   }
   return Kn(Tn), Tn.edges.push(...we), { explicitGroups: fe, inferredGroups: cn, parallelGroups: U, guideCount: we.length, portPriorityCap: zn };
@@ -54751,13 +54751,13 @@ function fde(Tn) {
 }
 const Tun = (Tn) => Math.round(Number(Tn) * 1e3) / 1e3, Gm = (Tn) => Tun(Tn.x) + "," + Tun(Tn.y), o6 = (Tn, qn) => Math.abs(Tn - qn) < 2e-3, ide = (Tn, qn, R) => Tn >= Math.min(qn, R) - 2e-3 && Tn <= Math.max(qn, R) + 2e-3, _kn = (Tn, qn) => o6(qn.a.x, qn.b.x) ? o6(Tn.x, qn.a.x) && ide(Tn.y, qn.a.y, qn.b.y) : o6(Tn.y, qn.a.y) && ide(Tn.x, qn.a.x, qn.b.x), Nkn = (Tn, qn) => Math.abs(Tn.x - qn.x) + Math.abs(Tn.y - qn.y);
 function tBe(Tn, qn = [], R = []) {
-  const Qn = /* @__PURE__ */ new Map(), zn = /* @__PURE__ */ new Set(), Xn = /* @__PURE__ */ new Set(), E = (Bn) => {
+  const Vn = /* @__PURE__ */ new Map(), zn = /* @__PURE__ */ new Set(), Xn = /* @__PURE__ */ new Set(), E = (Bn) => {
     const ee = { x: Tun(Bn.x), y: Tun(Bn.y) };
-    return Qn.set(Gm(ee), ee), Gm(ee);
+    return Vn.set(Gm(ee), ee), Gm(ee);
   };
   for (const Bn of Tn)
     E(Bn.a), E(Bn.b);
-  const Vn = qn.map(E);
+  const Qn = qn.map(E);
   for (const Bn of R)
     zn.add(E(Bn.a)), zn.add(E(Bn.b)), Xn.add([Gm(Bn.a), Gm(Bn.b)].sort().join("|"));
   for (let Bn = 0; Bn < Tn.length; Bn++) for (let ee = Bn + 1; ee < Tn.length; ee++) {
@@ -54768,13 +54768,13 @@ function tBe(Tn, qn = [], R = []) {
   }
   const we = /* @__PURE__ */ new Map();
   for (const Bn of Tn) {
-    const ee = [...Qn.values()].filter((re) => _kn(re, Bn)).sort((re, ze) => re.x - ze.x || re.y - ze.y);
+    const ee = [...Vn.values()].filter((re) => _kn(re, Bn)).sort((re, ze) => re.x - ze.x || re.y - ze.y);
     for (let re = 1; re < ee.length; re++) {
       const ze = Gm(ee[re - 1]), Ie = Gm(ee[re]);
       ze !== Ie && we.set([ze, Ie].sort().join("|"), { a: ze, b: Ie, length: Nkn(ee[re - 1], ee[re]) });
     }
   }
-  const Gn = new Map([...Qn.keys()].map((Bn) => [Bn, Bn])), fe = (Bn) => {
+  const Gn = new Map([...Vn.keys()].map((Bn) => [Bn, Bn])), fe = (Bn) => {
     let ee = Bn;
     for (; Gn.get(ee) !== ee; ) ee = Gn.get(ee);
     for (; Bn !== ee; ) {
@@ -54782,7 +54782,7 @@ function tBe(Tn, qn = [], R = []) {
       Gn.set(Bn, ee), Bn = re;
     }
     return ee;
-  }, cn = [...we.entries()].sort(([Bn, ee], [re, ze]) => Number(Xn.has(re)) - Number(Xn.has(Bn)) || ee.length - ze.length || Bn.localeCompare(re)), U = new Map([...Qn.keys()].map((Bn) => [Bn, /* @__PURE__ */ new Set()]));
+  }, cn = [...we.entries()].sort(([Bn, ee], [re, ze]) => Number(Xn.has(re)) - Number(Xn.has(Bn)) || ee.length - ze.length || Bn.localeCompare(re)), U = new Map([...Vn.keys()].map((Bn) => [Bn, /* @__PURE__ */ new Set()]));
   let q = 0;
   for (const [, Bn] of cn) {
     const ee = fe(Bn.a), re = fe(Bn.b);
@@ -54792,8 +54792,8 @@ function tBe(Tn, qn = [], R = []) {
     }
     Gn.set(ee, re), U.get(Bn.a).add(Bn.b), U.get(Bn.b).add(Bn.a);
   }
-  if (Vn.length > 1 && Vn.some((Bn) => fe(Bn) !== fe(Vn[0]))) throw Error("Geometric net cleanup found disconnected terminals.");
-  const wn = /* @__PURE__ */ new Set([...Vn, ...zn]), kn = [...U].filter(([Bn, ee]) => ee.size === 1 && !wn.has(Bn)).map(([Bn]) => Bn);
+  if (Qn.length > 1 && Qn.some((Bn) => fe(Bn) !== fe(Qn[0]))) throw Error("Geometric net cleanup found disconnected terminals.");
+  const wn = /* @__PURE__ */ new Set([...Qn, ...zn]), kn = [...U].filter(([Bn, ee]) => ee.size === 1 && !wn.has(Bn)).map(([Bn]) => Bn);
   let Kn = 0;
   for (; kn.length; ) {
     const Bn = kn.pop();
@@ -54802,18 +54802,18 @@ function tBe(Tn, qn = [], R = []) {
     U.get(Bn).clear(), U.get(ee).delete(Bn), Kn++, U.get(ee).size === 1 && !wn.has(ee) && kn.push(ee);
   }
   for (const [Bn, ee] of U) if (ee.size === 2 && !wn.has(Bn)) {
-    const [re, ze] = [...ee], Ie = Qn.get(re), At = Qn.get(Bn), bi = Qn.get(ze);
+    const [re, ze] = [...ee], Ie = Vn.get(re), At = Vn.get(Bn), bi = Vn.get(ze);
     (o6(Ie.x, At.x) && o6(At.x, bi.x) || o6(Ie.y, At.y) && o6(At.y, bi.y)) && (U.get(re).delete(Bn), U.get(ze).delete(Bn), U.get(re).add(ze), U.get(ze).add(re), ee.clear());
   }
   const vn = [], An = /* @__PURE__ */ new Set();
   for (const [Bn, ee] of U) for (const re of ee) {
     const ze = [Bn, re].sort().join("|");
-    An.has(ze) || (An.add(ze), vn.push({ a: Qn.get(Bn), b: Qn.get(re) }));
+    An.has(ze) || (An.add(ze), vn.push({ a: Vn.get(Bn), b: Vn.get(re) }));
   }
-  return { segments: vn, junctions: [...U].filter(([, Bn]) => Bn.size >= 3).map(([Bn]) => Qn.get(Bn)), cyclesRemoved: q, leavesRemoved: Kn, wireLength: vn.reduce((Bn, ee) => Bn + Nkn(ee.a, ee.b), 0) };
+  return { segments: vn, junctions: [...U].filter(([, Bn]) => Bn.size >= 3).map(([Bn]) => Vn.get(Bn)), cyclesRemoved: q, leavesRemoved: Kn, wireLength: vn.reduce((Bn, ee) => Bn + Nkn(ee.a, ee.b), 0) };
 }
 function iBe(Tn, qn) {
-  const R = Gp.parse(Tn), Qn = /* @__PURE__ */ new Map(), zn = /* @__PURE__ */ new Map(), Xn = qn.modules.circuit.cells;
+  const R = Gp.parse(Tn), Vn = /* @__PURE__ */ new Map(), zn = /* @__PURE__ */ new Map(), Xn = qn.modules.circuit.cells;
   for (const U of R.filter((q) => Array.isArray(q) && q[0] === "g")) {
     const q = U[1].id?.slice(5), wn = Xn[q], kn = U[1].transform?.match(/translate\(([^,]+),([^\)]+)\)/);
     if (!(!wn || !kn))
@@ -54824,13 +54824,13 @@ function iBe(Tn, qn) {
   }
   for (const U of R.filter((q) => Array.isArray(q) && q[0] === "line" && q[1].class?.startsWith("net_"))) {
     const q = U[1], wn = { a: { x: +q.x1, y: +q.y1 }, b: { x: +q.x2, y: +q.y2 }, attachment: !!q["data-ground-attachment"] };
-    Nkn(wn.a, wn.b) < 2e-3 || (Qn.has(q.class) || Qn.set(q.class, []), Qn.get(q.class).push(wn));
+    Nkn(wn.a, wn.b) < 2e-3 || (Vn.has(q.class) || Vn.set(q.class, []), Vn.get(q.class).push(wn));
   }
   const E = [];
-  let Vn = 0, we = 0, Gn = 0, fe = 0;
-  for (const [U, q] of Qn) {
+  let Qn = 0, we = 0, Gn = 0, fe = 0;
+  for (const [U, q] of Vn) {
     const wn = q.filter((Kn) => Kn.attachment), kn = tBe(q, zn.get(U) || [], wn);
-    Vn += kn.cyclesRemoved, we += kn.leavesRemoved, Gn += kn.wireLength, fe += kn.segments.length;
+    Qn += kn.cyclesRemoved, we += kn.leavesRemoved, Gn += kn.wireLength, fe += kn.segments.length;
     for (const Kn of kn.segments) {
       const vn = wn.find((ee) => [Gm(ee.a), Gm(ee.b)].sort().join("|") === [Gm(Kn.a), Gm(Kn.b)].sort().join("|")), An = vn?.a || Kn.a, Bn = vn?.b || Kn.b;
       E.push(["line", { x1: An.x, y1: An.y, x2: Bn.x, y2: Bn.y, class: U, ...vn ? { "data-ground-attachment": "true" } : {} }]);
@@ -54838,17 +54838,17 @@ function iBe(Tn, qn) {
     for (const Kn of kn.junctions) E.push(["circle", { cx: Kn.x, cy: Kn.y, r: 2, class: U, style: "fill:#000" }]);
   }
   const cn = R.filter((U, q) => q < 2 || !Array.isArray(U) || !["line", "circle"].includes(U[0]) || !U[1].class?.startsWith("net_"));
-  return cn.push(...E), { svg: Gp.stringify(cn), report: { normalizedNets: Qn.size, cyclesRemoved: Vn, leavesRemoved: we, uniqueSegments: fe, uniqueWireLength: Gn, geometricConnectivityVerified: !0 } };
+  return cn.push(...E), { svg: Gp.stringify(cn), report: { normalizedNets: Vn.size, cyclesRemoved: Qn, leavesRemoved: we, uniqueSegments: fe, uniqueWireLength: Gn, geometricConnectivityVerified: !0 } };
 }
 const GB = "org.eclipse.elk.", rBe = (Tn) => Tn?.potential !== null && Tn?.potential !== void 0;
-function cBe(Tn, qn, R, Qn) {
-  if (Qn) return null;
+function cBe(Tn, qn, R, Vn) {
+  if (Vn?.groups.some((Kn) => Kn.members.length) || Vn?.relations.length) return null;
   const zn = Object.entries(qn).filter(([, Kn]) => ["Q", "M", "J", "Z"].includes(Kn.spiceLayout?.kind));
   if (!zn.length || zn.length > 8 || Object.keys(qn).length > 80 || Object.values(qn).some((Kn) => Kn.spiceBlock || Object.keys(Kn.connections).length > 4 || Kn.spiceLayout && !["Q", "M", "J", "Z", "R", "L", "C", "D", "V", "I", "PORT"].includes(Kn.spiceLayout.kind))) return null;
   const Xn = /* @__PURE__ */ new Map();
   for (const Kn of Object.values(qn)) for (const [vn, [An]] of Object.entries(Kn.connections)) rBe(Kn.spiceLayout?.ports[vn]) && Xn.set(An, Kn.spiceLayout.ports[vn].potential);
   if (Xn.size < 2 || Xn.size > 5) return null;
-  const E = new Set(Object.entries(qn).filter(([, Kn]) => Kn.spiceLayout?.kind === "V" && Object.values(Kn.connections).every(([vn]) => Xn.has(vn))).map(([Kn]) => Kn)), Vn = Tn.children.filter((Kn) => E.has(Kn.id)), we = Tn.edges.filter((Kn) => Xn.has(Number(R[Kn.id]?.replaceAll(",", "")))), Gn = Tn.edges.filter((Kn) => !we.includes(Kn)), fe = Tn.children.filter((Kn) => qn[Kn.id]?.spiceLayout?.passive && Object.values(qn[Kn.id].connections).filter(([vn]) => Xn.has(vn)).length === 1), cn = new Set(fe.map((Kn) => Kn.id)), U = Tn.children;
+  const E = new Set(Object.entries(qn).filter(([, Kn]) => Kn.spiceLayout?.kind === "V" && Object.values(Kn.connections).every(([vn]) => Xn.has(vn))).map(([Kn]) => Kn)), Qn = Tn.children.filter((Kn) => E.has(Kn.id)), we = Tn.edges.filter((Kn) => Xn.has(Number(R[Kn.id]?.replaceAll(",", "")))), Gn = Tn.edges.filter((Kn) => !we.includes(Kn)), fe = Tn.children.filter((Kn) => qn[Kn.id]?.spiceLayout?.passive && Object.values(qn[Kn.id].connections).filter(([vn]) => Xn.has(vn)).length === 1), cn = new Set(fe.map((Kn) => Kn.id)), U = Tn.children;
   Tn.children = Tn.children.filter((Kn) => !E.has(Kn.id) && !cn.has(Kn.id));
   const q = new Set(Tn.children.map((Kn) => Kn.id)), wn = /* @__PURE__ */ new Map();
   for (const Kn of Gn) {
@@ -54865,11 +54865,11 @@ function cBe(Tn, qn, R, Qn) {
       R[re] = Kn, Tn.edges.push({ id: re, source: ee.slice(0, ee.lastIndexOf(".")), sourcePort: ee, target: Bn.slice(0, Bn.lastIndexOf(".")), targetPort: Bn });
     }
   }
-  return { rails: Xn, railEdges: we, sources: Vn, branches: fe, signalNets: wn, core: q, original: U, options: { [GB + "direction"]: "RIGHT", [GB + "layered.layering.strategy"]: "NETWORK_SIMPLEX", [GB + "layered.spacing.nodeNodeBetweenLayers"]: 120 } };
+  return { rails: Xn, railEdges: we, sources: Qn, branches: fe, signalNets: wn, core: q, original: U, options: { [GB + "direction"]: "RIGHT", [GB + "layered.layering.strategy"]: "NETWORK_SIMPLEX", [GB + "layered.spacing.nodeNodeBetweenLayers"]: 120 } };
 }
-function uBe(Tn, qn, R, Qn) {
-  const zn = structuredClone(Tn), Xn = [...qn.rails].filter(([, N]) => N > 0).sort((N, Kt) => Kt[1] - N[1]), E = [...qn.rails].filter(([, N]) => N <= 0).sort((N, Kt) => Kt[1] - N[1]), Vn = new Map(zn.children.map((N) => [N.id, N])), we = (N) => {
-    const Kt = N.lastIndexOf("."), lt = Vn.get(N.slice(0, Kt)), dt = lt?.ports.find((xi) => xi.id === N);
+function uBe(Tn, qn, R, Vn) {
+  const zn = structuredClone(Tn), Xn = [...qn.rails].filter(([, N]) => N > 0).sort((N, Kt) => Kt[1] - N[1]), E = [...qn.rails].filter(([, N]) => N <= 0).sort((N, Kt) => Kt[1] - N[1]), Qn = new Map(zn.children.map((N) => [N.id, N])), we = (N) => {
+    const Kt = N.lastIndexOf("."), lt = Qn.get(N.slice(0, Kt)), dt = lt?.ports.find((xi) => xi.id === N);
     return dt ? { x: lt.x + dt.x, y: lt.y + dt.y, owner: lt.id, pin: N.slice(Kt + 1) } : null;
   }, Gn = Math.max(0, ...qn.branches.map((N) => N.height)), fe = -Gn - 40, cn = zn.height + 40, U = { upper: [], lower: [] }, q = [], wn = /* @__PURE__ */ new Map();
   for (const N of qn.branches) {
@@ -54883,7 +54883,7 @@ function uBe(Tn, qn, R, Qn) {
     const Zc = { ...N, x: so, y: jr ? fe : cn };
     U[Wi].push(Zc), wn.set(Zc.id, Zc), zn.children.push(Zc);
     const pt = { x: so + hr.x, y: Zc.y + hr.y }, ui = "__branch_" + q.length;
-    Qn[ui] = wi[0], q.push({ id: ui, source: Xt.p.owner, sourcePort: Xt.id, target: Zc.id, targetPort: Zc.id + "." + lt, sections: [{ id: ui + "_s", startPoint: { x: Xt.p.x, y: Xt.p.y }, bendPoints: [{ x: pt.x, y: Xt.p.y }], endPoint: pt }] });
+    Vn[ui] = wi[0], q.push({ id: ui, source: Xt.p.owner, sourcePort: Xt.id, target: Zc.id, targetPort: Zc.id + "." + lt, sections: [{ id: ui + "_s", startPoint: { x: Xt.p.x, y: Xt.p.y }, bendPoints: [{ x: pt.x, y: Xt.p.y }], endPoint: pt }] });
   }
   zn.edges.push(...q);
   for (const N of q) for (const Kt of N.sections) {
@@ -54913,7 +54913,7 @@ function uBe(Tn, qn, R, Qn) {
     return { x: lt.x + dt.x, y: lt.y + dt.y, owner: lt.id, side: dt.layoutOptions?.[GB + "port.side"] };
   }, bi = /* @__PURE__ */ new Map(), jn = (N, Kt, lt) => !zn.children.some((dt) => dt.id !== lt && Math.max(N.x, Kt.x) > dt.x + 0.02 && Math.min(N.x, Kt.x) < dt.x + dt.width - 0.02 && Math.max(N.y, Kt.y) > dt.y + 0.02 && Math.min(N.y, Kt.y) < dt.y + dt.height - 0.02);
   for (const N of qn.railEdges) {
-    const Kt = Number(Qn[N.id]?.replaceAll(",", "")), lt = re.get(Kt);
+    const Kt = Number(Vn[N.id]?.replaceAll(",", "")), lt = re.get(Kt);
     for (const gi of [N.sourcePort, N.targetPort]) if (!bi.has(gi)) {
       const Xt = At(gi), jr = Xt.side === "EAST" ? { x: Xt.x + 14, y: Xt.y } : Xt.side === "WEST" ? { x: Xt.x - 14, y: Xt.y } : Xt, Wi = { x: jr.x, y: lt };
       if (!jn(Xt, jr, Xt.owner) || !jn(jr, Wi, Xt.owner)) return null;
@@ -54926,19 +54926,19 @@ function uBe(Tn, qn, R, Qn) {
   return zn.width = Math.max(...zn.children.map((N) => N.x + N.width)) + 24, zn.height = Math.max(...zn.children.map((N) => N.y + N.height), ...re.values()) + 40, { graph: zn, railPitch: Bn, railCount: re.size };
 }
 function sBe(Tn, qn) {
-  const R = /* @__PURE__ */ new Map(), Qn = /* @__PURE__ */ new Map(), zn = [...Tn.edges], Xn = /* @__PURE__ */ new Map();
+  const R = /* @__PURE__ */ new Map(), Vn = /* @__PURE__ */ new Map(), zn = [...Tn.edges], Xn = /* @__PURE__ */ new Map();
   let E = 0;
-  const Vn = (q) => {
+  const Qn = (q) => {
     R.set(q.id, q);
     for (const wn of q.children || [])
-      Qn.set(wn.id, q), Vn(wn);
+      Vn.set(wn.id, q), Qn(wn);
   };
-  Vn(Tn);
+  Qn(Tn);
   const we = (q) => {
     const wn = [];
-    let kn = Qn.get(q);
+    let kn = Vn.get(q);
     for (; kn; )
-      wn.push(kn), kn = Qn.get(kn.id);
+      wn.push(kn), kn = Vn.get(kn.id);
     return wn;
   }, Gn = (q, wn) => {
     const kn = we(q), Kn = new Set(we(wn).map((vn) => vn.id));
@@ -54969,15 +54969,15 @@ function sBe(Tn, qn) {
       Kn.edges.push({ ...q, sourcePort: ze(wn, !0), targetPort: ze(kn, !1) });
       continue;
     }
-    let vn = q.sourcePort, An = Qn.get(wn.id);
+    let vn = q.sourcePort, An = Vn.get(wn.id);
     const Bn = qn[q.id];
     for (; An !== Kn; ) {
       const re = cn(An, Bn, !0);
-      U(An, vn, re, q.id), vn = re, An = Qn.get(An.id);
+      U(An, vn, re, q.id), vn = re, An = Vn.get(An.id);
     }
     const ee = [];
-    for (An = Qn.get(kn.id); An !== Kn; )
-      ee.push(An), An = Qn.get(An.id);
+    for (An = Vn.get(kn.id); An !== Kn; )
+      ee.push(An), An = Vn.get(An.id);
     ee.reverse();
     for (const re of ee) {
       const ze = cn(re, Bn, !1);
@@ -54988,26 +54988,26 @@ function sBe(Tn, qn) {
   return { original: zn.filter((q) => !q.id.startsWith("__guide_")), pieces: Xn };
 }
 function oBe(Tn, qn) {
-  const R = new Map(Tn.edges.map((Qn) => [Qn.id, Qn]));
-  return Tn.edges = qn.original.map((Qn) => {
-    const zn = (qn.pieces.get(Qn.id) || []).map((Xn) => {
+  const R = new Map(Tn.edges.map((Vn) => [Vn.id, Vn]));
+  return Tn.edges = qn.original.map((Vn) => {
+    const zn = (qn.pieces.get(Vn.id) || []).map((Xn) => {
       const E = R.get(Xn);
       if (!E) throw Error("ELK omitted a hierarchy edge section.");
       return E;
     });
-    return { ...Qn, container: Tn.id, sections: zn.flatMap((Xn) => Xn.sections || []), junctionPoints: zn.flatMap((Xn) => Xn.junctionPoints || []) };
+    return { ...Vn, container: Tn.id, sections: zn.flatMap((Xn) => Xn.sections || []), junctionPoints: zn.flatMap((Xn) => Xn.junctionPoints || []) };
   }), Tn;
 }
 const { FlatModule: fBe } = KRe, kun = nde.default || nde, lBe = ede.default || ede, Q0 = "org.eclipse.elk.";
 function xkn(Tn, qn) {
-  const R = qn[Tn.parentNode.Key], Qn = R?.spiceLayout?.ports[Tn.key];
+  const R = qn[Tn.parentNode.Key], Vn = R?.spiceLayout?.ports[Tn.key];
   if (R?.type && R.attributes.name === "0") return "ret";
-  if (["pwr", "ret", "bias"].includes(Qn?.role) || Qn?.role === "unknown" && Qn?.potential !== null && Qn?.potential !== void 0) return "rail";
-  if (Qn?.role === "io") return "neutral";
-  if (R?.spiceBlock && Qn?.role === "out") return "driver";
-  if (R?.spiceBlock && Qn?.role === "in") return "sink";
-  if (R?.attributes.value && Object.keys(R.connections).length === 1) return Qn?.role === "in" ? "driver" : Qn?.role === "out" ? "sink" : "neutral";
-  if (R?.connections["+"] && Qn?.role === "in" && Tn.key === "+" || R?.spiceLayout?.source && ["+", "-"].includes(Tn.key) || ["Q", "M", "J", "Z"].includes(R?.spiceLayout?.kind) && ["E", "S"].includes(Tn.key)) return "driver";
+  if (["pwr", "ret", "bias"].includes(Vn?.role) || Vn?.role === "unknown" && Vn?.potential !== null && Vn?.potential !== void 0) return "rail";
+  if (Vn?.role === "io") return "neutral";
+  if (R?.spiceBlock && Vn?.role === "out") return "driver";
+  if (R?.spiceBlock && Vn?.role === "in") return "sink";
+  if (R?.attributes.value && Object.keys(R.connections).length === 1) return Vn?.role === "in" ? "driver" : Vn?.role === "out" ? "sink" : "neutral";
+  if (R?.connections["+"] && Vn?.role === "in" && Tn.key === "+" || R?.spiceLayout?.source && ["+", "-"].includes(Tn.key) || ["Q", "M", "J", "Z"].includes(R?.spiceLayout?.kind) && ["E", "S"].includes(Tn.key)) return "driver";
   if (Tn.key === "G" && ["M", "J", "Z"].includes(R?.spiceLayout?.kind) || Tn.key === "B" && R?.spiceLayout?.kind === "Q" || ["C+", "C-"].includes(Tn.key)) return "sink";
   if (R?.spiceBlock || R?.spiceLayout?.flexible) {
     const zn = Tn.parentNode.getTemplate(), Xn = kun.getPortsWithPrefix(zn, "").find((E) => E[1]["s:pid"] === Tn.key);
@@ -55016,7 +55016,7 @@ function xkn(Tn, qn) {
   }
   return "neutral";
 }
-async function Dkn(Tn, qn, { groundDecoration: R = !0, balanced: Qn = !1, wrapping: zn = !1, groupParallel: Xn = !0, classicLayout: E = !0, onLayout: Vn = null, onRawLayout: we = null } = {}) {
+async function Dkn(Tn, qn, { groundDecoration: R = !0, balanced: Vn = !1, wrapping: zn = !1, groupParallel: Xn = !0, classicLayout: E = !0, onLayout: Qn = null, onRawLayout: we = null } = {}) {
   kun.skin = Gp.parse(Tn);
   const Gn = new fBe(qn);
   Gn.createWires();
@@ -55074,7 +55074,7 @@ async function Dkn(Tn, qn, { groundDecoration: R = !0, balanced: Qn = !1, wrappi
     [Q0 + "aspectRatio"]: 1.6,
     [Q0 + "hierarchyHandling"]: "INCLUDE_CHILDREN"
   };
-  Qn && U.children.length > 8 && (Ie[Q0 + "layered.layering.strategy"] = "COFFMAN_GRAHAM", Ie[Q0 + "layered.layering.coffmanGraham.layerBound"] = Math.max(3, Math.ceil(Math.sqrt(U.children.length)))), zn && (Ie[Q0 + "layered.wrapping.strategy"] = "MULTI_EDGE"), An && Object.assign(Ie, An.options), re && (Ie[Q0 + "hierarchyHandling"] = "SEPARATE_CHILDREN");
+  Vn && U.children.length > 8 && (Ie[Q0 + "layered.layering.strategy"] = "COFFMAN_GRAHAM", Ie[Q0 + "layered.layering.coffmanGraham.layerBound"] = Math.max(3, Math.ceil(Math.sqrt(U.children.length)))), zn && (Ie[Q0 + "layered.wrapping.strategy"] = "MULTI_EDGE"), An && Object.assign(Ie, An.options), re && (Ie[Q0 + "hierarchyHandling"] = "SEPARATE_CHILDREN");
   let At = U.children.length ? await ze.layout(U, { layoutOptions: Ie }) : { ...U, width: 0, height: 0 };
   const bi = [], jn = (pt, ui = 0, ht = 0) => {
     for (const Ci of pt.children || []) {
@@ -55084,18 +55084,18 @@ async function Dkn(Tn, qn, { groundDecoration: R = !0, balanced: Qn = !1, wrappi
   };
   jn(At), we?.(At), fde(At), At = nBe(At), re && (At = oBe(At, re));
   const N = An ? uBe(At, An, fe, CT.ElkModel.wireNameLookup) : null;
-  if (An && !N) return Dkn(Tn, qn, { groundDecoration: R, balanced: Qn, wrapping: zn, groupParallel: Xn, classicLayout: !1, onLayout: Vn });
+  if (An && !N) return Dkn(Tn, qn, { groundDecoration: R, balanced: Vn, wrapping: zn, groupParallel: Xn, classicLayout: !1, onLayout: Qn });
   N && (At = N.graph);
-  const Kt = Qn ? "compact balanced" : "compact signal flow", lt = CT.ElkModel.wireNameLookup, dt = [];
+  const Kt = Vn ? "compact balanced" : "compact signal flow", lt = CT.ElkModel.wireNameLookup, dt = [];
   let xi = 0;
   for (const pt of Kn) {
     const ui = fe[pt.id].connections.A[0];
     xi += XRe(At, lt, ui), xi += JRe(At, lt, ui);
     const ht = VRe(At, lt, pt, qn);
-    if (!ht) return Dkn(Tn, qn, { groundDecoration: !1, balanced: Qn, wrapping: zn, groupParallel: Xn, classicLayout: E, onLayout: Vn });
+    if (!ht) return Dkn(Tn, qn, { groundDecoration: !1, balanced: Vn, wrapping: zn, groupParallel: Xn, classicLayout: E, onLayout: Qn });
     dt.push(ht), vn.push({ child: ht.node, voltage: 0 }), QRe(At, lt, ui, ht);
   }
-  vn.sort((pt, ui) => ui.voltage - pt.voltage), hBe(At, qn, lt, dt, kn), Vn?.(At);
+  vn.sort((pt, ui) => ui.voltage - pt.voltage), hBe(At, qn, lt, dt, kn), Qn?.(At);
   const Ri = new Map(At.children.map((pt) => [pt.id, pt]));
   let wi = 0;
   for (let pt = 0; pt < vn.length; pt++) for (let ui = pt + 1; ui < vn.length; ui++) vn[pt].voltage > vn[ui].voltage && Ri.get(vn[pt].child.id).y >= Ri.get(vn[ui].child.id).y && wi++;
@@ -55139,15 +55139,15 @@ async function Dkn(Tn, qn, { groundDecoration: R = !0, balanced: Qn = !1, wrappi
   ]), Zc = iBe(hr.replace("</svg>", so.map((pt) => Gp.stringify(pt)).join("") + "</svg>"), qn);
   return Zc.svg.replace("</svg>", Gp.stringify(["metadata", { id: "spice-layout-report" }, JSON.stringify({ ...Wi, ...Zc.report })]) + "</svg>");
 }
-function hBe(Tn, qn, R, Qn = [], zn = /* @__PURE__ */ new Map()) {
-  const Xn = new Map(Tn.children.map((U) => [U.id, U])), E = /* @__PURE__ */ new Map(), Vn = /* @__PURE__ */ new Map();
+function hBe(Tn, qn, R, Vn = [], zn = /* @__PURE__ */ new Map()) {
+  const Xn = new Map(Tn.children.map((U) => [U.id, U])), E = /* @__PURE__ */ new Map(), Qn = /* @__PURE__ */ new Map();
   for (const U of Tn.children) for (const q of U.ports || []) {
     const wn = zn.get(q.id);
     if (wn && (Math.abs(wn.x - q.x) > 0.02 || Math.abs(wn.y - q.y) > 0.02)) throw Error("Layout moved a fixed symbol terminal.");
   }
   for (const [U, q] of Object.entries(qn.modules.circuit.cells)) for (const [wn, [kn]] of Object.entries(q.connections)) {
     const Kn = U + "." + wn;
-    E.set(Kn, kn), Vn.has(kn) || Vn.set(kn, []), Vn.get(kn).push(Kn);
+    E.set(Kn, kn), Qn.has(kn) || Qn.set(kn, []), Qn.get(kn).push(Kn);
   }
   const we = new Map([...E.keys()].map((U) => [U, U])), Gn = (U) => {
     let q = U;
@@ -55157,7 +55157,7 @@ function hBe(Tn, qn, R, Qn = [], zn = /* @__PURE__ */ new Map()) {
       we.set(U, q), U = wn;
     }
     return q;
-  }, fe = (U, q) => we.set(Gn(U), Gn(q)), cn = new Set(Qn.flatMap((U) => YRe(Tn, R, U, qn)));
+  }, fe = (U, q) => we.set(Gn(U), Gn(q)), cn = new Set(Vn.flatMap((U) => YRe(Tn, R, U, qn)));
   for (const U of Tn.edges) {
     const q = U.sourcePort || U.sources?.[0], wn = U.targetPort || U.targets?.[0], kn = Number(R[U.id]?.replaceAll(",", ""));
     for (const Kn of [q, wn]) if (E.get(Kn) !== kn) throw Error("Layout changed a terminal/net mapping.");
@@ -55176,8 +55176,8 @@ function hBe(Tn, qn, R, Qn = [], zn = /* @__PURE__ */ new Map()) {
       for (let An = 1; An < vn.length; An++) if (Math.abs(vn[An].x - vn[An - 1].x) > 0.02 && Math.abs(vn[An].y - vn[An - 1].y) > 0.02) throw Error("Layout produced a non-orthogonal wire.");
     }
   }
-  for (const U of Qn) U.anchor && fe(U.groundPin, U.pin || Vn.get(U.bit).find((q) => q !== U.groundPin));
-  for (const U of Vn.values()) if (U.length > 1) {
+  for (const U of Vn) U.anchor && fe(U.groundPin, U.pin || Qn.get(U.bit).find((q) => q !== U.groundPin));
+  for (const U of Qn.values()) if (U.length > 1) {
     for (const q of U) if (!cn.has(q)) throw Error("Layout omitted an electrical terminal.");
     if (U.some((q) => Gn(q) !== Gn(U[0]))) throw Error("Layout disconnected terminals of the same net.");
   }
@@ -55188,26 +55188,26 @@ function rde(Tn) {
 function aBe(Tn) {
   if (!Tn.length) throw Error("No valid schematic layout candidate.");
   const qn = Tn.filter((R) => R.report.aspectRatio <= 2.5);
-  return [...qn.length ? qn : Tn].sort((R, Qn) => rde(R.report) - rde(Qn.report))[0];
+  return [...qn.length ? qn : Tn].sort((R, Vn) => rde(R.report) - rde(Vn.report))[0];
 }
 self.onmessage = async ({ data: Tn }) => {
   const qn = console.error;
   let R = "";
-  console.error = (...Qn) => {
-    R = Qn.map((zn) => zn?.message || String(zn)).join(" ");
+  console.error = (...Vn) => {
+    R = Vn.map((zn) => zn?.message || String(zn)).join(" ");
   };
   try {
-    let Qn;
+    let Vn;
     if (Tn.settings.conventional === !1) {
       const zn = structuredClone(Tn.netlist);
-      Qn = await xRe.render(Zae(zn, Tn.settings), zn);
+      Vn = await xRe.render(Zae(zn, Tn.settings), zn);
     } else {
       const zn = Object.keys(Tn.netlist.modules.circuit.cells).length, Xn = [], E = [];
-      let Vn = 0;
+      let Qn = 0;
       const we = [{ orientationStrategy: "signal", balanced: !1 }];
       zn >= 7 && we.push({ orientationStrategy: "flow", balanced: !0 }), zn >= 7 && zn <= 100 && we.push({ orientationStrategy: "flow-reversed", balanced: !0 });
       const Gn = async (q) => {
-        Vn++;
+        Qn++;
         const wn = structuredClone(Tn.netlist), kn = Zae(wn, { ...Tn.settings, ...q }), Kn = await Dkn(kn, wn, q), vn = Gp.parse(Kn), An = vn.find((ee) => Array.isArray(ee) && ee[1]?.id === "spice-layout-report"), Bn = JSON.parse(An[2]);
         Bn.orientationStrategy = q.orientationStrategy, An[2] = JSON.stringify(Bn), Xn.push({ svg: Gp.stringify(vn), report: Bn, profile: q });
       };
@@ -55228,12 +55228,12 @@ self.onmessage = async ({ data: Tn }) => {
       }
       if (!Xn.length) throw Error(E.join("; ") || "No valid layout candidate.");
       const fe = aBe(Xn), cn = Gp.parse(fe.svg), U = cn.find((q) => Array.isArray(q) && q[1]?.id === "spice-layout-report");
-      U[2] = JSON.stringify({ ...fe.report, candidatesTried: Vn, rejectedCandidates: E.length, groupingFallback: fe.profile.groupParallel === !1 }), Qn = Gp.stringify(cn);
+      U[2] = JSON.stringify({ ...fe.report, candidatesTried: Qn, rejectedCandidates: E.length, groupingFallback: fe.profile.groupParallel === !1 }), Vn = Gp.stringify(cn);
     }
-    if (!Qn) throw Error(R || "netlistsvg / ELK could not create a drawing.");
-    self.postMessage({ svg: Qn });
-  } catch (Qn) {
-    self.postMessage({ error: Qn.message || String(Qn) });
+    if (!Vn) throw Error(R || "netlistsvg / ELK could not create a drawing.");
+    self.postMessage({ svg: Vn });
+  } catch (Vn) {
+    self.postMessage({ error: Vn.message || String(Vn) });
   } finally {
     console.error = qn;
   }

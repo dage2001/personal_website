@@ -56,6 +56,9 @@ export function bindLayoutDescription(tree,circuit) {
   for(const g of groups.values())if(known.has(g.id.toLowerCase()))throw Error('Layout group name conflicts with a circuit instance/device: '+g.id);
   for(const g of groups.values())for(const member of g.members)if(!groups.has(member.toLowerCase())&&!known.has(member.toLowerCase()))throw Error('Unknown @layout instance/device: '+member);
   for(const r of description.relations)for(const member of [r.a,r.b])if(!groups.has(member.toLowerCase())&&!known.has(member.toLowerCase()))throw Error('Unknown @layout place target: '+member);
+  // The header describes the top-level sheet. Opening an instance starts a new
+  // layout scope; ancestor rows, columns, ordering and priority caps stop here.
+  if(circuit.focus)return null;
   const owners=new Map(),output=[];
   for(const g of description.groups) {
     const members=[];
