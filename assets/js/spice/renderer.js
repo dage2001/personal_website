@@ -24,7 +24,7 @@ export async function renderSchematic(netlist, settings) {
   }
   const drawing=source.drawing?structuredClone(source.drawing):null;
   const metadata=doc.querySelector('#spice-layout-report');
-  if(metadata){const report=JSON.parse(metadata.textContent),device=id=>normalized.ids.get(id)||id;report.mirroredTransistors=(report.mirroredTransistors||[]).map(device);report.recognizedMotifs=mapTransistorMotifs(report.recognizedMotifs||[],device,bit=>normalized.bits.get(bit)??bit);for(const m of report.motifMeasurements||[])m.members=m.members.map(device);for(const rail of report.voltageRails||[])if(rail.bit!==undefined)rail.bit=normalized.bits.get(rail.bit)??rail.bit;metadata.textContent=JSON.stringify(report);}
+  if(metadata){const report=JSON.parse(metadata.textContent),device=id=>normalized.ids.get(id)||id;report.mirroredTransistors=(report.mirroredTransistors||[]).map(device);report.orientationDevicesTested=(report.orientationDevicesTested||[]).map(device);report.recognizedMotifs=mapTransistorMotifs(report.recognizedMotifs||[],device,bit=>normalized.bits.get(bit)??bit);for(const p of report.pairConstraints||[])p.members=p.members.map(device);for(const m of report.motifMeasurements||[]){m.members=m.members.map(device);if(m.interlopers)m.interlopers=m.interlopers.map(device);}for(const rail of report.voltageRails||[])if(rail.bit!==undefined)rail.bit=normalized.bits.get(rail.bit)??rail.bit;metadata.textContent=JSON.stringify(report);}
   if(drawing){for(const c of drawing.components){c.id=normalized.ids.get(c.id)||c.id;for(const p of c.ports)p.bit=normalized.bits.get(p.bit)??p.bit;}for(const s of drawing.segments)s.bit=normalized.bits.get(s.bit)??s.bit;}
   return {svg:new XMLSerializer().serializeToString(doc.documentElement),drawing};
 }

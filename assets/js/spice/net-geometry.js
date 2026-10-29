@@ -21,7 +21,8 @@ export function simplifyNetGeometry(segments,terminals=[],protectedSegments=[]) 
     for(let i=1;i<ps.length;i++){const a=key(ps[i-1]),b=key(ps[i]);if(a!==b)atomic.set([a,b].sort().join('|'),{a,b,length:distance(ps[i-1],ps[i])});}
   }
   const parent=new Map([...points.keys()].map(k=>[k,k])),find=id=>{let root=id;while(parent.get(root)!==root)root=parent.get(root);while(id!==root){const next=parent.get(id);parent.set(id,root);id=next;}return root;};
-  const edges=[...atomic.entries()].sort(([ak,a],[bk,b])=>Number(protectedKeys.has(bk))-Number(protectedKeys.has(ak))||a.length-b.length||ak.localeCompare(bk)),adj=new Map([...points.keys()].map(k=>[k,new Set()]));let cyclesRemoved=0;
+  const protectedEdge=e=>protectedKeys.has([e.a,e.b].sort().join('|'))||protectedSegments.some(s=>on(points.get(e.a),s)&&on(points.get(e.b),s));
+  const edges=[...atomic.entries()].sort(([ak,a],[bk,b])=>Number(protectedEdge(b))-Number(protectedEdge(a))||a.length-b.length||ak.localeCompare(bk)),adj=new Map([...points.keys()].map(k=>[k,new Set()]));let cyclesRemoved=0;
   for(const [,e]of edges){const a=find(e.a),b=find(e.b);if(a===b){cyclesRemoved++;continue;}parent.set(a,b);adj.get(e.a).add(e.b);adj.get(e.b).add(e.a);}
   if(terminalKeys.length>1&&terminalKeys.some(k=>find(k)!==find(terminalKeys[0])))throw Error('Geometric net cleanup found disconnected terminals.');
   const pinned=new Set([...terminalKeys,...protectedPoints]),queue=[...adj].filter(([k,v])=>v.size===1&&!pinned.has(k)).map(([k])=>k);let leavesRemoved=0;
@@ -48,10 +49,11 @@ export function normalizeSvgNets(source,netlist) {
     const a=line[1],s={a:{x:+a.x1,y:+a.y1},b:{x:+a.x2,y:+a.y2},attachment:!!a['data-ground-attachment']};if(distance(s.a,s.b)<.002)continue;
     if(!nets.has(a.class))nets.set(a.class,[]);nets.get(a.class).push(s);
   }
-  const output=[];let cyclesRemoved=0,leavesRemoved=0,wireLength=0,segmentCount=0;
+  const output=[];let cyclesRemoved=0,leavesRemoved=0,wireLength=0,segmentCount=0,bendCount=0;
   for(const [id,segments]of nets) {
     const attachments=segments.filter(s=>s.attachment),result=simplifyNetGeometry(segments,terminalMap.get(id)||[],attachments);
     cyclesRemoved+=result.cyclesRemoved;leavesRemoved+=result.leavesRemoved;wireLength+=result.wireLength;segmentCount+=result.segments.length;
+    const directions=new Map();for(const s of result.segments)for(const p of [s.a,s.b]){const k=key(p);if(!directions.has(k))directions.set(k,[]);directions.get(k).push(same(s.a.x,s.b.x)?'v':'h');}bendCount+=[...directions.values()].filter(ds=>ds.length===2&&ds[0]!==ds[1]).length;
     for(const s of result.segments) {
       const attachment=attachments.find(a=>[key(a.a),key(a.b)].sort().join('|')===[key(s.a),key(s.b)].sort().join('|'));
       const a=attachment?.a||s.a,b=attachment?.b||s.b;
@@ -61,5 +63,5 @@ export function normalizeSvgNets(source,netlist) {
   }
   const clean=ast.filter((n,i)=>i<2||!Array.isArray(n)||!['line','circle'].includes(n[0])||!n[1].class?.startsWith('net_'));
   clean.push(...output);
-  return {svg:onml.stringify(clean),report:{normalizedNets:nets.size,cyclesRemoved,leavesRemoved,uniqueSegments:segmentCount,uniqueWireLength:wireLength,geometricConnectivityVerified:true}};
+  return {svg:onml.stringify(clean),report:{normalizedNets:nets.size,cyclesRemoved,leavesRemoved,uniqueSegments:segmentCount,uniqueWireLength:wireLength,uniqueBends:bendCount,geometricConnectivityVerified:true}};
 }

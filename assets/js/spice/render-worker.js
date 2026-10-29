@@ -14,10 +14,13 @@ self.onmessage = async ({data}) => {
       const netlist=structuredClone(data.netlist);svg=await render(makeSkin(netlist,data.settings),netlist);
     }else {
       const count=Object.keys(data.netlist.modules.circuit.cells).length,candidates=[],failures=[];let attempts=0;
-      const profiles=[{orientationStrategy:'signal',balanced:false,motifLayout:false}];
-      if(count<=80&&data.netlist.modules.circuit.spiceMotifs?.some(m=>m.confidence==='high'&&m.members.length>1))profiles.push({orientationStrategy:'signal',balanced:false,motifLayout:true});
-      if(count>=7)profiles.push({orientationStrategy:'flow',balanced:true,motifLayout:false});
-      if(count>=7&&count<=100)profiles.push({orientationStrategy:'flow-reversed',balanced:true,motifLayout:false});
+      const pairSheet=count<=80&&data.netlist.modules.circuit.spiceMotifs?.some(m=>m.kind==='differential-pair'&&m.confidence==='high'&&m.roles.inputs.length===2&&m.roles.inputs.every(id=>data.netlist.modules.circuit.cells[id].spiceLayout.kind==='Q'&&Object.keys(data.netlist.modules.circuit.cells[id].connections).length===3));
+      const profiles=[{orientationStrategy:'signal',balanced:false,motifLayout:!!pairSheet}];
+      if(!pairSheet){
+        if(count<=80&&data.netlist.modules.circuit.spiceMotifs?.some(m=>m.confidence==='high'&&m.members.length>1))profiles.push({orientationStrategy:'signal',balanced:false,motifLayout:true});
+        if(count>=7)profiles.push({orientationStrategy:'flow',balanced:true,motifLayout:false});
+        if(count>=7&&count<=100)profiles.push({orientationStrategy:'flow-reversed',balanced:true,motifLayout:false});
+      }
       const attempt=async profile=>{
         attempts++;
         const netlist=structuredClone(data.netlist),skin=makeSkin(netlist,{...data.settings,...profile});
