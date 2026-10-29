@@ -1,12 +1,13 @@
 /** Split a real edge at visual boundaries so each ELK level may use its own direction. */
-export function splitHierarchyEdges(graph,lookup) {
+export function splitHierarchyEdges(graph,lookup,cells={}) {
+  const potentials=new Map();for(const c of Object.values(cells))for(const [pin,[bit]]of Object.entries(c.connections)){const value=c.spiceLayout?.ports[pin]?.potential;if(value!==null&&value!==undefined)potentials.set(String(bit),value);}
   const nodes=new Map(),parents=new Map(),original=[...graph.edges],pieces=new Map();let serial=0;
   const index=n=>{nodes.set(n.id,n);for(const c of n.children||[]){parents.set(c.id,n);index(c);}};index(graph);
   const ancestors=id=>{const result=[];let n=parents.get(id);while(n){result.push(n);n=parents.get(n.id);}return result;};
   const owner=(a,b)=>{const aa=ancestors(a),bb=new Set(ancestors(b).map(n=>n.id));return aa.find(n=>bb.has(n.id))||graph;};
   const visit=n=>{if(n.children){n.edges=[];n.ports=n.ports||[];n.layoutOptions={...n.layoutOptions,'org.eclipse.elk.hierarchyHandling':'SEPARATE_CHILDREN','org.eclipse.elk.portConstraints':'FIXED_SIDE'};for(const c of n.children)visit(c);}};visit(graph);
   const boundary=(container,net,source)=>{
-    const vertical=container.layoutOptions?.['org.eclipse.elk.direction']==='DOWN',side=vertical?(source?'SOUTH':'NORTH'):(source?'EAST':'WEST'),id=container.id+'.boundary_'+net.replace(/\W/g,'_')+'_'+side;
+    const voltage=container.spiceClassic?potentials.get(net.replaceAll(',','')):undefined,vertical=container.layoutOptions?.['org.eclipse.elk.direction']==='DOWN',side=voltage!==undefined?(voltage>0?'NORTH':'SOUTH'):vertical?(source?'SOUTH':'NORTH'):(source?'EAST':'WEST'),id=container.id+'.boundary_'+net.replace(/\W/g,'_')+'_'+side;
     if(!container.ports.some(p=>p.id===id))container.ports.push({id,width:0,height:0,layoutOptions:{'org.eclipse.elk.port.side':side}});
     return id;
   };

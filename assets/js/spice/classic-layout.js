@@ -3,6 +3,16 @@ const option='org.eclipse.elk.';
 const known=p=>p?.potential!==null&&p?.potential!==undefined;
 const pointOn=(p,a,b)=>Math.abs(a.x-b.x)<.002?Math.abs(p.x-a.x)<.002&&p.y>=Math.min(a.y,b.y)-.002&&p.y<=Math.max(a.y,b.y)+.002:Math.abs(p.y-a.y)<.002&&p.x>=Math.min(a.x,b.x)-.002&&p.x<=Math.max(a.x,b.x)+.002;
 
+/** Keep known supplies out of visual hierarchy routing; one rail per real net. */
+export function prepareSharedClassicRails(graph,cells,lookup,description) {
+  if(!description?.groups.some(g=>g.direction==='classic')||Object.keys(cells).length>80||Object.values(cells).some(c=>c.spiceBlock))return null;
+  const rails=new Map();for(const c of Object.values(cells))for(const [pin,[bit]]of Object.entries(c.connections))if(known(c.spiceLayout?.ports[pin]))rails.set(bit,c.spiceLayout.ports[pin].potential);
+  if(rails.size<2||rails.size>5)return null;
+  const sources=[],railPorts=[];graph.children=graph.children.filter(n=>{const c=cells[n.id],all=Object.values(c.connections).every(([b])=>rails.has(b));if(all&&c.spiceLayout?.kind==='V'){sources.push(n);return false;}if(all&&c.spiceLayout?.kind==='PORT'){railPorts.push(n);return false;}return true;});
+  const railEdges=graph.edges.filter(e=>rails.has(Number(lookup[e.id]?.replaceAll(',',''))));graph.edges=graph.edges.filter(e=>!railEdges.includes(e));
+  return {rails,railEdges,sources,railPorts,unusedPorts:[],branches:[]};
+}
+
 /** ELK lays out the transistor/signal skeleton; simple rail branches use local templates. */
 export function prepareClassicLayout(graph,cells,lookup,description,{maxActive=32,currentFlow=false}={}) {
   if(description?.groups.some(g=>g.members.length)||description?.relations.length)return null;
@@ -114,5 +124,5 @@ export function installClassicRails(layout,classic,cells,lookup) {
   const wires=graph.edges.flatMap(e=>(e.sections||[]).flatMap(s=>{const ps=[s.startPoint,...s.bendPoints||[],s.endPoint];return ps.slice(1).map((b,i)=>({a:ps[i],b,bit:Number(lookup[e.id]?.replaceAll(',',''))}));}));
   for(const s of wires)if(foreignPin(s.a,s.b,s.bit))return fail('Wire touches a different-net terminal');
   for(let i=0;i<wires.length;i++)for(let j=i+1;j<wires.length;j++){const a=wires[i],b=wires[j];if(a.bit!==b.bit&&(pointOn(a.a,b.a,b.b)||pointOn(a.b,b.a,b.b)||pointOn(b.a,a.a,a.b)||pointOn(b.b,a.a,a.b)))return fail('Different-net wire contact in classic template');}
-  return {graph,railPitch:pitch,railCount:railY.size,railBands:[...railY].map(([bit,y])=>({potential:classic.rails.get(bit),y}))};
+  return {graph,translation:{x:left+(wireLeft<0?16-wireLeft:0),y:top},railPitch:pitch,railCount:railY.size,railBands:[...railY].map(([bit,y])=>({bit,potential:classic.rails.get(bit),y}))};
 }

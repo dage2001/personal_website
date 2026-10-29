@@ -22,6 +22,8 @@ export async function renderSchematic(netlist, settings) {
     }).join(' '));
   }
   const drawing=source.drawing?structuredClone(source.drawing):null;
+  const metadata=doc.querySelector('#spice-layout-report');
+  if(metadata){const report=JSON.parse(metadata.textContent);report.mirroredTransistors=(report.mirroredTransistors||[]).map(id=>normalized.ids.get(id)||id);for(const rail of report.voltageRails||[])if(rail.bit!==undefined)rail.bit=normalized.bits.get(rail.bit)??rail.bit;metadata.textContent=JSON.stringify(report);}
   if(drawing){for(const c of drawing.components){c.id=normalized.ids.get(c.id)||c.id;for(const p of c.ports)p.bit=normalized.bits.get(p.bit)??p.bit;}for(const s of drawing.segments)s.bit=normalized.bits.get(s.bit)??s.bit;}
   return {svg:new XMLSerializer().serializeToString(doc.documentElement),drawing};
 }
