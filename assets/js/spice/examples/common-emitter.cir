@@ -1,5 +1,6 @@
-* Voltage-divider biased common-emitter amplifier; layout regression.
+* Voltage-divider biased common-emitter amplifier.
 * Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.2.
+* https://wiki.analog.com/university/courses/electronics/text/chapter-9
 V1 vcc 0 12
 V2 in 0 SINE(0 10m 1k) AC 1
 C1 in b 1u

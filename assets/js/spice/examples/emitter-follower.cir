@@ -1,5 +1,6 @@
 * Common-collector voltage follower; independently chosen example values.
 * Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.4.
+* https://wiki.analog.com/university/courses/electronics/text/chapter-9
 V1 vcc 0 12
 V2 in 0 SINE(0 10m 1k)
 CIN in b 1u
