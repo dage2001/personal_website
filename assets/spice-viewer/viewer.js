@@ -1608,7 +1608,7 @@ function ce(t) {
 function Ie(t) {
   return JSON.stringify(t.map((e) => [e.name, e.kind, Object.entries(e.terminals).sort(), e.value, e.model, e.controlSource, e.controlSources || [], e.coupledInductors || []]).sort((e, n) => e[0].localeCompare(n[0])));
 }
-const Ne = 5;
+const Ne = 6;
 function be(t) {
   const e = String(t).split("/").at(-1);
   let n;
@@ -1778,7 +1778,7 @@ async function Nt(t, e) {
 function Lt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("assets/render-worker-D3rXHC5P.js", import.meta.url).href,
+    "" + new URL("assets/render-worker-CIHctgU2.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((o, i) => {

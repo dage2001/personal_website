@@ -1,7 +1,7 @@
 import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
 
-export const layoutRulesVersion = 5;
+export const layoutRulesVersion = 6;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
