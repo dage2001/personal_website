@@ -167,6 +167,9 @@ if (root) {
         if(r.classicRails)items.push({severity:'info',message:`Transistor layout: local load/bias branches; ${r.railCount} shared voltage rails.`});
         if(r.localClassicInstances?.length)items.push({severity:'info',message:`${r.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.`});
         if(r.localClassicStages?.length)items.push({severity:'info',message:`Classic transistor proximity active: ${r.localClassicStages.join(', ')}.`});
+        if(r.sharedClassicRails)items.push({severity:'info',message:'Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes.'});
+        if(r.mirroredTransistors?.length)items.push({severity:'info',message:`Control pins face right where shorter: ${r.mirroredTransistors.join(', ')}.`});
+        if(r.sharedRailFallback)items.push({severity:'warning',message:`Shared rail layout uses an automatic fallback: ${r.sharedRailFallback}.`});
         for(const f of r.localClassicFallbacks||[])if(f.stage)items.push({severity:'info',message:`Classic stage ${f.stage} uses automatic layout: ${f.reason||'No unobstructed local template'}.`});
         if(r.geometricConnectivityVerified)items.push({severity:'info',message:`Net geometry verified; ${r.cyclesRemoved} same-net loop(s) and ${r.leavesRemoved} unused wire branch(es) removed.`});
         showDiagnostics(items);
