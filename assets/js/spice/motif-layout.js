@@ -1,6 +1,6 @@
 const opt='org.eclipse.elk.';
 export function motifPairs(m) {
-  return m.kind==='current-mirror'?[[m.roles.reference,...m.roles.outputs]]:m.kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:[];
+  return m.kind==='current-mirror'?[[m.roles.reference,...m.roles.outputs]]:m.kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:['darlington-pair','sziklai-pair','cascode-pair'].includes(m.kind)?[[m.roles.driver,m.roles.output]]:m.kind==='push-pull-pair'?[[m.roles.upper,m.roles.lower]]:[];
 }
 
 /** Soft ELK preferences on real nodes/edges, without extra boxes or guide wires. */
@@ -31,7 +31,7 @@ export function motifControlChoices(graph,cells,motifs) {
 export function measureMotifs(graph,cells,motifs,rowOnly=new Set()) {
   const byId=new Map(graph.children.map(n=>[n.id,n])),measurements=[];let penalty=0;
   const control=n=>{const pin=cells[n.id].spiceLayout.kind==='Q'?'B':'G',p=n.ports.find(p=>p.id===n.id+'.'+pin);return {x:n.x+p.x,y:n.y+p.y};};
-  for(const m of motifs){if(m.confidence!=='high')continue;
+  for(const m of motifs){if(m.confidence!=='high'||!['differential-pair','current-mirror'].includes(m.kind))continue;
     for(const pair of motifPairs(m)){if(pair.length<2||!pair.every(id=>byId.has(id)))continue;
       const nodes=pair.map(id=>byId.get(id)).sort((a,b)=>a.x-b.x),ps=nodes.map(control),spread=Math.max(...ps.map(p=>p.y))-Math.min(...ps.map(p=>p.y)),gap=Math.max(0,nodes.at(-1).x-(nodes[0].x+nodes[0].width)-100*(nodes.length-1)),weight=m.kind==='differential-pair'?2:1;
       const interlopers=graph.children.filter(n=>!pair.includes(n.id)&&n.x>nodes[0].x&&n.x<nodes.at(-1).x&&n.y<Math.min(...nodes.map(n=>n.y+n.height))&&n.y+n.height>Math.max(...nodes.map(n=>n.y))).map(n=>n.id);
