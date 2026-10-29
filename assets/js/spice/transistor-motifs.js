@@ -54,6 +54,26 @@ export function recognizeTransistorMotifs(circuit,nodes={}) {
     const upper=resistors.get(pair(a.drain,a.control))||[],lower=resistors.get(pair(a.control,a.source))||[];
     if(upper.length===1&&lower.length===1)emit('vbe-multiplier',[a.id],{transistor:a.id,collectorResistor:upper[0].name,emitterResistor:lower[0].name},{control:a.control,collector:a.drain,emitter:a.source},['collector-base-resistor','base-emitter-resistor'],'basic',[upper[0].name,lower[0].name]);
   }
+  // Classic compound pairs: index actual shared terminals, never device names.
+  const bjts=active.filter(a=>a.family==='bjt'),bjtControls=new Map();
+  for(const a of bjts)index(bjtControls,a.control,a);
+  const activePins=node=>(pins.get(node)||[]).filter(p=>activeById.has(p.device));
+  for(const driver of bjts)if(driver.control!==driver.drain){
+    for(const output of bjtControls.get(driver.source)||[])if(output.id!==driver.id&&same(driver,output)&&output.control!==output.drain&&driver.drain===output.drain&&output.source!==driver.control){
+      emit('darlington-pair',[driver.id,output.id],{driver:driver.id,output:output.id},{link:driver.source,collector:driver.drain},['same-polarity','shared-collector','emitter-to-base'],'basic',[],(bjtControls.get(driver.source)||[]).length===1?'high':'medium');
+    }
+    for(const output of bjtControls.get(driver.drain)||[])if(output.id!==driver.id&&!same(driver,output)&&output.control!==output.drain&&driver.source===output.drain&&output.source!==driver.control&&activePins(driver.drain).length===2){
+      emit('sziklai-pair',[driver.id,output.id],{driver:driver.id,output:output.id},{link:driver.drain,feedback:driver.source},['opposite-polarity','collector-to-base','emitter-to-collector','unambiguous-drive-node']);
+    }
+    for(const p of pins.get(driver.drain)||[]){const upper=activeById.get(p.device);if(!upper||upper.family!=='bjt'||upper.id===driver.id||!same(driver,upper)||upper.source!==driver.drain||known(driver.drain)||upper.control===driver.control||upper.control===upper.drain||upper.drain===driver.source||activePins(driver.drain).length!==2)continue;
+      emit('cascode-pair',[driver.id,upper.id],{driver:driver.id,output:upper.id},{link:driver.drain},['same-polarity','collector-to-emitter','distinct-controls','unambiguous-internal-node']);
+    }
+  }
+  for(const upper of bjts.filter(a=>a.polarity==='npn'&&known(a.drain)))for(const lower of bjts.filter(a=>a.polarity==='pnp'&&known(a.drain))){
+    if(nodes[upper.drain].potential<=nodes[lower.drain].potential)continue;
+    const match=resistiveReturns(upper).flatMap(a=>resistiveReturns(lower).filter(b=>a.node===b.node&&!known(a.node)).map(b=>({node:a.node,rs:[a.resistor,b.resistor].filter(Boolean)})))[0];if(!match)continue;
+    emit('push-pull-pair',[upper.id,lower.id],{upper:upper.id,lower:lower.id},{output:match.node},['complementary-polarity','ordered-collector-supplies',match.rs.length?'resistive-common-output':'shared-emitter-output'],'emitter-follower',match.rs);
+  }
   return motifs;
 }
 
@@ -70,7 +90,7 @@ export function declaredTransistorMotifs(circuit,nodes,pairs) {
   for(const pair of pairs){
     if(new Set(pair.members).size!==pair.members.length)throw Error('Duplicate @layout pair member.');
     const members=pair.members.map(id=>devices.get(id));if(members.some(c=>!c))throw Error('Unknown @layout pair device.');
-    const kind={mirror:'current-mirror',differential:'differential-pair',vbe:'vbe-multiplier'}[pair.kind];
+    const kind={mirror:'current-mirror',differential:'differential-pair',vbe:'vbe-multiplier',darlington:'darlington-pair',sziklai:'sziklai-pair',cascode:'cascode-pair','push-pull':'push-pull-pair'}[pair.kind];
     // Preserve tail-bias evidence for a declared basic differential pair.
     const extra=pair.kind==='differential'&&members.length===2?circuit.components.filter(c=>!pair.members.includes(c.name)&&Object.values(c.terminals).includes(members[0].terminals.E??members[0].terminals.S)):[];
     const matches=recognizeTransistorMotifs({...circuit,components:[...members,...extra]},nodes),match=matches.find(m=>m.kind===kind&&m.confidence==='high'&&pair.members.every(id=>m.members.includes(id)));

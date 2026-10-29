@@ -34,8 +34,10 @@ RL OUT_SIG 0 100k
 * pair mirror { Q11 Q10 R4 }
 * pair mirror { Q12 Q13 }
 * pair vbe { Q18 R7 R8 }
+* pair darlington { Q16 Q17 }
+* pair push-pull { Q14 Q20 R9 R10 }
 * face Q7 right
-* face Q16 right
+* face Q16 left
 * face Q17 left
 * face Q18 left
 * face Q22 left

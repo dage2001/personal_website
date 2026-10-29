@@ -16,13 +16,13 @@ function spines(segments,terminals){
 }
 
 /** Local straight shortcuts onto an already routed net, never a replacement router. */
-export function shortenNetTrees(nets,allTerminals,boxes=[],protectedByNet=new Map(),{maxCuts=48}={}) {
+export function shortenNetTrees(nets,allTerminals,boxes=[],protectedByNet=new Map(),{maxCuts=48,preferredSegments=new Map()}={}) {
   const current=new Map(),protectedNets=new Map(),changed=new Set();let cuts=0,saved=0;
   for(const [bit,segs]of nets){const terminals=allTerminals.get(bit)||[],protect=[...protectedByNet.get(bit)||[],...spines(segs,terminals)];protectedNets.set(bit,protect);current.set(bit,simplifyNetGeometry(segs,terminals,protect));}
   const differentPins=bit=>[...allTerminals].filter(([b])=>b!==bit).flatMap(([,ps])=>ps);
-  for(const [bit]of current){const terminals=allTerminals.get(bit)||[],protect=protectedNets.get(bit),foreignPins=differentPins(bit);
+  for(const bit of [...current.keys()].sort((a,b)=>Number(preferredSegments.has(b))-Number(preferredSegments.has(a)))){const terminals=allTerminals.get(bit)||[],protect=protectedNets.get(bit),foreignPins=differentPins(bit);
     for(let iteration=0;iteration<12&&cuts<maxCuts;iteration++){
-      const tree=current.get(bit),{graph,points}=adjacency(tree.segments),candidates=[];
+      const tree=current.get(bit),{graph,points}=adjacency(tree.segments),candidates=(preferredSegments.get(bit)||[]).map(s=>({segments:[s],gain:Infinity,preferred:true}));
       for(const [from,a]of points){const dist=distances(graph,from);for(const s of tree.segments){const v=same(s.a.x,s.b.x),b=v?{x:s.a.x,y:a.y}:{x:a.x,y:s.a.y},shortcut={a,b},d=length(shortcut);if(d<eps||d>240||!on(b,s))continue;const old=Math.min((dist.get(key(s.a))??Infinity)+Math.abs(s.a.x-b.x)+Math.abs(s.a.y-b.y),(dist.get(key(s.b))??Infinity)+Math.abs(s.b.x-b.x)+Math.abs(s.b.y-b.y)),gain=old-d;if(gain>2)candidates.push({segments:[shortcut],gain});}}
       // Two adjacent elbows separated by a short jog can become one elbow.
       // Endpoints and any real terminals on the old path remain pinned.
@@ -30,10 +30,10 @@ export function shortenNetTrees(nets,allTerminals,boxes=[],protectedByNet=new Ma
       candidates.sort((a,b)=>b.gain-a.gain);let accepted=false;
       const foreign=[...current].filter(([b])=>b!==bit).flatMap(([,t])=>t.segments);
       const oldBends=bends(tree.segments);
-      for(const {segments:add}of candidates.slice(0,32)){
+      for(const {segments:add,preferred=false}of candidates.slice(0,32)){
         if(add.some(s=>boxes.some(n=>Math.max(s.a.x,s.b.x)>n.x+.02&&Math.min(s.a.x,s.b.x)<n.x+n.width-.02&&Math.max(s.a.y,s.b.y)>n.y+.02&&Math.min(s.a.y,s.b.y)<n.y+n.height-.02)||foreignPins.some(p=>on(p,s))||foreign.some(f=>contact(s,f))))continue;
         const next=simplifyNetGeometry([...tree.segments,...add],terminals,[...protect,...add]);if(next.wireLength>tree.wireLength+eps||next.wireLength+8*bends(next.segments)>=tree.wireLength+8*oldBends-.01||protect.some(s=>!covered(s,next.segments)))continue;
-        current.set(bit,next);changed.add(bit);saved+=Math.max(0,tree.wireLength-next.wireLength);cuts++;accepted=true;break;
+        if(preferred)protect.push(...add);current.set(bit,next);changed.add(bit);saved+=Math.max(0,tree.wireLength-next.wireLength);cuts++;accepted=true;break;
       }
       if(!accepted)break;
     }
@@ -43,12 +43,18 @@ export function shortenNetTrees(nets,allTerminals,boxes=[],protectedByNet=new Ma
 }
 
 /** Write optimized net trees back as paths between the original physical pins. */
-export function shortenLayoutNets(layout,cells,voltageRails=[]) {
+export function shortenLayoutNets(layout,cells,voltageRails=[],pairs=[]) {
   const terminals=new Map(),pinPoints=new Map(),nets=new Map(),edgeBits=new Map(),protectedNets=new Map();
   for(const n of layout.children)for(const p of n.ports||[]){const bit=cells[n.id]?.connections[p.id.slice(n.id.length+1)]?.[0];if(bit===undefined)continue;const point={x:n.x+p.x,y:n.y+p.y};pinPoints.set(p.id,point);if(!terminals.has(bit))terminals.set(bit,[]);terminals.get(bit).push(point);}
   for(const e of layout.edges){const source=e.sourcePort||e.sources?.[0],at=source.lastIndexOf('.'),bit=cells[source.slice(0,at)]?.connections[source.slice(at+1)]?.[0];if(bit===undefined)throw Error('Shortcut edge has no real net.');edgeBits.set(e.id,bit);if(!nets.has(bit))nets.set(bit,[]);for(const section of e.sections||[]){const ps=[section.startPoint,...section.bendPoints||[],section.endPoint];for(let i=1;i<ps.length;i++)if(length({a:ps[i-1],b:ps[i]})>eps)nets.get(bit).push({a:ps[i-1],b:ps[i]});}}
   for(const rail of voltageRails)if(nets.has(rail.bit))protectedNets.set(rail.bit,nets.get(rail.bit).filter(s=>same(s.a.y,rail.y)&&same(s.b.y,rail.y)));
-  const result=shortenNetTrees(nets,terminals,layout.children,protectedNets,{maxCuts:layout.children.length>120?12:48}),graphs=new Map([...result.nets].map(([bit,t])=>[bit,adjacency(t.segments)]));
+  const preferredSegments=new Map();
+  for(const pair of pairs.filter(p=>p.kind==='current-mirror'&&p.members.length===2)){
+    const [a,b]=pair.members.map(id=>{const pin=cells[id].spiceLayout.kind==='Q'?'B':'G';return {bit:cells[id].connections[pin][0],point:pinPoints.get(id+'.'+pin)};});
+    if(a.bit!==b.bit||!a.point||!b.point||!same(a.point.y,b.point.y))continue;
+    if(!preferredSegments.has(a.bit))preferredSegments.set(a.bit,[]);preferredSegments.get(a.bit).push({a:a.point,b:b.point});
+  }
+  const result=shortenNetTrees(nets,terminals,layout.children,protectedNets,{maxCuts:layout.children.length>120?12:48,preferredSegments}),graphs=new Map([...result.nets].map(([bit,t])=>[bit,adjacency(t.segments)]));
   if(!result.cuts)return {graph:layout,cuts:0,saved:0};
   for(const e of layout.edges){const a=pinPoints.get(e.sourcePort||e.sources?.[0]),b=pinPoints.get(e.targetPort||e.targets?.[0]),{graph,points}=graphs.get(edgeBits.get(e.id)),from=key(a),to=key(b),queue=[from],previous=new Map([[from,null]]);for(let i=0;i<queue.length&&!previous.has(to);i++)for(const step of graph.get(queue[i])||[])if(!previous.has(step.to)){previous.set(step.to,queue[i]);queue.push(step.to);}if(!previous.has(to))throw Error('Shortcut disconnected a physical pin.');let route=[];for(let p=to;p!==null;p=previous.get(p))route.unshift(points.get(p)||a);route=route.filter((p,i,ps)=>i===0||i===ps.length-1||!(same(ps[i-1].x,p.x)&&same(p.x,ps[i+1].x)||same(ps[i-1].y,p.y)&&same(p.y,ps[i+1].y)));if(route.length===1)route.push({...route[0]});e.sections=[{id:e.id+'_net_tree',startPoint:{...route[0]},bendPoints:route.slice(1,-1).map(p=>({...p})),endPoint:{...route.at(-1)}}];e.junctionPoints=[];}
   return {graph:layout,cuts:result.cuts,saved:result.saved};

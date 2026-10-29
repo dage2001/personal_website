@@ -1,5 +1,6 @@
 import {prepareClassicLayout,installClassicRails} from './classic-layout.js';
 import {transistorCurrentRank} from './transistor-flow.js';
+import {shortenLayoutNets} from './net-shortcuts.js';
 import {tileTransistorPairs} from './paired-layout.js';
 const option='org.eclipse.elk.';
 const netOf=(e,lookup)=>Number(lookup[e.id]?.replaceAll(',',''));
@@ -40,7 +41,7 @@ export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=
     }
     const local={id:node.id+'_local',children,edges},classic=prepareClassicLayout(local,localCells,lookup,null,{maxActive:node.spiceClassic?12:8,currentFlow:!!node.spiceClassic,motifs});if(!classic){if(node.spiceClassic)failures.push({stage:node.spiceGroup,reason:'Ineligible classic stage'});return;}
     const tiled=tileTransistorPairs(local,pairs);
-    let installed;try {const placed=tiled.restore(await elk.layout(local,{layoutOptions:{[option+'algorithm']:'layered',[option+'edgeRouting']:'ORTHOGONAL',[option+'separateConnectedComponents']:false,[option+'hierarchyHandling']:'SEPARATE_CHILDREN',...classic.options,...node.spiceClassic?{[option+'direction']:'DOWN',[option+'layered.spacing.nodeNodeBetweenLayers']:32,[option+'spacing.nodeNode']:Math.max(32,...classic.branches.map(n=>n.width+24))}:{}}}));installed=installClassicRails(placed,classic,localCells,lookup);}catch(error){failures.push({stage:node.spiceGroup,reason:error.message});return;}
+    let installed;try {const placed=tiled.restore(await elk.layout(local,{layoutOptions:{[option+'algorithm']:'layered',[option+'edgeRouting']:'ORTHOGONAL',[option+'separateConnectedComponents']:false,[option+'hierarchyHandling']:'SEPARATE_CHILDREN',...classic.options,...node.spiceClassic?{[option+'direction']:'DOWN',[option+'layered.spacing.nodeNodeBetweenLayers']:32,[option+'spacing.nodeNode']:Math.max(32,...classic.branches.map(n=>n.width+24))}:{}}}));if(tiled.pairs.some(p=>p.placement==='stagger'))shortenLayoutNets(placed,localCells,[],tiled.pairs);installed=installClassicRails(placed,classic,localCells,lookup);}catch(error){failures.push({stage:node.spiceGroup,reason:error.message});return;}
     if(!installed){if(node.spiceClassic)failures.push({stage:node.spiceGroup,reason:classic.failure});return;}
     if(node.spiceClassic){const wires=segments(installed.graph,lookup);for(let i=0;i<wires.length;i++)for(let j=i+1;j<wires.length;j++)if(wires[i].bit!==wires[j].bit&&contact(wires[i],wires[j])){failures.push({stage:node.spiceGroup,reason:'Internal wire contact',a:wires[i],b:wires[j]});return;}}
     const placed=installed.graph,byId=new Map(placed.children.map(n=>[n.id,n])),point=p=>{const at=p.lastIndexOf('.'),n=byId.get(p.slice(0,at)),port=n?.ports.find(v=>v.id===p);if(!port)throw Error('Missing local template terminal.');return {x:n.x+port.x,y:n.y+port.y};};

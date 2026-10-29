@@ -48,3 +48,12 @@ Small classic sheets test each free transistor mirror through an actual layout. 
 有 `pair` 注释的页面调用 `declaredTransistorMotifs`，校验指定器件形成的局部结构，禁止静默退回全图搜索。没有声明则继续使用原识别器。声明与自动匹配结果通过同一个 adapter 与 cache 路径，不改变连接或引脚身份。`origin: annotation` 标记用于审查。
 
 LM741 已内嵌六条结构声明与八个自由晶体管的 `face`。Q12/Q13 跨 BIAS/OUTPUT 区域以 B 极同排约束求解；其余三个镜和两对差分支路仍相邻。VBE 倍增器是已声明结构，仍为局部方向与邻近偏好。
+
+
+## v14：级联、互补双管与镜控制网
+
+新增 `darlington-pair`、`sziklai-pair`、`cascode-pair`、`push-pull-pair`，覆盖注释校验、无注释自动识别、adapter 与规范化缓存。新类型的 driver/output 或 upper/lower 角色均显式重映射。双管并非一律同排：前三者在同作用域内使用紧凑错层模板，推挽射随结构保留软偏好。歧义、未知极性或不匹配连线不作为高置信度模板使用。
+
+LM741 的 Q16/Q17 显式声明为 Darlington，Q14/Q20 与 R9/R10 显式声明为互补推挽；Q16/Q17 的 B 均朝左。镜及差分结构优先处理重叠。复杂整图新模板无法安全恢复电源轨时保留原有经典布局并报告 `compoundPairFallback`。
+
+跨区域电流镜之前仅约束 B/G 同高，仍沿旧区域边界绕行。对真实同网、同高的镜控制极增加无长度上限的直连候选，并优先处理这些网；候选必须通过符号避障、异网终端/接触和全端点连接检查。一般局部捷径仍保留原 240 单位上限。修正同时写回 SVG 与 ASC 的公共图形数据。

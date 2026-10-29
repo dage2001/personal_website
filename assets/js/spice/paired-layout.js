@@ -9,11 +9,11 @@ export function rigidTransistorPairs(motifs,cells,description) {
   const pairs=[],used=new Set();
   const scope=id=>owners.get(id)||cells[id]?.spiceLayout?.owner||'';
   const supported=id=>{const c=cells[id],kind=c?.spiceLayout?.kind;return kind==='Q'?Object.keys(c.connections).length===3:['M','J','Z'].includes(kind)&&!!c.connections.G;};
-  for(const kind of ['differential-pair','current-mirror'])for(const m of motifs)if(m.kind===kind&&m.confidence==='high'){
-    const branches=kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:[[m.roles.reference,...m.roles.outputs]];
+  for(const kind of ['differential-pair','current-mirror','darlington-pair','sziklai-pair','cascode-pair'])for(const m of motifs)if(m.kind===kind&&m.confidence==='high'){
+    const branches=kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:kind==='current-mirror'?[[m.roles.reference,...m.roles.outputs]]:kind==='push-pull-pair'?[[m.roles.upper,m.roles.lower]]:[[m.roles.driver,m.roles.output]];
     for(const ids of branches){
       if(ids.length!==2||new Set(ids).size!==ids.length||ids.some(id=>used.has(id)||!supported(id))||kind!=='current-mirror'&&ids.some(id=>scope(id)!==scope(ids[0])))continue;
-      pairs.push({motif:m.id,kind,members:ids,controlSides:ids.map((_,i)=>kind==='current-mirror'?(i?'left':'right'):(i?'right':'left'))});ids.forEach(id=>used.add(id));
+      const compound=!['differential-pair','current-mirror'].includes(kind);pairs.push({motif:m.id,kind,placement:compound?'stagger':'row',rise:kind==='cascode-pair'?cells[ids[0]].spiceLayout.polarity!=='p':cells[ids[0]].spiceLayout.polarity==='p',members:ids,controlSides:ids.map((id,i)=>compound?(description?.faces||[]).find(f=>f.device===id)?.side||'left':kind==='current-mirror'?(i?'left':'right'):(i?'right':'left'))});ids.forEach(id=>used.add(id));
     }
   }
   return pairs;
@@ -36,13 +36,18 @@ export function tileTransistorPairs(graph,pairs) {
   for(const pair of pairs){const members=pair.members.map(id=>nodes.get(id));if(members.some(n=>!n)||members.some(n=>Math.abs(n.height-members[0].height)>.002))continue;
     const control=n=>n.ports.find(p=>p.id===n.id+'.B'||p.id===n.id+'.G');
     if(members.some((n,i)=>{const p=control(n);return !p||Math.abs(p.x-(pair.controlSides[i]==='left'?0:n.width))>.002;}))continue;
-    const id='__transistor_pair_'+tiles.size,gap=32,height=members[0].height,children=[],pp=[];let width=0;
-    for(const member of members){children.push({...member,x:width,y:0});width+=member.width+gap;}width-=gap;
+    const id='__transistor_pair_'+tiles.size,gap=32,stagger=pair.placement==='stagger',height=stagger?members.reduce((sum,n)=>sum+n.height,0)+16:members[0].height,children=[],pp=[];let width=0;
+    for(const [i,member]of members.entries()){children.push({...member,x:stagger?i*(members[0].width/2+12):width,y:stagger?((pair.rise?1-i:i)*(members[0].height+16)):0});width+=member.width+gap;}width=Math.max(...children.map(n=>n.x+n.width));
     for(const child of children){owners.set(child.id,id);for(const p of child.ports){const pid=id+'.p'+pp.length;ports.set(p.id,pid);const exposed={...p,id:pid,x:child.x+p.x,y:p.y};
-      // ELK snaps side ports to the tile boundary even with FIXED_POS. Inward
-      // controls therefore escape vertically along the symbol edge to a real
-      // top/bottom tile port; restore those short leads before net cleanup.
-      if(exposed.x>.002&&exposed.x<width-.002&&['WEST','EAST'].includes(p.layoutOptions?.[opt+'port.side'])){const drain=child.ports.find(q=>q.id===child.id+'.C'||q.id===child.id+'.D'),top=(drain?.y??0)<height/2;exposed.y=top?0:height;exposed.layoutOptions={...p.layoutOptions,[opt+'port.side']:top?'NORTH':'SOUTH'};leads.set(p.id,{tile:id,point:{x:exposed.x,y:p.y}});}
+      exposed.y+=child.y;
+      const side=p.layoutOptions?.[opt+'port.side'],boundary=side==='WEST'?exposed.x===0:side==='EAST'?exposed.x===width:side==='NORTH'?exposed.y===0:exposed.y===height;
+      // Internal pins escape to an outer tile port along a clear symbol edge.
+      // The short physical lead is restored before the net-tree simplifier.
+      if(!boundary){
+        const point={x:exposed.x,y:exposed.y},targets=[{side:'WEST',x:0,y:point.y},{side:'EAST',x:width,y:point.y},{side:'NORTH',x:point.x,y:0},{side:'SOUTH',x:point.x,y:height}],clear=t=>!children.some(n=>Math.max(point.x,t.x)>n.x+.02&&Math.min(point.x,t.x)<n.x+n.width-.02&&Math.max(point.y,t.y)>n.y+.02&&Math.min(point.y,t.y)<n.y+n.height-.02);
+        const target=targets.filter(clear).sort((a,b)=>Number(b.side===side)-Number(a.side===side)||Math.abs(a.x-point.x)+Math.abs(a.y-point.y)-Math.abs(b.x-point.x)-Math.abs(b.y-point.y))[0];
+        if(!target)throw Error('No safe paired-device pin escape.');exposed.x=target.x;exposed.y=target.y;exposed.layoutOptions={...p.layoutOptions,[opt+'port.side']:target.side};leads.set(p.id,{tile:id,point});
+      }
       pp.push(exposed);}}
     const tile={id,width,height,ports:pp,layoutOptions:{[opt+'portConstraints']:'FIXED_POS'}};tiles.set(id,{tile,children});applied.push(pair);
   }

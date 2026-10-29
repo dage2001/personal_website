@@ -192,3 +192,28 @@ classic 成员的书写顺序不指定 B/G 朝向。viewer 可按真实同网邻
 - 同区域双管镜保持相邻；不同 classic 功能区域的电流镜允许隔着其他功能级，但要求 B/G 同一水平线，不要求两个区域合并。当前跨区域对齐由同一 row 容器下的经典区域实现；布局求解不收敛时明确报错。
 - 仅有配对声明时仍采用自动经典布局，不必额外编造功能区域。可选 `face` 用于进一步减少方向搜索；省略时保留局部朝向试排。含声明的页面不进行多轮组合镜像搜索。
 - 建议设计阶段生成顺序：先验证电气连接，再列配对，随后定义功能区域，最后指定必要的 B/G 朝向。不要为了让声明通过而改动原本电路连接。
+
+
+## 更多经典双管结构（layout v14）
+
+以下声明与现有 `pair mirror`、`pair differential` 共用一个 `@layout` 块。角色由实际连接确定，不依赖位号；支持 NPN / PNP 对偶结构。
+
+```spice
+* pair darlington { QDRIVER QOUTPUT }
+* pair sziklai { QDRIVER QOUTPUT }
+* pair cascode { QLOW QHIGH }
+* pair push-pull { QUPPER QLOWER RUPPER RLOWER }
+```
+
+| 声明 | 保守拓扑校验 | 布局处理 |
+| --- | --- | --- |
+| `darlington` | 同极性、共集电极，驱动管 E 接输出管 B，驱动分支无多输出歧义 | 同区域内按信号级联紧凑错层放置 |
+| `sziklai` | 互补极性，驱动管 C 接输出管 B，驱动管 E 接输出管 C，驱动节点无第三个有源端口 | 互补反馈双管，紧凑错层放置 |
+| `cascode` | 同极性，下管 C 接上管 E，控制极不同，中间节点未接已知电源且无额外有源端口 | 按电流通路区分上下管，紧凑错层放置 |
+| `push-pull` | 上 NPN、下 PNP，集电极供电电位顺序已确认，E 直接或经一个电阻汇到同一输出 | 保留方向与邻近软偏好，不强制把整个输出级包为刚性方块 |
+
+直接共 E 的互补射随对可只写两管；存在退化/输出电阻时应把这些电阻列入声明。Sziklai 的带二极管变体、Wilson 镜和 folded cascode 不属于本版规则。规则证明的是局部连接形状，不证明静态工作点、增益或稳定性。
+
+同区域的差分与电流镜优先保留，重叠器件不重复硬打包。复杂整图若新双管模板妨碍安全供电接入，会明确提示退回邻近布局；不会牺牲原有共用供电轨或静默丢器件。可通过分为合适的 `classic` 功能区域提高模板适用性。
+
+定义参考：[ADI 的 Darlington / Cascode 术语](https://wiki.analog.com/university/courses/electronics/text/glossary)、[ADI 的 Sziklai 应用实例](https://www.analog.com/en/resources/design-notes/4096v-80ma-precision-reference.html)。
