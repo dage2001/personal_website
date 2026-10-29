@@ -18,13 +18,18 @@ function symbol(node,component,card,xy) {
   const line=(a,b)=>lines.push(`LINE Normal ${Math.round(a.x)} ${Math.round(a.y)} ${Math.round(b.x)} ${Math.round(b.y)}`);
   const two=pins.length===2&&['R','C','L','D','V','I','B'].includes(component.kind);
   if(two){
-    const [a,b]=pins,vertical=Math.abs(a.x-b.x)<.1,c={x:(a.x+b.x)/2,y:(a.y+b.y)/2},distance=Math.abs(vertical?b.y-a.y:b.x-a.x),d=Math.min(32,distance/4),t=Math.sign(vertical?b.y-a.y:b.x-a.x);
+    const ordered=['D','V','I','B'].includes(component.kind)?[pins.find(p=>p.pin==='+')||pins[0],pins.find(p=>p.pin==='-')||pins[1]]:pins;
+    const [a,b]=ordered,vertical=Math.abs(a.x-b.x)<.1,c={x:(a.x+b.x)/2,y:(a.y+b.y)/2},distance=Math.abs(vertical?b.y-a.y:b.x-a.x),d=Math.min(32,distance/4),t=Math.sign(vertical?b.y-a.y:b.x-a.x);
     const p=(u,v)=>vertical?{x:c.x+v,y:c.y+u*t}:{x:c.x+u*t,y:c.y+v};
     line(a,p(-d,0));line(p(d,0),b);
     if(component.kind==='C'){line(p(-6,-20),p(-6,20));line(p(6,-20),p(6,20));line(p(-d,0),p(-6,0));line(p(6,0),p(d,0));}
-    else if(['R','L'].includes(component.kind)){const vs=[[-d,0],[-d+6,0],[-d+12,-12],[-d+22,12],[-d+32,-12],[d-6,0],[d,0]];for(let i=1;i<vs.length;i++)line(p(...vs[i-1]),p(...vs[i]));}
+    else if(component.kind==='R'||component.kind==='B'&&/^\s*R\s*=/i.test(component.value)){const vs=[[-d,0],[-d+6,0],[-d+12,-12],[-d+22,12],[-d+32,-12],[d-6,0],[d,0]];for(let i=1;i<vs.length;i++)line(p(...vs[i-1]),p(...vs[i]));}
+    else if(component.kind==='L'){let previous=p(-d,0);for(let turn=0;turn<4;turn++)for(let i=1;i<=8;i++){const next=p(-d+(turn+i/8)*d/2,16*Math.sin(i*Math.PI/8));line(previous,next);previous=next;}}
     else if(component.kind==='D'){line(p(-d,0),p(-12,0));line(p(12,0),p(d,0));line(p(-12,-18),p(-12,18));line(p(-12,18),p(12,0));line(p(12,0),p(-12,-18));line(p(12,-18),p(12,18));}
-    else {lines.push(`CIRCLE Normal ${Math.round(c.x-24)} ${Math.round(c.y-24)} ${Math.round(c.x+24)} ${Math.round(c.y+24)}`);line(p(-d,0),p(-24,0));line(p(24,0),p(d,0));line(p(-12,-6),p(-12,6));line(p(-18,0),p(-6,0));line(p(12,-6),p(12,6));}
+    else {lines.push(`CIRCLE Normal ${Math.round(c.x-24)} ${Math.round(c.y-24)} ${Math.round(c.x+24)} ${Math.round(c.y+24)}`);line(p(-d,0),p(-24,0));line(p(24,0),p(d,0));
+      if(component.kind==='I'||component.kind==='B'&&/^\s*(?:I|P)\s*=/i.test(component.value)){line(p(-12,0),p(12,0));line(p(12,0),p(4,-7));line(p(12,0),p(4,7));}
+      else {line(p(-12,-6),p(-12,6));line(p(-18,0),p(-6,0));line(p(12,-6),p(12,6));}
+    }
   }else{
     const inset=16;lines.push(`RECTANGLE Normal ${inset} ${inset} ${Math.max(inset+16,w-inset)} ${Math.max(inset+16,h-inset)}`);
     for(const p of pins){const q={x:Math.max(inset,Math.min(w-inset,p.x)),y:Math.max(inset,Math.min(h-inset,p.y))};line(p,q);lines.push(`TEXT ${Math.round(q.x+4)} ${Math.round(q.y+4)} Left 1 ${safe(annotation(component.block?.ports.find(a=>a.pin===p.pin)?.label||component.pinLabels?.[Object.keys(component.terminals).indexOf(p.pin)]||p.pin))}`);}
