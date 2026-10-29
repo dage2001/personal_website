@@ -2,9 +2,9 @@ import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
 import {classicPassiveOrientations} from './classic-orientation.js';
 import {currentLimiterTransistors} from './transistor-flow.js';
-import {recognizeTransistorMotifs} from './transistor-motifs.js';
+import {declaredTransistorMotifs,recognizeTransistorMotifs} from './transistor-motifs.js';
 
-export const layoutRulesVersion = 12;
+export const layoutRulesVersion = 13;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -52,13 +52,13 @@ export function dcPotentials(devices) {
   return {nodes:result,diagnostics};
 }
 
-export function analyzeLayout(tree,circuit) {
+export function analyzeLayout(tree,circuit,description=null) {
   const dc=dcPotentials(leafDevices(tree.root)),nodes=Object.create(null),cells=Object.create(null);
   for(const n of Object.values(circuit.nodes)) {
     const named=namingRole(n.name),legacy=legacyRail(n.name);
     nodes[n.name]={role:named!=='unknown'?named:legacy,roleSource:named!=='unknown'?'node-name':legacy!=='unknown'?'legacy-rail-name':'unknown',potential:dc.nodes[n.name]?.known?dc.nodes[n.name].value:null};
   }
-  const motifs=recognizeTransistorMotifs(circuit,nodes),orientations=classicPassiveOrientations(circuit,nodes,motifs),limiters=currentLimiterTransistors(circuit);
+  const motifs=description?.pairs?.length?declaredTransistorMotifs(circuit,nodes,description.pairs):recognizeTransistorMotifs(circuit,nodes),orientations=classicPassiveOrientations(circuit,nodes,motifs),limiters=currentLimiterTransistors(circuit);
   const roleAt=(c,pin,node)=>{
     const base={role:nodes[node].role,roleSource:nodes[node].roleSource};
     const formal=c.block?.ports.find(p=>p.pin===pin);

@@ -80,5 +80,19 @@ export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=
     hidden.set(node.id,{children:clean(physical),edges:clean(routed)});node.ports=resolvedPorts;delete node.children;delete node.edges;node.width=width;node.height=height;node.layoutOptions={...node.layoutOptions,[option+'portConstraints']:'FIXED_POS'};
     pairConstraints.push(...tiled.pairs);appliedMotifs.push(...classic.appliedMotifs);if(node.spiceClassic)stages.push(node.spiceGroup);else successful.push(node.spiceGroup.slice('@instance_'.length));
   }
-  await visit(graph);return {instances:successful,stages,appliedMotifs,pairConstraints,failures,restore:layout=>{const visit=n=>{if(hidden.has(n.id))Object.assign(n,hidden.get(n.id));for(const child of n.children||[])visit(child);};visit(layout);return layout;}};
+  await visit(graph);
+  const crossPairs=[],rowConstraints=[];
+  function alignRows(parent){
+    for(const child of parent.children||[])if(child.children)alignRows(child);
+    const stageOf=new Map();for(const stage of parent.children||[])if(hidden.has(stage.id))for(const n of hidden.get(stage.id).children)stageOf.set(n.id,{stage,n});
+    const anchors=new Map();
+    for(const pair of pairs.filter(p=>p.kind==='current-mirror')){const [a,b]=pair.members.map(id=>stageOf.get(id));if(!a||!b||a.stage===b.stage)continue;const control=n=>n.ports.find(p=>p.id===n.id+'.B'||p.id===n.id+'.G');anchors.set(a.stage.id,a.n.y+control(a.n).y);anchors.set(b.stage.id,b.n.y+control(b.n).y);crossPairs.push(pair);rowConstraints.push({pair,a:a.stage.id,b:b.stage.id,ay:a.n.y+control(a.n).y,by:b.n.y+control(b.n).y});}
+    if(!anchors.size)return;
+    const reference=Math.max(...anchors.values());
+    for(const child of parent.children||[]){child.y=reference-(anchors.get(child.id)??reference);for(const p of child.ports||[])if(p.spiceGuide&&p.id.includes('.order_'))p.y=anchors.get(child.id)??reference;}
+    for(const e of parent.edges||[])if(e.id.startsWith('__guide_'))e.layoutOptions={...e.layoutOptions,[option+'layered.priority.straightness']:1000000,[option+'layered.priority.shortness']:1000000};
+    parent.layoutOptions={...parent.layoutOptions,[option+'layered.nodePlacement.strategy']:'INTERACTIVE',[option+'layered.nodePlacement.bk.fixedAlignment']:'LEFTUP'};
+  }
+  alignRows(graph);
+  return {crossPairs,rowConstraints,instances:successful,stages,appliedMotifs,pairConstraints,failures,restore:layout=>{const visit=n=>{if(hidden.has(n.id))Object.assign(n,hidden.get(n.id));for(const child of n.children||[])visit(child);};visit(layout);return layout;}};
 }

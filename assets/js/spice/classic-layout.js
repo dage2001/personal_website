@@ -107,8 +107,9 @@ export function installClassicRails(layout,classic,cells,lookup) {
       if(!clear(points)){
         // Keep a clear direct rail tap whenever possible. A buried collector
         // may need a short outward escape before reaching the shared rail.
-        const owner=nodes.get(p.owner),exit={x:p.x+(p.side==='WEST'?-16:p.side==='EAST'?16:0),y:p.y+(p.side==='NORTH'?-16:p.side==='SOUTH'?16:0)},xs=[p.x-24,p.x+24,owner.x-24,owner.x+owner.width+24,Math.min(...graph.children.map(n=>n.x))-24,Math.max(...graph.children.map(n=>n.x+n.width))+24];
-        const choices=xs.map(x=>[p,exit,{x,y:exit.y},{x,y}]).filter(clear).sort((a,b)=>Math.abs(a[2].x-p.x)-Math.abs(b[2].x-p.x));
+        const owner=nodes.get(p.owner),xs=[p.x-24,p.x+24,owner.x-24,owner.x+owner.width+24,...graph.children.flatMap(n=>[n.x-16,n.x+n.width+16]),Math.min(...graph.children.map(n=>n.x))-24,Math.max(...graph.children.map(n=>n.x+n.width))+24];
+        const length=ps=>ps.slice(1).reduce((sum,b,i)=>sum+Math.abs(b.x-ps[i].x)+Math.abs(b.y-ps[i].y),0);
+        const choices=[8,16,24,32,48,64,96].flatMap(distance=>{const exit={x:p.x+(p.side==='WEST'?-distance:p.side==='EAST'?distance:0),y:p.y+(p.side==='NORTH'?-distance:p.side==='SOUTH'?distance:0)};return xs.map(x=>[p,exit,{x,y:exit.y},{x,y}]);}).filter(clear).sort((a,b)=>length(a)-length(b));
         if(!choices.length)return fail('No clear rail escape for '+id);points=choices[0];
       }
       paths.set(id,points);

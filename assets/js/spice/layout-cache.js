@@ -12,7 +12,7 @@ export function normalizeLayout(netlist) {
     if(cell.spiceLayout)cells[id].spiceLayout=cell.spiceLayout;
   });
   const canonical=new Map([...ids].map(([id,name])=>[name,id])),description=netlist.modules.circuit.spiceLayoutDescription;
-  const spiceLayoutDescription=description?{...description,groups:description.groups.map(g=>({...g,members:g.members.map(m=>m.cell?{...m,cell:canonical.get(m.cell)}:m)})),relations:description.relations.map(r=>({...r,a:canonical.get(r.a)||r.a,b:canonical.get(r.b)||r.b}))}:null;
+  const spiceLayoutDescription=description?{...description,faces:(description.faces||[]).map(f=>({...f,device:canonical.get(f.device)})),pairs:(description.pairs||[]).map(p=>({...p,members:p.members.map(id=>canonical.get(id))})),groups:description.groups.map(g=>({...g,members:g.members.map(m=>m.cell?{...m,cell:canonical.get(m.cell)}:m)})),relations:description.relations.map(r=>({...r,a:canonical.get(r.a)||r.a,b:canonical.get(r.b)||r.b}))}:null;
   const spiceMotifs=mapTransistorMotifs(netlist.modules.circuit.spiceMotifs||[],name=>canonical.get(name),normalizeBit);
   return {netlist:{modules:{circuit:{attributes:{top:1},ports:{},cells,spiceMotifs,spiceLayoutDescription}}},ids,bits:new Map([...bits].map(([old,canonical])=>[canonical,old]))};
 }

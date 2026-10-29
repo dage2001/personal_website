@@ -172,7 +172,7 @@ if (root) {
         if(r.mirroredTransistors?.length)items.push({severity:'info',message:`Control-pin mirror choices: ${r.mirroredTransistors.join(', ')}.`});
         if(r.recognizedMotifs?.length)items.push({severity:'info',message:`Transistor structures: ${r.recognizedMotifs.map(m=>`${m.kind} (${m.members.join(', ')}; ${m.confidence})`).join('; ')}.`});
         if(r.appliedMotifs?.length)items.push({severity:'info',message:`Topology preferences applied to ${r.appliedMotifs.length} local structure(s); ELK still determines placement and routing.`});
-        if(r.pairConstraints?.length)items.push({severity:'info',message:`${r.pairConstraints.length} transistor motif group(s) placed together; unrelated devices cannot enter the pair.`});
+        if(r.pairConstraints?.length){const cross=r.pairConstraints.filter(p=>p.crossRegion).length;items.push({severity:'info',message:`${r.pairConstraints.length-cross} adjacent transistor pair(s); ${cross} cross-region mirror row constraint(s).`});}
         if(r.netShortcuts)items.push({severity:'info',message:`${r.netShortcuts} safe straight net shortcut(s); ${r.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.`});
         if(r.sharedRailFallback)items.push({severity:'warning',message:`Shared rail layout uses an automatic fallback: ${r.sharedRailFallback}.`});
         for(const f of r.localClassicFallbacks||[])if(f.stage)items.push({severity:'info',message:`Classic stage ${f.stage} uses automatic layout: ${f.reason||'No unobstructed local template'}.`});

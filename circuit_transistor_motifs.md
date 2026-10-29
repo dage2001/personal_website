@@ -41,3 +41,10 @@ Small classic sheets test each free transistor mirror through an actual layout. 
 ## v12: 双管电流镜进入硬约束放置
 
 识别结果不变。与差分对共用不可拆分放置单元；双管电流镜按 reference / output 顺序并排，B/G 相向。差分对拥有重叠优先级；低置信度、多输出、跨显式区域的电流镜继续使用软偏好。LM741 的 Q8/Q9、Q5/Q6、Q11/Q10 并排，Q12/Q13 因跨 BIAS/OUTPUT 区域不强制配对。辅助 Q7 不纳入 Q5/Q6 的单元。
+
+
+## v13: 声明优先与跨区域镜
+
+有 `pair` 注释的页面调用 `declaredTransistorMotifs`，校验指定器件形成的局部结构，禁止静默退回全图搜索。没有声明则继续使用原识别器。声明与自动匹配结果通过同一个 adapter 与 cache 路径，不改变连接或引脚身份。`origin: annotation` 标记用于审查。
+
+LM741 已内嵌六条结构声明与八个自由晶体管的 `face`。Q12/Q13 跨 BIAS/OUTPUT 区域以 B 极同排约束求解；其余三个镜和两对差分支路仍相邻。VBE 倍增器是已声明结构，仍为局部方向与邻近偏好。

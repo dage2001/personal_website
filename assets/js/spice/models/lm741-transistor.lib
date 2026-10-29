@@ -9,6 +9,20 @@
 .subckt LM741_TL IN_P IN_N PWR_VCC RET_VEE OUT_SIG IO_NULL1 IO_NULL5
 * Local visual constraints apply only when this instance sheet is opened.
 * @layout begin v1
+* pair differential { Q1 Q2 Q3 Q4 }
+* pair mirror { Q5 Q6 Q7 R1 R2 }
+* pair mirror { Q8 Q9 }
+* pair mirror { Q11 Q10 R4 }
+* pair mirror { Q12 Q13 }
+* pair vbe { Q18 R7 R8 }
+* face Q7 right
+* face Q16 right
+* face Q17 left
+* face Q18 left
+* face Q22 left
+* face Q14 right
+* face Q15 left
+* face Q20 left
 * group SUPPLY row { PWR_VCC }
 * group CORE row {
 *   group INPUT classic { IN_P IN_N Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 R1 R2 R3 IO_NULL1 IO_NULL5 }

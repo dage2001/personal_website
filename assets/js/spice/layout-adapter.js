@@ -34,7 +34,7 @@ export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),fo
   if(components.length>1500)throw Error('This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.');
   const models=Object.assign(record(),...Object.values(tree.contexts).map(c=>c.models));
   const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,extraNodes),models,diagnostics:tree.ir.diagnostics,mode,focus};
-  circuit.topology=auditProjection(tree,circuit);circuit.layout=analyzeLayout(tree,circuit);circuit.layout.description=bindLayoutDescription(tree,circuit);return circuit;
+  circuit.topology=auditProjection(tree,circuit);const description=bindLayoutDescription(tree,circuit);circuit.layout=analyzeLayout(tree,circuit,description);circuit.layout.description=description;return circuit;
 }
 export function auditProjection(tree,view) {
   const represented=[],seen=new Set();
