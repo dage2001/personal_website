@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793242922">
+  <link rel="stylesheet" href="/assets/main.css?v=1793245374">
   <link rel="canonical" href="https://jordan-wang.win/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793242922" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793245374" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793242922">
-  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793242922"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793245374">
+  <script type="module" src="/assets/spice-viewer/viewer.js?v=1793245374"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -145,13 +145,14 @@
       <div class="spice-panel-header"><label for="spice-input">SPICE netlist</label><span class="spice-caption">01 / Circuit</span></div>
       <textarea id="spice-input" spellcheck="false" aria-label="SPICE netlist" aria-describedby="spice-input-help"></textarea>
       <div class="spice-toolbar">
-        <button type="button" data-example="filter">RLC filter</button>
-        <button type="button" data-example="mixed">Mixed analog</button>
-        <button type="button" data-example="hierarchy">Nested channels</button>
-        <button type="button" data-example="ltspice">LTspice families</button>
-        <button type="button" data-example="amplifier">BJT amplifier</button>
+        <button type="button" data-example="filter">RLC low-pass</button>
+        <button type="button" data-example="amplifier">Common emitter</button>
+        <button type="button" data-example="follower">Emitter follower</button>
+        <button type="button" data-example="sallen">Sallen–Key · LM741</button>
+        <button type="button" data-example="instrumentation">Instrumentation amp</button>
         <button type="button" id="spice-generate">Generate ↗</button>
       </div>
+      <p class="spice-help" id="spice-example-info" aria-live="polite"></p>
       <div class="spice-file-row"><label for="spice-file">Open .cir file </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,text/plain"></div>
       <div class="spice-file-row"><label for="spice-libraries">Library files </label><input type="file" id="spice-libraries" accept=".lib,.sub,.mod,.cir,.txt" multiple><p class="spice-help" id="spice-library-status">For .include / .lib dependencies</p></div>
     </section>
@@ -227,7 +228,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793242922"></script>
+<script src="/assets/js/site.js?v=1793245374"></script>
 
 
 

@@ -2,13 +2,10 @@ import {parseHierarchy} from './hierarchy-parser.js';
 import {elaborateCircuit} from './elaborate.js';
 import {projectHierarchy,toNetlistsvg} from './layout-adapter.js';
 import {renderSchematic} from './renderer.js';
-import mixed from './examples/mixed.cir?raw';
-import filter from './examples/filter.cir?raw';
-import hierarchy from './examples/hierarchy.cir?raw';
-import ltspice from './examples/ltspice-elements.cir?raw';
-import amplifier from './examples/common-emitter.cir?raw';
+import {examples} from './examples.js';
 import {readSpiceFile} from './file-text.js';
 import './viewer.css';
+const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
 const root = $('app');
@@ -20,9 +17,15 @@ if (root) {
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value,detailed:$('detailed').checked,conventional:$('conventional').checked});
-  function invalidate() { svgText = ''; exports(); status.textContent = 'Input changed — generate to refresh the schematic.'; }
+  function showExampleInfo(example) {
+    const element=$('example-info');if(!element)return;element.replaceChildren();if(!example)return;
+    element.append(document.createTextNode(example.description+' '));
+    if(example.url){const link=document.createElement('a');link.href=example.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=example.reference;element.append(link);}
+  }
+  function invalidate() { svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
+  showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
   input.addEventListener('input', invalidate);
   for (const id of ['font','size','color','detailed','conventional']) $(id).addEventListener('input', invalidate);
   function showDiagnostics(items) {
@@ -226,7 +229,7 @@ if (root) {
     }
   }
   $('generate').onclick=generate;
-  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{input.value=({mixed,filter,hierarchy,ltspice,amplifier})[button.dataset.example];invalidate();generate();};
+  for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{const example=examples[button.dataset.example];input.value=example.source;invalidate();showExampleInfo(example);generate();};
   $('file').onchange=async event=>{
     const file=event.target.files[0];if (!file)return;
     if (file.size>2000000) {status.textContent='File exceeds 2 MB.';return;}
