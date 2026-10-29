@@ -1768,7 +1768,7 @@ function xt(t) {
   }
   return o;
 }
-const we = 11;
+const we = 12;
 function _e(t) {
   const e = String(t).split("/").at(-1);
   let n;
@@ -1955,7 +1955,7 @@ async function Mt(t, e) {
 function Dt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("render-worker-D6rTw1T8.js", import.meta.url).href,
+    "" + new URL("render-worker-QPytGn_-.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((r, o) => {
@@ -2373,7 +2373,7 @@ ${Object.entries(U.terminals).map(([k, B]) => `${k} → ${B}`).join("   ")}`, U.
       if (B) {
         c.layout.report = JSON.parse(B.textContent);
         const S = c.layout.report;
-        _.push({ severity: "info", message: `Layout: compact signal flow; ${S.powerSourcesChecked} DC/ground symbols checked, ${S.powerOrderViolations} DC order preference(s) unmet. ${S.powerPass}. ${S.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), S.classicTemplateFallback && _.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), S.groundPlacement && _.push({ severity: "info", message: `Ground: ${S.groundPlacement}; ${S.straightenedGroundDrops || 0} return-path simplification(s).` }), S.explicitGroups && _.push({ severity: "info", message: `Layout comments: ${S.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), S.classicRails && _.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${S.railCount} shared voltage rails.` }), S.localClassicInstances?.length && _.push({ severity: "info", message: `${S.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), S.localClassicStages?.length && _.push({ severity: "info", message: `Classic transistor proximity active: ${S.localClassicStages.join(", ")}.` }), S.sharedClassicRails && _.push({ severity: "info", message: "Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes." }), S.mirroredTransistors?.length && _.push({ severity: "info", message: `Control-pin mirror choices: ${S.mirroredTransistors.join(", ")}.` }), S.recognizedMotifs?.length && _.push({ severity: "info", message: `Transistor structures: ${S.recognizedMotifs.map((V) => `${V.kind} (${V.members.join(", ")}; ${V.confidence})`).join("; ")}.` }), S.appliedMotifs?.length && _.push({ severity: "info", message: `Topology preferences applied to ${S.appliedMotifs.length} local structure(s); ELK still determines placement and routing.` }), S.pairConstraints?.length && _.push({ severity: "info", message: `${S.pairConstraints.length} differential branch pair(s) placed together; unrelated devices cannot enter the pair.` }), S.netShortcuts && _.push({ severity: "info", message: `${S.netShortcuts} safe straight net shortcut(s); ${S.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.` }), S.sharedRailFallback && _.push({ severity: "warning", message: `Shared rail layout uses an automatic fallback: ${S.sharedRailFallback}.` });
+        _.push({ severity: "info", message: `Layout: compact signal flow; ${S.powerSourcesChecked} DC/ground symbols checked, ${S.powerOrderViolations} DC order preference(s) unmet. ${S.powerPass}. ${S.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), S.classicTemplateFallback && _.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), S.groundPlacement && _.push({ severity: "info", message: `Ground: ${S.groundPlacement}; ${S.straightenedGroundDrops || 0} return-path simplification(s).` }), S.explicitGroups && _.push({ severity: "info", message: `Layout comments: ${S.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), S.classicRails && _.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${S.railCount} shared voltage rails.` }), S.localClassicInstances?.length && _.push({ severity: "info", message: `${S.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), S.localClassicStages?.length && _.push({ severity: "info", message: `Classic transistor proximity active: ${S.localClassicStages.join(", ")}.` }), S.sharedClassicRails && _.push({ severity: "info", message: "Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes." }), S.mirroredTransistors?.length && _.push({ severity: "info", message: `Control-pin mirror choices: ${S.mirroredTransistors.join(", ")}.` }), S.recognizedMotifs?.length && _.push({ severity: "info", message: `Transistor structures: ${S.recognizedMotifs.map((V) => `${V.kind} (${V.members.join(", ")}; ${V.confidence})`).join("; ")}.` }), S.appliedMotifs?.length && _.push({ severity: "info", message: `Topology preferences applied to ${S.appliedMotifs.length} local structure(s); ELK still determines placement and routing.` }), S.pairConstraints?.length && _.push({ severity: "info", message: `${S.pairConstraints.length} transistor motif group(s) placed together; unrelated devices cannot enter the pair.` }), S.netShortcuts && _.push({ severity: "info", message: `${S.netShortcuts} safe straight net shortcut(s); ${S.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.` }), S.sharedRailFallback && _.push({ severity: "warning", message: `Shared rail layout uses an automatic fallback: ${S.sharedRailFallback}.` });
         for (const V of S.localClassicFallbacks || []) V.stage && _.push({ severity: "info", message: `Classic stage ${V.stage} uses automatic layout: ${V.reason || "No unobstructed local template"}.` });
         S.geometricConnectivityVerified && _.push({ severity: "info", message: `Net geometry verified; ${S.cyclesRemoved} same-net loop(s) and ${S.leavesRemoved} unused wire branch(es) removed.` }), T(_);
       }
@@ -2479,7 +2479,7 @@ Resolved: ` + S.value + `
     if (!(!x || v || l)) {
       l = !0, N(), n.textContent = "Generating ASC from the selected layout and checking connections…";
       try {
-        const { exportAsc: A } = await import("./asc-export-DuWN56kK.js");
+        const { exportAsc: A } = await import("./asc-export-sCQ3sbSl.js");
         if (o !== x) throw Error("Schematic changed. Generate again before exporting ASC.");
         d ||= A({ tree: a, circuit: c, drawing: x, source: t.value, libraries: C });
         const U = _ ? d.zip : d.ascBytes, k = URL.createObjectURL(new Blob([U], { type: _ ? "application/zip" : "application/octet-stream" })), B = document.createElement("a");

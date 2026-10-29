@@ -15,7 +15,7 @@ import {placeOutputShunts} from './output-shunts.js';
 import {layoutLocalClassicInstances} from './local-classic.js';
 import {controlSideChoices,mirrorTransistorSkin} from './transistor-orientation.js';
 import {motifControlChoices,measureMotifs} from './motif-layout.js';
-import {differentialPairs,outwardPairSkin,mirroredSkinDevices,tileDifferentialPairs} from './paired-layout.js';
+import {rigidTransistorPairs,pairedTransistorSkin,mirroredSkinDevices,tileTransistorPairs} from './paired-layout.js';
 import {shortenLayoutNets} from './net-shortcuts.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
@@ -46,8 +46,8 @@ function portRole(port,cells) {
 }
 
 export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,onLayout=null,onRawLayout=null}={}) {
-  const pairCells=netlist.modules.circuit.cells,pairs=pairedDevices&&motifLayout?differentialPairs(netlist.modules.circuit.spiceMotifs||[],pairCells,netlist.modules.circuit.spiceLayoutDescription):[];
-  skin=outwardPairSkin(skin,pairCells,pairs);Skin.skin=onml.parse(skin);
+  const pairCells=netlist.modules.circuit.cells,pairs=pairedDevices&&motifLayout?rigidTransistorPairs(netlist.modules.circuit.spiceMotifs||[],pairCells,netlist.modules.circuit.spiceLayoutDescription):[];
+  skin=pairedTransistorSkin(skin,pairCells,pairs);Skin.skin=onml.parse(skin);
   const flat=new FlatModule(netlist);flat.createWires();
   const cells=netlist.modules.circuit.cells,motifs=netlist.modules.circuit.spiceMotifs||[],activeMotifs=motifLayout?motifs:[];
   const groundIds=new Set(groundDecoration?Object.entries(cells).filter(([,c])=>c.attributes.name==='0').map(([id])=>id):[]);
@@ -134,7 +134,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(wrapping)options[option+'layered.wrapping.strategy']='MULTI_EDGE';
   if(classic)Object.assign(options,classic.options);
   if(split)options[option+'hierarchyHandling']='SEPARATE_CHILDREN';
-  const tiles=classic?tileDifferentialPairs(graph,pairs):null;
+  const tiles=classic?tileTransistorPairs(graph,pairs):null;
   let layout=graph.children.length?await elk.layout(graph,{layoutOptions:options}):{...graph,width:0,height:0};
   if(tiles)layout=tiles.restore(layout);if(localPlan)layout=localPlan.restore(layout);
   const visualGroups=[];const recordGroups=(n,x=0,y=0)=>{for(const c of n.children||[]){const cx=x+c.x,cy=y+c.y;if(c.spiceGroup&&!c.spiceGroup.startsWith('@'))visualGroups.push({name:c.spiceGroup,x:cx,y:cy,width:c.width,height:c.height});recordGroups(c,cx,cy);}};recordGroups(layout);
