@@ -11,18 +11,19 @@ const $ = id => document.getElementById('spice-' + id);
 const root = $('app');
 if (root) {
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
+  let drawing=null,ascPackage=null,ascExporting=false;
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
   const expanded=new Set();let pendingRoute=false,libraries={};
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
-  const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; };
+  const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting; };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value,detailed:$('detailed').checked,conventional:$('conventional').checked});
   function showExampleInfo(example) {
     const element=$('example-info');if(!element)return;element.replaceChildren();if(!example)return;
     element.append(document.createTextNode(example.description+' '));
     if(example.url){const link=document.createElement('a');link.href=example.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=example.reference;element.append(link);}
   }
-  function invalidate() { svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
+  function invalidate() { drawing=null;ascPackage=null;svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
@@ -131,7 +132,7 @@ if (root) {
   });
   async function generate() {
     if (busy) return;
-    busy=true; svgText=''; exports(); $('generate').disabled=true;
+    busy=true; drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
     input.readOnly=true; $('file').disabled=true;$('libraries').disabled=true;
     for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance')) element.disabled=true;
     status.textContent='Parsing netlist and routing wires…'; preview.setAttribute('aria-busy','true');
@@ -152,7 +153,7 @@ if (root) {
       const netlist=toNetlistsvg(circuit);
       if(settings().conventional)items.push(...circuit.layout.diagnostics);
       const rendered=await renderSchematic(netlist,settings());
-      const documentSVG=new DOMParser().parseFromString(rendered,'image/svg+xml');
+      const documentSVG=new DOMParser().parseFromString(rendered.svg,'image/svg+xml');
       if (documentSVG.querySelector('parsererror')) throw Error('Renderer produced invalid SVG.');
       const svg=documentSVG.documentElement;
       const layoutReport=svg.querySelector('#spice-layout-report');
@@ -201,7 +202,7 @@ if (root) {
         }
       }
       // Export remains at the fitted full-sheet view regardless of preview pan/zoom.
-      svgText=new XMLSerializer().serializeToString(svg); $('source').value=svgText;
+      drawing=rendered.drawing;svgText=new XMLSerializer().serializeToString(svg); $('source').value=svgText;
       preview.replaceChildren(document.importNode(svg,true)); setView();
       const warnings=items.filter(d=>d.severity==='warning').length;
       status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
@@ -251,6 +252,23 @@ if (root) {
     const url=URL.createObjectURL(new Blob([svgText],{type:'image/svg+xml;charset=utf-8'}));
     const a=document.createElement('a');a.href=url;a.download='spice-schematic.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   };
+  async function downloadAsc(bundle) {
+    const snapshot=drawing;if(!snapshot||busy||ascExporting)return;
+    ascExporting=true;exports();status.textContent='Generating ASC from the selected layout and checking connections…';
+    try {
+      const {exportAsc}=await import('./asc-export.js');
+      if(drawing!==snapshot)throw Error('Schematic changed. Generate again before exporting ASC.');
+      ascPackage ||= exportAsc({tree,circuit,drawing:snapshot,source:input.value,libraries});
+      const bytes=bundle?ascPackage.zip:ascPackage.ascBytes;
+      const url=URL.createObjectURL(new Blob([bytes],{type:bundle?'application/zip':'application/octet-stream'}));
+      const a=document.createElement('a');a.href=url;a.download=bundle?'spice-schematic-asc.zip':'spice-schematic.asc';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      status.textContent='ASC connections verified · '+ascPackage.manifest.audit.symbols+' symbols. '+(bundle?'Extract all files together, then open spice-schematic.asc in LTspice.':'This ASC requires its generated .asy symbols. Download the ASC bundle and keep all files together.');
+      if(ascPackage.manifest.warnings.length)status.textContent+=' '+ascPackage.manifest.warnings.join(' ');
+    }catch(error){status.textContent='ASC export failed: '+error.message;const li=document.createElement('li');li.className='error';li.textContent=status.textContent;diagnostics.append(li);}
+    finally{ascExporting=false;exports();}
+  }
+  $('download-asc').onclick=()=>downloadAsc(false);
+  $('download-asc-bundle').onclick=()=>downloadAsc(true);
   $('copy').onclick=async()=>{
     try {await navigator.clipboard.writeText(svgText);status.textContent='SVG source copied to clipboard.';}
     catch { $('source-details').open=true;$('source').focus();$('source').select();status.textContent='Clipboard unavailable. SVG source selected — press Ctrl+C / ⌘C.'; }
