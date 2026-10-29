@@ -3,7 +3,7 @@ const known=p=>p?.potential!==null&&p?.potential!==undefined;
 
 /** ELK lays out the transistor/signal skeleton; simple rail branches use local templates. */
 export function prepareClassicLayout(graph,cells,lookup,description) {
-  if(description)return null;
+  if(description?.groups.some(g=>g.members.length)||description?.relations.length)return null;
   const active=Object.entries(cells).filter(([,c])=>['Q','M','J','Z'].includes(c.spiceLayout?.kind));
   if(!active.length||active.length>8||Object.keys(cells).length>80||Object.values(cells).some(c=>c.spiceBlock||Object.keys(c.connections).length>4||c.spiceLayout&&!['Q','M','J','Z','R','L','C','D','V','I','PORT'].includes(c.spiceLayout.kind)))return null;
   const rails=new Map();for(const c of Object.values(cells))for(const [pin,[bit]]of Object.entries(c.connections))if(known(c.spiceLayout?.ports[pin]))rails.set(bit,c.spiceLayout.ports[pin].potential);
