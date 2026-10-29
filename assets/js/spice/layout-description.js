@@ -32,7 +32,7 @@ export function parseLayoutDescription(source) {
   function group(named) {
     if(groups.length>=256)throw Error('Layout description exceeds 256 groups.');
     const id=named?name():'@row'+anonymous++,direction=take();
-    if(!['row','column'].includes(direction))throw Error('Expected row or column.');
+    if(!['row','column','classic'].includes(direction))throw Error('Expected row, column or classic.');
     if(take()!=='{')throw Error('Expected { after '+direction);
     const result={id,direction,members:[]};groups.push(result);
     while(pos<tokens.length&&tokens[pos]!=='}') {
@@ -78,14 +78,14 @@ export function bindLayoutDescription(tree,circuit) {
   for(const r of description.relations)for(const member of [r.a,r.b])if(!groups.has(member.toLowerCase())&&!known.has(member.toLowerCase()))throw Error('Unknown @layout place target: '+member);
   // The header describes the top-level sheet. Opening an instance starts a new
   // layout scope; ancestor rows, columns, ordering and priority caps stop here.
-  const owners=new Map(),output=[];
+  const owners=new Map(),output=[],instances=new Set(Object.keys(tree.contexts).map(n=>n.toLowerCase()));
   for(const g of description.groups) {
     const members=[];
     for(const member of g.members) {
       if(groups.has(member.toLowerCase())){members.push({group:member});continue;}
       for(const c of circuit.components)if(c.name.toLowerCase()===member.toLowerCase()||c.name.toLowerCase().startsWith(member.toLowerCase()+'/')) {
         if(owners.has(c.name))throw Error('Overlapping @layout membership: '+c.name);
-        owners.set(c.name,g.id);members.push({cell:c.name,instance:member});
+        owners.set(c.name,g.id);members.push({cell:c.name,...instances.has(member.toLowerCase())?{instance:member}:{}});
       }
     }
     output.push({id:g.id,direction:g.direction,members});

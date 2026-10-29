@@ -35,3 +35,5 @@ Local LTspice 24.1.9 sanity checks: follower outputs for inputs -100/0/+100 mV w
 Run the optional development-only check with `LTSPICE_EXE` set, using `node scripts/test-spice-741-native.mjs`. The browser has no simulator dependency. Sallen-Key has 40 primitive devices; the three-op-amp example has 110. Each IC internally has 32 primitives plus seven interface markers.
 
 The former mixed-device, nested-filter and LTspice-family inputs remain only in `scripts/fixtures/spice/` for parser/rendering regression coverage. They are excluded from the static site and from the built-in example catalog.
+
+The stage groups use `group NAME classic { ... }`: the outer row orders functional stages, while each stage independently places transistor current paths and nearby bias/emitter parts. Ordinary devices are not wrapped as subcircuits. Rendering reports list the stages that actually used the template, with explicit fallback reasons when needed.

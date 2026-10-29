@@ -1,7 +1,9 @@
 import {structuralValue} from './structural-expression.js';
 import {leafDevices} from './flatten.js';
+import {classicPassiveOrientations} from './classic-orientation.js';
+import {currentLimiterTransistors} from './transistor-flow.js';
 
-export const layoutRulesVersion = 7;
+export const layoutRulesVersion = 8;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -55,6 +57,7 @@ export function analyzeLayout(tree,circuit) {
     const named=namingRole(n.name),legacy=legacyRail(n.name);
     nodes[n.name]={role:named!=='unknown'?named:legacy,roleSource:named!=='unknown'?'node-name':legacy!=='unknown'?'legacy-rail-name':'unknown',potential:dc.nodes[n.name]?.known?dc.nodes[n.name].value:null};
   }
+  const orientations=classicPassiveOrientations(circuit,nodes),limiters=currentLimiterTransistors(circuit);
   const roleAt=(c,pin,node)=>{
     const base={role:nodes[node].role,roleSource:nodes[node].roleSource};
     const formal=c.block?.ports.find(p=>p.pin===pin);
@@ -67,7 +70,7 @@ export function analyzeLayout(tree,circuit) {
     const ports=Object.fromEntries(Object.entries(c.terminals).map(([pin,node])=>[pin,{...nodes[node],...roleAt(c,pin,node)}]));
     const values=Object.values(ports);
     const passive=['r_v','spice_br','l_v','c_v','d_v'].includes(c.type);
-    const horizontal=passive&&values.length===2&&values.every(p=>!rail(p.role)&&(p.potential===null||p.role!=='unknown'));
+    const horizontal=passive&&!orientations.has(c.name)&&values.length===2&&values.every(p=>!rail(p.role)&&(p.potential===null||p.role!=='unknown'));
     const plus=c.terminals['+'],minus=c.terminals['-'];
     const nonGround=[plus,minus].filter(n=>n&&n!=='0');
     const supply=c.kind==='V'&&nonGround.some(n=>rail(nodes[n]?.role))&&!nonGround.some(n=>['in','out','io','fb'].includes(nodes[n]?.role))&&[plus,minus].every(n=>dc.nodes[n]?.known);
@@ -81,8 +84,9 @@ export function analyzeLayout(tree,circuit) {
       else if(values.every(p=>p.potential!==null))reverse=values[0].potential<values[1].potential;
       else reverse=side(values[0])==='low'||side(values[1])==='high'&&side(values[0])==='signal';
     }
+    if(orientations.has(c.name))reverse=orientations.get(c.name).reverse;
     const relative=c.synthetic?'':c.name.startsWith(circuit.focus+'/')?c.name.slice(circuit.focus.length+1):c.name;
-    cells[c.name]={version:layoutRulesVersion,kind:c.kind,owner:relative.includes('/')?relative.slice(0,relative.lastIndexOf('/')):'',passive,source:['V','I','E','F','G','H'].includes(c.kind)||c.kind==='B'&&!passive,ports,horizontal,orientation:horizontal?'horizontal':reverse?'vertical-reversed':'vertical',flexible:pinNames.length===2&&(passive||['V','I','B','F','H'].includes(c.kind)),supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
+    cells[c.name]={version:layoutRulesVersion,kind:c.kind,polarity:c.type.endsWith('pnp')?'p':c.type.endsWith('npn')?'n':null,currentLimiter:limiters.has(c.name),orientationReason:orientations.get(c.name)?.reason||null,owner:relative.includes('/')?relative.slice(0,relative.lastIndexOf('/')):'',passive,source:['V','I','E','F','G','H'].includes(c.kind)||c.kind==='B'&&!passive,ports,horizontal,orientation:horizontal?'horizontal':reverse?'vertical-reversed':'vertical',flexible:pinNames.length===2&&(passive||['V','I','B','F','H'].includes(c.kind)),supply:!!supply,voltage:supply?dc.nodes[referenceNode].value:null};
   }
   return {version:layoutRulesVersion,nodes,cells,diagnostics:dc.diagnostics};
 }

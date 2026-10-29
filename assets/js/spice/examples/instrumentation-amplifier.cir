@@ -52,14 +52,10 @@ XU3 N_NONINV N_INV PWR_VCC RET_VEE OUT_SIG N_NULL_XU3_1 N_NULL_XU3_5 LM741_TL
 * @layout begin v1
 * group SUPPLY row { PWR_VCC }
 * group CORE row {
-*   group INPUT row {
-*     column { Q8 row { IN_P Q1 } Q3 Q7 Q5 R1 IO_NULL1 }
-*     column { Q9 row { IN_N Q2 } Q4 Q6 R2 IO_NULL5 }
-*     column { R3 }
-*   }
-*   group BIAS column { Q12 R5 Q11 Q10 R4 }
-*   group GAIN row { column { Q18 Q16 Q17 R11 } column { R7 R8 R12 Q22 C1 } }
-*   group OUTPUT row { column { Q13 Q14 R9 OUT_SIG R10 Q20 } column { Q15 } }
+*   group INPUT classic { IN_P IN_N Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 R1 R2 R3 IO_NULL1 IO_NULL5 }
+*   group BIAS classic { Q10 Q11 Q12 R4 R5 }
+*   group GAIN classic { Q16 Q17 Q18 Q22 R7 R8 R11 R12 C1 }
+*   group OUTPUT classic { Q13 Q14 Q15 Q20 R9 R10 OUT_SIG }
 * }
 * group RETURN row { RET_VEE }
 * place SUPPLY above CORE

@@ -15,7 +15,7 @@ export function planLayoutGroups(graph,cells,description,parallel) {
   const leaves=new Map(graph.children.map(n=>[n.id,n])),used=new Set(),groupNodes=new Map(),guides=[];let serial=0,explicitGroups=0,inferredGroups=0,parallelGroups=0;
   const guide=(a,b,direction)=>{if(a===b)return;guides.push({id:'__guide_'+serial++,source:a,target:b,layoutOptions:{[opt+'layered.priority.direction']:1000,[opt+'direction']:direction}});};
   const box=(id,direction,children,ordered=false)=>{
-    const node={id:'__visual_'+serial++,spiceGroup:id,children,layoutOptions:{[opt+'algorithm']:'layered',[opt+'direction']:direction==='column'?'DOWN':'RIGHT',[opt+'edgeRouting']:'ORTHOGONAL',[opt+'padding']:'[top=12,left=12,bottom=12,right=12]',[opt+'spacing.nodeNode']:24,[opt+'layered.spacing.nodeNodeBetweenLayers']:28,[opt+'layered.considerModelOrder.strategy']:'NONE'}};
+    const node={id:'__visual_'+serial++,spiceGroup:id,spiceClassic:direction==='classic',children,layoutOptions:{[opt+'algorithm']:'layered',[opt+'direction']:direction==='row'?'RIGHT':'DOWN',[opt+'edgeRouting']:'ORTHOGONAL',[opt+'padding']:'[top=12,left=12,bottom=12,right=12]',[opt+'spacing.nodeNode']:24,[opt+'layered.spacing.nodeNodeBetweenLayers']:28,[opt+'layered.considerModelOrder.strategy']:'NONE'}};
     if(ordered){Object.assign(node.layoutOptions,{[opt+'layered.nodePlacement.strategy']:'INTERACTIVE',[opt+'layered.crossingMinimization.strategy']:'INTERACTIVE',[opt+'layered.interactiveReferencePoint']:'TOP_LEFT'});children.forEach((child,i)=>{child.x=direction==='column'?0:i*20000;child.y=direction==='column'?i*20000:0;});for(let i=1;i<children.length;i++)guide(children[i-1].id,children[i].id,node.layoutOptions[opt+'direction']);}
     groupNodes.set(id.toLowerCase(),node);return node;
   };
@@ -34,7 +34,7 @@ export function planLayoutGroups(graph,cells,description,parallel) {
         }
       }
       for(const wrapper of instances.values())wrapper.children=skeletonOrder(wrapper.children,cells,priorityCap);
-      active.delete(id);explicitGroups++;return box(def.id,def.direction,children,true);
+      active.delete(id);explicitGroups++;return box(def.id,def.direction,children,def.direction!=='classic');
     };
     const nested=new Set(description.groups.flatMap(g=>g.members.filter(m=>m.group).map(m=>m.group.toLowerCase())));
     const roots=description.groups.filter(g=>!nested.has(g.id.toLowerCase())).map(g=>build(g.id.toLowerCase())).filter(g=>g.children.length);
@@ -70,6 +70,7 @@ export function planLayoutGroups(graph,cells,description,parallel) {
     graph.children=[...roots,...skeletonOrder(graph.children.filter(n=>!used.has(n.id)),cells)];
   }
   function parallelInside(container) {
+    if(container.spiceClassic)return;
     const localCells=(container.children||[]).filter(n=>!n.children).map(n=>cells[n.id]);
     if(container.spiceGroup?.startsWith('@instance_')&&localCells.length===(container.children||[]).length&&localCells.length<=80&&localCells.filter(c=>['Q','M','J','Z'].includes(c?.spiceLayout?.kind)).length===1&&localCells.every(c=>c&&!c.spiceBlock&&['Q','M','J','Z','R','L','C','D','V','I','PORT'].includes(c.spiceLayout?.kind)))return;
     for(const child of container.children||[])if(child.children)parallelInside(child);
@@ -82,5 +83,6 @@ export function planLayoutGroups(graph,cells,description,parallel) {
 
 export function removeLayoutGuides(graph) {
   graph.edges=(graph.edges||[]).filter(e=>!e.id.startsWith('__guide_'));
-  for(const child of graph.children||[])if(child.children)removeLayoutGuides(child);
+  if(graph.ports)graph.ports=graph.ports.filter(p=>!p.spiceGuide);
+  for(const child of graph.children||[])removeLayoutGuides(child);
 }
