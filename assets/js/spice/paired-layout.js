@@ -12,7 +12,7 @@ export function rigidTransistorPairs(motifs,cells,description) {
   for(const kind of ['differential-pair','current-mirror'])for(const m of motifs)if(m.kind===kind&&m.confidence==='high'){
     const branches=kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:[[m.roles.reference,...m.roles.outputs]];
     for(const ids of branches){
-      if(ids.length!==2||new Set(ids).size!==ids.length||ids.some(id=>used.has(id)||!supported(id))||ids.some(id=>scope(id)!==scope(ids[0])))continue;
+      if(ids.length!==2||new Set(ids).size!==ids.length||ids.some(id=>used.has(id)||!supported(id))||kind!=='current-mirror'&&ids.some(id=>scope(id)!==scope(ids[0])))continue;
       pairs.push({motif:m.id,kind,members:ids,controlSides:ids.map((_,i)=>kind==='current-mirror'?(i?'left':'right'):(i?'right':'left'))});ids.forEach(id=>used.add(id));
     }
   }
@@ -50,4 +50,12 @@ export function tileTransistorPairs(graph,pairs) {
   const emitted=new Set();graph.children=graph.children.flatMap(n=>{const tile=owners.get(n.id);if(!tile)return [n];if(emitted.has(tile))return [];emitted.add(tile);return [tiles.get(tile).tile];});
   const originals=new Map();for(const e of graph.edges){originals.set(e.id,{source:e.source,target:e.target,sourcePort:e.sourcePort,targetPort:e.targetPort});e.source=owners.get(e.source)||e.source;e.target=owners.get(e.target)||e.target;e.sourcePort=ports.get(e.sourcePort)||e.sourcePort;e.targetPort=ports.get(e.targetPort)||e.targetPort;}
   return {pairs:applied,restore:g=>{const positions=new Map(g.children.map(n=>[n.id,n]));g.children=g.children.flatMap(n=>tiles.has(n.id)?tiles.get(n.id).children.map(c=>({...c,x:n.x+c.x,y:n.y+c.y})): [n]);for(const e of g.edges)if(originals.has(e.id)){Object.assign(e,originals.get(e.id));for(const [port,source]of [[e.sourcePort,true],[e.targetPort,false]])if(leads.has(port)){const lead=leads.get(port),tile=positions.get(lead.tile),point={x:tile.x+lead.point.x,y:tile.y+lead.point.y},section=source?e.sections?.[0]:e.sections?.at(-1);if(section){if(source){section.bendPoints=[section.startPoint,...section.bendPoints||[]];section.startPoint=point;}else{section.bendPoints=[...section.bendPoints||[],section.endPoint];section.endPoint=point;}}}}return g;}};
+}
+
+export function declaredFaceSkin(skin,cells,faces,pairs) {
+  const desired=new Map(pairs.flatMap(p=>p.members.map((id,i)=>[id,p.controlSides[i]])));
+  for(const f of faces){if(desired.has(f.device)&&desired.get(f.device)!==f.side)throw Error('Conflicting pair / face layout declaration for '+f.device);desired.set(f.device,f.side);}
+  const ast=onml.parse(skin),flips=[];
+  for(const f of faces){const pin=cells[f.device].spiceLayout.kind==='Q'?'B':'G',g=ast.find(g=>g[1]?.['s:type']===cells[f.device].type),p=g?.find(p=>p[1]?.['s:pid']===pin);if(!p)throw Error('Missing declared control pin.');if(p[1]['s:position']!==f.side)flips.push(f.device);}
+  return flips.length?mirrorTransistorSkin(skin,cells,flips):skin;
 }

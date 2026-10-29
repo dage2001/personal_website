@@ -62,3 +62,20 @@ export function mapTransistorMotifs(motifs,mapDevice,mapNode=x=>x) {
   const role=value=>Array.isArray(value)?value.map(mapDevice):mapDevice(value);
   return motifs.map(m=>({...m,members:m.members.map(mapDevice),transistors:m.transistors.map(mapDevice),roles:Object.fromEntries(Object.entries(m.roles).map(([k,v])=>[k,role(v)])),nets:Object.fromEntries(Object.entries(m.nets).map(([k,v])=>[k,mapNode(v)]))}));
 }
+
+/** Explicit declarations validate only the named small structures. No whole-sheet
+ * differential candidate search runs when a sheet supplies pair declarations. */
+export function declaredTransistorMotifs(circuit,nodes,pairs) {
+  const output=[],seen=new Set(),devices=new Map(circuit.components.map(c=>[c.name,c]));
+  for(const pair of pairs){
+    if(new Set(pair.members).size!==pair.members.length)throw Error('Duplicate @layout pair member.');
+    const members=pair.members.map(id=>devices.get(id));if(members.some(c=>!c))throw Error('Unknown @layout pair device.');
+    const kind={mirror:'current-mirror',differential:'differential-pair',vbe:'vbe-multiplier'}[pair.kind];
+    // Preserve tail-bias evidence for a declared basic differential pair.
+    const extra=pair.kind==='differential'&&members.length===2?circuit.components.filter(c=>!pair.members.includes(c.name)&&Object.values(c.terminals).includes(members[0].terminals.E??members[0].terminals.S)):[];
+    const matches=recognizeTransistorMotifs({...circuit,components:[...members,...extra]},nodes),match=matches.find(m=>m.kind===kind&&m.confidence==='high'&&pair.members.every(id=>m.members.includes(id)));
+    if(!match)throw Error('Invalid @layout pair '+pair.kind+' { '+pair.members.join(' ')+' }: electrical structure does not match.');
+    for(const m of matches.filter(m=>m===match||m.kind==='diode-connected'&&m.members.every(id=>match.members.includes(id)))){const key=JSON.stringify([m.kind,[...m.members].sort()]);if(seen.has(key))continue;seen.add(key);output.push({...m,id:'motif'+output.length,origin:'annotation'});}
+  }
+  return output;
+}

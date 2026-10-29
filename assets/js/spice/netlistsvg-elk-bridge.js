@@ -15,7 +15,7 @@ import {placeOutputShunts} from './output-shunts.js';
 import {layoutLocalClassicInstances} from './local-classic.js';
 import {controlSideChoices,mirrorTransistorSkin} from './transistor-orientation.js';
 import {motifControlChoices,measureMotifs} from './motif-layout.js';
-import {rigidTransistorPairs,pairedTransistorSkin,mirroredSkinDevices,tileTransistorPairs} from './paired-layout.js';
+import {rigidTransistorPairs,declaredFaceSkin,pairedTransistorSkin,mirroredSkinDevices,tileTransistorPairs} from './paired-layout.js';
 import {shortenLayoutNets} from './net-shortcuts.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
@@ -47,7 +47,7 @@ function portRole(port,cells) {
 
 export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,onLayout=null,onRawLayout=null}={}) {
   const pairCells=netlist.modules.circuit.cells,pairs=pairedDevices&&motifLayout?rigidTransistorPairs(netlist.modules.circuit.spiceMotifs||[],pairCells,netlist.modules.circuit.spiceLayoutDescription):[];
-  skin=pairedTransistorSkin(skin,pairCells,pairs);Skin.skin=onml.parse(skin);
+  skin=pairedTransistorSkin(skin,pairCells,pairs);skin=declaredFaceSkin(skin,pairCells,netlist.modules.circuit.spiceLayoutDescription?.faces||[],pairs);Skin.skin=onml.parse(skin);
   const flat=new FlatModule(netlist);flat.createWires();
   const cells=netlist.modules.circuit.cells,motifs=netlist.modules.circuit.spiceMotifs||[],activeMotifs=motifLayout?motifs:[];
   const groundIds=new Set(groundDecoration?Object.entries(cells).filter(([,c])=>c.attributes.name==='0').map(([id])=>id):[]);
@@ -136,6 +136,16 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(split)options[option+'hierarchyHandling']='SEPARATE_CHILDREN';
   const tiles=classic?tileTransistorPairs(graph,pairs):null;
   let layout=graph.children.length?await elk.layout(graph,{layoutOptions:options}):{...graph,width:0,height:0};
+  if(localPlan?.rowConstraints.length){
+    const index=g=>{const map=new Map();const visit=n=>{map.set(n.id,n);for(const c of n.children||[])visit(c);};visit(g);return map;},originals=index(graph);
+    for(let attempt=0;attempt<8;attempt++){
+      const placed=index(layout),errors=localPlan.rowConstraints.map(r=>({...r,delta:placed.get(r.b).y+r.by-placed.get(r.a).y-r.ay}));
+      if(errors.every(r=>Math.abs(r.delta)<.002))break;
+      if(attempt===7)throw Error('Cross-region mirror row constraint could not be satisfied.');
+      for(const r of errors)originals.get(r.b).y-=r.delta;
+      layout=await elk.layout(graph,{layoutOptions:options});
+    }
+  }
   if(tiles)layout=tiles.restore(layout);if(localPlan)layout=localPlan.restore(layout);
   const visualGroups=[];const recordGroups=(n,x=0,y=0)=>{for(const c of n.children||[]){const cx=x+c.x,cy=y+c.y;if(c.spiceGroup&&!c.spiceGroup.startsWith('@'))visualGroups.push({name:c.spiceGroup,x:cx,y:cy,width:c.width,height:c.height});recordGroups(c,cx,cy);}};recordGroups(layout);
   const rawLayout=onRawLayout?structuredClone(layout):null;removeLayoutGuides(layout);layout=flattenElkGroups(layout);
@@ -175,7 +185,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     localClassicInstances,
     localClassicStages:localPlan?.stages||[],
     localClassicFallbacks:localPlan?.failures||[],
-    visualGroups,netShortcuts:shortcuts.cuts,netWireSaved:shortcuts.saved,pairConstraints:[...(tiles?.pairs||[]),...(localPlan?.pairConstraints||[])],recognizedMotifs:motifs,appliedMotifs:[...new Set([...(classic?.appliedMotifs||[]),...(localPlan?.appliedMotifs||[])])],...measureMotifs(layout,cells,motifs),sharedClassicRails:!!shared&&!!railLayout,
+    visualGroups,motifSource:motifs.some(m=>m.origin==='annotation')?'annotation':'automatic',netShortcuts:shortcuts.cuts,netWireSaved:shortcuts.saved,pairConstraints:[...(tiles?.pairs||[]),...(localPlan?.pairConstraints||[]),...(localPlan?.crossPairs||[]).map(p=>({...p,crossRegion:true}))],recognizedMotifs:motifs,appliedMotifs:[...new Set([...(classic?.appliedMotifs||[]),...(localPlan?.appliedMotifs||[])])],...measureMotifs(layout,cells,motifs,new Set((localPlan?.crossPairs||[]).map(p=>p.motif))),sharedClassicRails:!!shared&&!!railLayout,
     outputShunts,classicRails:!!railLayout,railCount:railLayout?.railCount||0,railPitch:railLayout?.railPitch||null,voltageRails:railLayout?.railBands||[],
     width:layout.width,height:layout.height,wireLength,bends,detourLength,affinityGroups,nodeCount:Object.keys(cells).length,aspectRatio:Math.max(layout.width/layout.height,layout.height/layout.width),
     groundPlacement:attachments.some(a=>a.anchor)?'rail-attached':attachments.length?'isolated':Object.values(cells).some(c=>c.attributes.name==='0')?'ELK fallback (no clear ground attachment)':'not-present',groundAttachments:attachments.length,straightenedGroundDrops:straightened,
@@ -188,7 +198,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   const baseReport={...report,...normalized.report};
   let orientationCandidates=1,testedDevices=[];
   if(chooseControlSides&&(classic||localPlan?.stages.length||localPlan?.instances.length)){
-    const locked=new Set(pairs.flatMap(p=>p.members)),free=Object.keys(cells).filter(id=>!locked.has(id)&&['Q','M','J','Z'].includes(cells[id].spiceLayout?.kind)),choices=controlSideChoices(layout,cells).filter(id=>!locked.has(id));
+    const locked=new Set([...pairs.flatMap(p=>p.members),...(netlist.modules.circuit.spiceLayoutDescription?.faces||[]).map(f=>f.device)]),free=Object.keys(cells).filter(id=>!locked.has(id)&&['Q','M','J','Z'].includes(cells[id].spiceLayout?.kind)),choices=controlSideChoices(layout,cells).filter(id=>!locked.has(id));
     const singles=Object.keys(cells).length<=80?free:choices.slice(0,4),structural=motifControlChoices(layout,cells,activeMotifs).filter(id=>!locked.has(id)),variants=[...structural.length?[structural]:[],...choices.length?[choices]:[],...singles.map(id=>[id])],seen=new Set(['[]']);
     testedDevices=singles;let best=null,bestCost=baseReport.uniqueWireLength+(baseReport.uniqueBends??baseReport.bends)*8+3*baseReport.motifPenalty;
     const evaluate=async ids=>{const signature=JSON.stringify([...ids].sort());if(seen.has(signature))return;seen.add(signature);let candidateLayout,candidateRaw;orientationCandidates++;try{
@@ -198,7 +208,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     for(const ids of variants)await evaluate(ids);
     // A second sweep tests marginal flips around the best complete routed result,
     // rather than assuming the neighbours stay where the original heuristic saw them.
-    if(best&&Object.keys(cells).length<=80)for(let sweep=0;sweep<3;sweep++){const before=bestCost;for(const id of singles){const ids=new Set(best.ids);if(ids.has(id))ids.delete(id);else ids.add(id);await evaluate([...ids]);}if(before-bestCost<.001)break;}
+    if(best&&Object.keys(cells).length<=80)for(let sweep=0;sweep<(netlist.modules.circuit.spiceLayoutDescription?.pairs?.length?0:3);sweep++){const before=bestCost;for(const id of singles){const ids=new Set(best.ids);if(ids.has(id))ids.delete(id);else ids.add(id);await evaluate([...ids]);}if(before-bestCost<.001)break;}
     if(best){best.meta[2]=JSON.stringify({...best.r,mirroredTransistors:best.r.mirroredTransistors,orientationDevicesTested:testedDevices,controlOrientationCandidates:orientationCandidates});onRawLayout?.(best.raw);onLayout?.(best.layout);return onml.stringify(best.ast);}
   }
   onRawLayout?.(rawLayout);onLayout?.(layout);

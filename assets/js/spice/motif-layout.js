@@ -28,14 +28,14 @@ export function motifControlChoices(graph,cells,motifs) {
 }
 
 /** Geometric structure score is independent of whether preferences were enabled. */
-export function measureMotifs(graph,cells,motifs) {
+export function measureMotifs(graph,cells,motifs,rowOnly=new Set()) {
   const byId=new Map(graph.children.map(n=>[n.id,n])),measurements=[];let penalty=0;
   const control=n=>{const pin=cells[n.id].spiceLayout.kind==='Q'?'B':'G',p=n.ports.find(p=>p.id===n.id+'.'+pin);return {x:n.x+p.x,y:n.y+p.y};};
   for(const m of motifs){if(m.confidence!=='high')continue;
     for(const pair of motifPairs(m)){if(pair.length<2||!pair.every(id=>byId.has(id)))continue;
       const nodes=pair.map(id=>byId.get(id)).sort((a,b)=>a.x-b.x),ps=nodes.map(control),spread=Math.max(...ps.map(p=>p.y))-Math.min(...ps.map(p=>p.y)),gap=Math.max(0,nodes.at(-1).x-(nodes[0].x+nodes[0].width)-100*(nodes.length-1)),weight=m.kind==='differential-pair'?2:1;
       const interlopers=graph.children.filter(n=>!pair.includes(n.id)&&n.x>nodes[0].x&&n.x<nodes.at(-1).x&&n.y<Math.min(...nodes.map(n=>n.y+n.height))&&n.y+n.height>Math.max(...nodes.map(n=>n.y))).map(n=>n.id);
-      penalty+=weight*spread+.4*gap+500*interlopers.length;measurements.push({motif:m.id,kind:m.kind,members:pair,controlSpread:spread,excessGap:gap,interlopers});
+      const row=rowOnly.has(m.id);penalty+=weight*spread+(row?0:.4*gap+500*interlopers.length);measurements.push({sameRowOnly:row,motif:m.id,kind:m.kind,members:pair,controlSpread:spread,excessGap:row?0:gap,interlopers:row?[]:interlopers});
     }
   }
   return {motifPenalty:penalty,motifMeasurements:measurements};
