@@ -166,6 +166,8 @@ if (root) {
         if(r.explicitGroups)items.push({severity:'info',message:`Layout comments: ${r.explicitGroups} visual groups; nested row/column placement retained on expansion.`});
         if(r.classicRails)items.push({severity:'info',message:`Transistor layout: local load/bias branches; ${r.railCount} shared voltage rails.`});
         if(r.localClassicInstances?.length)items.push({severity:'info',message:`${r.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.`});
+        if(r.localClassicStages?.length)items.push({severity:'info',message:`Classic transistor proximity active: ${r.localClassicStages.join(', ')}.`});
+        for(const f of r.localClassicFallbacks||[])if(f.stage)items.push({severity:'info',message:`Classic stage ${f.stage} uses automatic layout: ${f.reason||'No unobstructed local template'}.`});
         if(r.geometricConnectivityVerified)items.push({severity:'info',message:`Net geometry verified; ${r.cyclesRemoved} same-net loop(s) and ${r.leavesRemoved} unused wire branch(es) removed.`});
         showDiagnostics(items);
       }

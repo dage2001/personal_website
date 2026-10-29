@@ -1,11 +1,14 @@
+import {transistorCurrentRank} from './transistor-flow.js';
 const option='org.eclipse.elk.';
 const known=p=>p?.potential!==null&&p?.potential!==undefined;
+const pointOn=(p,a,b)=>Math.abs(a.x-b.x)<.002?Math.abs(p.x-a.x)<.002&&p.y>=Math.min(a.y,b.y)-.002&&p.y<=Math.max(a.y,b.y)+.002:Math.abs(p.y-a.y)<.002&&p.x>=Math.min(a.x,b.x)-.002&&p.x<=Math.max(a.x,b.x)+.002;
 
 /** ELK lays out the transistor/signal skeleton; simple rail branches use local templates. */
-export function prepareClassicLayout(graph,cells,lookup,description) {
+export function prepareClassicLayout(graph,cells,lookup,description,{maxActive=32,currentFlow=false}={}) {
   if(description?.groups.some(g=>g.members.length)||description?.relations.length)return null;
   const active=Object.entries(cells).filter(([,c])=>['Q','M','J','Z'].includes(c.spiceLayout?.kind));
-  if(!active.length||active.length>8||Object.keys(cells).length>80||Object.values(cells).some(c=>c.spiceBlock||Object.keys(c.connections).length>4||c.spiceLayout&&!['Q','M','J','Z','R','L','C','D','V','I','PORT'].includes(c.spiceLayout.kind)))return null;
+  if(!active.length||active.length>maxActive||Object.keys(cells).length>80||Object.values(cells).some(c=>c.spiceBlock||Object.keys(c.connections).length>4||c.spiceLayout&&!['Q','M','J','Z','R','L','C','D','V','I','PORT'].includes(c.spiceLayout.kind)))return null;
+  const dense=active.length>8;currentFlow ||= dense;
   const rails=new Map();for(const c of Object.values(cells))for(const [pin,[bit]]of Object.entries(c.connections))if(known(c.spiceLayout?.ports[pin]))rails.set(bit,c.spiceLayout.ports[pin].potential);
   if(rails.size<2||rails.size>5)return null;
   const sourceIds=new Set(Object.entries(cells).filter(([,c])=>c.spiceLayout?.kind==='V'&&Object.values(c.connections).every(([bit])=>rails.has(bit))).map(([id])=>id));
@@ -19,10 +22,11 @@ export function prepareClassicLayout(graph,cells,lookup,description) {
   const core=new Set(graph.children.map(n=>n.id)),signalNets=new Map();
   for(const e of signalEdges){const net=lookup[e.id];if(!signalNets.has(net))signalNets.set(net,new Set());for(const id of [e.sourcePort,e.targetPort])signalNets.get(net).add(id);}
   graph.edges=[];let serial=0;
-  for(const [net,pins]of signalNets){const kept=[...pins].filter(p=>core.has(p.slice(0,p.lastIndexOf('.'))));for(const target of kept.slice(1)){const source=kept[0],id='__classic_'+serial++;lookup[id]=net;graph.edges.push({id,source:source.slice(0,source.lastIndexOf('.')),sourcePort:source,target:target.slice(0,target.lastIndexOf('.')),targetPort:target});}}
+  const rank=id=>{const at=id.lastIndexOf('.'),owner=id.slice(0,at),pin=id.slice(at+1),cell=cells[owner],meta=cell.spiceLayout,port=graph.children.find(n=>n.id===owner)?.ports.find(p=>p.id===id),side=port?.layoutOptions?.[option+'port.side'];if(meta?.kind==='PORT'){const feedback=currentFlow&&Object.values(cells).some(c=>c.spiceLayout?.kind==='PORT'&&Object.entries(c.connections).some(([p,[bit]])=>bit===cell.connections[pin][0]&&c.spiceLayout.ports[p]?.role==='out'));return meta.ports[pin]?.role==='in'&&!feedback?-1:3;}if(currentFlow&&meta?.kind==='V')return -1;const current=transistorCurrentRank(cell,pin);if(currentFlow&&current!==null)return current;if(meta?.kind==='Q'&&cell.connections.C[0]===cell.connections.B[0])return meta.polarity==='n'?2:0;if(['Q','M','J','Z'].includes(meta?.kind))return ['B','G'].includes(pin)?2:0;return ['SOUTH','EAST'].includes(side)?0.5:1.5;};
+  for(const [net,pins]of signalNets){const kept=[...pins].filter(p=>core.has(p.slice(0,p.lastIndexOf('.')))).sort((a,b)=>rank(a)-rank(b));for(const target of kept.slice(1)){const source=kept[0],id='__classic_'+serial++;lookup[id]=net;graph.edges.push({id,source:source.slice(0,source.lastIndexOf('.')),sourcePort:source,target:target.slice(0,target.lastIndexOf('.')),targetPort:target});}}
   const controls=new Set(active.map(([,c])=>c.connections[c.spiceLayout.kind==='Q'?'B':'G']?.[0])),columns=new Map();
   for(const branch of branches){const bits=Object.values(cells[branch.id].connections).map(b=>b[0]),signal=bits.find(b=>!rails.has(b)),rail=bits.find(b=>rails.has(b));if(controls.has(signal)){const key=signal+':'+(rails.get(rail)>0?'upper':'lower');columns.set(key,(columns.get(key)||0)+branch.width+24);}}
-  return {rails,railEdges,sources,railPorts,unusedPorts,branches,signalNets,core,original,options:{[option+'direction']:'RIGHT',[option+'layered.layering.strategy']:'NETWORK_SIMPLEX',[option+'layered.spacing.nodeNodeBetweenLayers']:Math.max(120,...[...columns.values()].map(w=>w+36))}};
+  return {rails,railEdges,sources,railPorts,unusedPorts,branches,signalNets,core,original,options:{[option+'direction']:dense?'DOWN':'RIGHT',[option+'layered.layering.strategy']:'NETWORK_SIMPLEX',[option+'layered.spacing.nodeNodeBetweenLayers']:dense?32:Math.max(120,...[...columns.values()].map(w=>w+36)),...dense?{[option+'spacing.nodeNode']:Math.max(32,...branches.map(n=>n.width+24))}:{}}};
 }
 
 /** Specialized supply-rail geometry; signal placement/routing remains ELK's job. */
@@ -35,22 +39,31 @@ export function installClassicRails(layout,classic,cells,lookup) {
   for(const branch of classic.branches) {
     const cell=cells[branch.id],[signalPin,[signalBit]]=Object.entries(cell.connections).find(([,b])=>!classic.rails.has(b[0])),[railPin,[railBit]]=Object.entries(cell.connections).find(([,b])=>classic.rails.has(b[0]));
     const group=[...classic.signalNets].find(([net])=>Number(net.replaceAll(',',''))===signalBit);if(!group)return fail('No signal anchor for '+branch.id);
-    const anchors=[...group[1]].map(id=>({id,p:corePoint(id)})).filter(a=>a.p).sort((a,b)=>Number(['Q','M','J','Z'].includes(cells[b.p.owner].spiceLayout?.kind))-Number(['Q','M','J','Z'].includes(cells[a.p.owner].spiceLayout?.kind)));
+    const anchors=[...group[1]].map(id=>({id,p:corePoint(id)})).filter(a=>a.p);
     if(!anchors.length)return fail('No core terminal for '+branch.id);const upper=classic.rails.get(railBit)>0,slot=upper?'upper':'lower',signalPort=branch.ports.find(p=>p.id===branch.id+'.'+signalPin);let chosen;
+    const candidates=[];
     for(const anchor of anchors) {
       const control=['Q','M','J','Z'].includes(cells[anchor.p.owner].spiceLayout?.kind)&&['B','G'].includes(anchor.p.pin),detour=upper&&anchor.p.side==='SOUTH'||!upper&&anchor.p.side==='NORTH';
       let preferred=anchor.p.x-signalPort.x;if(control)preferred+=anchor.p.side==='EAST'?branch.width+28:-branch.width-28;
       if(detour){const owner=coreNodes.get(anchor.p.owner);preferred=owner.x+owner.width+28-signalPort.x;}
       const direction=control&&anchor.p.side!=='EAST'?-1:1;
       for(const offset of control?[0,1,2,3]:[0,1,-1,2,-2,3]) {
-        const x=preferred+direction*offset*(branch.width+24),node={...branch,x,y:upper?upperY:lowerY};
-        if(occupied[slot].some(n=>x<n.x+n.width+18&&x+branch.width+18>n.x))continue;
+        const x=preferred+direction*offset*(branch.width+24);
+        for(const y of [anchor.p.y+(upper?-24:24)-signalPort.y,anchor.p.y+(upper?-64:64)-signalPort.y,upper?upperY:lowerY]){
+        const node={...branch,x,y};
+        if(graph.children.some(n=>x<n.x+n.width+8&&x+branch.width+8>n.x&&y<n.y+n.height+8&&y+branch.height+8>n.y))continue;
         const p={x:x+signalPort.x,y:node.y+signalPort.y},escapeY=anchor.p.y+(anchor.p.side==='NORTH'?-18:18),bends=detour?[{x:anchor.p.x,y:escapeY},{x:p.x,y:escapeY}]:[{x:p.x,y:anchor.p.y}],points=[anchor.p,...bends,p];
         if(points.slice(1).some((b,i)=>graph.children.some(n=>Math.max(points[i].x,b.x)>n.x+.02&&Math.min(points[i].x,b.x)<n.x+n.width-.02&&Math.max(points[i].y,b.y)>n.y+.02&&Math.min(points[i].y,b.y)<n.y+n.height-.02)))continue;
-        chosen={anchor,node,p,bends};break;
+        const wires=[...graph.edges,...branchPaths].flatMap(e=>(e.sections||[]).flatMap(s=>{const ps=[s.startPoint,...s.bendPoints||[],s.endPoint];return ps.slice(1).map((b,i)=>({a:ps[i],b,bit:Number(lookup[e.id]?.replaceAll(',',''))}));}));
+        if(wires.some(s=>Math.max(s.a.x,s.b.x)>node.x+.02&&Math.min(s.a.x,s.b.x)<node.x+node.width-.02&&Math.max(s.a.y,s.b.y)>node.y+.02&&Math.min(s.a.y,s.b.y)<node.y+node.height-.02))continue;
+        const on=(q,a,b)=>Math.abs(a.x-b.x)<.02?Math.abs(q.x-a.x)<.02&&q.y>=Math.min(a.y,b.y)-.02&&q.y<=Math.max(a.y,b.y)+.02:Math.abs(q.y-a.y)<.02&&q.x>=Math.min(a.x,b.x)-.02&&q.x<=Math.max(a.x,b.x)+.02;
+        if(wires.filter(s=>s.bit!==signalBit).some(s=>points.slice(1).some((b,i)=>on(points[i],s.a,s.b)||on(b,s.a,s.b)||on(s.a,points[i],b)||on(s.b,points[i],b))))continue;
+        const active=['Q','M','J','Z'].includes(cells[anchor.p.owner].spiceLayout?.kind),penalty=!active?1000:['E','S'].includes(anchor.p.pin)?0:control?24:8;
+        candidates.push({anchor,node,p,bends,score:Math.abs(p.x-anchor.p.x)+Math.abs(p.y-anchor.p.y)+penalty});
+        }
       }
-      if(chosen)break;
     }
+    chosen=candidates.sort((a,b)=>a.score-b.score)[0];
     if(!chosen)return fail('No unobstructed local branch for '+branch.id);
     const {anchor,node,p,bends}=chosen;occupied[slot].push(node);branchNodes.set(node.id,node);graph.children.push(node);
     const id='__branch_'+branchPaths.length;lookup[id]=group[0];branchPaths.push({id,source:anchor.p.owner,sourcePort:anchor.id,target:node.id,targetPort:node.id+'.'+signalPin,sections:[{id:id+'_s',startPoint:{x:anchor.p.x,y:anchor.p.y},bendPoints:bends,endPoint:p}]});
@@ -71,21 +84,35 @@ export function installClassicRails(layout,classic,cells,lookup) {
   const nodes=new Map(graph.children.map(n=>[n.id,n]));
   const endpoint=id=>{const split=id.lastIndexOf('.'),n=nodes.get(id.slice(0,split)),p=n?.ports.find(p=>p.id===id);if(!p)throw Error('Missing classic rail terminal.');return {x:n.x+p.x,y:n.y+p.y,owner:n.id,side:p.layoutOptions?.[option+'port.side']};};
   const paths=new Map();
-  const obstacle=(a,b,owner)=>graph.children.find(n=>n.id!==owner&&Math.max(a.x,b.x)>n.x+.02&&Math.min(a.x,b.x)<n.x+n.width-.02&&Math.max(a.y,b.y)>n.y+.02&&Math.min(a.y,b.y)<n.y+n.height-.02);
+  const obstacle=(a,b)=>graph.children.find(n=>Math.max(a.x,b.x)>n.x+.02&&Math.min(a.x,b.x)<n.x+n.width-.02&&Math.max(a.y,b.y)>n.y+.02&&Math.min(a.y,b.y)<n.y+n.height-.02);
+  const foreignPin=(a,b,bit)=>graph.children.some(n=>n.ports.some(p=>{const value=cells[n.id]?.connections[p.id.slice(n.id.length+1)]?.[0];return value!==undefined&&value!==bit&&pointOn({x:n.x+p.x,y:n.y+p.y},a,b);}));
   for(const edge of classic.railEdges) {
     const bit=Number(lookup[edge.id]?.replaceAll(',','')),y=railY.get(bit);
     for(const id of [edge.sourcePort,edge.targetPort])if(!paths.has(id)) {
       const p=endpoint(id),out=p.side==='EAST'?{x:p.x+14,y:p.y}:p.side==='WEST'?{x:p.x-14,y:p.y}:p,join={x:out.x,y};
-      const hit=obstacle(p,out,p.owner)||obstacle(out,join,p.owner);if(hit)return fail('Rail drop '+id+' obstructed by '+hit.id);
-      paths.set(id,[p,...out!==p?[out]:[],join]);
+      let points=[p,...out!==p?[out]:[],join];
+      const clear=ps=>ps.slice(1).every((b,i)=>!obstacle(ps[i],b)&&!foreignPin(ps[i],b,bit));
+      if(!clear(points)){
+        // Keep a clear direct rail tap whenever possible. A buried collector
+        // may need a short outward escape before reaching the shared rail.
+        const owner=nodes.get(p.owner),exit={x:p.x+(p.side==='WEST'?-16:p.side==='EAST'?16:0),y:p.y+(p.side==='NORTH'?-16:p.side==='SOUTH'?16:0)},xs=[p.x-24,p.x+24,owner.x-24,owner.x+owner.width+24,Math.min(...graph.children.map(n=>n.x))-24,Math.max(...graph.children.map(n=>n.x+n.width))+24];
+        const choices=xs.map(x=>[p,exit,{x,y:exit.y},{x,y}]).filter(clear).sort((a,b)=>Math.abs(a[2].x-p.x)-Math.abs(b[2].x-p.x));
+        if(!choices.length)return fail('No clear rail escape for '+id);points=choices[0];
+      }
+      paths.set(id,points);
     }
     const a=paths.get(edge.sourcePort),b=paths.get(edge.targetPort),points=[...a,{x:b.at(-1).x,y},...b.slice(0,-1).reverse()],clean=[];
     for(const p of points)if(!clean.length||Math.abs(p.x-clean.at(-1).x)>.002||Math.abs(p.y-clean.at(-1).y)>.002)clean.push({x:p.x,y:p.y});
     graph.edges.push({...edge,sections:[{id:edge.id+'_rail',startPoint:clean[0],bendPoints:clean.slice(1,-1),endPoint:clean.at(-1)}],junctionPoints:[]});
   }
-  graph.width=Math.max(...graph.children.map(n=>n.x+n.width))+24;graph.height=Math.max(...graph.children.map(n=>n.y+n.height),...railY.values())+40;
+  const wirePoints=graph.edges.flatMap(e=>(e.sections||[]).flatMap(s=>[s.startPoint,...s.bendPoints||[],s.endPoint])),wireLeft=Math.min(0,...wirePoints.map(p=>p.x));
+  if(wireLeft<0){const shift=16-wireLeft;for(const n of graph.children)n.x+=shift;for(const e of graph.edges){for(const s of e.sections||[])for(const p of [s.startPoint,...s.bendPoints||[],s.endPoint])p.x+=shift;for(const p of e.junctionPoints||[])p.x+=shift;}}
+  graph.width=Math.max(...graph.children.map(n=>n.x+n.width),...wirePoints.map(p=>p.x))+24;graph.height=Math.max(...graph.children.map(n=>n.y+n.height),...railY.values(),...wirePoints.map(p=>p.y))+40;
   // A terminal's owner is also an obstacle: bypassing it allowed a load tap
   // from a capacitor's B terminal to be drawn back through that capacitor.
   for(const edge of graph.edges)for(const section of edge.sections||[]){const points=[section.startPoint,...section.bendPoints||[],section.endPoint];for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],hit=graph.children.find(n=>Math.max(a.x,b.x)>n.x+.02&&Math.min(a.x,b.x)<n.x+n.width-.02&&Math.max(a.y,b.y)>n.y+.02&&Math.min(a.y,b.y)<n.y+n.height-.02);if(hit)return fail('Wire '+edge.id+' crosses symbol '+hit.id);}}
+  const wires=graph.edges.flatMap(e=>(e.sections||[]).flatMap(s=>{const ps=[s.startPoint,...s.bendPoints||[],s.endPoint];return ps.slice(1).map((b,i)=>({a:ps[i],b,bit:Number(lookup[e.id]?.replaceAll(',',''))}));}));
+  for(const s of wires)if(foreignPin(s.a,s.b,s.bit))return fail('Wire touches a different-net terminal');
+  for(let i=0;i<wires.length;i++)for(let j=i+1;j<wires.length;j++){const a=wires[i],b=wires[j];if(a.bit!==b.bit&&(pointOn(a.a,b.a,b.b)||pointOn(a.b,b.a,b.b)||pointOn(b.a,a.a,a.b)||pointOn(b.b,a.a,a.b)))return fail('Different-net wire contact in classic template');}
   return {graph,railPitch:pitch,railCount:railY.size,railBands:[...railY].map(([bit,y])=>({potential:classic.rails.get(bit),y}))};
 }

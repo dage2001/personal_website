@@ -15,7 +15,7 @@ export function splitHierarchyEdges(graph,lookup) {
     const src=nodes.get(edge.source),dst=nodes.get(edge.target);if(!src||!dst)throw Error('Unknown visual edge endpoint.');const common=owner(src.id,dst.id);
     if(edge.id.startsWith('__guide_')){
       const vertical=common.layoutOptions?.['org.eclipse.elk.direction']==='DOWN';
-      const port=(node,source)=>{const id=node.id+'.order_'+(source?'out':'in'),side=vertical?(source?'SOUTH':'NORTH'):(source?'EAST':'WEST');node.ports=node.ports||[];if(!node.ports.some(p=>p.id===id))node.ports.push({id,x:vertical?0:source?(node.width||0):0,y:vertical&&source?(node.height||0):0,width:0,height:0,layoutOptions:{'org.eclipse.elk.port.side':side,'org.eclipse.elk.port.index':-1000}});node.layoutOptions={...node.layoutOptions,'org.eclipse.elk.portAlignment.default':'BEGIN'};return id;};
+      const port=(node,source)=>{const id=node.id+'.order_'+(source?'out':'in'),side=vertical?(source?'SOUTH':'NORTH'):(source?'EAST':'WEST');node.ports=node.ports||[];if(!node.ports.some(p=>p.id===id))node.ports.push({id,spiceGuide:true,x:vertical?0:source?(node.width||0):0,y:vertical&&source?(node.height||0):0,width:0,height:0,layoutOptions:{'org.eclipse.elk.port.side':side,'org.eclipse.elk.port.index':-1000}});node.layoutOptions={...node.layoutOptions,'org.eclipse.elk.portAlignment.default':'BEGIN'};return id;};
       common.edges.push({...edge,sourcePort:port(src,true),targetPort:port(dst,false)});continue;
     }
     let from=edge.sourcePort,n=parents.get(src.id);const net=lookup[edge.id];

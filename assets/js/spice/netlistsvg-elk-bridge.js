@@ -165,6 +165,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   }
   const report={version:4,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,...plan,
     localClassicInstances,
+    localClassicStages:localPlan?.stages||[],
     localClassicFallbacks:localPlan?.failures||[],
     visualGroups,
     outputShunts,classicRails:!!railLayout,railCount:railLayout?.railCount||0,railPitch:railLayout?.railPitch||null,voltageRails:railLayout?.railBands||[],

@@ -126,3 +126,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 ```
 
 `scripts/test-spice-acceptance.cjs` 从命令行参数读取私有文件，不在脚本中固化研究网表内容。最终 JSON 报告为 `tmp/spice-acceptance-result.json`，完整 SVG 为 `tmp/spice-acceptance.svg`。
+
+## 2026-10-29：恢复晶体管功能级的就近布局
+
+原因：显式 row/column 跳过经典模板，原上限仅 8 管；器件又被错误包装为子电路容器。现引入局部 classic 组，保留级间关系，级内按电流通路布局；取消普通器件的实例包装。晶体管极性、保护反馈、VBE 分压与互补输出电阻均从拓扑识别，不依赖位号。
+
+741 的 INPUT、BIAS、GAIN、OUTPUT 四级必须实际报告启用，且无回退。自动回归同时重命名所有 Q/R/C 位号，检查 12 组偏置、发射极、补偿元件与所属晶体管的实际 SVG 引脚距离均小于 300 SVG 单位。分支优先取近处空位；电源引线与功能级边界引线必须避开异网端点/重叠接触，不能靠视觉近似掩盖 ASC 短接。无描述的 20 管内部页另有模板启用回归。
+
+本轮验证：82 项 Node 测试全部通过（含私有三 VDPO 三种 ASC 视图）；真实 Chrome 完整交互回归通过；本地 LTspice 对 11 份导出 ASC 重新生成网表并比对器件/连接通过，包含展开与内部 741，以及 353 器件 VDPO。布局虚拟顺序端口在捕获 Drawing IR 前移除，不作为真实引脚导出。安全回退仍保留；局部就近并不保证所有级共享同一条可见横轨或达到人工排版效果。
