@@ -1,526 +1,637 @@
-const Ne = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }, Pe = { 1: "in", 6: "_Q", 7: "Q", 8: "com" }, je = { 1: "CLK", 6: "Phi2", 7: "Phi1", 8: "com" }, Te = { 1: "D", 3: "CLK", 4: "PRE", 5: "CLR", 6: "_Q", 7: "Q", 8: "com" }, Ue = { 1: "in", 2: "in-", 6: "_Q", 7: "Q", 8: "com" }, Be = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }, _e = { 1: "a", 2: "b", 7: "Q", 8: "com" }, $e = { 1: "S", 2: "R", 6: "_Q", 7: "Q", 8: "com" }, Ve = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }, Fe = { 1: "FM", 2: "AM", 6: "COS", 7: "SIN", 8: "com" }, qe = { 1: "invin", 2: "noninvin", 3: "mult+", 4: "mult-", 5: "-V", 6: "+V", 7: "out", 8: "com" }, Xe = { 1: "in+", 2: "in-", 3: "CLK", 4: "S/H", 7: "out", 8: "com" }, ze = { 1: "invin", 2: "noninvin", 7: "out", 8: "com" }, He = {
-  AND: Ne,
+const Me = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }, Pe = { 1: "in", 6: "_Q", 7: "Q", 8: "com" }, je = { 1: "CLK", 6: "Phi2", 7: "Phi1", 8: "com" }, Ue = { 1: "D", 3: "CLK", 4: "PRE", 5: "CLR", 6: "_Q", 7: "Q", 8: "com" }, Te = { 1: "in", 2: "in-", 6: "_Q", 7: "Q", 8: "com" }, $e = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }, Be = { 1: "a", 2: "b", 7: "Q", 8: "com" }, _e = { 1: "S", 2: "R", 6: "_Q", 7: "Q", 8: "com" }, Ve = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }, Fe = { 1: "FM", 2: "AM", 6: "COS", 7: "SIN", 8: "com" }, qe = { 1: "invin", 2: "noninvin", 3: "mult+", 4: "mult-", 5: "-V", 6: "+V", 7: "out", 8: "com" }, ze = { 1: "in+", 2: "in-", 3: "CLK", 4: "S/H", 7: "out", 8: "com" }, Xe = { 1: "invin", 2: "noninvin", 7: "out", 8: "com" }, Ge = {
+  AND: Me,
   BUF: Pe,
   COUNTER: je,
-  DFLOP: Te,
-  SCHMITT: Ue,
-  OR: Be,
-  PHASEDET: _e,
-  SRFLOP: $e,
+  DFLOP: Ue,
+  SCHMITT: Te,
+  OR: $e,
+  PHASEDET: Be,
+  SRFLOP: _e,
   XOR: Ve,
   MODULATOR: Fe,
   OTA: qe,
-  SAMPLEHOLD: Xe,
-  VARISTOR: ze
-}, Ge = "A B C D E F G H I J K L M O Q R S T U V W X Z @ & Ö", Z = (t) => t.toLowerCase(), Ee = (t) => t === void 0 || t.includes("=") || /^(?:off|on)$/i.test(t), Qe = (t) => t.replace(/^\(/, "").replace(/\)$/, "").split(/[\s,]+/).filter(Boolean);
-function Ke(t, e) {
-  const n = (w) => e[Z(w || "")] || Object.entries(e).find(([c]) => c.startsWith(Z(w || "") + "."))?.[1], o = t[0][0].toUpperCase();
-  let i = [], d = [], r = "", s = "", a = [], l = [], b = 0, g = "", p = "", E = "", k = !0;
+  SAMPLEHOLD: ze,
+  VARISTOR: Xe
+}, He = "A B C D E F G H I J K L M O Q R S T U V W X Z @ & Ö", J = (t) => t.toLowerCase(), ye = (t) => t === void 0 || t.includes("=") || /^(?:off|on)$/i.test(t), We = (t) => t.replace(/^\(/, "").replace(/\)$/, "").split(/[\s,]+/).filter(Boolean);
+function Qe(t, e) {
+  const n = (b) => e[J(b || "")] || Object.entries(e).find(([p]) => p.startsWith(J(b || "") + "."))?.[1], o = t[0][0].toUpperCase();
+  let i = [], l = [], s = "", r = "", c = [], a = [], h = 0, m = "", u = "", E = "", k = !0;
   if ("RLC".includes(o))
-    i = ["A", "B"], s = Z(o) + "_v";
+    i = ["A", "B"], r = J(o) + "_v";
   else if ("DVIB".includes(o))
-    i = ["+", "-"], s = o === "D" ? "d_v" : o === "B" ? "spice_b" : Z(o);
+    i = ["+", "-"], r = o === "D" ? "d_v" : o === "B" ? "spice_b" : J(o);
   else if (o === "Q") {
-    i = ["C", "B", "E"], !n(t[4]) && (n(t[5]) || !Ee(t[5]) && !/^[+\-\d.{'"]/.test(t[5])) && i.push("S"), r = t[i.length + 1] || "";
-    const w = n(r)?.type;
-    k = ["NPN", "PNP"].includes(w), s = k ? (i.length === 3 ? "q_" : "spice_q4_") + Z(w) : "spice_q" + i.length;
+    i = ["C", "B", "E"], !n(t[4]) && (n(t[5]) || !ye(t[5]) && !/^[+\-\d.{'"]/.test(t[5])) && i.push("S"), s = t[i.length + 1] || "";
+    const b = n(s)?.type;
+    k = ["NPN", "PNP"].includes(b), r = k ? (i.length === 3 ? "q_" : "spice_q4_") + J(b) : "spice_q" + i.length;
   } else if (o === "M") {
-    const w = n(t[4]), c = n(t[5]), m = w?.type === "VDMOS" || !c && (!t[5] || Ee(t[5]));
-    i = m ? ["D", "G", "S"] : ["D", "G", "S", "B"], r = t[i.length + 1] || "";
-    const f = n(r), C = f?.type;
-    if (m && f && C !== "VDMOS") throw Error("Monolithic NMOS/PMOS requires a bulk terminal; three-terminal form requires VDMOS.");
-    if (!m && C === "VDMOS") throw Error("VDMOS requires exactly D/G/S terminals.");
-    k = ["NMOS", "PMOS", "VDMOS"].includes(C);
-    let h = null, x = f;
-    const v = /* @__PURE__ */ new Set();
-    for (; x && !v.has(x.name) && (v.add(x.name), h = /\bpchan(?:\s*=\s*([+\-\d.e]+))?/i.exec(x.raw), !h); )
-      x = n(x.baseModel);
-    const M = C === "PMOS" || C === "VDMOS" && h && (h[1] === void 0 || Number(h[1]) >= 0.5);
-    s = k ? "spice_" + (M ? "pmos" : "nmos") + (m ? "3" : "") : "spice_m";
+    const b = n(t[4]), p = n(t[5]), d = b?.type === "VDMOS" || !p && (!t[5] || ye(t[5]));
+    i = d ? ["D", "G", "S"] : ["D", "G", "S", "B"], s = t[i.length + 1] || "";
+    const w = n(s), g = w?.type;
+    if (d && w && g !== "VDMOS") throw Error("Monolithic NMOS/PMOS requires a bulk terminal; three-terminal form requires VDMOS.");
+    if (!d && g === "VDMOS") throw Error("VDMOS requires exactly D/G/S terminals.");
+    k = ["NMOS", "PMOS", "VDMOS"].includes(g);
+    let C = null, y = w;
+    const x = /* @__PURE__ */ new Set();
+    for (; y && !x.has(y.name) && (x.add(y.name), C = /\bpchan(?:\s*=\s*([+\-\d.e]+))?/i.exec(y.raw), !C); )
+      y = n(y.baseModel);
+    const N = g === "PMOS" || g === "VDMOS" && C && (C[1] === void 0 || Number(C[1]) >= 0.5);
+    r = k ? "spice_" + (N ? "pmos" : "nmos") + (d ? "3" : "") : "spice_m";
   } else if ("JZ".includes(o)) {
-    r = t[4] || "";
-    const w = n(r)?.type, c = o === "Z" && ["NIGBT", "PIGBT"].includes(w);
-    i = c ? ["C", "G", "E"] : ["D", "G", "S"], k = o === "J" ? ["NJF", "PJF"].includes(w) : ["NMF", "PMF", "NIGBT", "PIGBT"].includes(w), s = "spice_" + (c ? "igbt" : o === "J" ? "jfet" : "mesfet") + "_" + (/^P/.test(w || "") ? "p" : "n");
+    s = t[4] || "";
+    const b = n(s)?.type, p = o === "Z" && ["NIGBT", "PIGBT"].includes(b);
+    i = p ? ["C", "G", "E"] : ["D", "G", "S"], k = o === "J" ? ["NJF", "PJF"].includes(b) : ["NMF", "PMF", "NIGBT", "PIGBT"].includes(b), r = "spice_" + (p ? "igbt" : o === "J" ? "jfet" : "mesfet") + "_" + (/^P/.test(b || "") ? "p" : "n");
   } else if ("EFGH".includes(o)) {
-    i = ["+", "-"], s = "spice_" + Z(o);
-    let w = 3, c = /^poly\s*\(\s*(\d+)\s*\)$/i.exec(t[w] || "");
-    if (/^poly$/i.test(t[w] || "") && (c = /^\(\s*(\d+)\s*\)$/.exec(t[++w] || ""), !c))
+    i = ["+", "-"], r = "spice_" + J(o);
+    let b = 3, p = /^poly\s*\(\s*(\d+)\s*\)$/i.exec(t[b] || "");
+    if (/^poly$/i.test(t[b] || "") && (p = /^\(\s*(\d+)\s*\)$/.exec(t[++b] || ""), !p))
       throw Error("POLY requires a dimension.");
-    if (c) {
-      const m = Number(c[1]);
-      if (m > 128) throw Error("POLY supports at most 128 controlling variables.");
-      let f = w + 1, C = [];
-      const h = "EG".includes(o), x = m * (h ? 2 : 1);
-      for (; C.length < x && f < t.length; ) C.push(...Qe(t[f++]));
-      if (C.length !== x || f >= t.length) throw Error("POLY control count or coefficient list is incomplete.");
-      if (h) {
-        for (let v = 0; v < m; v++) i.push("C" + (v + 1) + "+", "C" + (v + 1) + "-");
-        d = [t[1], t[2], ...C];
-      } else a = C;
-      b = f, g = "POLY(" + m + ") " + (h ? "" : C.join(" ") + " "), p = "POLY", h && (s = "spice_device");
-    } else /^(?:value|vol|cur|table|laplace|[VI]\s*=)/i.test(t[3] || "") || t[3]?.startsWith("{") ? p = "BEHAVIORAL" : "EG".includes(o) ? (i.push("C+", "C-"), p = /\blaplace\s*=/i.test(t.slice(5).join(" ")) ? "LAPLACE" : /\btable\s*=/i.test(t.slice(5).join(" ")) ? "TABLE" : "LINEAR") : (a = [t[3]], b = 4, g = t[3] + " ");
-    E = { E: "VCVS", G: "VCCS", F: "CCCS", H: "CCVS" }[o] + (p ? " · " + p : "");
+    if (p) {
+      const d = Number(p[1]);
+      if (d > 128) throw Error("POLY supports at most 128 controlling variables.");
+      let w = b + 1, g = [];
+      const C = "EG".includes(o), y = d * (C ? 2 : 1);
+      for (; g.length < y && w < t.length; ) g.push(...We(t[w++]));
+      if (g.length !== y || w >= t.length) throw Error("POLY control count or coefficient list is incomplete.");
+      if (C) {
+        for (let x = 0; x < d; x++) i.push("C" + (x + 1) + "+", "C" + (x + 1) + "-");
+        l = [t[1], t[2], ...g];
+      } else c = g;
+      h = w, m = "POLY(" + d + ") " + (C ? "" : g.join(" ") + " "), u = "POLY", C && (r = "spice_device");
+    } else /^(?:value|vol|cur|table|laplace|[VI]\s*=)/i.test(t[3] || "") || t[3]?.startsWith("{") ? u = "BEHAVIORAL" : "EG".includes(o) ? (i.push("C+", "C-"), u = /\blaplace\s*=/i.test(t.slice(5).join(" ")) ? "LAPLACE" : /\btable\s*=/i.test(t.slice(5).join(" ")) ? "TABLE" : "LINEAR") : (c = [t[3]], h = 4, m = t[3] + " ");
+    E = { E: "VCVS", G: "VCCS", F: "CCCS", H: "CCVS" }[o] + (u ? " · " + u : "");
   } else if (o === "S")
-    i = ["A", "B", "C+", "C-"], r = t[5] || "", s = "spice_device", E = "Voltage switch";
+    i = ["A", "B", "C+", "C-"], s = t[5] || "", r = "spice_device", E = "Voltage switch";
   else if (o === "W")
-    i = ["A", "B"], a = [t[3]], r = t[4] || "", b = 3, s = "spice_device", E = "Current switch";
+    i = ["A", "B"], c = [t[3]], s = t[4] || "", h = 3, r = "spice_device", E = "Current switch";
   else if ("TO".includes(o))
-    i = ["L+", "L-", "R+", "R-"], o === "O" && (r = t[5] || ""), s = "spice_device", E = o === "T" ? "Transmission line" : "Lossy line";
+    i = ["L+", "L-", "R+", "R-"], o === "O" && (s = t[5] || ""), r = "spice_device", E = o === "T" ? "Transmission line" : "Lossy line";
   else if (o === "U")
-    i = ["N1", "N2", "COM"], r = t[4] || "", s = "spice_device", E = "Distributed RC";
+    i = ["N1", "N2", "COM"], s = t[4] || "", r = "spice_device", E = "Distributed RC";
   else if (o === "A")
-    i = Array.from({ length: 8 }, (w, c) => "P" + (c + 1)), s = "spice_device", E = t[9] || "A function";
+    i = Array.from({ length: 8 }, (b, p) => "P" + (p + 1)), r = "spice_device", E = t[9] || "A function";
   else if (o === "K") {
     if (t.length < 4) throw Error("Mutual coupling requires at least two inductors and a coefficient.");
-    if (l = t.slice(1, -1), l.some((w) => !/^L/i.test(w.split(":").at(-1)))) throw Error("K references must name inductors.");
-    b = t.length - 1, s = "spice_coupling", E = "Magnetic coupling", g = l.join(" ") + " · k=";
+    if (a = t.slice(1, -1), a.some((b) => !/^L/i.test(b.split(":").at(-1)))) throw Error("K references must name inductors.");
+    h = t.length - 1, r = "spice_coupling", E = "Magnetic coupling", m = a.join(" ") + " · k=";
   } else if (o === "@")
-    i = ["IN", "OUT"], s = "spice_device", E = "FRA";
+    i = ["IN", "OUT"], r = "spice_device", E = "FRA";
   else if (o === "&")
-    i = ["O+", "O-", "I+", "I-"], s = "spice_device", E = "FRA probe";
+    i = ["O+", "O-", "I+", "I-"], r = "spice_device", E = "FRA probe";
   else if (o === "Ö")
-    i = ["OUT", "V+", "V-", "IN-", "IN+"], s = "spice_device", E = "Transconductance";
+    i = ["OUT", "V+", "V-", "IN-", "IN+"], r = "spice_device", E = "Transconductance";
   else throw Error("Unknown LTspice element prefix: " + o);
-  if (b || (b = i.length + 1), d.length || (d = t.slice(1, i.length + 1)), d.length !== i.length) throw Error("Incomplete terminal list: expected " + i.length + " nodes.");
-  if (t.length <= b && !["&", "Ö"].includes(o)) throw Error("Missing value, model, or expression after " + i.length + " terminals.");
-  if (d.some((w) => /[=()]/.test(w) && !/^\{[\s\S]*\}$/.test(w))) throw Error("Invalid terminal token; check terminal count.");
-  if (o === "B" && !/\b[VIPR]\s*=/i.test(t.slice(b).join(" "))) throw Error("Behavioral source requires V=, I=, R= or P=.");
-  if (o === "B" && /^R\s*=/i.test(t.slice(b).join(" ")) && (s = "spice_br"), o === "D" && (r = t[3] || ""), o === "@") {
-    const w = t.slice(b).join(" ");
-    for (const c of w.matchAll(/\b(refnode|intnode)\s*=\s*(\{[^}]*\}|"[^"]*"|[^\s]+)/gi))
-      i.push(c[1].toUpperCase()), d.push(c[2]);
+  if (h || (h = i.length + 1), l.length || (l = t.slice(1, i.length + 1)), l.length !== i.length) throw Error("Incomplete terminal list: expected " + i.length + " nodes.");
+  if (t.length <= h && !["&", "Ö"].includes(o)) throw Error("Missing value, model, or expression after " + i.length + " terminals.");
+  if (l.some((b) => /[=()]/.test(b) && !/^\{[\s\S]*\}$/.test(b))) throw Error("Invalid terminal token; check terminal count.");
+  if (o === "B" && !/\b[VIPR]\s*=/i.test(t.slice(h).join(" "))) throw Error("Behavioral source requires V=, I=, R= or P=.");
+  if (o === "B" && /^R\s*=/i.test(t.slice(h).join(" ")) && (r = "spice_br"), o === "D" && (s = t[3] || ""), o === "@") {
+    const b = t.slice(h).join(" ");
+    for (const p of b.matchAll(/\b(refnode|intnode)\s*=\s*(\{[^}]*\}|"[^"]*"|[^\s]+)/gi))
+      i.push(p[1].toUpperCase()), l.push(p[2]);
   }
   if (o === "A" && !t[9]) throw Error("A element requires eight terminals followed by its function name.");
-  if (a.some((w) => !w)) throw Error("Missing controlling voltage source.");
-  const I = i.map((w, c) => o === "A" && He[(t[9] || "").toUpperCase()]?.[String(c + 1)] || w);
-  return { kind: o, pins: i, nodeTokens: d, pinLabels: I, model: r, type: s, controlSource: a[0] || "", controlSources: a, coupledInductors: l, value: g + t.slice(b).join(" "), sourceMode: p, symbol: E, polarityKnown: k };
+  if (c.some((b) => !b)) throw Error("Missing controlling voltage source.");
+  const L = i.map((b, p) => o === "A" && Ge[(t[9] || "").toUpperCase()]?.[String(p + 1)] || b);
+  return { kind: o, pins: i, nodeTokens: l, pinLabels: L, model: s, type: r, controlSource: c[0] || "", controlSources: c, coupledInductors: a, value: m + t.slice(h).join(" "), sourceMode: u, symbol: E, polarityKnown: k };
 }
-const We = Ge, Ye = new Set(We.split(" ")), he = () => /* @__PURE__ */ Object.create(null), q = (t) => t.toLowerCase();
+const Ke = He, Ye = new Set(Ke.split(" ")), he = () => /* @__PURE__ */ Object.create(null), q = (t) => t.toLowerCase();
 function le(t) {
   const e = [], n = [];
-  let o = "", i = 0, d = "";
-  for (let r = 0; r < t.length; r++) {
-    const s = t[r];
-    if (d) {
-      o += s, s === d && t[r - 1] !== "\\" && (d = "");
+  let o = "", i = 0, l = "";
+  for (let s = 0; s < t.length; s++) {
+    const r = t[s];
+    if (l) {
+      o += r, r === l && t[s - 1] !== "\\" && (l = "");
       continue;
     }
-    if (s === '"' || s === "'") {
-      d = s, o += s;
+    if (r === '"' || r === "'") {
+      l = r, o += r;
       continue;
     }
-    if (!i && (s === ";" || s === "$" && (!r || /\s/.test(t[r - 1])))) break;
-    if ("({".includes(s) && (n.push(s), i++), ")}".includes(s) && (i--, n.pop() !== (s === ")" ? "(" : "{")))
+    if (!i && (r === ";" || r === "$" && (!s || /\s/.test(t[s - 1])))) break;
+    if ("({".includes(r) && (n.push(r), i++), ")}".includes(r) && (i--, n.pop() !== (r === ")" ? "(" : "{")))
       throw Error("Unbalanced expression delimiters.");
-    /\s/.test(s) && !i ? (o && e.push(o), o = "") : o += s;
+    /\s/.test(r) && !i ? (o && e.push(o), o = "") : o += r;
   }
-  if (i || d) throw Error("Unclosed expression or quoted string.");
+  if (i || l) throw Error("Unclosed expression or quoted string.");
   return o && e.push(o), e;
 }
 function Ze(t, e = {}) {
-  const n = [], o = [], i = [], d = Object.assign(he(), e.models), r = he(), s = (c, m, f) => n.push({ severity: c, line: m, message: f });
+  const n = [], o = [], i = [], l = Object.assign(he(), e.models), s = he(), r = (p, d, w) => n.push({ severity: p, line: d, message: w });
   if (typeof t != "string") throw TypeError("Netlist must be a string.");
   if (t.length > 16e6) throw Error("Expanded netlist exceeds 16 MB.");
-  const a = [];
-  t.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((c, m) => {
-    const f = c.trim();
-    !f || f.startsWith("*") || (f.startsWith("+") ? a.length ? a.at(-1).text += " " + f.slice(1).trim() : s("error", m + 1, "Continuation has no preceding statement.") : a.push({ line: m + 1, text: f }));
+  const c = [];
+  t.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((p, d) => {
+    const w = p.trim();
+    !w || w.startsWith("*") || (w.startsWith("+") ? c.length ? c.at(-1).text += " " + w.slice(1).trim() : r("error", d + 1, "Continuation has no preceding statement.") : c.push({ line: d + 1, text: w }));
   });
-  for (const c of a) {
+  for (const p of c) {
     try {
-      c.tokens = le(c.text);
-    } catch (f) {
-      s("error", c.line, f.message), c.tokens = [];
+      p.tokens = le(p.text);
+    } catch (w) {
+      r("error", p.line, w.message), p.tokens = [];
     }
-    const m = c.tokens;
-    if (/^\.model$/i.test(m[0] || ""))
-      if (m.length < 3) s("error", c.line, ".model requires a name and device type.");
+    const d = p.tokens;
+    if (/^\.model$/i.test(d[0] || ""))
+      if (d.length < 3) r("error", p.line, ".model requires a name and device type.");
       else {
-        const f = /^ako:(.+)$/i.exec(m[2]), C = f && m[3] && !m[3].startsWith("(") ? m[3].split("(")[0].toUpperCase() : "";
-        d[q(m[1])] = { name: m[1], type: f ? C : m[2].split("(")[0].toUpperCase(), baseModel: f?.[1] || "", raw: c.text };
+        const w = /^ako:(.+)$/i.exec(d[2]), g = w && d[3] && !d[3].startsWith("(") ? d[3].split("(")[0].toUpperCase() : "";
+        l[q(d[1])] = { name: d[1], type: w ? g : d[2].split("(")[0].toUpperCase(), baseModel: w?.[1] || "", raw: p.text };
       }
   }
-  const l = /* @__PURE__ */ new Set();
-  function b(c) {
-    const m = d[q(c)];
-    if (!m) return "";
-    if (m.type) return m.type;
-    if (l.has(q(c))) throw Error("Circular AKO model inheritance: " + c);
-    return l.add(q(c)), m.type = b(m.baseModel), l.delete(q(c)), m.type;
+  const a = /* @__PURE__ */ new Set();
+  function h(p) {
+    const d = l[q(p)];
+    if (!d) return "";
+    if (d.type) return d.type;
+    if (a.has(q(p))) throw Error("Circular AKO model inheritance: " + p);
+    return a.add(q(p)), d.type = h(d.baseModel), a.delete(q(p)), d.type;
   }
-  for (const c of Object.values(d)) if (c.baseModel && !c.type)
+  for (const p of Object.values(l)) if (p.baseModel && !p.type)
     try {
-      b(c.name);
-    } catch (m) {
-      s("error", 0, m.message);
+      h(p.name);
+    } catch (d) {
+      r("error", 0, d.message);
     }
-  let g = "", p = 0, E = !1, k = !1;
-  const I = /* @__PURE__ */ new Set(), w = /* @__PURE__ */ new Set([".title", ".model", ".param", ".func", ".tran", ".ac", ".dc", ".op", ".options", ".option", ".ic", ".nodeset", ".save", ".probe", ".print", ".plot", ".meas", ".measure", ".temp", ".step", ".global", ".backanno", ".width", ".four", ".noise", ".pz", ".tf", ".sens"]);
-  for (const { line: c, text: m, tokens: f } of a) {
-    if (!f.length) continue;
-    const C = q(f[0]);
+  let m = "", u = 0, E = !1, k = !1;
+  const L = /* @__PURE__ */ new Set(), b = /* @__PURE__ */ new Set([".title", ".model", ".param", ".func", ".tran", ".ac", ".dc", ".op", ".options", ".option", ".ic", ".nodeset", ".save", ".probe", ".print", ".plot", ".meas", ".measure", ".temp", ".step", ".global", ".backanno", ".width", ".four", ".noise", ".pz", ".tf", ".sens"]);
+  for (const { line: p, text: d, tokens: w } of c) {
+    if (!w.length) continue;
+    const g = q(w[0]);
     if (k) {
-      s("warning", c, "Statement after .end is not rendered: " + m);
+      r("warning", p, "Statement after .end is not rendered: " + d);
       continue;
     }
-    if (C === ".control") {
-      E = !0, s("warning", c, ".control script retained but not executed or rendered.");
+    if (g === ".control") {
+      E = !0, r("warning", p, ".control script retained but not executed or rendered.");
       continue;
     }
-    if (C === ".endc") {
+    if (g === ".endc") {
       E = !1;
       continue;
     }
     if (E) continue;
-    if (C === ".subckt") {
-      p++, s("error", c, "Use parseHierarchy() for subcircuit definitions.");
+    if (g === ".subckt") {
+      u++, r("error", p, "Use parseHierarchy() for subcircuit definitions.");
       continue;
     }
-    if (C === ".ends") {
-      p ? p-- : s("error", c, "Unmatched .ends.");
+    if (g === ".ends") {
+      u ? u-- : r("error", p, "Unmatched .ends.");
       continue;
     }
-    if (p) continue;
-    if (C === ".end") {
+    if (u) continue;
+    if (g === ".end") {
       k = !0;
       continue;
     }
-    if (C.startsWith(".")) {
-      o.push({ line: c, text: m }), C === ".title" ? g = f.slice(1).join(" ") : [".protect", ".unprotect", ".prot", ".unprot"].includes(C) ? s("error", c, "Protected/encrypted model bodies cannot be expanded. Provide an unencrypted definition.") : [".if", ".elseif", ".else", ".endif", ".connect", ".alias"].includes(C) ? s("error", c, "Topology-changing directive is unsupported: " + m) : w.has(C) || s("warning", c, "Directive retained but not resolved: " + m);
+    if (g.startsWith(".")) {
+      o.push({ line: p, text: d }), g === ".title" ? m = w.slice(1).join(" ") : [".protect", ".unprotect", ".prot", ".unprot"].includes(g) ? r("error", p, "Protected/encrypted model bodies cannot be expanded. Provide an unencrypted definition.") : [".if", ".elseif", ".else", ".endif", ".connect", ".alias"].includes(g) ? r("error", p, "Topology-changing directive is unsupported: " + d) : b.has(g) || r("warning", p, "Directive retained but not resolved: " + d);
       continue;
     }
-    const h = f[0][0].toUpperCase();
-    if (!Ye.has(h)) {
-      c === 1 && !/\d/.test(f[0]) && f.length > 1 && h !== "X" ? (g = m, s("warning", c, "First line treated as a SPICE title; use .title for an unambiguous title.")) : s("warning", c, `Unsupported ${h} device was not rendered: ${m}`);
+    const C = w[0][0].toUpperCase();
+    if (!Ye.has(C)) {
+      p === 1 && !/\d/.test(w[0]) && w.length > 1 && C !== "X" ? (m = d, r("warning", p, "First line treated as a SPICE title; use .title for an unambiguous title.")) : r("warning", p, `Unsupported ${C} device was not rendered: ${d}`);
       continue;
     }
-    const x = h === "M" || h === "Q" ? 5 : 4;
-    if (c === 1 && !/\d/.test(f[0]) && (f.length < x || h === "T" && !/\b(?:zo|z0)\s*=/i.test(m))) {
-      g = m, s("info", c, "SPICE title: " + m);
+    const y = C === "M" || C === "Q" ? 5 : 4;
+    if (p === 1 && !/\d/.test(w[0]) && (w.length < y || C === "T" && !/\b(?:zo|z0)\s*=/i.test(d))) {
+      m = d, r("info", p, "SPICE title: " + d);
       continue;
     }
     try {
-      if (I.has(C)) throw Error("Duplicate component name (SPICE names are case insensitive).");
-      const v = Ke(f, d), { pins: M, nodeTokens: B, ...T } = v;
-      v.polarityKnown || s("warning", c, `${f[0]}: model polarity unknown; explicit ${M.join("/")} terminals retained.`);
-      const N = he();
-      M.forEach((ne, re) => {
-        const P = q(B[re]);
-        r[P] || (r[P] = { name: P, displayName: f[re + 1], bit: Object.keys(r).length + 2, terminals: [] }), r[P].terminals.push({ component: f[0], pin: ne }), N[ne] = P;
-      }), i.push({ ...T, name: f[0], terminals: N, line: c, raw: m }), I.add(C);
-    } catch (v) {
-      s("error", c, `${f[0]}: ${v.message} Statement: ${m}`);
+      if (L.has(g)) throw Error("Duplicate component name (SPICE names are case insensitive).");
+      const x = Qe(w, l), { pins: N, nodeTokens: M, ...T } = x;
+      x.polarityKnown || r("warning", p, `${w[0]}: model polarity unknown; explicit ${N.join("/")} terminals retained.`);
+      const P = he();
+      N.forEach((H, re) => {
+        const j = q(M[re]);
+        s[j] || (s[j] = { name: j, displayName: w[re + 1], bit: Object.keys(s).length + 2, terminals: [] }), s[j].terminals.push({ component: w[0], pin: H }), P[H] = j;
+      }), i.push({ ...T, name: w[0], terminals: P, line: p, raw: d }), L.add(g);
+    } catch (x) {
+      r("error", p, `${w[0]}: ${x.message} Statement: ${d}`);
     }
   }
-  p && s("error", 0, "Unclosed .subckt definition."), E && s("error", 0, "Unclosed .control block."), i.length || s("error", 0, "No supported components to render."), i.length > 300 && s("error", 0, "Phase 1 supports up to 300 components per drawing.");
-  for (const c of i) {
-    for (const m of c.controlSources || []) !m.includes(":") && !i.some((f) => q(f.name) === q(m) && f.kind === "V") && s("error", c.line, `${c.name}: controlling voltage source ${m} was not found.`);
-    for (const m of c.coupledInductors || []) !m.includes(":") && !i.some((f) => q(f.name) === q(m) && f.kind === "L") && s("error", c.line, `${c.name}: coupled inductor ${m} was not found.`);
-    (c.kind === "B" || c.type === "spice_b") && s("info", c.line, `${c.name}: expression retained verbatim; V()/I() references are dependencies, not electrical terminals.`);
+  u && r("error", 0, "Unclosed .subckt definition."), E && r("error", 0, "Unclosed .control block."), i.length || r("error", 0, "No supported components to render."), i.length > 300 && r("error", 0, "Phase 1 supports up to 300 components per drawing.");
+  for (const p of i) {
+    for (const d of p.controlSources || []) !d.includes(":") && !i.some((w) => q(w.name) === q(d) && w.kind === "V") && r("error", p.line, `${p.name}: controlling voltage source ${d} was not found.`);
+    for (const d of p.coupledInductors || []) !d.includes(":") && !i.some((w) => q(w.name) === q(d) && w.kind === "L") && r("error", p.line, `${p.name}: coupled inductor ${d} was not found.`);
+    (p.kind === "B" || p.type === "spice_b") && r("info", p.line, `${p.name}: expression retained verbatim; V()/I() references are dependencies, not electrical terminals.`);
   }
-  return { title: g, components: i, nodes: r, models: d, directives: o, diagnostics: n };
+  return { title: m, components: i, nodes: s, models: l, directives: o, diagnostics: n };
 }
-const K = (t) => t.replace(/^['"]|['"]$/g, "").replace(/\\/g, "/").replace(/^\.\//, "").toLowerCase(), ye = (t) => K(t).split("/").at(-1);
+const K = (t) => t.replace(/^['"]|['"]$/g, "").replace(/\\/g, "/").replace(/^\.\//, "").toLowerCase(), Ee = (t) => K(t).split("/").at(-1);
 function Je(t, { files: e = {}, filename: n = "input.cir" } = {}) {
-  const o = new Map(e instanceof Map ? e : Object.entries(e)), i = [], d = [], r = [];
-  let s = 0;
-  const a = (b, g) => {
-    const p = K(g).split("/").slice(0, -1).concat(K(b)).join("/"), E = [...o].filter(([I]) => K(I) === K(b) || K(I) === p);
+  const o = new Map(e instanceof Map ? e : Object.entries(e)), i = [], l = [], s = [];
+  let r = 0;
+  const c = (h, m) => {
+    const u = K(m).split("/").slice(0, -1).concat(K(h)).join("/"), E = [...o].filter(([L]) => K(L) === K(h) || K(L) === u);
     if (E.length === 1) return E[0];
-    const k = [...o].filter(([I]) => ye(I) === ye(b));
-    if (k.length !== 1) throw Error(k.length ? "Ambiguous library filename: " + b : "Missing library " + b + ". Add this file using Library files.");
+    const k = [...o].filter(([L]) => Ee(L) === Ee(h));
+    if (k.length !== 1) throw Error(k.length ? "Ambiguous library filename: " + h : "Missing library " + h + ". Add this file using Library files.");
     return k[0];
   };
-  function l(b, g, p = "", E = []) {
-    const k = K(g) + ":" + p.toLowerCase();
+  function a(h, m, u = "", E = []) {
+    const k = K(m) + ":" + u.toLowerCase();
     if (E.includes(k)) throw Error("Circular library include: " + [...E, k].join(" → "));
     if (E.length > 32) throw Error("Library nesting exceeds 32 levels.");
-    const I = [], w = /^\s*\.endl\b/im.test(b);
-    let c = !p;
-    const m = (C, h) => {
-      if (s += C.length, s > 16e6) throw Error("Expanded library input exceeds 16 MB.");
-      r.push(C), d.push({ file: g, line: h + 1 });
+    const L = [], b = /^\s*\.endl\b/im.test(h);
+    let p = !u;
+    const d = (g, C) => {
+      if (r += g.length, r > 16e6) throw Error("Expanded library input exceeds 16 MB.");
+      s.push(g), l.push({ file: m, line: C + 1 });
     };
-    if (b.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((C, h) => {
-      const x = C.trim();
-      if (/^\.lib\b/i.test(x) && w) {
-        const v = le(x);
-        if (v.length === 2 && !/[.\\/]/.test(v[1])) {
-          I.push(v[1].toLowerCase()), v[1].toLowerCase() === p.toLowerCase() && (c = !0), m("* Library section " + v[1], h);
+    if (h.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((g, C) => {
+      const y = g.trim();
+      if (/^\.lib\b/i.test(y) && b) {
+        const x = le(y);
+        if (x.length === 2 && !/[.\\/]/.test(x[1])) {
+          L.push(x[1].toLowerCase()), x[1].toLowerCase() === u.toLowerCase() && (p = !0), d("* Library section " + x[1], C);
           return;
         }
       }
-      if (/^\.endl\b/i.test(x)) {
-        I.pop(), m("* End library section", h);
+      if (/^\.endl\b/i.test(y)) {
+        L.pop(), d("* End library section", C);
         return;
       }
-      if (p && I.length && !I.includes(p.toLowerCase())) {
-        m("* Unselected library section", h);
+      if (u && L.length && !L.includes(u.toLowerCase())) {
+        d("* Unselected library section", C);
         return;
       }
-      if (/^\.(?:include|inc|lib)\b/i.test(x))
+      if (/^\.(?:include|inc|lib)\b/i.test(y))
         try {
-          const v = le(x);
-          if (!v[1]) throw Error("Include requires a filename.");
-          const [M, B] = a(v[1], g);
-          m("* Included " + M, h), l(B, M, v[2] || "", [...E, k]);
-        } catch (v) {
-          i.push({ severity: "error", line: h + 1, source: g, message: v.message }), m("* Unresolved include", h);
+          const x = le(y);
+          if (!x[1]) throw Error("Include requires a filename.");
+          const [N, M] = c(x[1], m);
+          d("* Included " + N, C), a(M, N, x[2] || "", [...E, k]);
+        } catch (x) {
+          i.push({ severity: "error", line: C + 1, source: m, message: x.message }), d("* Unresolved include", C);
         }
-      else m(C, h);
-    }), !c) throw Error("Library section " + p + " not found in " + g);
+      else d(g, C);
+    }), !p) throw Error("Library section " + u + " not found in " + m);
   }
   try {
-    l(t, n);
-  } catch (b) {
-    i.push({ severity: "error", line: 0, source: n, message: b.message });
+    a(t, n);
+  } catch (h) {
+    i.push({ severity: "error", line: 0, source: n, message: h.message });
   }
-  return { source: r.join(`
-`), origins: d, diagnostics: i };
+  return { source: s.join(`
+`), origins: l, diagnostics: i };
 }
-const ee = () => /* @__PURE__ */ Object.create(null), V = (t) => t.toLowerCase();
+function et(t) {
+  const e = [], n = [];
+  let o = !1, i = !1, l = 0;
+  if (t.split(/\r?\n/).forEach((b, p) => {
+    const d = b.trim();
+    if (/^\*\s*@layout\s+begin\b/i.test(d)) {
+      (i || o) && e.push({ severity: "error", line: p + 1, message: "Only one @layout block is allowed." }), /^\*\s*@layout\s+begin\s+v1\s*$/i.test(d) || e.push({ severity: "error", line: p + 1, message: "Expected @layout begin v1." }), i = !0, o = !0, l = p + 1;
+      return;
+    }
+    if (/^\*\s*@layout\s+end\s*$/i.test(d)) {
+      o || e.push({ severity: "error", line: p + 1, message: "Unexpected @layout end." }), o = !1;
+      return;
+    }
+    o && (d.startsWith("*") ? n.push(d.slice(1).trim()) : e.push({ severity: "error", line: p + 1, message: "Every @layout line must be a SPICE * comment." }));
+  }), o && e.push({ severity: "error", line: l, message: "Unclosed @layout block." }), !i) return { layout: null, diagnostics: e };
+  const s = n.join(" "), r = s.match(/[A-Za-z_@][\w./%:@-]*|\d+|[{}]|\S/g) || [], c = [], a = [];
+  let h = 0, m = 0, u = 10;
+  const E = () => r[h++], k = () => {
+    const b = E();
+    if (!b || !/^[A-Za-z_@][\w./%:@-]*$/.test(b)) throw Error("Expected layout identifier, got " + b);
+    return b;
+  };
+  function L(b) {
+    if (c.length >= 256) throw Error("Layout description exceeds 256 groups.");
+    const p = b ? k() : "@row" + m++, d = E();
+    if (!["row", "column"].includes(d)) throw Error("Expected row or column.");
+    if (E() !== "{") throw Error("Expected { after " + d);
+    const w = { id: p, direction: d, members: [] };
+    for (c.push(w); h < r.length && r[h] !== "}"; )
+      r[h] === "group" ? (E(), w.members.push(L(!0))) : ["row", "column"].includes(r[h]) ? w.members.push(L(!1)) : w.members.push(k());
+    if (E() !== "}") throw Error("Unclosed group " + p);
+    if (!w.members.length) throw Error("Empty layout group " + p);
+    return p;
+  }
+  try {
+    for (; h < r.length; )
+      if (r[h] === "group")
+        E(), L(!0);
+      else if (["row", "column"].includes(r[h])) L(!1);
+      else if (r[h] === "priority-cap") {
+        if (E(), u = Number(E()), !Number.isInteger(u) || u < 3 || u > 64) throw Error("priority-cap must be an integer from 3 to 64.");
+      } else if (E() === "place") {
+        const x = k(), N = E(), M = k();
+        if (!["left-of", "above"].includes(N)) throw Error("Expected left-of or above.");
+        a.push({ a: x, relation: N, b: M });
+      } else throw Error("Unknown layout instruction near " + r[h - 1]);
+    const b = /* @__PURE__ */ new Set();
+    for (const x of c) {
+      const N = x.id.toLowerCase();
+      if (b.has(N)) throw Error("Duplicate layout group " + x.id);
+      b.add(N);
+    }
+    const p = /* @__PURE__ */ new Set(), d = /* @__PURE__ */ new Set(), w = new Map(c.map((x) => [x.id.toLowerCase(), x])), g = (x) => {
+      if (p.has(x)) throw Error("Circular layout group " + x);
+      if (!d.has(x)) {
+        p.add(x);
+        for (const N of w.get(x).members) w.has(N.toLowerCase()) && g(N.toLowerCase());
+        p.delete(x), d.add(x);
+      }
+    };
+    for (const x of w.keys()) g(x);
+    const C = /* @__PURE__ */ new Map();
+    for (const x of a) {
+      if (x.a.toLowerCase() === x.b.toLowerCase()) throw Error("Self-relative layout constraint.");
+      C.has(x.a.toLowerCase()) || C.set(x.a.toLowerCase(), []), C.get(x.a.toLowerCase()).push(x.b.toLowerCase());
+    }
+    p.clear(), d.clear();
+    const y = (x) => {
+      if (p.has(x)) throw Error("Circular place constraints.");
+      if (!d.has(x)) {
+        p.add(x);
+        for (const N of C.get(x) || []) y(N);
+        p.delete(x), d.add(x);
+      }
+    };
+    for (const x of C.keys()) y(x);
+  } catch (b) {
+    e.push({ severity: "error", line: l, message: "Layout description: " + b.message });
+  }
+  return { layout: { version: 1, priorityCap: u, groups: c, relations: a }, diagnostics: e };
+}
+function tt(t, e) {
+  const n = t.ir.layoutDescription;
+  if (!n) return null;
+  const o = new Map(n.groups.map((a) => [a.id.toLowerCase(), a])), i = Object.values(t.contexts).flatMap((a) => a.devices.map((h) => h.name)), l = new Set([...Object.keys(t.contexts), ...i].map((a) => a.toLowerCase()));
+  for (const a of o.values()) if (l.has(a.id.toLowerCase())) throw Error("Layout group name conflicts with a circuit instance/device: " + a.id);
+  for (const a of o.values()) for (const h of a.members) if (!o.has(h.toLowerCase()) && !l.has(h.toLowerCase())) throw Error("Unknown @layout instance/device: " + h);
+  for (const a of n.relations) for (const h of [a.a, a.b]) if (!o.has(h.toLowerCase()) && !l.has(h.toLowerCase())) throw Error("Unknown @layout place target: " + h);
+  const s = /* @__PURE__ */ new Map(), r = [];
+  for (const a of n.groups) {
+    const h = [];
+    for (const m of a.members) {
+      if (o.has(m.toLowerCase())) {
+        h.push({ group: m });
+        continue;
+      }
+      for (const u of e.components) if (u.name.toLowerCase() === m.toLowerCase() || u.name.toLowerCase().startsWith(m.toLowerCase() + "/")) {
+        if (s.has(u.name)) throw Error("Overlapping @layout membership: " + u.name);
+        s.set(u.name, a.id), h.push({ cell: u.name, instance: m });
+      }
+    }
+    r.push({ id: a.id, direction: a.direction, members: h });
+  }
+  const c = /* @__PURE__ */ new Set();
+  for (const a of r) for (const h of a.members) if (h.group) {
+    const m = h.group.toLowerCase();
+    if (c.has(m)) throw Error("Layout group has multiple parents: " + h.group);
+    c.add(m);
+  }
+  return { version: 1, priorityCap: n.priorityCap, groups: r, relations: n.relations };
+}
+const te = () => /* @__PURE__ */ Object.create(null), V = (t) => t.toLowerCase();
 function Ie(t) {
-  const e = ee();
+  const e = te();
   for (let n = 0; n < t.length; n++) {
     const o = t[n];
     if (/^params?:$/i.test(o)) continue;
     const i = /^([a-z_][\w.$]*)(?:=([\s\S]*))?$/i.exec(o);
     if (!i) throw Error("Expected named parameter assignment, got: " + o);
-    const d = V(i[1]);
-    let r = i[2];
-    if (r === void 0) {
-      const s = /^=([\s\S]*)$/.exec(t[++n] || "");
-      if (!s) throw Error("Expected = after parameter " + d);
-      r = s[1];
+    const l = V(i[1]);
+    let s = i[2];
+    if (s === void 0) {
+      const r = /^=([\s\S]*)$/.exec(t[++n] || "");
+      if (!r) throw Error("Expected = after parameter " + l);
+      s = r[1];
     }
-    if (r || (r = t[++n]), !r || /^params?:$/i.test(r)) throw Error("Missing value for parameter " + d);
-    if (Object.hasOwn(e, d)) throw Error("Duplicate parameter: " + d);
-    e[d] = r;
+    if (s || (s = t[++n]), !s || /^params?:$/i.test(s)) throw Error("Missing value for parameter " + l);
+    if (Object.hasOwn(e, l)) throw Error("Duplicate parameter: " + l);
+    e[l] = s;
   }
   return e;
 }
 function xe(t) {
   const e = t.findIndex((n, o) => /^params?:$/i.test(n) || n.includes("=") || t[o + 1] === "=");
-  return e < 0 ? [t, ee()] : [t.slice(0, e), Ie(t.slice(e))];
+  return e < 0 ? [t, te()] : [t.slice(0, e), Ie(t.slice(e))];
 }
-function et(t, e = {}) {
+function nt(t, e = {}) {
   if (typeof t != "string") throw TypeError("Netlist must be a string.");
   if (t.length > 2e6) throw Error("Netlist exceeds the limit of 2 MB.");
-  const n = Je(t, e);
-  t = n.source;
-  const o = [...n.diagnostics], i = ee(), d = /* @__PURE__ */ new Set(["0"]), r = (c, m, f) => o.push({ severity: c, line: m, message: f }), s = (c, m, f, C = [], h = ee(), x = 0) => {
-    const v = { id: c, name: m, parent: f, ports: C, defaults: h, parameters: ee(), definitions: ee(), devices: [], instances: [], directives: [], line: x, statements: [] };
-    return i[c] = v, v;
-  }, a = s("root", "Top", null), l = [a], b = [];
-  let g = !1, p = !1;
-  t.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((c, m) => {
-    const f = c.trim();
-    !f || f.startsWith("*") || (f.startsWith("+") ? b.length ? b.at(-1).text += " " + f.slice(1).trim() : r("error", m + 1, "Continuation has no preceding statement.") : b.push({ text: f, line: m + 1 }));
+  const n = et(t), o = Je(t, e);
+  t = o.source;
+  const i = [...o.diagnostics, ...n.diagnostics], l = te(), s = /* @__PURE__ */ new Set(["0"]), r = (d, w, g) => i.push({ severity: d, line: w, message: g }), c = (d, w, g, C = [], y = te(), x = 0) => {
+    const N = { id: d, name: w, parent: g, ports: C, defaults: y, parameters: te(), definitions: te(), devices: [], instances: [], directives: [], line: x, statements: [] };
+    return l[d] = N, N;
+  }, a = c("root", "Top", null), h = [a], m = [];
+  let u = !1, E = !1;
+  t.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((d, w) => {
+    const g = d.trim();
+    !g || g.startsWith("*") || (g.startsWith("+") ? m.length ? m.at(-1).text += " " + g.slice(1).trim() : r("error", w + 1, "Continuation has no preceding statement.") : m.push({ text: g, line: w + 1 }));
   });
-  for (const { text: c, line: m } of b)
+  for (const { text: d, line: w } of m)
     try {
-      const f = le(c);
-      if (!f.length) continue;
-      const C = V(f[0]), h = l.at(-1);
-      if (p) {
-        r("warning", m, "Statement after .end is not rendered: " + c);
+      const g = le(d);
+      if (!g.length) continue;
+      const C = V(g[0]), y = h.at(-1);
+      if (E) {
+        r("warning", w, "Statement after .end is not rendered: " + d);
         continue;
       }
       if (C === ".control") {
-        g = !0, r("warning", m, ".control script retained but not executed or rendered.");
+        u = !0, r("warning", w, ".control script retained but not executed or rendered.");
         continue;
       }
       if (C === ".endc") {
-        g = !1;
+        u = !1;
         continue;
       }
-      if (g) continue;
+      if (u) continue;
       if (C === ".subckt") {
-        if (f.length < 2) throw Error(".SUBCKT requires a name.");
-        const [x, v] = xe(f.slice(2)), M = V(f[1]);
-        if (Object.hasOwn(h.definitions, M)) throw Error("Duplicate subcircuit definition: " + f[1]);
-        const B = x.map(V);
-        if (new Set(B).size !== x.length || B.includes("0")) throw Error("Subcircuit formal ports must be unique and cannot be ground 0.");
-        if (x.some((N) => /[{}()=]/.test(N))) throw Error("Invalid formal port.");
-        if (l.length > 64) throw Error("Definition nesting exceeds 64 levels.");
-        const T = h.id + "/" + encodeURIComponent(M);
-        h.definitions[M] = T, l.push(s(T, f[1], h.id, x, v, m));
+        if (g.length < 2) throw Error(".SUBCKT requires a name.");
+        const [x, N] = xe(g.slice(2)), M = V(g[1]);
+        if (Object.hasOwn(y.definitions, M)) throw Error("Duplicate subcircuit definition: " + g[1]);
+        const T = x.map(V);
+        if (new Set(T).size !== x.length || T.includes("0")) throw Error("Subcircuit formal ports must be unique and cannot be ground 0.");
+        if (x.some((H) => /[{}()=]/.test(H))) throw Error("Invalid formal port.");
+        if (h.length > 64) throw Error("Definition nesting exceeds 64 levels.");
+        const P = y.id + "/" + encodeURIComponent(M);
+        y.definitions[M] = P, h.push(c(P, g[1], y.id, x, N, w));
         continue;
       }
       if (C === ".ends") {
-        if (l.length === 1) throw Error("Unmatched .ENDS.");
-        if (f[1] && V(f[1]) !== V(h.name)) throw Error(".ENDS name does not match " + h.name);
-        l.pop();
+        if (h.length === 1) throw Error("Unmatched .ENDS.");
+        if (g[1] && V(g[1]) !== V(y.name)) throw Error(".ENDS name does not match " + y.name);
+        h.pop();
         continue;
       }
       if (C === ".end") {
-        if (l.length > 1) throw Error(".END inside a subcircuit; expected .ENDS.");
-        p = !0;
+        if (h.length > 1) throw Error(".END inside a subcircuit; expected .ENDS.");
+        E = !0;
         continue;
       }
       if (C === ".param") {
-        const x = Ie(f.slice(1));
-        for (const [v, M] of Object.entries(x)) {
-          if (Object.hasOwn(h.parameters, v)) throw Error("Repeated .param assignment requires simulator ordering semantics: " + v);
-          h.parameters[v] = M;
+        const x = Ie(g.slice(1));
+        for (const [N, M] of Object.entries(x)) {
+          if (Object.hasOwn(y.parameters, N)) throw Error("Repeated .param assignment requires simulator ordering semantics: " + N);
+          y.parameters[N] = M;
         }
       }
       if (C === ".global") {
-        if (f.length < 2) throw Error(".GLOBAL requires nodes.");
-        for (const x of f.slice(1)) d.add(V(x));
+        if (g.length < 2) throw Error(".GLOBAL requires nodes.");
+        for (const x of g.slice(1)) s.add(V(x));
       }
-      if (C.startsWith(".") && h.directives.push({ line: m, text: c }), C.startsWith("x")) {
-        const [x, v] = xe(f.slice(1));
+      if (C.startsWith(".") && y.directives.push({ line: w, text: d }), C.startsWith("x")) {
+        const [x, N] = xe(g.slice(1));
         if (!x.length) throw Error("X instance requires a subcircuit name.");
-        const M = /;§pnba\s+(.+)$/i.exec(c)?.[1].split(")");
-        h.instances.push({ name: f[0], nodes: x.slice(0, -1).map(V), definitionName: x.at(-1), definitionId: null, parameters: v, line: m, raw: c, pinNames: M });
-      } else h.statements.push({ line: m, text: c });
-    } catch (f) {
-      r("error", m, f.message + " Statement: " + c);
+        const M = /;§pnba\s+(.+)$/i.exec(d)?.[1].split(")");
+        y.instances.push({ name: g[0], nodes: x.slice(0, -1).map(V), definitionName: x.at(-1), definitionId: null, parameters: N, line: w, raw: d, pinNames: M });
+      } else y.statements.push({ line: w, text: d });
+    } catch (g) {
+      r("error", w, g.message + " Statement: " + d);
     }
-  l.length > 1 && r("error", l.at(-1).line, "Unclosed .SUBCKT " + l.at(-1).name), g && r("error", 0, "Unclosed .control block.");
-  function E(c, m) {
-    for (; c; ) {
-      if (Object.hasOwn(c.definitions, V(m))) return c.definitions[V(m)];
-      c = i[c.parent];
+  h.length > 1 && r("error", h.at(-1).line, "Unclosed .SUBCKT " + h.at(-1).name), u && r("error", 0, "Unclosed .control block.");
+  function k(d, w) {
+    for (; d; ) {
+      if (Object.hasOwn(d.definitions, V(w))) return d.definitions[V(w)];
+      d = l[d.parent];
     }
     return null;
   }
-  for (const c of Object.values(i)) {
-    const m = [...c.statements[0]?.line === 1 ? [] : [{ line: 0, text: "* Scope" }], ...c.statements], f = Ze(m.map((h) => h.text).join(`
-`), { models: i[c.parent]?.models });
-    c.devices = f.components.map((h) => ({ ...h, line: m[h.line - 1]?.line || c.line })), c.models = f.models, c === a && (a.title = f.title), o.push(...f.diagnostics.filter((h) => !h.message.includes("No supported components to render.") && !h.message.includes("300 components")).map((h) => ({ ...h, line: m[h.line - 1]?.line || c.line })));
-    const C = new Set(c.devices.map((h) => V(h.name)));
-    for (const h of c.instances)
-      if (C.has(V(h.name)) && r("error", h.line, "Duplicate instance/device name: " + h.name), C.add(V(h.name)), h.definitionId = E(c, h.definitionName), !h.definitionId && !/^\{[\s\S]*\}$/.test(h.definitionName)) r("error", h.line, "Undefined subcircuit: " + h.definitionName + " in " + h.name);
-      else if (h.definitionId) {
-        const x = i[h.definitionId];
-        x.ports.length !== h.nodes.length && r("error", h.line, `${h.name}: ${x.name} expects ${x.ports.length} ports; got ${h.nodes.length}.`);
+  for (const d of Object.values(l)) {
+    const w = [...d.statements[0]?.line === 1 ? [] : [{ line: 0, text: "* Scope" }], ...d.statements], g = Ze(w.map((y) => y.text).join(`
+`), { models: l[d.parent]?.models });
+    d.devices = g.components.map((y) => ({ ...y, line: w[y.line - 1]?.line || d.line })), d.models = g.models, d === a && (a.title = g.title), i.push(...g.diagnostics.filter((y) => !y.message.includes("No supported components to render.") && !y.message.includes("300 components")).map((y) => ({ ...y, line: w[y.line - 1]?.line || d.line })));
+    const C = new Set(d.devices.map((y) => V(y.name)));
+    for (const y of d.instances)
+      if (C.has(V(y.name)) && r("error", y.line, "Duplicate instance/device name: " + y.name), C.add(V(y.name)), y.definitionId = k(d, y.definitionName), !y.definitionId && !/^\{[\s\S]*\}$/.test(y.definitionName)) r("error", y.line, "Undefined subcircuit: " + y.definitionName + " in " + y.name);
+      else if (y.definitionId) {
+        const x = l[y.definitionId];
+        x.ports.length !== y.nodes.length && r("error", y.line, `${y.name}: ${x.name} expects ${x.ports.length} ports; got ${y.nodes.length}.`);
       }
   }
-  for (const c of Object.values(i)) delete c.statements;
-  const k = /* @__PURE__ */ new Set(), I = /* @__PURE__ */ new Set();
-  function w(c, m = []) {
-    if (k.has(c)) {
-      r("error", i[c].line, "Circular subcircuit reference: " + [...m, i[c].name].join(" → "));
+  for (const d of Object.values(l)) delete d.statements;
+  const L = /* @__PURE__ */ new Set(), b = /* @__PURE__ */ new Set();
+  function p(d, w = []) {
+    if (L.has(d)) {
+      r("error", l[d].line, "Circular subcircuit reference: " + [...w, l[d].name].join(" → "));
       return;
     }
-    if (!I.has(c)) {
-      if (k.add(c), m.length >= 64) {
-        r("error", i[c].line, "Subcircuit dependency nesting exceeds 64 levels."), k.delete(c), I.add(c);
+    if (!b.has(d)) {
+      if (L.add(d), w.length >= 64) {
+        r("error", l[d].line, "Subcircuit dependency nesting exceeds 64 levels."), L.delete(d), b.add(d);
         return;
       }
-      for (const f of i[c].instances) f.definitionId && w(f.definitionId, [...m, i[c].name]);
-      k.delete(c), I.add(c);
+      for (const g of l[d].instances) g.definitionId && p(g.definitionId, [...w, l[d].name]);
+      L.delete(d), b.add(d);
     }
   }
-  for (const c of Object.keys(i)) w(c);
+  for (const d of Object.keys(l)) p(d);
   !a.devices.length && !a.instances.length && r("error", 0, "No supported components or instances to render.");
-  for (const c of o) !c.source && c.line && n.origins[c.line - 1] && (c.source = n.origins[c.line - 1].file, c.line = n.origins[c.line - 1].line);
-  return { kind: "HierarchicalCircuit", version: 2, rootId: "root", title: a.title || "", scopes: i, globals: [...d], diagnostics: o };
+  for (const d of i) !d.source && d.line && o.origins[d.line - 1] && (d.source = o.origins[d.line - 1].file, d.line = o.origins[d.line - 1].line);
+  return { kind: "HierarchicalCircuit", version: 2, rootId: "root", title: a.title || "", scopes: l, globals: [...s], diagnostics: i, layoutDescription: n.layout };
 }
-const j = () => /* @__PURE__ */ Object.create(null), J = (t, e) => [...t, e].map((n) => encodeURIComponent(n)).join("/"), me = (t, e) => J(t.map((n) => n.toLowerCase()), e.toLowerCase());
-function tt(t, e = []) {
-  const n = j(), o = (i) => n[i] || (n[i] = { name: i, displayName: i.split("/").map((d) => decodeURIComponent(d)).join("/"), bit: Object.keys(n).length + 2, terminals: [] });
-  for (const i of t) for (const [d, r] of Object.entries(i.terminals)) o(r).terminals.push({ component: i.name, pin: d });
+const U = () => /* @__PURE__ */ Object.create(null), ee = (t, e) => [...t, e].map((n) => encodeURIComponent(n)).join("/"), me = (t, e) => ee(t.map((n) => n.toLowerCase()), e.toLowerCase());
+function rt(t, e = []) {
+  const n = U(), o = (i) => n[i] || (n[i] = { name: i, displayName: i.split("/").map((l) => decodeURIComponent(l)).join("/"), bit: Object.keys(n).length + 2, terminals: [] });
+  for (const i of t) for (const [l, s] of Object.entries(i.terminals)) o(s).terminals.push({ component: i.name, pin: l });
   for (const i of e) o(i);
   return n;
 }
-function nt(t) {
+function ot(t) {
   if (t.diagnostics.some((e) => e.severity === "error")) {
     const e = Error("Fix the parser errors below before generating.");
     throw e.diagnostics = t.diagnostics, e;
   }
 }
-const Ce = (t) => /^(?:\{[\s\S]*\}|'[\s\S]*')$/.test(t) ? t.slice(1, -1) : t, rt = new RegExp("(?<![\\w.$])[a-z_][\\w.$]*", "gi");
+const Ce = (t) => /^(?:\{[\s\S]*\}|'[\s\S]*')$/.test(t) ? t.slice(1, -1) : t, it = new RegExp("(?<![\\w.$])[a-z_][\\w.$]*", "gi");
 function de(t, e, n = (i) => i, o = (i) => i) {
   const i = [];
-  t = t.replace(/"(?:\\.|[^"\\])*"/g, (r) => (i.push(r), "@@" + (i.length - 1) + "@@")), t = t.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi, (r, s, a) => {
-    const l = a.split(",").map((g) => g.trim());
-    if (l.some((g) => !g || /[\s{}+*()]/.test(g))) throw Error("Unsupported dynamic voltage/current reference: " + r);
-    const b = s.toUpperCase() + "(" + l.map((g) => s.toLowerCase() === "v" ? n(g) : o(g, s)).join(",") + ")";
-    return i.push(b), "@@" + (i.length - 1) + "@@";
+  t = t.replace(/"(?:\\.|[^"\\])*"/g, (s) => (i.push(s), "@@" + (i.length - 1) + "@@")), t = t.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi, (s, r, c) => {
+    const a = c.split(",").map((m) => m.trim());
+    if (a.some((m) => !m || /[\s{}+*()]/.test(m))) throw Error("Unsupported dynamic voltage/current reference: " + s);
+    const h = r.toUpperCase() + "(" + a.map((m) => r.toLowerCase() === "v" ? n(m) : o(m, r)).join(",") + ")";
+    return i.push(h), "@@" + (i.length - 1) + "@@";
   });
-  let d = t.length;
-  return t = t.replace(rt, (r, s, a) => {
-    if (a.slice(s + r.length).trimStart().startsWith("(")) return r;
-    const l = e(r.toLowerCase());
-    if (l === void 0) return r;
-    if (d += l.length + 2, d > 1e5) throw Error("Expanded parameter expression exceeds 100000 characters.");
-    return "(" + l + ")";
-  }), t.replace(/@@(\d+)@@/g, (r, s) => i[Number(s)]);
+  let l = t.length;
+  return t = t.replace(it, (s, r, c) => {
+    if (c.slice(r + s.length).trimStart().startsWith("(")) return s;
+    const a = e(s.toLowerCase());
+    if (a === void 0) return s;
+    if (l += a.length + 2, l > 1e5) throw Error("Expanded parameter expression exceeds 100000 characters.");
+    return "(" + a + ")";
+  }), t.replace(/@@(\d+)@@/g, (s, r) => i[Number(r)]);
 }
-function it(t, e, n, o) {
-  const i = { ...e, ...n }, d = j(), r = /* @__PURE__ */ new Set(), s = j();
-  for (const [l, b] of Object.entries(o)) s[l] = de(Ce(b), (g) => t[g]);
-  function a(l) {
-    if (Object.hasOwn(s, l)) return s[l];
-    if (Object.hasOwn(d, l)) return d[l];
-    if (!Object.hasOwn(i, l)) return t[l];
-    if (r.has(l)) {
-      if (Object.hasOwn(t, l)) return t[l];
-      throw Error("Circular parameter dependency: " + [...r, l].join(" → "));
+function st(t, e, n, o) {
+  const i = { ...e, ...n }, l = U(), s = /* @__PURE__ */ new Set(), r = U();
+  for (const [a, h] of Object.entries(o)) r[a] = de(Ce(h), (m) => t[m]);
+  function c(a) {
+    if (Object.hasOwn(r, a)) return r[a];
+    if (Object.hasOwn(l, a)) return l[a];
+    if (!Object.hasOwn(i, a)) return t[a];
+    if (s.has(a)) {
+      if (Object.hasOwn(t, a)) return t[a];
+      throw Error("Circular parameter dependency: " + [...s, a].join(" → "));
     }
-    return r.add(l), d[l] = de(Ce(i[l]), a), r.delete(l), d[l];
+    return s.add(a), l[a] = de(Ce(i[a]), c), s.delete(a), l[a];
   }
-  for (const l of Object.keys(i)) a(l);
-  return Object.assign(j(), t, d, s);
+  for (const a of Object.keys(i)) c(a);
+  return Object.assign(U(), t, l, r);
 }
 function ve(t, e, n, o) {
   let i = "";
-  for (let a = 0; a < t.length; ) {
-    const l = t[a];
-    if (l !== "{" && l !== "'") {
-      i += l, a++;
+  for (let c = 0; c < t.length; ) {
+    const a = t[c];
+    if (a !== "{" && a !== "'") {
+      i += a, c++;
       continue;
     }
-    const b = a++;
-    let g = 1, p = "";
-    for (; a < t.length && g; a++) {
-      if (l === "'") {
-        t[a] === "'" && (g = 0);
+    const h = c++;
+    let m = 1, u = "";
+    for (; c < t.length && m; c++) {
+      if (a === "'") {
+        t[c] === "'" && (m = 0);
         continue;
       }
-      if (p) {
-        t[a] === p && (p = "");
+      if (u) {
+        t[c] === u && (u = "");
         continue;
       }
-      if (t[a] === '"' || t[a] === "'") {
-        p = t[a];
+      if (t[c] === '"' || t[c] === "'") {
+        u = t[c];
         continue;
       }
-      t[a] === "{" && g++, t[a] === "}" && g--;
+      t[c] === "{" && m++, t[c] === "}" && m--;
     }
-    if (g) throw Error("Unclosed parameter expression.");
-    i += l + de(t.slice(b + 1, a - 1), (E) => e[E], n, o) + (l === "{" ? "}" : "'");
+    if (m) throw Error("Unclosed parameter expression.");
+    i += a + de(t.slice(h + 1, c - 1), (E) => e[E], n, o) + (a === "{" ? "}" : "'");
   }
-  const d = [];
-  let r = 0, s = "";
-  for (let a = 0; a < i.length; a++) {
-    const l = i[a];
-    if (s) {
-      l === s && i[a - 1] !== "\\" && (s = "");
+  const l = [];
+  let s = 0, r = "";
+  for (let c = 0; c < i.length; c++) {
+    const a = i[c];
+    if (r) {
+      a === r && i[c - 1] !== "\\" && (r = "");
       continue;
     }
-    if (l === '"' || l === "'") {
-      s = l;
+    if (a === '"' || a === "'") {
+      r = a;
       continue;
     }
-    if ("({".includes(l) && r++, ")}".includes(l) && r--, !r && (a === 0 || /\s/.test(i[a - 1]))) {
-      const b = /^([a-z_][\w.$]*)\s*=(?!=)/i.exec(i.slice(a));
-      b && (d.push({ start: a, end: a + b[0].length, key: b[1].toLowerCase() }), a += b[0].length - 1);
+    if ("({".includes(a) && s++, ")}".includes(a) && s--, !s && (c === 0 || /\s/.test(i[c - 1]))) {
+      const h = /^([a-z_][\w.$]*)\s*=(?!=)/i.exec(i.slice(c));
+      h && (l.push({ start: c, end: c + h[0].length, key: h[1].toLowerCase() }), c += h[0].length - 1);
     }
   }
-  if (d.length) {
-    let a = i.slice(0, d[0].start);
-    d.forEach((l, b) => {
-      const g = d[b + 1]?.start ?? i.length, p = i.slice(l.end, g);
-      a += i.slice(l.start, l.end) + (p.includes("{") || ["refnode", "intnode"].includes(l.key) ? p : de(p, (E) => e[E], n, o));
-    }), i = a;
+  if (l.length) {
+    let c = i.slice(0, l[0].start);
+    l.forEach((a, h) => {
+      const m = l[h + 1]?.start ?? i.length, u = i.slice(a.end, m);
+      c += i.slice(a.start, a.end) + (u.includes("{") || ["refnode", "intnode"].includes(a.key) ? u : de(u, (E) => e[E], n, o));
+    }), i = c;
   } else Object.hasOwn(e, t.toLowerCase()) && (i = "{" + e[t.toLowerCase()] + "}");
   return i;
 }
-class ot {
+class at {
   /**
    * @callback HookCallback
    * @this {*|Jsep} this
@@ -563,7 +674,7 @@ class ot {
     });
   }
 }
-class st {
+class ct {
   constructor(e) {
     this.jsep = e, this.registered = {};
   }
@@ -588,7 +699,7 @@ class st {
     });
   }
 }
-class u {
+class f {
   /**
    * @returns {string}
    */
@@ -599,7 +710,7 @@ class u {
    * @returns {string}
    */
   static toString() {
-    return "JavaScript Expression Parser (JSEP) v" + u.version;
+    return "JavaScript Expression Parser (JSEP) v" + f.version;
   }
   // ==================== CONFIG ================================
   /**
@@ -608,7 +719,7 @@ class u {
    * @returns {Jsep}
    */
   static addUnaryOp(e) {
-    return u.max_unop_len = Math.max(e.length, u.max_unop_len), u.unary_ops[e] = 1, u;
+    return f.max_unop_len = Math.max(e.length, f.max_unop_len), f.unary_ops[e] = 1, f;
   }
   /**
    * @method jsep.addBinaryOp
@@ -618,7 +729,7 @@ class u {
    * @returns {Jsep}
    */
   static addBinaryOp(e, n, o) {
-    return u.max_binop_len = Math.max(e.length, u.max_binop_len), u.binary_ops[e] = n, o ? u.right_associative.add(e) : u.right_associative.delete(e), u;
+    return f.max_binop_len = Math.max(e.length, f.max_binop_len), f.binary_ops[e] = n, o ? f.right_associative.add(e) : f.right_associative.delete(e), f;
   }
   /**
    * @method addIdentifierChar
@@ -626,7 +737,7 @@ class u {
    * @returns {Jsep}
    */
   static addIdentifierChar(e) {
-    return u.additional_identifier_chars.add(e), u;
+    return f.additional_identifier_chars.add(e), f;
   }
   /**
    * @method addLiteral
@@ -635,7 +746,7 @@ class u {
    * @returns {Jsep}
    */
   static addLiteral(e, n) {
-    return u.literals[e] = n, u;
+    return f.literals[e] = n, f;
   }
   /**
    * @method removeUnaryOp
@@ -643,14 +754,14 @@ class u {
    * @returns {Jsep}
    */
   static removeUnaryOp(e) {
-    return delete u.unary_ops[e], e.length === u.max_unop_len && (u.max_unop_len = u.getMaxKeyLen(u.unary_ops)), u;
+    return delete f.unary_ops[e], e.length === f.max_unop_len && (f.max_unop_len = f.getMaxKeyLen(f.unary_ops)), f;
   }
   /**
    * @method removeAllUnaryOps
    * @returns {Jsep}
    */
   static removeAllUnaryOps() {
-    return u.unary_ops = {}, u.max_unop_len = 0, u;
+    return f.unary_ops = {}, f.max_unop_len = 0, f;
   }
   /**
    * @method removeIdentifierChar
@@ -658,7 +769,7 @@ class u {
    * @returns {Jsep}
    */
   static removeIdentifierChar(e) {
-    return u.additional_identifier_chars.delete(e), u;
+    return f.additional_identifier_chars.delete(e), f;
   }
   /**
    * @method removeBinaryOp
@@ -666,14 +777,14 @@ class u {
    * @returns {Jsep}
    */
   static removeBinaryOp(e) {
-    return delete u.binary_ops[e], e.length === u.max_binop_len && (u.max_binop_len = u.getMaxKeyLen(u.binary_ops)), u.right_associative.delete(e), u;
+    return delete f.binary_ops[e], e.length === f.max_binop_len && (f.max_binop_len = f.getMaxKeyLen(f.binary_ops)), f.right_associative.delete(e), f;
   }
   /**
    * @method removeAllBinaryOps
    * @returns {Jsep}
    */
   static removeAllBinaryOps() {
-    return u.binary_ops = {}, u.max_binop_len = 0, u;
+    return f.binary_ops = {}, f.max_binop_len = 0, f;
   }
   /**
    * @method removeLiteral
@@ -681,14 +792,14 @@ class u {
    * @returns {Jsep}
    */
   static removeLiteral(e) {
-    return delete u.literals[e], u;
+    return delete f.literals[e], f;
   }
   /**
    * @method removeAllLiterals
    * @returns {Jsep}
    */
   static removeAllLiterals() {
-    return u.literals = {}, u;
+    return f.literals = {}, f;
   }
   // ==================== END CONFIG ============================
   /**
@@ -715,7 +826,7 @@ class u {
    * @returns {jsep.Expression}
    */
   static parse(e) {
-    return new u(e).parse();
+    return new f(e).parse();
   }
   /**
    * Get the longest key length of any object
@@ -739,7 +850,7 @@ class u {
    * @returns {number}
    */
   static binaryPrecedence(e) {
-    return u.binary_ops[e] || 0;
+    return f.binary_ops[e] || 0;
   }
   /**
    * Looks for start of identifier
@@ -749,15 +860,15 @@ class u {
   static isIdentifierStart(e) {
     return e >= 65 && e <= 90 || // A...Z
     e >= 97 && e <= 122 || // a...z
-    e >= 128 && !u.binary_ops[String.fromCharCode(e)] || // any non-ASCII that is not an operator
-    u.additional_identifier_chars.has(String.fromCharCode(e));
+    e >= 128 && !f.binary_ops[String.fromCharCode(e)] || // any non-ASCII that is not an operator
+    f.additional_identifier_chars.has(String.fromCharCode(e));
   }
   /**
    * @param {number} ch
    * @returns {boolean}
    */
   static isIdentifierPart(e) {
-    return u.isIdentifierStart(e) || u.isDecimalDigit(e);
+    return f.isIdentifierStart(e) || f.isDecimalDigit(e);
   }
   /**
    * throw error at index of the expression
@@ -775,9 +886,9 @@ class u {
    * @returns {?jsep.Expression}
    */
   runHook(e, n) {
-    if (u.hooks[e]) {
+    if (f.hooks[e]) {
       const o = { context: this, node: n };
-      return u.hooks.run(e, o), o.node;
+      return f.hooks.run(e, o), o.node;
     }
     return n;
   }
@@ -787,9 +898,9 @@ class u {
    * @returns {?jsep.Expression}
    */
   searchHook(e) {
-    if (u.hooks[e]) {
+    if (f.hooks[e]) {
       const n = { context: this };
-      return u.hooks[e].find(function(o) {
+      return f.hooks[e].find(function(o) {
         return o.call(n.context, n), n.node;
       }), n.node;
     }
@@ -799,7 +910,7 @@ class u {
    */
   gobbleSpaces() {
     let e = this.code;
-    for (; e === u.SPACE_CODE || e === u.TAB_CODE || e === u.LF_CODE || e === u.CR_CODE; )
+    for (; e === f.SPACE_CODE || e === f.TAB_CODE || e === f.LF_CODE || e === f.CR_CODE; )
       e = this.expr.charCodeAt(++this.index);
     this.runHook("gobble-spaces");
   }
@@ -810,7 +921,7 @@ class u {
   parse() {
     this.runHook("before-all");
     const e = this.gobbleExpressions(), n = e.length === 1 ? e[0] : {
-      type: u.COMPOUND,
+      type: f.COMPOUND,
       body: e
     };
     return this.runHook("after-all", n);
@@ -823,7 +934,7 @@ class u {
   gobbleExpressions(e) {
     let n = [], o, i;
     for (; this.index < this.expr.length; )
-      if (o = this.code, o === u.SEMCOL_CODE || o === u.COMMA_CODE)
+      if (o = this.code, o === f.SEMCOL_CODE || o === f.COMMA_CODE)
         this.index++;
       else if (i = this.gobbleExpression())
         n.push(i);
@@ -851,9 +962,9 @@ class u {
    */
   gobbleBinaryOp() {
     this.gobbleSpaces();
-    let e = this.expr.substr(this.index, u.max_binop_len), n = e.length;
+    let e = this.expr.substr(this.index, f.max_binop_len), n = e.length;
     for (; n > 0; ) {
-      if (u.binary_ops.hasOwnProperty(e) && (!u.isIdentifierStart(this.code) || this.index + e.length < this.expr.length && !u.isIdentifierPart(this.expr.charCodeAt(this.index + e.length))))
+      if (f.binary_ops.hasOwnProperty(e) && (!f.isIdentifierStart(this.code) || this.index + e.length < this.expr.length && !f.isIdentifierPart(this.expr.charCodeAt(this.index + e.length))))
         return this.index += n, e;
       e = e.substr(0, --n);
     }
@@ -865,32 +976,32 @@ class u {
    * @returns {?jsep.BinaryExpression}
    */
   gobbleBinaryExpression() {
-    let e, n, o, i, d, r, s, a, l;
-    if (r = this.gobbleToken(), !r || (n = this.gobbleBinaryOp(), !n))
-      return r;
-    for (d = { value: n, prec: u.binaryPrecedence(n), right_a: u.right_associative.has(n) }, s = this.gobbleToken(), s || this.throwError("Expected expression after " + n), i = [r, d, s]; n = this.gobbleBinaryOp(); ) {
-      if (o = u.binaryPrecedence(n), o === 0) {
+    let e, n, o, i, l, s, r, c, a;
+    if (s = this.gobbleToken(), !s || (n = this.gobbleBinaryOp(), !n))
+      return s;
+    for (l = { value: n, prec: f.binaryPrecedence(n), right_a: f.right_associative.has(n) }, r = this.gobbleToken(), r || this.throwError("Expected expression after " + n), i = [s, l, r]; n = this.gobbleBinaryOp(); ) {
+      if (o = f.binaryPrecedence(n), o === 0) {
         this.index -= n.length;
         break;
       }
-      d = { value: n, prec: o, right_a: u.right_associative.has(n) }, l = n;
-      const b = (g) => d.right_a && g.right_a ? o > g.prec : o <= g.prec;
-      for (; i.length > 2 && b(i[i.length - 2]); )
-        s = i.pop(), n = i.pop().value, r = i.pop(), e = {
-          type: u.BINARY_EXP,
+      l = { value: n, prec: o, right_a: f.right_associative.has(n) }, a = n;
+      const h = (m) => l.right_a && m.right_a ? o > m.prec : o <= m.prec;
+      for (; i.length > 2 && h(i[i.length - 2]); )
+        r = i.pop(), n = i.pop().value, s = i.pop(), e = {
+          type: f.BINARY_EXP,
           operator: n,
-          left: r,
-          right: s
+          left: s,
+          right: r
         }, i.push(e);
-      e = this.gobbleToken(), e || this.throwError("Expected expression after " + l), i.push(d, e);
+      e = this.gobbleToken(), e || this.throwError("Expected expression after " + a), i.push(l, e);
     }
-    for (a = i.length - 1, e = i[a]; a > 1; )
+    for (c = i.length - 1, e = i[c]; c > 1; )
       e = {
-        type: u.BINARY_EXP,
-        operator: i[a - 1].value,
-        left: i[a - 2],
+        type: f.BINARY_EXP,
+        operator: i[c - 1].value,
+        left: i[c - 2],
         right: e
-      }, a -= 2;
+      }, c -= 2;
     return e;
   }
   /**
@@ -902,31 +1013,31 @@ class u {
     let e, n, o, i;
     if (this.gobbleSpaces(), i = this.searchHook("gobble-token"), i)
       return this.runHook("after-token", i);
-    if (e = this.code, u.isDecimalDigit(e) || e === u.PERIOD_CODE)
+    if (e = this.code, f.isDecimalDigit(e) || e === f.PERIOD_CODE)
       return this.gobbleNumericLiteral();
-    if (e === u.SQUOTE_CODE || e === u.DQUOTE_CODE)
+    if (e === f.SQUOTE_CODE || e === f.DQUOTE_CODE)
       i = this.gobbleStringLiteral();
-    else if (e === u.OBRACK_CODE)
+    else if (e === f.OBRACK_CODE)
       i = this.gobbleArray();
     else {
-      for (n = this.expr.substr(this.index, u.max_unop_len), o = n.length; o > 0; ) {
-        if (u.unary_ops.hasOwnProperty(n) && (!u.isIdentifierStart(this.code) || this.index + n.length < this.expr.length && !u.isIdentifierPart(this.expr.charCodeAt(this.index + n.length)))) {
+      for (n = this.expr.substr(this.index, f.max_unop_len), o = n.length; o > 0; ) {
+        if (f.unary_ops.hasOwnProperty(n) && (!f.isIdentifierStart(this.code) || this.index + n.length < this.expr.length && !f.isIdentifierPart(this.expr.charCodeAt(this.index + n.length)))) {
           this.index += o;
-          const d = this.gobbleToken();
-          return d || this.throwError("missing unaryOp argument"), this.runHook("after-token", {
-            type: u.UNARY_EXP,
+          const l = this.gobbleToken();
+          return l || this.throwError("missing unaryOp argument"), this.runHook("after-token", {
+            type: f.UNARY_EXP,
             operator: n,
-            argument: d,
+            argument: l,
             prefix: !0
           });
         }
         n = n.substr(0, --o);
       }
-      u.isIdentifierStart(e) ? (i = this.gobbleIdentifier(), u.literals.hasOwnProperty(i.name) ? i = {
-        type: u.LITERAL,
-        value: u.literals[i.name],
+      f.isIdentifierStart(e) ? (i = this.gobbleIdentifier(), f.literals.hasOwnProperty(i.name) ? i = {
+        type: f.LITERAL,
+        value: f.literals[i.name],
         raw: i.name
-      } : i.name === u.this_str && (i = { type: u.THIS_EXP })) : e === u.OPAREN_CODE && (i = this.gobbleGroup());
+      } : i.name === f.this_str && (i = { type: f.THIS_EXP })) : e === f.OPAREN_CODE && (i = this.gobbleGroup());
     }
     return i ? (i = this.gobbleTokenProperty(i), this.runHook("after-token", i)) : this.runHook("after-token", !1);
   }
@@ -941,24 +1052,24 @@ class u {
   gobbleTokenProperty(e) {
     this.gobbleSpaces();
     let n = this.code;
-    for (; n === u.PERIOD_CODE || n === u.OBRACK_CODE || n === u.OPAREN_CODE || n === u.QUMARK_CODE; ) {
+    for (; n === f.PERIOD_CODE || n === f.OBRACK_CODE || n === f.OPAREN_CODE || n === f.QUMARK_CODE; ) {
       let o;
-      if (n === u.QUMARK_CODE) {
-        if (this.expr.charCodeAt(this.index + 1) !== u.PERIOD_CODE)
+      if (n === f.QUMARK_CODE) {
+        if (this.expr.charCodeAt(this.index + 1) !== f.PERIOD_CODE)
           break;
         o = !0, this.index += 2, this.gobbleSpaces(), n = this.code;
       }
-      this.index++, n === u.OBRACK_CODE ? (e = {
-        type: u.MEMBER_EXP,
+      this.index++, n === f.OBRACK_CODE ? (e = {
+        type: f.MEMBER_EXP,
         computed: !0,
         object: e,
         property: this.gobbleExpression()
-      }, e.property || this.throwError('Unexpected "' + this.char + '"'), this.gobbleSpaces(), n = this.code, n !== u.CBRACK_CODE && this.throwError("Unclosed ["), this.index++) : n === u.OPAREN_CODE ? e = {
-        type: u.CALL_EXP,
-        arguments: this.gobbleArguments(u.CPAREN_CODE),
+      }, e.property || this.throwError('Unexpected "' + this.char + '"'), this.gobbleSpaces(), n = this.code, n !== f.CBRACK_CODE && this.throwError("Unclosed ["), this.index++) : n === f.OPAREN_CODE ? e = {
+        type: f.CALL_EXP,
+        arguments: this.gobbleArguments(f.CPAREN_CODE),
         callee: e
-      } : (n === u.PERIOD_CODE || o) && (o && this.index--, this.gobbleSpaces(), e = {
-        type: u.MEMBER_EXP,
+      } : (n === f.PERIOD_CODE || o) && (o && this.index--, this.gobbleSpaces(), e = {
+        type: f.MEMBER_EXP,
         computed: !1,
         object: e,
         property: this.gobbleIdentifier()
@@ -973,18 +1084,18 @@ class u {
    */
   gobbleNumericLiteral() {
     let e = "", n, o;
-    for (; u.isDecimalDigit(this.code); )
+    for (; f.isDecimalDigit(this.code); )
       e += this.expr.charAt(this.index++);
-    if (this.code === u.PERIOD_CODE)
-      for (e += this.expr.charAt(this.index++); u.isDecimalDigit(this.code); )
+    if (this.code === f.PERIOD_CODE)
+      for (e += this.expr.charAt(this.index++); f.isDecimalDigit(this.code); )
         e += this.expr.charAt(this.index++);
     if (n = this.char, n === "e" || n === "E") {
-      for (e += this.expr.charAt(this.index++), n = this.char, (n === "+" || n === "-") && (e += this.expr.charAt(this.index++)); u.isDecimalDigit(this.code); )
+      for (e += this.expr.charAt(this.index++), n = this.char, (n === "+" || n === "-") && (e += this.expr.charAt(this.index++)); f.isDecimalDigit(this.code); )
         e += this.expr.charAt(this.index++);
-      u.isDecimalDigit(this.expr.charCodeAt(this.index - 1)) || this.throwError("Expected exponent (" + e + this.char + ")");
+      f.isDecimalDigit(this.expr.charCodeAt(this.index - 1)) || this.throwError("Expected exponent (" + e + this.char + ")");
     }
-    return o = this.code, u.isIdentifierStart(o) ? this.throwError("Variable names cannot start with a number (" + e + this.char + ")") : (o === u.PERIOD_CODE || e.length === 1 && e.charCodeAt(0) === u.PERIOD_CODE) && this.throwError("Unexpected period"), {
-      type: u.LITERAL,
+    return o = this.code, f.isIdentifierStart(o) ? this.throwError("Variable names cannot start with a number (" + e + this.char + ")") : (o === f.PERIOD_CODE || e.length === 1 && e.charCodeAt(0) === f.PERIOD_CODE) && this.throwError("Unexpected period"), {
+      type: f.LITERAL,
       value: parseFloat(e),
       raw: e
     };
@@ -999,12 +1110,12 @@ class u {
     const n = this.index, o = this.expr.charAt(this.index++);
     let i = !1;
     for (; this.index < this.expr.length; ) {
-      let d = this.expr.charAt(this.index++);
-      if (d === o) {
+      let l = this.expr.charAt(this.index++);
+      if (l === o) {
         i = !0;
         break;
-      } else if (d === "\\")
-        switch (d = this.expr.charAt(this.index++), d) {
+      } else if (l === "\\")
+        switch (l = this.expr.charAt(this.index++), l) {
           case "n":
             e += `
 `;
@@ -1025,13 +1136,13 @@ class u {
             e += "\v";
             break;
           default:
-            e += d;
+            e += l;
         }
       else
-        e += d;
+        e += l;
     }
     return i || this.throwError('Unclosed quote after "' + e + '"'), {
-      type: u.LITERAL,
+      type: f.LITERAL,
       value: e,
       raw: this.expr.substring(n, this.index)
     };
@@ -1045,10 +1156,10 @@ class u {
    */
   gobbleIdentifier() {
     let e = this.code, n = this.index;
-    for (u.isIdentifierStart(e) ? this.index++ : this.throwError("Unexpected " + this.char); this.index < this.expr.length && (e = this.code, u.isIdentifierPart(e)); )
+    for (f.isIdentifierStart(e) ? this.index++ : this.throwError("Unexpected " + this.char); this.index < this.expr.length && (e = this.code, f.isIdentifierPart(e)); )
       this.index++;
     return {
-      type: u.IDENTIFIER,
+      type: f.IDENTIFIER,
       name: this.expr.slice(n, this.index)
     };
   }
@@ -1066,23 +1177,23 @@ class u {
     let o = !1, i = 0;
     for (; this.index < this.expr.length; ) {
       this.gobbleSpaces();
-      let d = this.code;
-      if (d === e) {
-        o = !0, this.index++, e === u.CPAREN_CODE && i && i >= n.length && this.throwError("Unexpected token " + String.fromCharCode(e));
+      let l = this.code;
+      if (l === e) {
+        o = !0, this.index++, e === f.CPAREN_CODE && i && i >= n.length && this.throwError("Unexpected token " + String.fromCharCode(e));
         break;
-      } else if (d === u.COMMA_CODE) {
+      } else if (l === f.COMMA_CODE) {
         if (this.index++, i++, i !== n.length) {
-          if (e === u.CPAREN_CODE)
+          if (e === f.CPAREN_CODE)
             this.throwError("Unexpected token ,");
-          else if (e === u.CBRACK_CODE)
-            for (let r = n.length; r < i; r++)
+          else if (e === f.CBRACK_CODE)
+            for (let s = n.length; s < i; s++)
               n.push(null);
         }
       } else if (n.length !== i && i !== 0)
         this.throwError("Expected comma");
       else {
-        const r = this.gobbleExpression();
-        (!r || r.type === u.COMPOUND) && this.throwError("Expected comma"), n.push(r);
+        const s = this.gobbleExpression();
+        (!s || s.type === f.COMPOUND) && this.throwError("Expected comma"), n.push(s);
       }
     }
     return o || this.throwError("Expected " + String.fromCharCode(e)), n;
@@ -1098,10 +1209,10 @@ class u {
    */
   gobbleGroup() {
     this.index++;
-    let e = this.gobbleExpressions(u.CPAREN_CODE);
-    if (this.code === u.CPAREN_CODE)
+    let e = this.gobbleExpressions(f.CPAREN_CODE);
+    if (this.code === f.CPAREN_CODE)
       return this.index++, e.length === 1 ? e[0] : e.length ? {
-        type: u.SEQUENCE_EXP,
+        type: f.SEQUENCE_EXP,
         expressions: e
       } : !1;
     this.throwError("Unclosed (");
@@ -1114,15 +1225,15 @@ class u {
    */
   gobbleArray() {
     return this.index++, {
-      type: u.ARRAY_EXP,
-      elements: this.gobbleArguments(u.CBRACK_CODE)
+      type: f.ARRAY_EXP,
+      elements: this.gobbleArguments(f.CBRACK_CODE)
     };
   }
 }
-const at = new ot();
-Object.assign(u, {
-  hooks: at,
-  plugins: new st(u),
+const lt = new at();
+Object.assign(f, {
+  hooks: lt,
+  plugins: new ct(f),
   // Node Types
   // ----------
   // This is the full set of types that any JSEP node can be.
@@ -1216,43 +1327,14 @@ Object.assign(u, {
   // Except for `this`, which is special. This could be changed to something like `'self'` as well
   this_str: "this"
 });
-u.max_unop_len = u.getMaxKeyLen(u.unary_ops);
-u.max_binop_len = u.getMaxKeyLen(u.binary_ops);
-const te = (t) => new u(t).parse(), ct = Object.getOwnPropertyNames(class {
+f.max_unop_len = f.getMaxKeyLen(f.unary_ops);
+f.max_binop_len = f.getMaxKeyLen(f.binary_ops);
+const ne = (t) => new f(t).parse(), dt = Object.getOwnPropertyNames(class {
 });
-Object.getOwnPropertyNames(u).filter((t) => !ct.includes(t) && te[t] === void 0).forEach((t) => {
-  te[t] = u[t];
+Object.getOwnPropertyNames(f).filter((t) => !dt.includes(t) && ne[t] === void 0).forEach((t) => {
+  ne[t] = f[t];
 });
-te.Jsep = u;
-const lt = "ConditionalExpression";
-var dt = {
-  name: "ternary",
-  init(t) {
-    t.hooks.add("after-expression", function(n) {
-      if (n.node && this.code === t.QUMARK_CODE) {
-        this.index++;
-        const o = n.node, i = this.gobbleExpression();
-        if (i || this.throwError("Expected expression"), this.gobbleSpaces(), this.code === t.COLON_CODE) {
-          this.index++;
-          const d = this.gobbleExpression();
-          if (d || this.throwError("Expected expression"), n.node = {
-            type: lt,
-            test: o,
-            consequent: i,
-            alternate: d
-          }, o.operator && t.binary_ops[o.operator] <= 0.9) {
-            let r = o;
-            for (; r.right.operator && t.binary_ops[r.right.operator] <= 0.9; )
-              r = r.right;
-            n.node.test = r.right, r.right = n.node, n.node = o;
-          }
-        } else
-          this.throwError("Expected :");
-      }
-    });
-  }
-};
-te.plugins.register(dt);
+ne.Jsep = f;
 const ut = "ConditionalExpression";
 var ft = {
   name: "ternary",
@@ -1263,17 +1345,17 @@ var ft = {
         const o = n.node, i = this.gobbleExpression();
         if (i || this.throwError("Expected expression"), this.gobbleSpaces(), this.code === t.COLON_CODE) {
           this.index++;
-          const d = this.gobbleExpression();
-          if (d || this.throwError("Expected expression"), n.node = {
+          const l = this.gobbleExpression();
+          if (l || this.throwError("Expected expression"), n.node = {
             type: ut,
             test: o,
             consequent: i,
-            alternate: d
+            alternate: l
           }, o.operator && t.binary_ops[o.operator] <= 0.9) {
-            let r = o;
-            for (; r.right.operator && t.binary_ops[r.right.operator] <= 0.9; )
-              r = r.right;
-            n.node.test = r.right, r.right = n.node, n.node = o;
+            let s = o;
+            for (; s.right.operator && t.binary_ops[s.right.operator] <= 0.9; )
+              s = s.right;
+            n.node.test = s.right, s.right = n.node, n.node = o;
           }
         } else
           this.throwError("Expected :");
@@ -1281,213 +1363,242 @@ var ft = {
     });
   }
 };
-te.plugins.register(ft);
-const ht = { t: 1e12, g: 1e9, k: 1e3, m: 1e-3, u: 1e-6, µ: 1e-6, μ: 1e-6, n: 1e-9, p: 1e-12, f: 1e-15 }, Oe = { abs: Math.abs, sqrt: Math.sqrt, exp: Math.exp, ln: Math.log, log: Math.log, log10: Math.log10, sin: Math.sin, cos: Math.cos, tan: Math.tan, asin: Math.asin, acos: Math.acos, atan: Math.atan, atan2: Math.atan2, sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, min: Math.min, max: Math.max, ceil: Math.ceil, floor: Math.floor, round: Math.round, int: Math.trunc, sgn: Math.sign, pow: Math.pow, pwr: (t, e) => Math.abs(t) ** e, mod: (t, e) => t % e, limit: (t, e, n) => Math.min(Math.max(t, e), n) }, $ = (t) => Number(t) > 0.5;
+ne.plugins.register(ft);
+const ht = "ConditionalExpression";
+var pt = {
+  name: "ternary",
+  init(t) {
+    t.hooks.add("after-expression", function(n) {
+      if (n.node && this.code === t.QUMARK_CODE) {
+        this.index++;
+        const o = n.node, i = this.gobbleExpression();
+        if (i || this.throwError("Expected expression"), this.gobbleSpaces(), this.code === t.COLON_CODE) {
+          this.index++;
+          const l = this.gobbleExpression();
+          if (l || this.throwError("Expected expression"), n.node = {
+            type: ht,
+            test: o,
+            consequent: i,
+            alternate: l
+          }, o.operator && t.binary_ops[o.operator] <= 0.9) {
+            let s = o;
+            for (; s.right.operator && t.binary_ops[s.right.operator] <= 0.9; )
+              s = s.right;
+            n.node.test = s.right, s.right = n.node, n.node = o;
+          }
+        } else
+          this.throwError("Expected :");
+      }
+    });
+  }
+};
+ne.plugins.register(pt);
+const mt = { t: 1e12, g: 1e9, k: 1e3, m: 1e-3, u: 1e-6, µ: 1e-6, μ: 1e-6, n: 1e-9, p: 1e-12, f: 1e-15 }, Oe = { abs: Math.abs, sqrt: Math.sqrt, exp: Math.exp, ln: Math.log, log: Math.log, log10: Math.log10, sin: Math.sin, cos: Math.cos, tan: Math.tan, asin: Math.asin, acos: Math.acos, atan: Math.atan, atan2: Math.atan2, sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, min: Math.min, max: Math.max, ceil: Math.ceil, floor: Math.floor, round: Math.round, int: Math.trunc, sgn: Math.sign, pow: Math.pow, pwr: (t, e) => Math.abs(t) ** e, mod: (t, e) => t % e, limit: (t, e, n) => Math.min(Math.max(t, e), n) }, _ = (t) => Number(t) > 0.5;
 function se(t, e = {}) {
   const n = /* @__PURE__ */ new Set();
   let o = 0;
-  function i(s) {
-    return s = String(s).trim(), /^\{[\s\S]*\}$/.test(s) && (s = s.slice(1, -1)), s = s.replace(new RegExp(`"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|(?<![\\w.])(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:e[+-]?\\d+)?[a-zµμΩ]*\\d*[a-zµμΩ]*(?![\\w.])`, "gi"), (a) => {
-      if (a[0] === '"' || a[0] === "'") return a;
-      const [, l, b, g] = /^((?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)([a-zµμΩ]*)(\d*)[a-zµμΩ]*$/i.exec(a), p = b.toLowerCase(), E = p.startsWith("meg") ? 1e6 : p.startsWith("mil") ? 254e-7 : ht[p[0]] || 1;
-      return "(" + (g ? +(l + (l.includes(".") ? "" : ".") + g) : Number(l)) * E + ")";
-    }), d(te(s));
+  function i(r) {
+    return r = String(r).trim(), /^\{[\s\S]*\}$/.test(r) && (r = r.slice(1, -1)), r = r.replace(new RegExp(`"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|(?<![\\w.])(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:e[+-]?\\d+)?[a-zµμΩ]*\\d*[a-zµμΩ]*(?![\\w.])`, "gi"), (c) => {
+      if (c[0] === '"' || c[0] === "'") return c;
+      const [, a, h, m] = /^((?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)([a-zµμΩ]*)(\d*)[a-zµμΩ]*$/i.exec(c), u = h.toLowerCase(), E = u.startsWith("meg") ? 1e6 : u.startsWith("mil") ? 254e-7 : mt[u[0]] || 1;
+      return "(" + (m ? +(a + (a.includes(".") ? "" : ".") + m) : Number(a)) * E + ")";
+    }), l(ne(r));
   }
-  function d(s) {
+  function l(r) {
     if (++o > 1e4) throw Error("Structural expression is too complex.");
-    if (s.type === "Literal") return s.value;
-    if (s.type === "Identifier") {
-      const a = s.name.toLowerCase();
-      if (a === "pi") return Math.PI;
-      if (a === "e") return Math.E;
-      if (!Object.hasOwn(e, a)) throw Error("Undefined structural parameter: " + s.name);
-      if (n.has(a)) throw Error("Circular structural parameter: " + a);
-      n.add(a);
-      const l = i(e[a]);
-      return n.delete(a), l;
+    if (r.type === "Literal") return r.value;
+    if (r.type === "Identifier") {
+      const c = r.name.toLowerCase();
+      if (c === "pi") return Math.PI;
+      if (c === "e") return Math.E;
+      if (!Object.hasOwn(e, c)) throw Error("Undefined structural parameter: " + r.name);
+      if (n.has(c)) throw Error("Circular structural parameter: " + c);
+      n.add(c);
+      const a = i(e[c]);
+      return n.delete(c), a;
     }
-    if (s.type === "ConditionalExpression") return $(d(s.test)) ? d(s.consequent) : d(s.alternate);
-    if (s.type === "UnaryExpression") {
-      const a = d(s.argument);
-      if (s.operator === "-") return -a;
-      if (s.operator === "+") return +a;
-      if (s.operator === "!" || s.operator === "~") return !$(a);
+    if (r.type === "ConditionalExpression") return _(l(r.test)) ? l(r.consequent) : l(r.alternate);
+    if (r.type === "UnaryExpression") {
+      const c = l(r.argument);
+      if (r.operator === "-") return -c;
+      if (r.operator === "+") return +c;
+      if (r.operator === "!" || r.operator === "~") return !_(c);
     }
-    if (s.type === "BinaryExpression") {
-      const a = d(s.left);
-      if (s.operator === "&&") return $(a) && $(d(s.right));
-      if (s.operator === "||") return $(a) || $(d(s.right));
-      const l = d(s.right);
-      switch (s.operator) {
+    if (r.type === "BinaryExpression") {
+      const c = l(r.left);
+      if (r.operator === "&&") return _(c) && _(l(r.right));
+      if (r.operator === "||") return _(c) || _(l(r.right));
+      const a = l(r.right);
+      switch (r.operator) {
         case "+":
-          return a + l;
+          return c + a;
         case "-":
-          return a - l;
+          return c - a;
         case "*":
-          return a * l;
+          return c * a;
         case "/":
-          return a / l;
+          return c / a;
         case "**":
-          return a ** l;
+          return c ** a;
         case "%":
-          return a % l;
+          return c % a;
         case "^":
-          return $(a) !== $(l);
+          return _(c) !== _(a);
         case "&":
-          return $(a) && $(l);
+          return _(c) && _(a);
         case "|":
-          return $(a) || $(l);
+          return _(c) || _(a);
         case ">":
-          return a > l;
+          return c > a;
         case "<":
-          return a < l;
+          return c < a;
         case ">=":
-          return a >= l;
+          return c >= a;
         case "<=":
-          return a <= l;
+          return c <= a;
         case "==":
         case "===":
-          return a === l;
+          return c === a;
         case "!=":
         case "!==":
-          return a !== l;
+          return c !== a;
       }
     }
-    if (s.type === "CallExpression" && s.callee.type === "Identifier") {
-      const a = s.callee.name.toLowerCase();
-      if (a === "if") {
-        if (s.arguments.length !== 3) throw Error("if() needs three arguments.");
-        return $(d(s.arguments[0])) ? d(s.arguments[1]) : d(s.arguments[2]);
+    if (r.type === "CallExpression" && r.callee.type === "Identifier") {
+      const c = r.callee.name.toLowerCase();
+      if (c === "if") {
+        if (r.arguments.length !== 3) throw Error("if() needs three arguments.");
+        return _(l(r.arguments[0])) ? l(r.arguments[1]) : l(r.arguments[2]);
       }
-      if (Object.hasOwn(Oe, a)) return Oe[a](...s.arguments.map(d));
+      if (Object.hasOwn(Oe, c)) return Oe[c](...r.arguments.map(l));
     }
     throw Error("Unsupported structural expression. No JavaScript execution is allowed.");
   }
-  const r = i(t);
-  if (typeof r == "number" && !Number.isFinite(r)) throw Error("Structural expression is not finite.");
-  return r;
+  const s = i(t);
+  if (typeof s == "number" && !Number.isFinite(s)) throw Error("Structural expression is not finite.");
+  return s;
 }
-function pt(t) {
-  nt(t);
-  const e = j(), n = /* @__PURE__ */ new Map();
+function gt(t) {
+  ot(t);
+  const e = U(), n = /* @__PURE__ */ new Map();
   let o = 0, i = 0;
-  function d(r, s, a, l, b, g, p) {
-    if (s.length > 64) throw Error("Instance nesting exceeds 64 levels.");
+  function l(s, r, c, a, h, m, u) {
+    if (r.length > 64) throw Error("Instance nesting exceeds 64 levels.");
     if (++o > 2e3) throw Error("Elaboration exceeds 2000 instances.");
-    const E = t.scopes[r], k = s.length ? J(s.slice(0, -1), s.at(-1)) : "", I = j();
-    if (p.some((h) => h.scopeId === r)) throw Error("Circular subcircuit reference at " + k);
-    const w = it(l, E.defaults, E.parameters, b);
-    function c(h) {
-      if (/^\{[\s\S]*\}$/.test(h)) {
-        const v = se(h, w);
-        h = String(typeof v == "boolean" ? Number(v) : v);
+    const E = t.scopes[s], k = r.length ? ee(r.slice(0, -1), r.at(-1)) : "", L = U();
+    if (u.some((C) => C.scopeId === s)) throw Error("Circular subcircuit reference at " + k);
+    const b = st(a, E.defaults, E.parameters, h);
+    function p(C) {
+      if (/^\{[\s\S]*\}$/.test(C)) {
+        const x = se(C, b);
+        C = String(typeof x == "boolean" ? Number(x) : x);
       }
-      /^"[\s\S]*"$/.test(h) && (h = h.slice(1, -1));
-      const x = h.toLowerCase();
-      return Object.hasOwn(a, x) ? a[x] : t.globals.includes(x) ? me([], x) : I[x] || (I[x] = me(s, x));
+      /^"[\s\S]*"$/.test(C) && (C = C.slice(1, -1));
+      const y = C.toLowerCase();
+      return Object.hasOwn(c, y) ? c[y] : t.globals.includes(y) ? me([], y) : L[y] || (L[y] = me(r, y));
     }
-    const m = { id: k, path: s, scopeId: r, name: g?.name || "Top", definition: E.name, ports: E.ports.map((h) => ({ name: h, node: c(h) })), params: w, nodes: I, models: j(), devices: [], children: [], raw: g?.raw || "", line: g?.line || 0 };
-    e[k] = m, n.set(k, c);
-    const f = [...p, m];
-    function C(h) {
-      if (!h) return "";
-      let x = E;
-      for (; x; ) {
-        if (x.directives.some((v) => new RegExp("^\\.model\\s+" + h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:\\.\\d+)?(?:\\s|$)", "i").test(v.text))) {
-          const v = [...f].reverse().find((M) => M.scopeId === x.id);
-          return J(v?.path || [], h.toLowerCase());
+    const d = { id: k, path: r, scopeId: s, name: m?.name || "Top", definition: E.name, ports: E.ports.map((C) => ({ name: C, node: p(C) })), params: b, nodes: L, models: U(), devices: [], children: [], raw: m?.raw || "", line: m?.line || 0 };
+    e[k] = d, n.set(k, p);
+    const w = [...u, d];
+    function g(C) {
+      if (!C) return "";
+      let y = E;
+      for (; y; ) {
+        if (y.directives.some((x) => new RegExp("^\\.model\\s+" + C.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:\\.\\d+)?(?:\\s|$)", "i").test(x.text))) {
+          const x = [...w].reverse().find((N) => N.scopeId === y.id);
+          return ee(x?.path || [], C.toLowerCase());
         }
-        x = t.scopes[x.parent];
+        y = t.scopes[y.parent];
       }
-      return h;
+      return C;
     }
-    for (const h of E.directives.filter((x) => /^\.model\b/i.test(x.text))) {
-      const x = /^\.model\s+(\S+)/i.exec(h.text)?.[1];
-      if (!x) continue;
-      const v = C(x), M = E.models[x.toLowerCase()], B = ve(h.text, w, c, (T) => J(s, T));
-      m.models[v] = { ...M, name: v, raw: B.replace(/^(\.model\s+)\S+/i, (T, N) => N + v), instanceId: k, parameters: w };
+    for (const C of E.directives.filter((y) => /^\.model\b/i.test(y.text))) {
+      const y = /^\.model\s+(\S+)/i.exec(C.text)?.[1];
+      if (!y) continue;
+      const x = g(y), N = E.models[y.toLowerCase()], M = ve(C.text, b, p, (T) => ee(r, T));
+      d.models[x] = { ...N, name: x, raw: M.replace(/^(\.model\s+)\S+/i, (T, P) => P + x), instanceId: k, parameters: b };
     }
-    for (const h of E.devices) {
+    for (const C of E.devices) {
       if (++i > 3e3) throw Error("Elaboration exceeds 3000 primitive devices.");
-      const x = j();
-      for (const [M, B] of Object.entries(h.terminals)) x[M] = c(B);
-      const v = C(h.model);
-      m.devices.push({ ...h, name: J(s, h.name), localName: h.name, instanceId: k, terminals: x, model: v, parameters: w });
+      const y = U();
+      for (const [N, M] of Object.entries(C.terminals)) y[N] = p(M);
+      const x = g(C.model);
+      d.devices.push({ ...C, name: ee(r, C.name), localName: C.name, instanceId: k, terminals: y, model: x, parameters: b });
     }
-    for (const h of E.instances) {
-      let x = h.definitionId;
-      if (!x) {
-        const T = String(se(h.definitionName, w)).toLowerCase();
-        let N = E;
-        for (; N && !x; )
-          x = N.definitions[T], N = t.scopes[N.parent];
-        if (!x) throw Error("Undefined selected subcircuit: " + T);
+    for (const C of E.instances) {
+      let y = C.definitionId;
+      if (!y) {
+        const T = String(se(C.definitionName, b)).toLowerCase();
+        let P = E;
+        for (; P && !y; )
+          y = P.definitions[T], P = t.scopes[P.parent];
+        if (!y) throw Error("Undefined selected subcircuit: " + T);
       }
-      const v = t.scopes[x], M = j();
-      if (v.ports.length !== h.nodes.length) throw Error(h.name + ": expected " + v.ports.length + " ports; got " + h.nodes.length);
-      v.ports.forEach((T, N) => {
-        M[T.toLowerCase()] = c(h.nodes[N]);
+      const x = t.scopes[y], N = U();
+      if (x.ports.length !== C.nodes.length) throw Error(C.name + ": expected " + x.ports.length + " ports; got " + C.nodes.length);
+      x.ports.forEach((T, P) => {
+        N[T.toLowerCase()] = p(C.nodes[P]);
       });
-      const B = d(x, [...s, h.name], M, w, h.parameters, h, f);
-      h.pinNames?.length === B.ports.length && B.ports.forEach((T, N) => {
-        T.label = h.pinNames[N];
-      }), m.children.push(B);
+      const M = l(y, [...r, C.name], N, b, C.parameters, C, w);
+      C.pinNames?.length === M.ports.length && M.ports.forEach((T, P) => {
+        T.label = C.pinNames[P];
+      }), d.children.push(M);
     }
-    return m;
+    return d;
   }
   try {
-    let b = function(g, p) {
-      const E = p.split(":");
-      if (E.length === 1) return { owner: g, name: p };
+    let h = function(m, u) {
+      const E = u.split(":");
+      if (E.length === 1) return { owner: m, name: u };
       const k = E.pop();
-      for (const I of [[...g.path, ...E], E]) {
-        const w = s.get(I.map(encodeURIComponent).join("/").toLowerCase());
-        if (w) return { owner: w, name: k };
+      for (const L of [[...m.path, ...E], E]) {
+        const b = r.get(L.map(encodeURIComponent).join("/").toLowerCase());
+        if (b) return { owner: b, name: k };
       }
-      throw Error("Unknown hierarchical reference: " + p);
+      throw Error("Unknown hierarchical reference: " + u);
     };
-    const r = d(t.rootId, [], j(), j(), j(), null, []), s = new Map(Object.values(e).map((g) => [g.id.toLowerCase(), g])), a = Object.assign(j(), ...Object.values(e).map((g) => g.models)), l = (g) => a[g] || Object.entries(a).find(([p]) => p.startsWith(g + "."))?.[1];
-    for (const g of Object.values(e)) for (const p of g.devices) {
-      const E = t.scopes[g.scopeId].devices.find((w) => w.name === p.localName), k = (w) => {
-        const c = b(g, w);
-        return n.get(c.owner.id)(c.name);
-      }, I = (w, c = "", m = "") => {
-        const f = b(g, w), C = f.owner.devices.find((h) => h.localName.toLowerCase() === f.name.toLowerCase());
-        if (c.toLowerCase() === "ix") {
-          const h = f.owner.ports.find((x, v) => x.name.toLowerCase() === f.name.toLowerCase() || String(v + 1) === f.name);
-          if (h) return f.owner.id + ":" + h.name;
+    const s = l(t.rootId, [], U(), U(), U(), null, []), r = new Map(Object.values(e).map((m) => [m.id.toLowerCase(), m])), c = Object.assign(U(), ...Object.values(e).map((m) => m.models)), a = (m) => c[m] || Object.entries(c).find(([u]) => u.startsWith(m + "."))?.[1];
+    for (const m of Object.values(e)) for (const u of m.devices) {
+      const E = t.scopes[m.scopeId].devices.find((b) => b.name === u.localName), k = (b) => {
+        const p = h(m, b);
+        return n.get(p.owner.id)(p.name);
+      }, L = (b, p = "", d = "") => {
+        const w = h(m, b), g = w.owner.devices.find((C) => C.localName.toLowerCase() === w.name.toLowerCase());
+        if (p.toLowerCase() === "ix") {
+          const C = w.owner.ports.find((y, x) => y.name.toLowerCase() === w.name.toLowerCase() || String(x + 1) === w.name);
+          if (C) return w.owner.id + ":" + C.name;
         }
-        if (!C) {
-          if (m) throw Error(p.name + ": referenced " + m + " device " + w + " was not found.");
-          return J(f.owner.path, f.name);
+        if (!g) {
+          if (d) throw Error(u.name + ": referenced " + d + " device " + b + " was not found.");
+          return ee(w.owner.path, w.name);
         }
-        if (m && C.kind !== m) throw Error(p.name + ": " + w + " must be a " + m + " device.");
-        return C.name;
+        if (d && g.kind !== d) throw Error(u.name + ": " + b + " must be a " + d + " device.");
+        return g.name;
       };
-      if (p.value = ve(E.value, g.params, k, I), E.model && (p.value = p.value.replace(E.model, p.model)), p.kind === "M" && Object.keys(p.terminals).length === 3) {
-        let w = l(p.model), c = !1;
-        const m = /* @__PURE__ */ new Set();
-        for (; w?.type === "VDMOS" && !m.has(w.name); ) {
-          m.add(w.name);
-          const f = /\bpchan(?:\s*=\s*(\{[^}]*\}|[^\s)]+))?/i.exec(w.raw);
-          if (f) {
-            c = f[1] === void 0 || Number(se(f[1], w.parameters)) >= 0.5;
+      if (u.value = ve(E.value, m.params, k, L), E.model && (u.value = u.value.replace(E.model, u.model)), u.kind === "M" && Object.keys(u.terminals).length === 3) {
+        let b = a(u.model), p = !1;
+        const d = /* @__PURE__ */ new Set();
+        for (; b?.type === "VDMOS" && !d.has(b.name); ) {
+          d.add(b.name);
+          const w = /\bpchan(?:\s*=\s*(\{[^}]*\}|[^\s)]+))?/i.exec(b.raw);
+          if (w) {
+            p = w[1] === void 0 || Number(se(w[1], b.parameters)) >= 0.5;
             break;
           }
-          const C = w.name.includes("/") ? w.name.slice(0, w.name.lastIndexOf("/") + 1) : "";
-          w = l(C + (w.baseModel || "").toLowerCase()) || l((w.baseModel || "").toLowerCase());
+          const g = b.name.includes("/") ? b.name.slice(0, b.name.lastIndexOf("/") + 1) : "";
+          b = a(g + (b.baseModel || "").toLowerCase()) || a((b.baseModel || "").toLowerCase());
         }
-        m.size && (p.type = "spice_" + (c ? "pmos3" : "nmos3"));
+        d.size && (u.type = "spice_" + (p ? "pmos3" : "nmos3"));
       }
-      p.controlSources = (E.controlSources || []).map((w) => I(w, "", "V")), p.controlSource = p.controlSources[0] || "", p.coupledInductors = (E.coupledInductors || []).map((w) => I(w, "", "L"));
-      for (const w of /* @__PURE__ */ new Set([...E.controlSources || [], ...E.coupledInductors || []])) {
-        const c = w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        p.value = p.value.replace(new RegExp("(?<![\\w./%])" + c + "(?![\\w.$])", "g"), () => I(w));
+      u.controlSources = (E.controlSources || []).map((b) => L(b, "", "V")), u.controlSource = u.controlSources[0] || "", u.coupledInductors = (E.coupledInductors || []).map((b) => L(b, "", "L"));
+      for (const b of /* @__PURE__ */ new Set([...E.controlSources || [], ...E.coupledInductors || []])) {
+        const p = b.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        u.value = u.value.replace(new RegExp("(?<![\\w./%])" + p + "(?![\\w.$])", "g"), () => L(b));
       }
     }
-    return { kind: "ElaboratedHierarchy", ir: t, root: r, contexts: e };
-  } catch (r) {
-    throw r.diagnostics = [...t.diagnostics, { severity: "error", line: 0, message: r.message }], r;
+    return { kind: "ElaboratedHierarchy", ir: t, root: s, contexts: e };
+  } catch (s) {
+    throw s.diagnostics = [...t.diagnostics, { severity: "error", line: 0, message: s.message }], s;
   }
 }
 function ae(t) {
@@ -1496,7 +1607,7 @@ function ae(t) {
 function Se(t) {
   return JSON.stringify(t.map((e) => [e.name, e.kind, Object.entries(e.terminals).sort(), e.value, e.model, e.controlSource, e.controlSources || [], e.coupledInductors || []]).sort((e, n) => e[0].localeCompare(n[0])));
 }
-const ke = 3;
+const ke = 4;
 function ge(t) {
   const e = String(t).split("/").at(-1);
   let n;
@@ -1507,125 +1618,127 @@ function ge(t) {
   }
   return n === "0" ? "ret" : /^(IN|OUT|IO|PWR|RET|BIAS|FB|N)_/i.exec(n)?.[1].toLowerCase() || "unknown";
 }
-const ce = (t) => ["pwr", "ret", "bias"].includes(t), mt = (t) => String(t).split("/").at(-1).toLowerCase(), De = (t) => ({ vdd: "pwr", vcc: "pwr", vee: "ret", vss: "ret" })[mt(t)] || "unknown", gt = (t) => {
+const ce = (t) => ["pwr", "ret", "bias"].includes(t), bt = (t) => String(t).split("/").at(-1).toLowerCase(), De = (t) => ({ vdd: "pwr", vcc: "pwr", vee: "ret", vss: "ret" })[bt(t)] || "unknown", wt = (t) => {
   const e = ge(t);
   return e !== "unknown" ? e : { in: "in", input: "in", out: "out", output: "out" }[String(t).toLowerCase()] || De(t);
 };
-function bt(t) {
-  const e = /* @__PURE__ */ new Map(), n = [], o = (r, s, a) => {
-    e.has(r) || e.set(r, []), e.get(r).push({ node: s, delta: a });
+function yt(t) {
+  const e = /* @__PURE__ */ new Map(), n = [], o = (s, r, c) => {
+    e.has(s) || e.set(s, []), e.get(s).push({ node: r, delta: c });
   };
-  for (const r of t)
-    if (r.kind === "V")
+  for (const s of t)
+    if (s.kind === "V")
       try {
-        let s = r.value.trim();
-        const a = /\bRser\s*=\s*(\{[^}]*\}|\([^)]*\)|[^\s]+)/i.exec(s);
-        if (a && Number(se(a[1], r.parameters)) !== 0 || (s = s.replace(/\bRser\s*=\s*(\{[^}]*\}|\([^)]*\)|[^\s]+)/i, "").trim(), /\b(?:PULSE|PWL|SINE|SIN|EXP|SFFM|AM|TRNOISE|Rpar|Cpar)\b/i.test(s))) continue;
-        const l = /^(?:DC\s+)?(\{[^}]*\}|\S+)(?:\s+AC\s+[^\s]+(?:\s+[^\s]+)?)?$/i.exec(s);
-        if (!l) continue;
-        const b = se(l[1], r.parameters);
-        if (typeof b != "number" || !Number.isFinite(b)) continue;
-        o(r.terminals["-"], r.terminals["+"], b), o(r.terminals["+"], r.terminals["-"], -b);
+        let r = s.value.trim();
+        const c = /\bRser\s*=\s*(\{[^}]*\}|\([^)]*\)|[^\s]+)/i.exec(r);
+        if (c && Number(se(c[1], s.parameters)) !== 0 || (r = r.replace(/\bRser\s*=\s*(\{[^}]*\}|\([^)]*\)|[^\s]+)/i, "").trim(), /\b(?:PULSE|PWL|SINE|SIN|EXP|SFFM|AM|TRNOISE|Rpar|Cpar)\b/i.test(r))) continue;
+        const a = /^(?:DC\s+)?(\{[^}]*\}|\S+)(?:\s+AC\s+[^\s]+(?:\s+[^\s]+)?)?$/i.exec(r);
+        if (!a) continue;
+        const h = se(a[1], s.parameters);
+        if (typeof h != "number" || !Number.isFinite(h)) continue;
+        o(s.terminals["-"], s.terminals["+"], h), o(s.terminals["+"], s.terminals["-"], -h);
       } catch {
       }
-  const i = /* @__PURE__ */ Object.create(null), d = /* @__PURE__ */ new Set();
-  for (const r of ["0", ...e.keys()]) {
-    if (d.has(r)) continue;
-    const s = /* @__PURE__ */ new Map([[r, 0]]), a = [r];
-    d.add(r);
-    let l = !1;
-    for (let b = 0; b < a.length; b++) for (const g of e.get(a[b]) || []) {
-      const p = s.get(a[b]) + g.delta;
-      s.has(g.node) ? Math.abs(s.get(g.node) - p) > 1e-8 * Math.max(1, Math.abs(p)) && (l = !0) : (s.set(g.node, p), d.add(g.node), a.push(g.node));
+  const i = /* @__PURE__ */ Object.create(null), l = /* @__PURE__ */ new Set();
+  for (const s of ["0", ...e.keys()]) {
+    if (l.has(s)) continue;
+    const r = /* @__PURE__ */ new Map([[s, 0]]), c = [s];
+    l.add(s);
+    let a = !1;
+    for (let h = 0; h < c.length; h++) for (const m of e.get(c[h]) || []) {
+      const u = r.get(c[h]) + m.delta;
+      r.has(m.node) ? Math.abs(r.get(m.node) - u) > 1e-8 * Math.max(1, Math.abs(u)) && (a = !0) : (r.set(m.node, u), l.add(m.node), c.push(m.node));
     }
-    l && n.push({ severity: "warning", message: "Layout: inconsistent ideal DC voltage constraints; conflicting potentials are not used." });
-    for (const [b, g] of s) i[b] = { value: g, reference: r, known: r === "0" && !l, consistent: !l };
+    a && n.push({ severity: "warning", message: "Layout: inconsistent ideal DC voltage constraints; conflicting potentials are not used." });
+    for (const [h, m] of r) i[h] = { value: m, reference: s, known: s === "0" && !a, consistent: !a };
   }
   return { nodes: i, diagnostics: n };
 }
-function wt(t, e) {
-  const n = bt(ae(t.root)), o = /* @__PURE__ */ Object.create(null), i = /* @__PURE__ */ Object.create(null);
-  for (const r of Object.values(e.nodes)) {
-    const s = ge(r.name), a = De(r.name);
-    o[r.name] = { role: s !== "unknown" ? s : a, roleSource: s !== "unknown" ? "node-name" : a !== "unknown" ? "legacy-rail-name" : "unknown", potential: n.nodes[r.name]?.known ? n.nodes[r.name].value : null };
+function Et(t, e) {
+  const n = yt(ae(t.root)), o = /* @__PURE__ */ Object.create(null), i = /* @__PURE__ */ Object.create(null);
+  for (const s of Object.values(e.nodes)) {
+    const r = ge(s.name), c = De(s.name);
+    o[s.name] = { role: r !== "unknown" ? r : c, roleSource: r !== "unknown" ? "node-name" : c !== "unknown" ? "legacy-rail-name" : "unknown", potential: n.nodes[s.name]?.known ? n.nodes[s.name].value : null };
   }
-  const d = (r, s, a) => {
-    const l = { role: o[a].role, roleSource: o[a].roleSource }, b = r.block?.ports.find((E) => E.pin === s);
-    if (b?.implicit || !r.block && !r.synthetic) return l;
-    const g = r.synthetic ? r.value : b?.name || b?.label, p = gt(g);
-    return p !== "unknown" ? { role: p, roleSource: ge(g) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : ce(l.role) ? { ...l, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
+  const l = (s, r, c) => {
+    const a = { role: o[c].role, roleSource: o[c].roleSource }, h = s.block?.ports.find((E) => E.pin === r);
+    if (h?.implicit || !s.block && !s.synthetic) return a;
+    const m = s.synthetic ? s.value : h?.name || h?.label, u = wt(m);
+    return u !== "unknown" ? { role: u, roleSource: ge(m) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : ce(a.role) ? { ...a, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
   };
-  for (const r of e.components) {
-    const s = Object.fromEntries(Object.entries(r.terminals).map(([f, C]) => [f, { ...o[C], ...d(r, f, C) }])), a = Object.values(s), l = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(r.type), b = l && a.length === 2 && a.every((f) => !ce(f.role) && (f.potential === null || f.role !== "unknown")), g = r.terminals["+"], p = r.terminals["-"], E = [g, p].filter((f) => f && f !== "0"), k = r.kind === "V" && E.some((f) => ce(o[f]?.role)) && !E.some((f) => ["in", "out", "io", "fb"].includes(o[f]?.role)) && [g, p].every((f) => n.nodes[f]?.known), I = g === "0" ? p : g, w = Object.keys(r.terminals), c = (f) => ce(f.role) ? f.potential !== null ? f.potential > 0 ? "high" : "low" : f.role === "ret" ? "low" : "high" : "signal";
-    let m = !1;
-    w.length === 2 && (r.terminals[w[0]] === "0" ? m = !0 : r.terminals[w[1]] === "0" ? m = !1 : a.every((f) => f.potential !== null) ? m = a[0].potential < a[1].potential : m = c(a[0]) === "low" || c(a[1]) === "high" && c(a[0]) === "signal"), i[r.name] = { version: ke, kind: r.kind, passive: l, source: ["V", "I", "E", "F", "G", "H"].includes(r.kind) || r.kind === "B" && !l, ports: s, horizontal: b, orientation: b ? "horizontal" : m ? "vertical-reversed" : "vertical", flexible: w.length === 2 && (l || ["V", "I", "B", "F", "H"].includes(r.kind)), supply: !!k, voltage: k ? n.nodes[I].value : null };
+  for (const s of e.components) {
+    const r = Object.fromEntries(Object.entries(s.terminals).map(([g, C]) => [g, { ...o[C], ...l(s, g, C) }])), c = Object.values(r), a = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(s.type), h = a && c.length === 2 && c.every((g) => !ce(g.role) && (g.potential === null || g.role !== "unknown")), m = s.terminals["+"], u = s.terminals["-"], E = [m, u].filter((g) => g && g !== "0"), k = s.kind === "V" && E.some((g) => ce(o[g]?.role)) && !E.some((g) => ["in", "out", "io", "fb"].includes(o[g]?.role)) && [m, u].every((g) => n.nodes[g]?.known), L = m === "0" ? u : m, b = Object.keys(s.terminals), p = (g) => ce(g.role) ? g.potential !== null ? g.potential > 0 ? "high" : "low" : g.role === "ret" ? "low" : "high" : "signal";
+    let d = !1;
+    b.length === 2 && (s.terminals[b[0]] === "0" ? d = !0 : s.terminals[b[1]] === "0" ? d = !1 : c.every((g) => g.potential !== null) ? d = c[0].potential < c[1].potential : d = p(c[0]) === "low" || p(c[1]) === "high" && p(c[0]) === "signal");
+    const w = s.synthetic ? "" : s.name.startsWith(e.focus + "/") ? s.name.slice(e.focus.length + 1) : s.name;
+    i[s.name] = { version: ke, kind: s.kind, owner: w.includes("/") ? w.slice(0, w.lastIndexOf("/")) : "", passive: a, source: ["V", "I", "E", "F", "G", "H"].includes(s.kind) || s.kind === "B" && !a, ports: r, horizontal: h, orientation: h ? "horizontal" : d ? "vertical-reversed" : "vertical", flexible: b.length === 2 && (a || ["V", "I", "B", "F", "H"].includes(s.kind)), supply: !!k, voltage: k ? n.nodes[L].value : null };
   }
   return { version: ke, nodes: o, cells: i, diagnostics: n.diagnostics };
 }
-function Re(t, e) {
-  const n = e.ports.map((i, d) => ({ pin: "P" + d, name: i.name, label: i.label || i.name, node: i.node, implicit: !1 })), o = new Set(ae(e).flatMap((i) => Object.values(i.terminals)));
+function Ne(t, e) {
+  const n = e.ports.map((i, l) => ({ pin: "P" + l, name: i.name, label: i.label || i.name, node: i.node, implicit: !1 })), o = new Set(ae(e).flatMap((i) => Object.values(i.terminals)));
   for (const i of t.ir.globals) {
-    const d = me([], i);
-    o.has(d) && !n.some((r) => r.node === d) && n.push({ pin: "G" + n.length, label: i === "0" ? "⏚ 0" : "global: " + i, node: d, implicit: !0 });
+    const l = me([], i);
+    o.has(l) && !n.some((s) => s.node === l) && n.push({ pin: "G" + n.length, label: i === "0" ? "⏚ 0" : "global: " + i, node: l, implicit: !0 });
   }
   return n;
 }
-function Et(t, { mode: e = "hierarchical", expanded: n = /* @__PURE__ */ new Set(), focus: o = "" } = {}) {
+function xt(t, { mode: e = "hierarchical", expanded: n = /* @__PURE__ */ new Set(), focus: o = "" } = {}) {
   const i = t.contexts[o];
   if (!i) throw Error("Unknown instance: " + o);
-  const d = [], r = [];
-  function s(b) {
-    r.push(...Object.values(b.nodes), ...b.ports.map((p) => p.node));
-    const g = [...b.devices.map((p) => ({ line: p.line, device: p })), ...b.children.map((p) => ({ line: p.line, child: p }))].sort((p, E) => p.line - E.line);
-    for (const p of g) {
-      if (p.device) {
-        const w = p.device;
-        d.push({ ...w, layoutLabel: [...b.path.slice(i.path.length), w.localName].join("/") });
+  const l = [], s = [];
+  function r(h) {
+    s.push(...Object.values(h.nodes), ...h.ports.map((u) => u.node));
+    const m = [...h.devices.map((u) => ({ line: u.line, device: u })), ...h.children.map((u) => ({ line: u.line, child: u }))].sort((u, E) => u.line - E.line);
+    for (const u of m) {
+      if (u.device) {
+        const b = u.device;
+        l.push({ ...b, layoutLabel: [...h.path.slice(i.path.length), b.localName].join("/") });
         continue;
       }
-      const E = p.child;
+      const E = u.child;
       if (e === "flat" || n.has(E.id)) {
-        s(E);
+        r(E);
         continue;
       }
-      const k = Re(t, E), I = j();
-      k.forEach((w) => {
-        I[w.pin] = w.node;
-      }), d.push({ name: E.id, kind: "X", type: "spice_subckt", terminals: I, value: E.definition, raw: E.raw, line: E.line, instanceId: E.id, layoutLabel: E.path.slice(i.path.length).join("/"), block: { definitionId: E.scopeId, ports: k, parameters: E.params } });
+      const k = Ne(t, E), L = U();
+      k.forEach((b) => {
+        L[b.pin] = b.node;
+      }), l.push({ name: E.id, kind: "X", type: "spice_subckt", terminals: L, value: E.definition, raw: E.raw, line: E.line, instanceId: E.id, layoutLabel: E.path.slice(i.path.length).join("/"), block: { definitionId: E.scopeId, ports: k, parameters: E.params } });
     }
   }
-  s(i);
-  for (const [b, g] of i.ports.entries()) d.push({ name: "@port/" + o + "/" + b, kind: "PORT", type: "spice_port", terminals: { A: g.node }, layoutLabel: g.name, value: g.name, raw: "Interface port " + g.name, synthetic: !0 });
-  if (d.length > 1500) throw Error("This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.");
-  const a = Object.assign(j(), ...Object.values(t.contexts).map((b) => b.models)), l = { title: o || t.ir.title, components: d, nodes: tt(d, r), models: a, diagnostics: t.ir.diagnostics, mode: e, focus: o };
-  return l.topology = yt(t, l), l.layout = wt(t, l), l;
+  r(i);
+  for (const [h, m] of i.ports.entries()) l.push({ name: "@port/" + o + "/" + h, kind: "PORT", type: "spice_port", terminals: { A: m.node }, layoutLabel: m.name, value: m.name, raw: "Interface port " + m.name, synthetic: !0 });
+  if (l.length > 1500) throw Error("This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.");
+  const c = Object.assign(U(), ...Object.values(t.contexts).map((h) => h.models)), a = { title: o || t.ir.title, components: l, nodes: rt(l, s), models: c, diagnostics: t.ir.diagnostics, mode: e, focus: o };
+  return a.topology = Ct(t, a), a.layout = Et(t, a), a.layout.description = tt(t, a), a;
 }
-function yt(t, e) {
+function Ct(t, e) {
   const n = [], o = /* @__PURE__ */ new Set();
-  for (const r of e.components)
-    if (!r.synthetic)
-      if (r.kind === "X") {
-        const s = t.contexts[r.instanceId];
-        if (!s) throw Error("Projection contains an unknown block.");
-        const a = Re(t, s);
-        if (JSON.stringify(Object.entries(r.terminals)) !== JSON.stringify(a.map((l) => [l.pin, l.node]))) throw Error("Block interface topology mismatch: " + r.name);
-        n.push(...ae(s));
-      } else n.push(r);
-  for (const r of n) {
-    if (o.has(r.name)) throw Error("Projection duplicates " + r.name);
-    o.add(r.name);
+  for (const s of e.components)
+    if (!s.synthetic)
+      if (s.kind === "X") {
+        const r = t.contexts[s.instanceId];
+        if (!r) throw Error("Projection contains an unknown block.");
+        const c = Ne(t, r);
+        if (JSON.stringify(Object.entries(s.terminals)) !== JSON.stringify(c.map((a) => [a.pin, a.node]))) throw Error("Block interface topology mismatch: " + s.name);
+        n.push(...ae(r));
+      } else n.push(s);
+  for (const s of n) {
+    if (o.has(s.name)) throw Error("Projection duplicates " + s.name);
+    o.add(s.name);
   }
-  const i = Se(n), d = ae(t.contexts[e.focus]);
-  if (i !== Se(d)) throw Error("Projection lost or changed electrical devices/connections.");
+  const i = Se(n), l = ae(t.contexts[e.focus]);
+  if (i !== Se(l)) throw Error("Projection lost or changed electrical devices/connections.");
   return { verified: !0, leafCount: n.length, signature: i };
 }
-function xt(t) {
-  const e = j(), n = j();
+function vt(t) {
+  const e = U(), n = U();
   for (const o of t.components) {
-    const i = j(), d = j();
-    for (const [r, s] of Object.entries(o.terminals))
-      i[r] = [t.nodes[s].bit], d[r] = "input";
-    e[o.name] = { type: o.type, port_directions: d, connections: i, parameters: {}, attributes: { ref: o.name, displayRef: o.layoutLabel || o.name, value: o.value, spice: o.raw } }, e[o.name].spiceLayout = t.layout?.cells[o.name], o.block && (e[o.name].spiceBlock = { ports: o.block.ports.map((r) => ({ pin: r.pin, label: r.label })), definitionId: o.block.definitionId }), (o.type === "spice_device" || o.type === "spice_coupling") && (e[o.name].spiceSymbol = { label: o.symbol || o.kind, ports: Object.keys(o.terminals).map((r, s) => ({ pin: r, label: o.pinLabels?.[s] || r })), references: o.coupledInductors?.length ? o.coupledInductors : o.controlSources || [] });
+    const i = U(), l = U();
+    for (const [s, r] of Object.entries(o.terminals))
+      i[s] = [t.nodes[r].bit], l[s] = "input";
+    e[o.name] = { type: o.type, port_directions: l, connections: i, parameters: {}, attributes: { ref: o.name, displayRef: o.layoutLabel || o.name, value: o.value, spice: o.raw } }, e[o.name].spiceLayout = t.layout?.cells[o.name], o.block && (e[o.name].spiceBlock = { ports: o.block.ports.map((s) => ({ pin: s.pin, label: s.label })), definitionId: o.block.definitionId }), (o.type === "spice_device" || o.type === "spice_coupling") && (e[o.name].spiceSymbol = { label: o.symbol || o.kind, ports: Object.keys(o.terminals).map((s, r) => ({ pin: s, label: o.pinLabels?.[r] || s })), references: o.coupledInductors?.length ? o.coupledInductors : o.controlSources || [] });
   }
   for (const o of Object.values(t.nodes)) n[o.name] = { hide_name: 0, bits: [o.bit], attributes: {} };
   if (t.nodes[0]) {
@@ -1633,46 +1746,48 @@ function xt(t) {
     for (; Object.hasOwn(e, o); ) o += "_";
     e[o] = { type: "gnd", connections: { A: [t.nodes[0].bit] }, port_directions: { A: "input" }, attributes: { name: "0" }, parameters: {} };
   }
-  return { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: e, netnames: n } } };
+  return { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: e, netnames: n, spiceLayoutDescription: t.layout?.description || null } } };
 }
-function Ct(t) {
-  const e = /* @__PURE__ */ new Map(), n = /* @__PURE__ */ new Map(), o = {}, i = (d) => (n.has(d) || n.set(d, n.size + 2), n.get(d));
-  return Object.entries(t.modules.circuit.cells).forEach(([d, r], s) => {
-    const a = "c" + s;
-    e.set(a, d);
-    const l = Object.fromEntries(Object.entries(r.connections).map(([b, g]) => [b, g.map(i)]));
-    o[a] = { type: r.type, connections: l, port_directions: r.port_directions, attributes: { displayRef: r.attributes.displayRef || r.attributes.ref || "", value: r.attributes.value || "", name: r.attributes.name || "" } }, r.spiceBlock && (o[a].spiceBlock = r.spiceBlock), r.spiceSymbol && (o[a].spiceSymbol = r.spiceSymbol), r.spiceLayout && (o[a].spiceLayout = r.spiceLayout);
-  }), { netlist: { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: o } } }, ids: e, bits: new Map([...n].map(([d, r]) => [r, d])) };
+function Ot(t) {
+  const e = /* @__PURE__ */ new Map(), n = /* @__PURE__ */ new Map(), o = {}, i = (c) => (n.has(c) || n.set(c, n.size + 2), n.get(c));
+  Object.entries(t.modules.circuit.cells).forEach(([c, a], h) => {
+    const m = "c" + h;
+    e.set(m, c);
+    const u = Object.fromEntries(Object.entries(a.connections).map(([E, k]) => [E, k.map(i)]));
+    o[m] = { type: a.type, connections: u, port_directions: a.port_directions, attributes: { displayRef: a.attributes.displayRef || a.attributes.ref || "", value: a.attributes.value || "", name: a.attributes.name || "" } }, a.spiceBlock && (o[m].spiceBlock = a.spiceBlock), a.spiceSymbol && (o[m].spiceSymbol = a.spiceSymbol), a.spiceLayout && (o[m].spiceLayout = a.spiceLayout);
+  });
+  const l = new Map([...e].map(([c, a]) => [a, c])), s = t.modules.circuit.spiceLayoutDescription, r = s ? { ...s, groups: s.groups.map((c) => ({ ...c, members: c.members.map((a) => a.cell ? { ...a, cell: l.get(a.cell) } : a) })), relations: s.relations.map((c) => ({ ...c, a: l.get(c.a) || c.a, b: l.get(c.b) || c.b })) } : null;
+  return { netlist: { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: o, spiceLayoutDescription: r } } }, ids: e, bits: new Map([...n].map(([c, a]) => [a, c])) };
 }
 const Q = /* @__PURE__ */ new Map();
-async function vt(t, e) {
-  const n = Ct(t), o = JSON.stringify([n.netlist, e]);
+async function St(t, e) {
+  const n = Ot(t), o = JSON.stringify([n.netlist, e]);
   let i = Q.get(o);
-  i ? (Q.delete(o), Q.set(o, i)) : (i = await Ot(n.netlist, e), i.length < 1e6 && (Q.set(o, i), Q.size > 20 && Q.delete(Q.keys().next().value)));
-  const d = new DOMParser().parseFromString(i, "image/svg+xml");
-  if (d.querySelector("parsererror")) throw Error("Renderer produced invalid SVG.");
-  for (const r of d.querySelectorAll("[id],[class]")) {
-    const s = r.getAttribute("id");
-    s?.startsWith("cell_") && n.ids.has(s.slice(5)) && r.setAttribute("id", "cell_" + n.ids.get(s.slice(5)));
-    const a = r.getAttribute("class");
-    a && r.setAttribute("class", a.split(/\s+/).map((l) => l.startsWith("cell_") && n.ids.has(l.slice(5)) ? "cell_" + n.ids.get(l.slice(5)) : /^net_\d+$/.test(l) && n.bits.has(Number(l.slice(4))) ? "net_" + n.bits.get(Number(l.slice(4))) : l).join(" "));
+  i ? (Q.delete(o), Q.set(o, i)) : (i = await kt(n.netlist, e), i.length < 1e6 && (Q.set(o, i), Q.size > 20 && Q.delete(Q.keys().next().value)));
+  const l = new DOMParser().parseFromString(i, "image/svg+xml");
+  if (l.querySelector("parsererror")) throw Error("Renderer produced invalid SVG.");
+  for (const s of l.querySelectorAll("[id],[class]")) {
+    const r = s.getAttribute("id");
+    r?.startsWith("cell_") && n.ids.has(r.slice(5)) && s.setAttribute("id", "cell_" + n.ids.get(r.slice(5)));
+    const c = s.getAttribute("class");
+    c && s.setAttribute("class", c.split(/\s+/).map((a) => a.startsWith("cell_") && n.ids.has(a.slice(5)) ? "cell_" + n.ids.get(a.slice(5)) : /^net_\d+$/.test(a) && n.bits.has(Number(a.slice(4))) ? "net_" + n.bits.get(Number(a.slice(4))) : a).join(" "));
   }
-  return new XMLSerializer().serializeToString(d.documentElement);
+  return new XMLSerializer().serializeToString(l.documentElement);
 }
-function Ot(t, e) {
+function kt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("assets/render-worker-zF-jqopy.js", import.meta.url).href,
+    "" + new URL("assets/render-worker-BLKsB-Iq.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((o, i) => {
-    const d = (a, l) => {
-      clearTimeout(s), n.terminate(), a ? i(Error(a)) : o(l);
-    }, r = Object.keys(t.modules.circuit.cells).length > 300 ? 6e4 : 3e4, s = setTimeout(() => d("Layout timed out. Open a subcircuit sheet or collapse instances."), r);
-    n.onmessage = ({ data: a }) => d(a.error, a.svg), n.onerror = (a) => d(a.message || "Layout worker failed."), n.postMessage({ netlist: t, settings: e });
+    const l = (c, a) => {
+      clearTimeout(r), n.terminate(), c ? i(Error(c)) : o(a);
+    }, s = Object.keys(t.modules.circuit.cells).length > 300 ? 6e4 : 3e4, r = setTimeout(() => l("Layout timed out. Open a subcircuit sheet or collapse instances."), s);
+    n.onmessage = ({ data: c }) => l(c.error, c.svg), n.onerror = (c) => l(c.message || "Layout worker failed."), n.postMessage({ netlist: t, settings: e });
   });
 }
-const St = `* Mixed RLC, semiconductors and nonlinear / controlled sources
+const Lt = `* Mixed RLC, semiconductors and nonlinear / controlled sources
 .title Mixed analog circuit
 VCC vcc 0 DC 5
 VIN in 0 SIN(0 0.1 1k)
@@ -1710,7 +1825,7 @@ C1 out 0 100n
 Rload out 0 1k
 .ac dec 100 1k 10Meg
 .end
-`, kt = `* Two parameterized channels, each with two nested filter instances
+`, It = `* Two parameterized channels, each with two nested filter instances
 .title Hierarchical analog channels
 .global vdd
 .param base=1k
@@ -1736,7 +1851,7 @@ Rmonitor monitor 0 1Meg
 .ends CHANNEL
 .tran 1u 1m
 .end
-`, Lt = `* Viewer grammar coverage: all documented LTspice 24+ element prefixes
+`, Dt = `* Viewer grammar coverage: all documented LTspice 24+ element prefixes
 .title LTspice element families
 V1 in 0 PULSE(0 1 0 1n 1n 1u 2u 4) Rser=0
 VSENSE sense 0 0
@@ -1787,8 +1902,22 @@ Rbot b c {bot}
 .ends DIVIDER
 .tran 0 10u
 .end
+`, Nt = `* Voltage-divider biased common-emitter amplifier; layout regression.
+* Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.2.
+V1 vcc 0 12
+V2 in 0 SINE(0 10m 1k) AC 1
+C1 in b 1u
+R1 vcc b 47k
+R2 b 0 10k
+RC vcc c 4.7k
+RE e 0 1k
+CE e 0 100u
+Q1 c b e 2N3904
+.model 2N3904 NPN(IS=6.7f BF=200 VAF=100)
+.tran 5m
+.end
 `;
-function It(t) {
+function Rt(t) {
   const e = new Uint8Array(t);
   if (e[0] === 255 && e[1] === 254 || e[1] === 0) return new TextDecoder("utf-16le").decode(e);
   if (e[0] === 254 && e[1] === 255 || e[0] === 0) return new TextDecoder("utf-16be").decode(e);
@@ -1799,265 +1928,265 @@ function It(t) {
   }
 }
 async function Le(t) {
-  return It(await t.arrayBuffer());
+  return Rt(await t.arrayBuffer());
 }
-const O = (t) => document.getElementById("spice-" + t), oe = O("app");
-if (oe) {
-  let C = function() {
-    i = "", m(), n.textContent = "Input changed — generate to refresh the schematic.";
-  }, h = function(y) {
+const O = (t) => document.getElementById("spice-" + t), ie = O("app");
+if (ie) {
+  let g = function() {
+    i = "", d(), n.textContent = "Input changed — generate to refresh the schematic.";
+  }, C = function(v) {
     o.replaceChildren();
-    for (const { severity: S, line: A, message: R, source: L } of y) {
-      const _ = document.createElement("li");
-      _.className = S, _.textContent = `${S.toUpperCase()}${L && L !== "input.cir" ? " · " + L : ""}${A ? " · line " + A : ""}: ${R}`, o.append(_);
+    for (const { severity: S, line: A, message: R, source: I } of v) {
+      const B = document.createElement("li");
+      B.className = S, B.textContent = `${S.toUpperCase()}${I && I !== "input.cir" ? " · " + I : ""}${A ? " · line " + A : ""}: ${R}`, o.append(B);
     }
-    O("messages").open = y.some((S) => S.severity !== "info"), O("message-count").textContent = `${y.length} message${y.length === 1 ? "" : "s"}`;
-  }, x = function() {
-    e.querySelector("svg")?.setAttribute("viewBox", `${p.x} ${p.y} ${p.w} ${p.h}`), O("zoom-level").textContent = Math.round(E.w / p.w * 100) + "%";
-  }, v = function(y, S = p.x + p.w / 2, A = p.y + p.h / 2) {
+    O("messages").open = v.some((S) => S.severity !== "info"), O("message-count").textContent = `${v.length} message${v.length === 1 ? "" : "s"}`;
+  }, y = function() {
+    e.querySelector("svg")?.setAttribute("viewBox", `${u.x} ${u.y} ${u.w} ${u.h}`), O("zoom-level").textContent = Math.round(E.w / u.w * 100) + "%";
+  }, x = function(v, S = u.x + u.w / 2, A = u.y + u.h / 2) {
     if (!e.querySelector("svg")) return;
-    const R = Math.max(0.05, Math.min(10, p.w * y / E.w)) * E.w / p.w;
-    p = { x: S + (p.x - S) * R, y: A + (p.y - A) * R, w: p.w * R, h: p.h * R }, x();
-  }, B = function(y) {
+    const R = Math.max(0.05, Math.min(10, u.w * v / E.w)) * E.w / u.w;
+    u = { x: S + (u.x - S) * R, y: A + (u.y - A) * R, w: u.w * R, h: u.h * R }, y();
+  }, M = function(v) {
     const S = new URLSearchParams();
-    y && S.set("instance", y);
+    v && S.set("instance", v);
     const A = S.toString();
-    location.hash.slice(1) === A ? (l = y, P()) : location.hash = A;
+    location.hash.slice(1) === A ? (a = v, j()) : location.hash = A;
   }, T = function() {
-    l = new URLSearchParams(location.hash.slice(1)).get("instance") || "";
-  }, N = function(y) {
-    const S = r.contexts[y].path;
-    for (let A = 1; A <= S.length; A++) I.add(S.slice(0, A).map(encodeURIComponent).join("/"));
-  }, ne = function() {
-    const y = !!(b && b !== l && r?.contexts[b]);
-    O("selection-actions").hidden = !y, O("toggle-instance").textContent = I.has(b) ? "Collapse instance" : "Expand instance", O("toggle-instance").disabled = !1, O("open-instance").href = "#" + new URLSearchParams({ instance: b });
+    a = new URLSearchParams(location.hash.slice(1)).get("instance") || "";
+  }, P = function(v) {
+    const S = s.contexts[v].path;
+    for (let A = 1; A <= S.length; A++) L.add(S.slice(0, A).map(encodeURIComponent).join("/"));
+  }, H = function() {
+    const v = !!(h && h !== a && s?.contexts[h]);
+    O("selection-actions").hidden = !v, O("toggle-instance").textContent = L.has(h) ? "Collapse instance" : "Expand instance", O("toggle-instance").disabled = !1, O("open-instance").href = "#" + new URLSearchParams({ instance: h });
   }, re = function() {
     O("breadcrumbs").replaceChildren();
-    const y = (A, R) => {
-      const L = document.createElement("button");
-      L.type = "button", L.textContent = A, L.onclick = () => B(R), L.disabled = R === l, O("breadcrumbs").append(L);
+    const v = (A, R) => {
+      const I = document.createElement("button");
+      I.type = "button", I.textContent = A, I.onclick = () => M(R), I.disabled = R === a, O("breadcrumbs").append(I);
     };
-    if (y("Top", ""), l) {
-      const A = r.contexts[l].path;
-      for (let R = 0; R < A.length; R++) y(A[R], A.slice(0, R + 1).map(encodeURIComponent).join("/"));
+    if (v("Top", ""), a) {
+      const A = s.contexts[a].path;
+      for (let R = 0; R < A.length; R++) v(A[R], A.slice(0, R + 1).map(encodeURIComponent).join("/"));
     }
     O("instances").replaceChildren();
     const S = (A, R) => {
-      for (const L of A.children) {
-        const _ = document.createElement("div");
-        _.className = "spice-instance-row", _.style.setProperty("--depth", Math.min(R, 8)), _.dataset.instance = L.id;
-        const X = document.createElement("button");
-        X.type = "button", X.textContent = I.has(L.id) ? "−" : "+", X.title = (I.has(L.id) ? "Collapse " : "Expand ") + L.id, X.setAttribute("aria-label", X.title), X.setAttribute("aria-expanded", String(I.has(L.id))), X.onclick = () => {
-          I.has(L.id) ? I.delete(L.id) : N(L.id), b = L.id, P();
+      for (const I of A.children) {
+        const B = document.createElement("div");
+        B.className = "spice-instance-row", B.style.setProperty("--depth", Math.min(R, 8)), B.dataset.instance = I.id;
+        const z = document.createElement("button");
+        z.type = "button", z.textContent = L.has(I.id) ? "−" : "+", z.title = (L.has(I.id) ? "Collapse " : "Expand ") + I.id, z.setAttribute("aria-label", z.title), z.setAttribute("aria-expanded", String(L.has(I.id))), z.onclick = () => {
+          L.has(I.id) ? L.delete(I.id) : P(I.id), h = I.id, j();
         };
-        const W = document.createElement("a");
-        W.href = "#" + new URLSearchParams({ instance: L.id }), W.textContent = L.name + " · " + L.definition, W.title = "Open " + L.id + " as its own sheet";
-        const H = document.createElement("span");
-        if (H.className = "spice-help", H.textContent = Object.entries(L.params).map(([G, Y]) => G + "=" + Y).join(" · "), _.append(X, W), H.textContent) {
-          const G = document.createElement("details"), Y = document.createElement("summary");
-          Y.textContent = "Parameters", G.append(Y, H), _.append(G);
+        const Y = document.createElement("a");
+        Y.href = "#" + new URLSearchParams({ instance: I.id }), Y.textContent = I.name + " · " + I.definition, Y.title = "Open " + I.id + " as its own sheet";
+        const G = document.createElement("span");
+        if (G.className = "spice-help", G.textContent = Object.entries(I.params).map(([W, Z]) => W + "=" + Z).join(" · "), B.append(z, Y), G.textContent) {
+          const W = document.createElement("details"), Z = document.createElement("summary");
+          Z.textContent = "Parameters", W.append(Z, G), B.append(W);
         }
-        O("instances").append(_), S(L, R + 1);
+        O("instances").append(B), S(I, R + 1);
       }
     };
-    S(r.contexts[l], 0), O("hierarchy-panel").hidden = !r.contexts[l].children.length, O("focus-title").textContent = l ? l + " / " + r.contexts[l].definition : "Top-level schematic", ne();
+    S(s.contexts[a], 0), O("hierarchy-panel").hidden = !s.contexts[a].children.length, O("focus-title").textContent = a ? a + " / " + s.contexts[a].definition : "Top-level schematic", H();
   };
   const t = O("input"), e = O("preview"), n = O("status"), o = O("diagnostics");
-  let i = "", d, r, s, a = "", l = "", b = "", g = !1, p = { x: 0, y: 0, w: 1, h: 1 }, E = { ...p }, k;
-  const I = /* @__PURE__ */ new Set();
-  let w = !1, c = {};
+  let i = "", l, s, r, c = "", a = "", h = "", m = !1, u = { x: 0, y: 0, w: 1, h: 1 }, E = { ...u }, k;
+  const L = /* @__PURE__ */ new Set();
+  let b = !1, p = {};
   try {
-    c = JSON.parse(sessionStorage.getItem("spice-libraries-v3") || "{}");
+    p = JSON.parse(sessionStorage.getItem("spice-libraries-v3") || "{}");
   } catch {
   }
-  oe.addEventListener("click", (y) => {
-    g && y.target.closest('a[href^="#"]') && y.preventDefault();
+  ie.addEventListener("click", (v) => {
+    m && v.target.closest('a[href^="#"]') && v.preventDefault();
   });
-  const m = () => {
-    O("copy").disabled = O("download").disabled = !i || g;
-  }, f = () => ({ font: O("font").value, fontSize: Number(O("size").value), color: O("color").value, detailed: O("detailed").checked, conventional: O("conventional").checked });
+  const d = () => {
+    O("copy").disabled = O("download").disabled = !i || m;
+  }, w = () => ({ font: O("font").value, fontSize: Number(O("size").value), color: O("color").value, detailed: O("detailed").checked, conventional: O("conventional").checked });
   t.value = pe;
   try {
     t.value = sessionStorage.getItem("spice-netlist-v2") || pe;
   } catch {
   }
-  t.addEventListener("input", C);
-  for (const y of ["font", "size", "color", "detailed", "conventional"]) O(y).addEventListener("input", C);
-  O("zoom-in").onclick = () => v(0.8), O("zoom-out").onclick = () => v(1.25), O("fit").onclick = () => {
-    p = { ...E }, x();
+  t.addEventListener("input", g);
+  for (const v of ["font", "size", "color", "detailed", "conventional"]) O(v).addEventListener("input", g);
+  O("zoom-in").onclick = () => x(0.8), O("zoom-out").onclick = () => x(1.25), O("fit").onclick = () => {
+    u = { ...E }, y();
   };
-  const M = (y) => {
+  const N = (v) => {
     const S = e.querySelector("svg");
-    return S ? new DOMPoint(y.clientX, y.clientY).matrixTransform(S.getScreenCTM().inverse()) : null;
+    return S ? new DOMPoint(v.clientX, v.clientY).matrixTransform(S.getScreenCTM().inverse()) : null;
   };
-  e.addEventListener("wheel", (y) => {
-    const S = M(y);
-    S && (y.preventDefault(), v(y.deltaY > 0 ? 1.12 : 1 / 1.12, S.x, S.y));
-  }, { passive: !1 }), e.addEventListener("pointerdown", (y) => {
-    y.button !== 0 || !e.querySelector("svg") || (k = { start: M(y), x: y.clientX, y: y.clientY, view: { ...p }, moved: !1 }, e.setPointerCapture(y.pointerId));
-  }), e.addEventListener("pointermove", (y) => {
+  e.addEventListener("wheel", (v) => {
+    const S = N(v);
+    S && (v.preventDefault(), x(v.deltaY > 0 ? 1.12 : 1 / 1.12, S.x, S.y));
+  }, { passive: !1 }), e.addEventListener("pointerdown", (v) => {
+    v.button !== 0 || !e.querySelector("svg") || (k = { start: N(v), x: v.clientX, y: v.clientY, view: { ...u }, moved: !1 }, e.setPointerCapture(v.pointerId));
+  }), e.addEventListener("pointermove", (v) => {
     if (!k) return;
-    const S = M(y);
-    Math.hypot(y.clientX - k.x, y.clientY - k.y) > 4 && (k.moved = !0), p.x += k.start.x - S.x, p.y += k.start.y - S.y, x();
-  }), e.addEventListener("pointerup", (y) => {
+    const S = N(v);
+    Math.hypot(v.clientX - k.x, v.clientY - k.y) > 4 && (k.moved = !0), u.x += k.start.x - S.x, u.y += k.start.y - S.y, y();
+  }), e.addEventListener("pointerup", (v) => {
     if (!k) return;
     const S = k.moved;
-    if (k = null, e.hasPointerCapture(y.pointerId) && e.releasePointerCapture(y.pointerId), !S) {
-      const A = document.elementFromPoint(y.clientX, y.clientY)?.closest("[data-component]"), R = d?.components.find((L) => L.name === A?.dataset.component);
-      R && (b = R.instanceId || "", O("selection").textContent = `${R.raw}
-${Object.entries(R.terminals).map(([L, _]) => `${L} → ${_}`).join("   ")}`, R.kind === "X" ? (N(R.instanceId), P()) : ne());
+    if (k = null, e.hasPointerCapture(v.pointerId) && e.releasePointerCapture(v.pointerId), !S) {
+      const A = document.elementFromPoint(v.clientX, v.clientY)?.closest("[data-component]"), R = l?.components.find((I) => I.name === A?.dataset.component);
+      R && (h = R.instanceId || "", O("selection").textContent = `${R.raw}
+${Object.entries(R.terminals).map(([I, B]) => `${I} → ${B}`).join("   ")}`, R.kind === "X" ? (P(R.instanceId), j()) : H());
     }
   }), window.addEventListener("hashchange", () => {
-    if (g) {
-      w = !0;
+    if (m) {
+      b = !0;
       return;
     }
-    T(), b = "", P();
+    T(), h = "", j();
   }), O("collapse-all").onclick = () => {
-    I.clear(), P();
+    L.clear(), j();
   }, O("expand-all").onclick = () => {
-    for (const y of Object.keys(r?.contexts || {})) y && I.add(y);
-    P();
+    for (const v of Object.keys(s?.contexts || {})) v && L.add(v);
+    j();
   }, O("toggle-instance").onclick = () => {
-    I.has(b) ? I.delete(b) : N(b), P();
+    L.has(h) ? L.delete(h) : P(h), j();
   }, e.addEventListener("pointercancel", () => {
     k = null;
-  }), e.addEventListener("keydown", (y) => {
-    const S = y.target.closest("[data-instance]");
-    if (S && (y.key === "Enter" || y.key === " ")) {
-      y.preventDefault(), b = S.dataset.instance, N(b), P();
+  }), e.addEventListener("keydown", (v) => {
+    const S = v.target.closest("[data-instance]");
+    if (S && (v.key === "Enter" || v.key === " ")) {
+      v.preventDefault(), h = S.dataset.instance, P(h), j();
       return;
     }
-    y.key === "+" || y.key === "=" ? v(0.8) : y.key === "-" ? v(1.25) : y.key.toLowerCase() === "f" ? (p = { ...E }, x()) : y.key.startsWith("Arrow") && (y.preventDefault(), p.x += ({ ArrowLeft: -0.08, ArrowRight: 0.08 }[y.key] || 0) * p.w, p.y += ({ ArrowUp: -0.08, ArrowDown: 0.08 }[y.key] || 0) * p.h, x());
+    v.key === "+" || v.key === "=" ? x(0.8) : v.key === "-" ? x(1.25) : v.key.toLowerCase() === "f" ? (u = { ...E }, y()) : v.key.startsWith("Arrow") && (v.preventDefault(), u.x += ({ ArrowLeft: -0.08, ArrowRight: 0.08 }[v.key] || 0) * u.w, u.y += ({ ArrowUp: -0.08, ArrowDown: 0.08 }[v.key] || 0) * u.h, y());
   });
-  async function P() {
-    if (g) return;
-    g = !0, i = "", m(), O("generate").disabled = !0, t.readOnly = !0, O("file").disabled = !0, O("libraries").disabled = !0;
-    for (const S of oe.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance")) S.disabled = !0;
+  async function j() {
+    if (m) return;
+    m = !0, i = "", d(), O("generate").disabled = !0, t.readOnly = !0, O("file").disabled = !0, O("libraries").disabled = !0;
+    for (const S of ie.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance")) S.disabled = !0;
     n.textContent = "Parsing netlist and routing wires…", e.setAttribute("aria-busy", "true");
-    let y = [];
+    let v = [];
     try {
-      if (a !== t.value || !r) {
-        if (s = et(t.value, { files: c }), y = [...s.diagnostics], y.some((D) => D.severity === "error"))
-          throw r = null, Error("Fix the parser errors below before generating.");
-        r = pt(s), a && a !== t.value ? (I.clear(), l = "", b = "", history.replaceState(null, "", location.pathname + location.search)) : T(), a = t.value;
+      if (c !== t.value || !s) {
+        if (r = nt(t.value, { files: p }), v = [...r.diagnostics], v.some((D) => D.severity === "error"))
+          throw s = null, Error("Fix the parser errors below before generating.");
+        s = gt(r), c && c !== t.value ? (L.clear(), a = "", h = "", history.replaceState(null, "", location.pathname + location.search)) : T(), c = t.value;
         try {
           sessionStorage.setItem("spice-netlist-v2", t.value);
         } catch {
         }
       }
-      if (y = [...s.diagnostics], h(y), y.some((D) => D.severity === "error")) throw Error("Fix the parser errors below before generating.");
-      d = Et(r, { expanded: I, focus: l });
-      const S = xt(d);
-      f().conventional && y.push(...d.layout.diagnostics);
-      const A = await vt(S, f()), R = new DOMParser().parseFromString(A, "image/svg+xml");
+      if (v = [...r.diagnostics], C(v), v.some((D) => D.severity === "error")) throw Error("Fix the parser errors below before generating.");
+      l = xt(s, { expanded: L, focus: a });
+      const S = vt(l);
+      w().conventional && v.push(...l.layout.diagnostics);
+      const A = await St(S, w()), R = new DOMParser().parseFromString(A, "image/svg+xml");
       if (R.querySelector("parsererror")) throw Error("Renderer produced invalid SVG.");
-      const L = R.documentElement, _ = L.querySelector("#spice-layout-report");
-      if (_) {
-        d.layout.report = JSON.parse(_.textContent);
-        const D = d.layout.report;
-        y.push({ severity: "info", message: `Layout: compact signal flow; ${D.powerSourcesChecked} DC/ground symbols checked, ${D.powerOrderViolations} DC order preference(s) unmet. ${D.powerPass}. Global voltage bands are a preference.` }), D.groundPlacement && y.push({ severity: "info", message: `Ground: ${D.groundPlacement}; ${D.straightenedGroundDrops || 0} return-path simplification(s).` }), h(y);
+      const I = R.documentElement, B = I.querySelector("#spice-layout-report");
+      if (B) {
+        l.layout.report = JSON.parse(B.textContent);
+        const D = l.layout.report;
+        v.push({ severity: "info", message: `Layout: compact signal flow; ${D.powerSourcesChecked} DC/ground symbols checked, ${D.powerOrderViolations} DC order preference(s) unmet. ${D.powerPass}. Global voltage bands are a preference.` }), D.groundPlacement && v.push({ severity: "info", message: `Ground: ${D.groundPlacement}; ${D.straightenedGroundDrops || 0} return-path simplification(s).` }), D.explicitGroups && v.push({ severity: "info", message: `Layout comments: ${D.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), D.classicRails && v.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${D.railCount} shared voltage rails.` }), D.geometricConnectivityVerified && v.push({ severity: "info", message: `Net geometry verified; ${D.cyclesRemoved} same-net loop(s) and ${D.leavesRemoved} unused wire branch(es) removed.` }), C(v);
       }
-      if (L.localName !== "svg" || L.querySelector("script,foreignObject")) throw Error("Invalid schematic output.");
-      const X = Number(L.getAttribute("width")), W = Number(L.getAttribute("height"));
-      E = { x: -20, y: -20, w: X + 40, h: W + 40 }, p = { ...E }, L.setAttribute("viewBox", `${E.x} ${E.y} ${E.w} ${E.h}`), L.setAttribute("width", String(E.w)), L.setAttribute("height", String(E.h)), L.setAttribute("role", "img"), L.setAttribute("aria-label", d.title || "SPICE schematic"), L.setAttribute("style", "background:white");
-      for (const D of d.components) {
-        const U = R.getElementById("cell_" + D.name);
-        if (!U) throw Error("Renderer omitted component " + D.name);
-        U.setAttribute("data-component", D.name), D.kind === "X" && (U.setAttribute("data-instance", D.instanceId), U.setAttribute("role", "button"), U.setAttribute("tabindex", "0"), U.setAttribute("aria-label", "Expand " + D.name));
-        const z = R.createElementNS(L.namespaceURI, "title");
-        z.textContent = D.raw + `
+      if (I.localName !== "svg" || I.querySelector("script,foreignObject")) throw Error("Invalid schematic output.");
+      const z = Number(I.getAttribute("width")), Y = Number(I.getAttribute("height"));
+      E = { x: -20, y: -20, w: z + 40, h: Y + 40 }, u = { ...E }, I.setAttribute("viewBox", `${E.x} ${E.y} ${E.w} ${E.h}`), I.setAttribute("width", String(E.w)), I.setAttribute("height", String(E.h)), I.setAttribute("role", "img"), I.setAttribute("aria-label", l.title || "SPICE schematic"), I.setAttribute("style", "background:white");
+      for (const D of l.components) {
+        const $ = R.getElementById("cell_" + D.name);
+        if (!$) throw Error("Renderer omitted component " + D.name);
+        $.setAttribute("data-component", D.name), D.kind === "X" && ($.setAttribute("data-instance", D.instanceId), $.setAttribute("role", "button"), $.setAttribute("tabindex", "0"), $.setAttribute("aria-label", "Expand " + D.name));
+        const X = R.createElementNS(I.namespaceURI, "title");
+        X.textContent = D.raw + `
 Resolved: ` + D.value + `
-` + Object.entries(D.terminals).map(([F, ie]) => F + ": " + ie).join(", "), U.prepend(z);
+` + Object.entries(D.terminals).map(([F, oe]) => F + ": " + oe).join(", "), $.prepend(X);
       }
-      for (const D of Object.values(d.nodes))
-        for (const U of L.querySelectorAll(".net_" + D.bit)) {
-          U.setAttribute("data-net", D.name);
-          const z = R.createElementNS(L.namespaceURI, "title");
-          z.textContent = "Node " + D.displayName, U.append(z);
+      for (const D of Object.values(l.nodes))
+        for (const $ of I.querySelectorAll(".net_" + D.bit)) {
+          $.setAttribute("data-net", D.name);
+          const X = R.createElementNS(I.namespaceURI, "title");
+          X.textContent = "Node " + D.displayName, $.append(X);
         }
-      const H = d.components.filter((D) => D.kind === "K").map((D) => ({ name: D.name, inductors: D.coupledInductors, value: D.value }));
-      if (H.length) {
-        const D = R.createElementNS(L.namespaceURI, "metadata");
-        D.setAttribute("id", "spice-magnetic-couplings"), D.textContent = JSON.stringify(H), L.append(D);
-        for (const U of H) for (const z of U.inductors) {
-          const F = R.getElementById("cell_" + z);
+      const G = l.components.filter((D) => D.kind === "K").map((D) => ({ name: D.name, inductors: D.coupledInductors, value: D.value }));
+      if (G.length) {
+        const D = R.createElementNS(I.namespaceURI, "metadata");
+        D.setAttribute("id", "spice-magnetic-couplings"), D.textContent = JSON.stringify(G), I.append(D);
+        for (const $ of G) for (const X of $.inductors) {
+          const F = R.getElementById("cell_" + X);
           if (!F) continue;
-          const ie = R.createElementNS(L.namespaceURI, "circle"), ue = [...F.children].find((fe) => fe.getAttribute("s:pid") === "A"), Ae = ue?.getAttribute("s:position"), be = { left: [6, -8], right: [-6, -8], top: [-8, 6], bottom: [-8, -6] }[Ae] || [0, 0];
-          for (const [fe, Me] of Object.entries({ cx: Number(ue?.getAttribute("s:x")) + be[0], cy: Number(ue?.getAttribute("s:y")) + be[1], r: 3, fill: f().color, stroke: "none", "data-coupling": U.name })) ie.setAttribute(fe, String(Me));
-          const we = R.createElementNS(L.namespaceURI, "title");
-          we.textContent = U.name + " · dotted terminal: " + U.inductors.join(", "), ie.append(we), F.append(ie);
+          const oe = R.createElementNS(I.namespaceURI, "circle"), ue = [...F.children].find((fe) => fe.getAttribute("s:pid") === "A"), Re = ue?.getAttribute("s:position"), be = { left: [6, -8], right: [-6, -8], top: [-8, 6], bottom: [-8, -6] }[Re] || [0, 0];
+          for (const [fe, Ae] of Object.entries({ cx: Number(ue?.getAttribute("s:x")) + be[0], cy: Number(ue?.getAttribute("s:y")) + be[1], r: 3, fill: w().color, stroke: "none", "data-coupling": $.name })) oe.setAttribute(fe, String(Ae));
+          const we = R.createElementNS(I.namespaceURI, "title");
+          we.textContent = $.name + " · dotted terminal: " + $.inductors.join(", "), oe.append(we), F.append(oe);
         }
       }
-      i = new XMLSerializer().serializeToString(L), O("source").value = i, e.replaceChildren(document.importNode(L, !0)), x();
-      const G = y.filter((D) => D.severity === "warning").length;
-      n.textContent = `${d.components.filter((D) => !D.synthetic).length} components · ${Object.keys(d.nodes).length} nodes · ${d.topology.leafCount} primitive devices verified${G ? " · Review " + G + " warning(s); drawing may be partial." : " · Schematic ready."}`, d.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${d.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), d.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found.");
-      const Y = Object.values(d.nodes).map((D) => {
-        const U = document.createElement("tr");
-        for (const z of [D.displayName, D.terminals.map((F) => F.component + "." + F.pin).join(", ")]) {
+      i = new XMLSerializer().serializeToString(I), O("source").value = i, e.replaceChildren(document.importNode(I, !0)), y();
+      const W = v.filter((D) => D.severity === "warning").length;
+      n.textContent = `${l.components.filter((D) => !D.synthetic).length} components · ${Object.keys(l.nodes).length} nodes · ${l.topology.leafCount} primitive devices verified${W ? " · Review " + W + " warning(s); drawing may be partial." : " · Schematic ready."}`, l.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${l.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), l.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found.");
+      const Z = Object.values(l.nodes).map((D) => {
+        const $ = document.createElement("tr");
+        for (const X of [D.displayName, D.terminals.map((F) => F.component + "." + F.pin).join(", ")]) {
           const F = document.createElement("td");
-          F.textContent = z, U.append(F);
+          F.textContent = X, $.append(F);
         }
-        return U;
+        return $;
       });
-      O("nets").replaceChildren(...Y), O("json").value = JSON.stringify({ circuit: d, netlist: S, hierarchy: s }, null, 2), O("selection").textContent = "Click a component to inspect its original statement and pin connections.", re();
+      O("nets").replaceChildren(...Z), O("json").value = JSON.stringify({ circuit: l, netlist: S, hierarchy: r }, null, 2), O("selection").textContent = "Click a component to inspect its original statement and pin connections.", re();
     } catch (S) {
-      if (e.replaceChildren(), i = "", O("source").value = "", O("json").value = "", O("nets").replaceChildren(), O("selection").textContent = "", n.textContent = S.message, !r)
+      if (e.replaceChildren(), i = "", O("source").value = "", O("json").value = "", O("nets").replaceChildren(), O("selection").textContent = "", n.textContent = S.message, !s)
         O("hierarchy-panel").hidden = !0, O("selection-actions").hidden = !0, O("breadcrumbs").replaceChildren();
-      else if (!r.contexts[l]) {
+      else if (!s.contexts[a]) {
         const A = document.createElement("button");
-        A.type = "button", A.textContent = "Return to Top", A.onclick = () => B(""), O("breadcrumbs").replaceChildren(A);
+        A.type = "button", A.textContent = "Return to Top", A.onclick = () => M(""), O("breadcrumbs").replaceChildren(A);
       }
-      S.diagnostics && (y = S.diagnostics), y.some((A) => A.severity === "error") || y.push({ severity: "error", line: 0, message: S.message }), h(y);
+      S.diagnostics && (v = S.diagnostics), v.some((A) => A.severity === "error") || v.push({ severity: "error", line: 0, message: S.message }), C(v);
     } finally {
-      g = !1, O("generate").disabled = !1, t.readOnly = !1, O("file").disabled = !1, O("libraries").disabled = !1;
-      for (const S of oe.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-collapse-all, #spice-expand-all")) S.disabled = !1;
-      r && r.contexts[l] && re(), e.setAttribute("aria-busy", "false"), m(), w && (w = !1, T(), queueMicrotask(P));
+      m = !1, O("generate").disabled = !1, t.readOnly = !1, O("file").disabled = !1, O("libraries").disabled = !1;
+      for (const S of ie.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-collapse-all, #spice-expand-all")) S.disabled = !1;
+      s && s.contexts[a] && re(), e.setAttribute("aria-busy", "false"), d(), b && (b = !1, T(), queueMicrotask(j));
     }
   }
-  O("generate").onclick = P;
-  for (const y of oe.querySelectorAll("[data-example]")) y.onclick = () => {
-    t.value = { mixed: St, filter: pe, hierarchy: kt, ltspice: Lt }[y.dataset.example], C(), P();
+  O("generate").onclick = j;
+  for (const v of ie.querySelectorAll("[data-example]")) v.onclick = () => {
+    t.value = { mixed: Lt, filter: pe, hierarchy: It, ltspice: Dt, amplifier: Nt }[v.dataset.example], g(), j();
   };
-  O("file").onchange = async (y) => {
-    const S = y.target.files[0];
+  O("file").onchange = async (v) => {
+    const S = v.target.files[0];
     if (S) {
       if (S.size > 2e6) {
         n.textContent = "File exceeds 2 MB.";
         return;
       }
       try {
-        t.value = await Le(S), C(), P();
+        t.value = await Le(S), g(), j();
       } catch (A) {
         n.textContent = "File could not be read: " + A.message;
       } finally {
-        y.target.value = "";
+        v.target.value = "";
       }
     }
-  }, O("libraries").onchange = async (y) => {
+  }, O("libraries").onchange = async (v) => {
     try {
-      for (const S of y.target.files) {
+      for (const S of v.target.files) {
         if (S.size > 16e6) throw Error("Library exceeds 16 MB: " + S.name);
-        c[S.webkitRelativePath || S.name] = await Le(S);
+        p[S.webkitRelativePath || S.name] = await Le(S);
       }
       try {
-        sessionStorage.setItem("spice-libraries-v3", JSON.stringify(c));
+        sessionStorage.setItem("spice-libraries-v3", JSON.stringify(p));
       } catch {
       }
-      r = null, a = "", O("library-status").textContent = Object.keys(c).length + " library file(s) loaded", P();
+      s = null, c = "", O("library-status").textContent = Object.keys(p).length + " library file(s) loaded", j();
     } catch (S) {
       n.textContent = S.message;
     } finally {
-      y.target.value = "";
+      v.target.value = "";
     }
-  }, O("library-status").textContent = Object.keys(c).length ? "Libraries restored from this session." : "For .include / .lib dependencies", O("download").onclick = () => {
-    const y = URL.createObjectURL(new Blob([i], { type: "image/svg+xml;charset=utf-8" })), S = document.createElement("a");
-    S.href = y, S.download = "spice-schematic.svg", S.click(), setTimeout(() => URL.revokeObjectURL(y), 1e3);
+  }, O("library-status").textContent = Object.keys(p).length ? "Libraries restored from this session." : "For .include / .lib dependencies", O("download").onclick = () => {
+    const v = URL.createObjectURL(new Blob([i], { type: "image/svg+xml;charset=utf-8" })), S = document.createElement("a");
+    S.href = v, S.download = "spice-schematic.svg", S.click(), setTimeout(() => URL.revokeObjectURL(v), 1e3);
   }, O("copy").onclick = async () => {
     try {
       await navigator.clipboard.writeText(i), n.textContent = "SVG source copied to clipboard.";
     } catch {
       O("source-details").open = !0, O("source").focus(), O("source").select(), n.textContent = "Clipboard unavailable. SVG source selected — press Ctrl+C / ⌘C.";
     }
-  }, P();
+  }, j();
 }

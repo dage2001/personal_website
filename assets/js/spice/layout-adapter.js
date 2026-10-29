@@ -1,6 +1,7 @@
 import {indexNodes,record,nodeName} from './circuit-ir.js';
 import {leafDevices,topologySignature} from './flatten.js';
 import {analyzeLayout} from './layout-semantics.js';
+import {bindLayoutDescription} from './layout-description.js';
 
 export function blockInterface(tree,context) {
   const pins=context.ports.map((p,i)=>({pin:'P'+i,name:p.name,label:p.label||p.name,node:p.node,implicit:false}));
@@ -32,7 +33,7 @@ export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),fo
   if(components.length>1500)throw Error('This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.');
   const models=Object.assign(record(),...Object.values(tree.contexts).map(c=>c.models));
   const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,extraNodes),models,diagnostics:tree.ir.diagnostics,mode,focus};
-  circuit.topology=auditProjection(tree,circuit);circuit.layout=analyzeLayout(tree,circuit);return circuit;
+  circuit.topology=auditProjection(tree,circuit);circuit.layout=analyzeLayout(tree,circuit);circuit.layout.description=bindLayoutDescription(tree,circuit);return circuit;
 }
 export function auditProjection(tree,view) {
   const represented=[],seen=new Set();
@@ -65,5 +66,5 @@ export function toNetlistsvg(circuit) {
     let ground='__ground';while(Object.hasOwn(cells,ground))ground+='_';
     cells[ground]={type:'gnd',connections:{A:[circuit.nodes['0'].bit]},port_directions:{A:'input'},attributes:{name:'0'},parameters:{}};
   }
-  return {modules:{circuit:{attributes:{top:1},ports:{},cells,netnames}}};
+  return {modules:{circuit:{attributes:{top:1},ports:{},cells,netnames,spiceLayoutDescription:circuit.layout?.description||null}}};
 }

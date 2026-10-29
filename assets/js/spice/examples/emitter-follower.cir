@@ -1,0 +1,13 @@
+* Common-collector voltage follower; independently chosen example values.
+* Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.4.
+V1 vcc 0 12
+V2 in 0 SINE(0 10m 1k)
+CIN in b 1u
+R1 vcc b 100k
+R2 b 0 100k
+Q1 vcc b e QN
+RE e 0 2.2k
+COUT e out 1u
+RL out 0 10k
+.model QN NPN(BF=150)
+.end

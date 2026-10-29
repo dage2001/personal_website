@@ -1,0 +1,15 @@
+* Common-source amplifier; gate bias, drain load and bypassed source resistor.
+* Topology reference: Analog Devices, Single Transistor Amplifier Stages, 9.2.
+VDD vcc 0 12
+VIN in 0 AC 1
+CIN in gate 100n
+R1 vcc gate 1Meg
+R2 gate 0 330k
+RD vcc drain 4.7k
+RS source 0 1k
+CS source 0 100u
+M1 drain gate source 0 MN
+COUT drain out 1u
+RL out 0 100k
+.model MN NMOS(VTO=1 KP=1m)
+.end

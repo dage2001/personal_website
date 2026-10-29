@@ -5,7 +5,7 @@ export function groupParallelCells(graph,parallel) {
   for(const members of parallel.values()) {
     if(members.length<2)continue;
     const children=members.map(id=>nodes.get(id)).filter(Boolean);if(children.length<2)continue;
-    let id='__layout_parallel_'+groups.length;while(nodes.has(id))id+='_';
+    let id='__layout_parallel_'+(graph.id||'root')+'_'+groups.length;while(nodes.has(id))id+='_';
     const group={id,children,layoutOptions:{'org.eclipse.elk.algorithm':'layered','org.eclipse.elk.direction':'RIGHT','org.eclipse.elk.edgeRouting':'ORTHOGONAL','org.eclipse.elk.padding':'[top=8,left=8,bottom=8,right=8]','org.eclipse.elk.spacing.nodeNode':16,'org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers':20}};
     if(children.length>4)Object.assign(group.layoutOptions,{'org.eclipse.elk.layered.layering.strategy':'COFFMAN_GRAHAM','org.eclipse.elk.layered.layering.coffmanGraham.layerBound':Math.ceil(Math.sqrt(children.length))});
     groups.push(group);for(const child of children)owner.set(child.id,group);
