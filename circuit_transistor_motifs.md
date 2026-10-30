@@ -64,3 +64,12 @@ LM741 的 Q16/Q17 显式声明为 Darlington，Q14/Q20 与 R9/R10 显式声明�
 结构识别及注释语法不变。新增布局适配层的 `compactPairGroups`，对同一真实实例、同级 row 的 classic 区域尝试配对重归属。Q13 从 OUTPUT 的布局区域临时迁到 BIAS，与 Q12 同排相邻；电气 IR 与原声明仍保留原值。重归属记录的器件 ID 通过 renderer 还原为真实实例名称。
 
 `pairProximity` / `pairSeparationPenalty` 覆盖所有高置信度 `motifPairs`，包括软推挽和跨区域镜。`pairConstraints[].compacted` 与 `pairCompactions` 表示实际完成；不满足公共供电轨或经典区域检查时返回原布局并记录原因。
+
+
+## v16：多端口子网、整对反射与端点接入
+
+pair 模板具有更高 ELK 布局优先级；输入接口标记按实际 B/G 端口作为附属节点预留空间，最终仍恢复为原物理器件/标记。供电二端支路全局后接入。所有临时子网节点和局部代理端口必须在 Drawing IR / SVG / ASC 之前移除。
+
+新增 `pairSideChoices`：按外部非供电网距离筛选最多两个整对反射候选，避开固定 face；最终由完整路由成本验收。`pairOrientationTrials` 和 `flippedPairs` 保留可审阅记录，并映射回真实实例名称。LM741 的 Q10/Q11 选择输出管在左、参考管在右。
+
+`inputAttachments`、`mirroredInputPorts`、`deferredRailBranches` 记录端口/支路处理结果。Q12 B–C 的本地 L 形候选及竖直接轨路径保护共用网络树简化器，避免 SVG 与 ASC 几何分叉。

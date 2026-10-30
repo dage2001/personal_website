@@ -5,13 +5,16 @@ const known=p=>p?.potential!==null&&p?.potential!==undefined;
 const pointOn=(p,a,b)=>Math.abs(a.x-b.x)<.002?Math.abs(p.x-a.x)<.002&&p.y>=Math.min(a.y,b.y)-.002&&p.y<=Math.max(a.y,b.y)+.002:Math.abs(p.y-a.y)<.002&&p.x>=Math.min(a.x,b.x)-.002&&p.x<=Math.max(a.x,b.x)+.002;
 
 /** Keep known supplies out of visual hierarchy routing; one rail per real net. */
-export function prepareSharedClassicRails(graph,cells,lookup,description) {
+export function prepareSharedClassicRails(graph,cells,lookup,description,{deferBranches=false}={}) {
   if(!description?.groups.some(g=>g.direction==='classic')||Object.keys(cells).length>80||Object.values(cells).some(c=>c.spiceBlock))return null;
   const rails=new Map();for(const c of Object.values(cells))for(const [pin,[bit]]of Object.entries(c.connections))if(known(c.spiceLayout?.ports[pin]))rails.set(bit,c.spiceLayout.ports[pin].potential);
   if(rails.size<2||rails.size>5)return null;
   const sources=[],railPorts=[];graph.children=graph.children.filter(n=>{const c=cells[n.id],all=Object.values(c.connections).every(([b])=>rails.has(b));if(all&&c.spiceLayout?.kind==='V'){sources.push(n);return false;}if(all&&c.spiceLayout?.kind==='PORT'){railPorts.push(n);return false;}return true;});
   const railEdges=graph.edges.filter(e=>rails.has(Number(lookup[e.id]?.replaceAll(',',''))));graph.edges=graph.edges.filter(e=>!railEdges.includes(e));
-  return {rails,railEdges,sources,railPorts,unusedPorts:[],branches:[]};
+  const branches=deferBranches?graph.children.filter(n=>cells[n.id]?.spiceLayout?.passive&&Object.values(cells[n.id].connections).filter(([bit])=>rails.has(bit)).length===1):[],branchIds=new Set(branches.map(n=>n.id)),signalNets=new Map();
+  for(const e of graph.edges){const net=lookup[e.id];if(!signalNets.has(net))signalNets.set(net,new Set());for(const p of [e.sourcePort,e.targetPort])signalNets.get(net).add(p);}
+  if(branches.length){graph.children=graph.children.filter(n=>!branchIds.has(n.id));graph.edges=[];let serial=0;for(const [net,pins]of signalNets){const kept=[...pins].filter(p=>!branchIds.has(p.slice(0,p.lastIndexOf('.'))));for(const target of kept.slice(1)){const source=kept[0],id='__shared_core_'+serial++;lookup[id]=net;graph.edges.push({id,source:source.slice(0,source.lastIndexOf('.')),sourcePort:source,target:target.slice(0,target.lastIndexOf('.')),targetPort:target});}}}
+  return {rails,railEdges,sources,railPorts,unusedPorts:[],branches,signalNets};
 }
 
 /** ELK lays out the transistor/signal skeleton; simple rail branches use local templates. */
@@ -46,7 +49,7 @@ export function installClassicRails(layout,classic,cells,lookup) {
   const fail=message=>{classic.failure=message;return null;};
   const graph=structuredClone(layout),positive=[...classic.rails].filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]),low=[...classic.rails].filter(([,v])=>v<=0).sort((a,b)=>b[1]-a[1]);
   const coreNodes=new Map(graph.children.map(n=>[n.id,n])),corePoint=id=>{const split=id.lastIndexOf('.'),n=coreNodes.get(id.slice(0,split)),p=n?.ports.find(p=>p.id===id);return p?{x:n.x+p.x,y:n.y+p.y,owner:n.id,pin:id.slice(split+1),side:p.layoutOptions?.[option+'port.side']}:null;};
-  const branchHeight=Math.max(0,...classic.branches.map(n=>n.height)),upperY=-branchHeight-40,lowerY=graph.height+40,occupied={upper:[],lower:[]},branchPaths=[];
+  const branchHeight=Math.max(0,...classic.branches.map(n=>n.height)),upperY=-branchHeight-40,lowerY=graph.height+40,occupied={upper:[],lower:[]},branchPaths=[],reservedDrops=[];
   const branchNodes=new Map();
   for(const branch of classic.branches) {
     const cell=cells[branch.id],[signalPin,[signalBit]]=Object.entries(cell.connections).find(([,b])=>!classic.rails.has(b[0])),[railPin,[railBit]]=Object.entries(cell.connections).find(([,b])=>classic.rails.has(b[0]));
@@ -61,23 +64,25 @@ export function installClassicRails(layout,classic,cells,lookup) {
       const direction=control&&anchor.p.side!=='EAST'?-1:1;
       for(const offset of control?[0,1,2,3]:[0,1,-1,2,-2,3]) {
         const x=preferred+direction*offset*(branch.width+24);
-        for(const y of [anchor.p.y+(upper?-24:24)-signalPort.y,anchor.p.y+(upper?-64:64)-signalPort.y,upper?upperY:lowerY]){
+        for(const y of [...[24,48,64,96,128,192].map(d=>anchor.p.y+(upper?-d:d)-signalPort.y),upper?upperY:lowerY]){
         const node={...branch,x,y};
         if(graph.children.some(n=>x<n.x+n.width+8&&x+branch.width+8>n.x&&y<n.y+n.height+8&&y+branch.height+8>n.y))continue;
         const p={x:x+signalPort.x,y:node.y+signalPort.y},escapeY=anchor.p.y+(anchor.p.side==='NORTH'?-18:18),bends=detour?[{x:anchor.p.x,y:escapeY},{x:p.x,y:escapeY}]:[{x:p.x,y:anchor.p.y}],points=[anchor.p,...bends,p];
         if(points.slice(1).some((b,i)=>graph.children.some(n=>Math.max(points[i].x,b.x)>n.x+.02&&Math.min(points[i].x,b.x)<n.x+n.width-.02&&Math.max(points[i].y,b.y)>n.y+.02&&Math.min(points[i].y,b.y)<n.y+n.height-.02)))continue;
-        const wires=[...graph.edges,...branchPaths].flatMap(e=>(e.sections||[]).flatMap(s=>{const ps=[s.startPoint,...s.bendPoints||[],s.endPoint];return ps.slice(1).map((b,i)=>({a:ps[i],b,bit:Number(lookup[e.id]?.replaceAll(',',''))}));}));
+        const wires=[...graph.edges,...branchPaths].flatMap(e=>(e.sections||[]).flatMap(s=>{const ps=[s.startPoint,...s.bendPoints||[],s.endPoint];return ps.slice(1).map((b,i)=>({a:ps[i],b,bit:Number(lookup[e.id]?.replaceAll(',',''))}));})).concat(reservedDrops);
         if(wires.some(s=>Math.max(s.a.x,s.b.x)>node.x+.02&&Math.min(s.a.x,s.b.x)<node.x+node.width-.02&&Math.max(s.a.y,s.b.y)>node.y+.02&&Math.min(s.a.y,s.b.y)<node.y+node.height-.02))continue;
         const on=(q,a,b)=>Math.abs(a.x-b.x)<.02?Math.abs(q.x-a.x)<.02&&q.y>=Math.min(a.y,b.y)-.02&&q.y<=Math.max(a.y,b.y)+.02:Math.abs(q.y-a.y)<.02&&q.x>=Math.min(a.x,b.x)-.02&&q.x<=Math.max(a.x,b.x)+.02;
         if(wires.filter(s=>s.bit!==signalBit).some(s=>points.slice(1).some((b,i)=>on(points[i],s.a,s.b)||on(b,s.a,s.b)||on(s.a,points[i],b)||on(s.b,points[i],b))))continue;
         const active=['Q','M','J','Z'].includes(cells[anchor.p.owner].spiceLayout?.kind),penalty=!active?1000:['E','S'].includes(anchor.p.pin)?0:control?24:8;
-        candidates.push({anchor,node,p,bends,score:Math.abs(p.x-anchor.p.x)+Math.abs(p.y-anchor.p.y)+penalty});
+        const railPort=branch.ports.find(p=>p.id===branch.id+'.'+railPin),start={x:node.x+railPort.x,y:node.y+railPort.y},end={x:start.x,y:upper?Math.min(upperY,node.y)-80:Math.max(lowerY,node.y+node.height)+80},drop={a:start,b:end,bit:railBit};
+        const directDrop=!graph.children.some(n=>Math.max(start.y,end.y)>n.y+.02&&Math.min(start.y,end.y)<n.y+n.height-.02&&start.x>n.x+.02&&start.x<n.x+n.width-.02)&&!graph.children.some(n=>n.ports.some(p=>cells[n.id]?.connections[p.id.slice(n.id.length+1)]?.[0]!==railBit&&on({x:n.x+p.x,y:n.y+p.y},start,end)))&&!wires.filter(w=>w.bit!==railBit).some(w=>on(w.a,start,end)||on(w.b,start,end)||on(start,w.a,w.b)||on(end,w.a,w.b));
+        candidates.push({anchor,node,p,bends,drop,directDrop,score:2*Math.abs(p.x-anchor.p.x)+Math.abs(p.y-anchor.p.y)+penalty+(directDrop?0:1000)});
         }
       }
     }
     chosen=candidates.sort((a,b)=>a.score-b.score)[0];
     if(!chosen)return fail('No unobstructed local branch for '+branch.id);
-    const {anchor,node,p,bends}=chosen;occupied[slot].push(node);branchNodes.set(node.id,node);graph.children.push(node);
+    const {anchor,node,p,bends,drop,directDrop}=chosen;if(directDrop)reservedDrops.push(drop);occupied[slot].push(node);branchNodes.set(node.id,node);graph.children.push(node);
     const id='__branch_'+branchPaths.length;lookup[id]=group[0];branchPaths.push({id,source:anchor.p.owner,sourcePort:anchor.id,target:node.id,targetPort:node.id+'.'+signalPin,sections:[{id:id+'_s',startPoint:{x:anchor.p.x,y:anchor.p.y},bendPoints:bends,endPoint:p}]});
   }
   graph.edges.push(...branchPaths);

@@ -172,6 +172,7 @@ if (root) {
         if(r.mirroredTransistors?.length)items.push({severity:'info',message:`Control-pin mirror choices: ${r.mirroredTransistors.join(', ')}.`});
         if(r.recognizedMotifs?.length)items.push({severity:'info',message:`Transistor structures: ${r.recognizedMotifs.map(m=>`${m.kind} (${m.members.join(', ')}; ${m.confidence})`).join('; ')}.`});
         if(r.appliedMotifs?.length)items.push({severity:'info',message:`Topology preferences applied to ${r.appliedMotifs.length} local structure(s); ELK still determines placement and routing.`});
+        if(r.subnetFirstFallback)items.push({severity:'warning',message:'Subnet attachment kept the previous safe placement: '+r.subnetFirstFallback});
         if(r.pairCompactionFallback)items.push({severity:'warning',message:'Pair proximity kept the original regions: '+r.pairCompactionFallback});
         if(r.compoundPairFallback)items.push({severity:'warning',message:'Compound-pair placement fell back to proximity rules: '+r.compoundPairFallback});
         if(r.pairConstraints?.length){const cross=r.pairConstraints.filter(p=>p.crossRegion&&!p.compacted).length;items.push({severity:'info',message:`${r.pairConstraints.length-cross} adjacent transistor pair(s); ${cross} cross-region mirror row constraint(s).`});}
