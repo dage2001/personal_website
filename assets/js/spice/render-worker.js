@@ -25,7 +25,7 @@ self.onmessage = async ({data}) => {
         attempts++;
         const netlist=structuredClone(data.netlist),skin=makeSkin(netlist,{...data.settings,...profile});
         let candidateDrawing;
-        const source=await renderConventional(skin,netlist,{...profile,onLayout:graph=>{candidateDrawing=captureDrawing(graph,netlist.modules.circuit.cells);}});
+        const source=await renderConventional(skin,netlist,{...profile,gridSize:data.settings.gridSize||0,onLayout:graph=>{candidateDrawing=captureDrawing(graph,netlist.modules.circuit.cells);}});
         const ast=onml.parse(source),metadata=ast.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');
         const report=JSON.parse(metadata[2]);report.orientationStrategy=profile.orientationStrategy;metadata[2]=JSON.stringify(report);
         candidates.push({svg:onml.stringify(ast),drawing:candidateDrawing,report,profile});

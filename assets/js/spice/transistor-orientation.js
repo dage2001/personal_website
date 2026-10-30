@@ -28,7 +28,7 @@ export function mirrorTransistorSkin(source,cells,ids) {
     for(let i=2;i<g.length;i++){const child=g[i];if(!Array.isArray(child)||child[0]==='s:alias')continue;
       if(child[1]?.['s:pid']){const a=child[1];a['s:x']=width-Number(a['s:x']);if(a['s:position']==='left')a['s:position']='right';else if(a['s:position']==='right')a['s:position']='left';}
       else if(child[0]==='text'){child[1].x=width-Number(child[1].x);const anchor=child[1]['text-anchor']||'start';child[1]['text-anchor']=anchor==='start'?'end':anchor==='end'?'start':anchor;}
-      else child[1].transform=`translate(${width},0) scale(-1,1) ${child[1].transform||''}`;
+      else {if(child[1]?.['data-pin-lead'])child[1]['data-inner-x']=width-Number(child[1]['data-inner-x']);child[1].transform=`translate(${width},0) scale(-1,1) ${child[1].transform||''}`;}
     }
   }
   return onml.stringify(skin);

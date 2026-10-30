@@ -19,6 +19,8 @@ import {rigidTransistorPairs,declaredFaceSkin,pairedTransistorSkin,mirroredSkinD
 import {controlInputTargets,alignControlInputSkin,deferControlInputs,installControlInputs} from './subnet-attachments.js';
 import {compactPairGroups} from './pair-proximity.js';
 import {shortenLayoutNets} from './net-shortcuts.js';
+import {alignPassiveBanks} from './grid-align.js';
+import {snapLayoutGrid} from './grid-layout.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
 const option='org.eclipse.elk.';
@@ -47,11 +49,11 @@ function portRole(port,cells) {
   return 'neutral';
 }
 
-export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,compoundPairs=true,compactPairs=true,subnetFirst=true,pairOrder=[],onLayout=null,onRawLayout=null}={}) {
+export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,compoundPairs=true,compactPairs=true,subnetFirst=true,pairOrder=[],gridSize=0,onLayout=null,onRawLayout=null}={}) {
   const module=netlist.modules.circuit,compaction=compactPairs&&motifLayout&&pairedDevices?compactPairGroups(module.spiceLayoutDescription,module.spiceMotifs||[],module.cells):{description:module.spiceLayoutDescription,compactions:[]};
   if(compaction.compactions.length){
     const planned={...netlist,modules:{...netlist.modules,circuit:{...module,spiceLayoutDescription:compaction.description,spicePairCompactions:compaction.compactions}}};
-    const options={groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs:false,subnetFirst,pairOrder};
+    const options={groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs:false,subnetFirst,pairOrder,gridSize};
     let candidateLayout,candidateRaw;
     try{
       const svg=await renderConventional(skin,planned,{...options,onLayout:g=>candidateLayout=g,onRawLayout:onRawLayout?g=>candidateRaw=g:null}),ast=onml.parse(svg),report=JSON.parse(ast.find(n=>n[1]?.id==='spice-layout-report')[2]);
@@ -169,13 +171,14 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(split)layout=reuniteHierarchyEdges(layout,split);
   if(classic&&tiles?.pairs.some(p=>p.placement==='stagger'))layout=shortenLayoutNets(layout,cells,[],pairs).graph;
   const railLayout=classic||shared?installClassicRails(layout,classic||shared,cells,graphPackage.ElkModel.wireNameLookup):null;
-  if(shared&&!railLayout&&subnetFirst){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst:false,pairOrder,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),subnetFirstFallback:shared.failure});return onml.stringify(fallback);}
-  if(shared&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails:false,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),sharedRailFallback:shared.failure});return onml.stringify(fallback);}
-  if(classic&&!railLayout&&compoundPairs&&tiles?.pairs.some(p=>p.placement==='stagger')){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs:false,compactPairs,subnetFirst,pairOrder,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),compoundPairFallback:classic.failure});return onml.stringify(fallback);}
-  if(classic&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),classicTemplateFallback:classic.failure||'Local template unavailable'});return onml.stringify(fallback);}
+  if(shared&&!railLayout&&subnetFirst){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst:false,pairOrder,gridSize,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),subnetFirstFallback:shared.failure});return onml.stringify(fallback);}
+  if(shared&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails:false,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder,gridSize,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),sharedRailFallback:shared.failure});return onml.stringify(fallback);}
+  if(classic&&!railLayout&&compoundPairs&&tiles?.pairs.some(p=>p.placement==='stagger')){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs:false,compactPairs,subnetFirst,pairOrder,gridSize,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),compoundPairFallback:classic.failure});return onml.stringify(fallback);}
+  if(classic&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder,gridSize,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),classicTemplateFallback:classic.failure||'Local template unavailable'});return onml.stringify(fallback);}
   if(railLayout){layout=railLayout.graph;for(const group of visualGroups){group.x+=railLayout.translation.x;group.y+=railLayout.translation.y;}}
-  let inputAttachment={attached:[]};try{inputAttachment=installControlInputs(layout,deferredInputs,cells,graphPackage.ElkModel.wireNameLookup);for(const group of visualGroups)group.x+=inputAttachment.translation.x;}catch(error){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst:false,pairOrder,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),subnetFirstFallback:error.message});return onml.stringify(fallback);}
+  let inputAttachment={attached:[]};try{inputAttachment=installControlInputs(layout,deferredInputs,cells,graphPackage.ElkModel.wireNameLookup);for(const group of visualGroups)group.x+=inputAttachment.translation.x;}catch(error){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst:false,pairOrder,gridSize,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),subnetFirstFallback:error.message});return onml.stringify(fallback);}
   const shortcuts=shortenLayoutNets(layout,cells,railLayout?.railBands||[],pairs);layout=shortcuts.graph;
+  const gridAlignment=gridSize?alignPassiveBanks(layout,cells,gridSize):{graph:layout,aligned:0,moved:[]};layout=gridAlignment.graph;
   const powerPass=balanced?'compact balanced':'compact signal flow';
   const lookup=graphPackage.ElkModel.wireNameLookup,attachments=[];
   const outputShunts=railLayout||visualGroups.length?0:placeOutputShunts(layout,cells,lookup);let straightened=0;
@@ -183,12 +186,15 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     const bit=cells[ground.id].connections.A[0];
     if(!railLayout){straightened+=alignGroundBus(layout,lookup,bit);straightened+=straightenGroundDrops(layout,lookup,bit);}
     const attached=attachGroundSymbol(layout,lookup,ground,netlist);
-    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder,onLayout,onRawLayout});
+    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder,gridSize,onLayout,onRawLayout});
     attachments.push(attached);power.push({child:attached.node,voltage:0});
     refreshGroundJunctions(layout,lookup,bit,attached);
   }
   power.sort((a,b)=>b.voltage-a.voltage);
   validateLayoutEndpoints(layout,netlist,lookup,attachments,fixedPorts);
+  const gridReport=gridSize?snapLayoutGrid(layout,cells,Skin.skin,attachments,railLayout?.railBands||[],visualGroups,gridSize):{};
+  if(gridSize&&railLayout?.railBands.length>1)railLayout.railPitch=railLayout.railBands[1].y-railLayout.railBands[0].y;
+  if(gridSize)validateLayoutEndpoints(layout,netlist,lookup,attachments);
   const positions=new Map(layout.children.map(n=>[n.id,n]));
   let inversions=0;
   for(let i=0;i<power.length;i++)for(let j=i+1;j<power.length;j++)if(power[i].voltage>power[j].voltage&&positions.get(power[i].child.id).y>=positions.get(power[j].child.id).y)inversions++;
@@ -202,7 +208,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     const a=edge.sections?.[0]?.startPoint,b=edge.sections?.at(-1)?.endPoint;
     wireLength+=length;if(a&&b)detourLength+=Math.max(0,length-Math.abs(a.x-b.x)-Math.abs(a.y-b.y));
   }
-  const report={version:4,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,...plan,
+  const report={...gridReport,gridAlignedBranches:gridAlignment.aligned,version:4,direction:'RIGHT',powerPass,powerSourcesChecked:power.length,powerOrderViolations:inversions,...plan,
     localClassicInstances,
     localClassicStages:localPlan?.stages||[],
     localClassicFallbacks:localPlan?.failures||[],
@@ -223,7 +229,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     const singles=Object.keys(cells).length<=80?free:choices.slice(0,4),structural=motifControlChoices(layout,cells,activeMotifs).filter(id=>!locked.has(id)),variants=[...structural.length?[structural]:[],...choices.length?[choices]:[],...singles.map(id=>[id])],seen=new Set([JSON.stringify([[],[...pairOrder].sort()])]);
     testedDevices=singles;let best=null,bestCost=baseReport.uniqueWireLength+(baseReport.uniqueBends??baseReport.bends)*8+3*baseReport.motifPenalty+3*baseReport.pairSeparationPenalty;
     const evaluate=async (ids,orders=pairOrder)=>{const signature=JSON.stringify([[...ids].sort(),[...orders].sort()]);if(seen.has(signature))return;seen.add(signature);let candidateLayout,candidateRaw;orientationCandidates++;try{
-      const alternate=await renderConventional(mirrorTransistorSkin(skin,cells,ids),netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides:false,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder:orders,onLayout:g=>candidateLayout=g,onRawLayout:onRawLayout?g=>candidateRaw=g:null}),ast=onml.parse(alternate),meta=ast.find(n=>n[1]?.id==='spice-layout-report'),r=JSON.parse(meta[2]),cost=r.uniqueWireLength+(r.uniqueBends??r.bends)*8+3*r.motifPenalty+3*r.pairSeparationPenalty;
+      const alternate=await renderConventional(mirrorTransistorSkin(skin,cells,ids),netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides:false,motifLayout,pairedDevices,compoundPairs,compactPairs,subnetFirst,pairOrder:orders,gridSize,onLayout:g=>candidateLayout=g,onRawLayout:onRawLayout?g=>candidateRaw=g:null}),ast=onml.parse(alternate),meta=ast.find(n=>n[1]?.id==='spice-layout-report'),r=JSON.parse(meta[2]),cost=r.uniqueWireLength+(r.uniqueBends??r.bends)*8+3*r.motifPenalty+3*r.pairSeparationPenalty;
       if(r.pairConstraints.length>=baseReport.pairConstraints.length&&Number(r.sharedClassicRails)>=Number(baseReport.sharedClassicRails)&&r.localClassicStages.length>=baseReport.localClassicStages.length&&Number(r.classicRails)>=Number(baseReport.classicRails)&&cost<bestCost){bestCost=cost;best={ast,meta,r,ids,orders,layout:candidateLayout,raw:candidateRaw};}
     }catch{/* Reject an unsafe alternative; retain a verified candidate. */}};
     for(const ids of variants)await evaluate(ids);

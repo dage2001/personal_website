@@ -1656,23 +1656,23 @@ function de(t) {
 function ve(t, e = {}) {
   const n = new Map(t.components.map((s) => [s.name, s])), o = /* @__PURE__ */ new Map(), r = /* @__PURE__ */ new Map(), u = [], f = (s, w) => JSON.stringify([s, w].sort()), i = (s) => e[s]?.potential !== null && e[s]?.potential !== void 0;
   for (const s of t.components) {
-    for (const [T, j] of Object.entries(s.terminals))
-      o.has(j) || o.set(j, []), o.get(j).push({ device: s.name, pin: T });
+    for (const [U, j] of Object.entries(s.terminals))
+      o.has(j) || o.set(j, []), o.get(j).push({ device: s.name, pin: U });
     if (s.kind === "R") {
-      const T = Object.values(s.terminals);
-      if (T.length === 2 && T[0] !== T[1]) {
-        const j = f(...T);
+      const U = Object.values(s.terminals);
+      if (U.length === 2 && U[0] !== U[1]) {
+        const j = f(...U);
         r.has(j) || r.set(j, []), r.get(j).push(s);
       }
     }
     const w = s.kind === "Q" ? "bjt" : ["M", "J", "Z"].includes(s.kind) ? "fet" : null, x = w === "bjt" ? /_(npn|pnp)$/.exec(s.type)?.[1] : /_(nmos|pmos|jfet_n|jfet_p|mesfet_n|mesfet_p)$/.exec(s.type)?.[1];
     if (!w || !x) continue;
     const D = s.terminals, v = D[w === "bjt" ? "B" : "G"], P = D[w === "bjt" ? "C" : "D"], B = D[w === "bjt" ? "E" : "S"];
-    [v, P, B].some((T) => T === void 0) || v === B || P === B || u.push({ id: s.name, family: w, polarity: x, control: v, drain: P, source: B, body: s.kind === "M" ? D.B : void 0 });
+    [v, P, B].some((U) => U === void 0) || v === B || P === B || u.push({ id: s.name, family: w, polarity: x, control: v, drain: P, source: B, body: s.kind === "M" ? D.B : void 0 });
   }
-  const c = [], d = /* @__PURE__ */ new Set(), a = (s, w, x, D, v, P = "basic", B = [], T = "high") => {
+  const c = [], d = /* @__PURE__ */ new Set(), a = (s, w, x, D, v, P = "basic", B = [], U = "high") => {
     const j = [.../* @__PURE__ */ new Set([...w, ...B])], W = JSON.stringify([s, P, [...j].sort()]);
-    d.has(W) || (d.add(W), c.push({ id: "motif" + c.length, kind: s, variant: P, transistors: w, members: j, roles: x, nets: D, evidence: v, confidence: T }));
+    d.has(W) || (d.add(W), c.push({ id: "motif" + c.length, kind: s, variant: P, transistors: w, members: j, roles: x, nets: D, evidence: v, confidence: U }));
   }, y = (s, w) => s.family === w.family && s.polarity === w.polarity, l = /* @__PURE__ */ new Map(), p = /* @__PURE__ */ new Map(), b = /* @__PURE__ */ new Map(), g = new Map(u.map((s) => [s.id, s])), _ = (s, w, x) => {
     s.has(w) || s.set(w, []), s.get(w).push(x);
   }, m = (s, w) => JSON.stringify([s.family, s.polarity, w]);
@@ -1690,19 +1690,19 @@ function ve(t, e = {}) {
   for (const s of u) s.control === s.drain && a("diode-connected", [s.id], { reference: s.id }, { control: s.control, return: s.source }, ["control-drain-short", s.family]);
   for (const s of u) {
     const w = l.get(m(s, s.control));
-    if (w.filter((T) => T.control === T.drain).length > 1) continue;
+    if (w.filter((U) => U.control === U.drain).length > 1) continue;
     let x = null;
-    if (s.control !== s.drain && s.family === "bjt" && (x = (l.get(m(s, s.drain)) || []).find((T) => T.id !== s.id && y(T, s) && T.control === s.drain && T.source === s.control && i(T.drain))), s.control !== s.drain && !x) continue;
+    if (s.control !== s.drain && s.family === "bjt" && (x = (l.get(m(s, s.drain)) || []).find((U) => U.id !== s.id && y(U, s) && U.control === s.drain && U.source === s.control && i(U.drain))), s.control !== s.drain && !x) continue;
     const D = h(s), v = [];
     let P = null, B = [];
-    for (const T of w) {
-      if (T.id === s.id || T.id === x?.id || T.drain === s.drain || T.drain === T.control) continue;
-      const j = D.flatMap((W) => h(T).filter((O) => W.node === O.node).map((O) => ({ node: W.node, rs: [W.resistor, O.resistor].filter(Boolean) }))).find((W) => P === null || W.node === P);
-      j && (P = j.node, v.push(T.id), B.push(...j.rs));
+    for (const U of w) {
+      if (U.id === s.id || U.id === x?.id || U.drain === s.drain || U.drain === U.control) continue;
+      const j = D.flatMap((W) => h(U).filter((O) => W.node === O.node).map((O) => ({ node: W.node, rs: [W.resistor, O.resistor].filter(Boolean) }))).find((W) => P === null || W.node === P);
+      j && (P = j.node, v.push(U.id), B.push(...j.rs));
     }
     if (v.length) {
-      const T = v.every((j) => g.get(j).body === s.body);
-      a("current-mirror", [s.id, ...v, ...x ? [x.id] : []], { reference: s.id, outputs: v, ...x ? { helper: x.id } : {} }, { control: s.control, return: P }, ["same-polarity", "shared-control", x ? "emitter-follower-reference" : "diode-reference", B.length ? "resistive-common-return" : "shared-return", T ? "compatible-bodies" : "different-body-connections"], x ? "assisted" : B.length ? "degenerated" : "basic", [...B, ...x ? [x.id] : []], T ? "high" : "medium");
+      const U = v.every((j) => g.get(j).body === s.body);
+      a("current-mirror", [s.id, ...v, ...x ? [x.id] : []], { reference: s.id, outputs: v, ...x ? { helper: x.id } : {} }, { control: s.control, return: P }, ["same-polarity", "shared-control", x ? "emitter-follower-reference" : "diode-reference", B.length ? "resistive-common-return" : "shared-return", U ? "compatible-bodies" : "different-body-connections"], x ? "assisted" : B.length ? "degenerated" : "basic", [...B, ...x ? [x.id] : []], U ? "high" : "medium");
     }
   }
   const I = [], E = /* @__PURE__ */ new Set(), k = (s, w) => {
@@ -1827,7 +1827,7 @@ function At(t) {
   }
   return r;
 }
-const _e = 18;
+const _e = 19;
 function Ne(t) {
   const e = String(t).split("/").at(-1);
   let n;
@@ -2037,7 +2037,7 @@ async function jt(t, e) {
 function Bt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("render-worker-DQwUzxhK.js", import.meta.url).href,
+    "" + new URL("render-worker-DCIL6LzF.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((o, r) => {
@@ -2459,7 +2459,7 @@ function Yt(t, e) {
 function Zt(t) {
   const e = (v) => t.querySelector("#spice-" + v), n = new AbortController(), o = n.signal, r = { editor: e("editor-panel"), info: e("info-panel") }, u = Object.fromEntries(Object.keys(r).map((v) => [v, t.querySelector(`[data-window-handle="${v}"]`)])), f = { editor: !0, info: !0 }, i = [], c = { editor: {}, info: {} }, d = [];
   let a = !1, y = !1, l = null, p = null, b = null, g = null;
-  const _ = () => t.dispatchEvent(new CustomEvent("spice:workspacechange", { detail: { fullscreen: a, panels: { ...f } } })), m = (v, P, B, T = {}) => v.addEventListener(P, B, { ...T, signal: o });
+  const _ = () => t.dispatchEvent(new CustomEvent("spice:workspacechange", { detail: { fullscreen: a, panels: { ...f } } })), m = (v, P, B, U = {}) => v.addEventListener(P, B, { ...U, signal: o });
   function h(v, P) {
     f[v] = P, r[v].hidden = a && !P, e("show-" + v).setAttribute("aria-expanded", String(P)), _();
   }
@@ -2472,7 +2472,7 @@ function Zt(t) {
     return { x: P.left - B.left, y: P.top - B.top, w: P.width, h: P.height, width: B.width, height: B.height };
   }
   function k(v, P, B) {
-    const T = E(v), j = parseFloat(getComputedStyle(t).getPropertyValue("--spice-window-top")) || 100, W = Math.max(8, Math.min(P, T.width - T.w - 8)), O = Math.max(8, Math.min(j, T.height - T.h - 8)), A = Math.max(O, Math.min(B, T.height - T.h - 8));
+    const U = E(v), j = parseFloat(getComputedStyle(t).getPropertyValue("--spice-window-top")) || 100, W = Math.max(8, Math.min(P, U.width - U.w - 8)), O = Math.max(8, Math.min(j, U.height - U.h - 8)), A = Math.max(O, Math.min(B, U.height - U.h - 8));
     v.style.left = Math.round(W) + "px", v.style.top = Math.round(A) + "px", v.style.right = "auto", v.style.bottom = "auto";
   }
   function N() {
@@ -2543,27 +2543,27 @@ function Zt(t) {
       h(v, !1), e("show-" + v).focus({ preventScroll: !0 });
     }), m(r[v], "pointerdown", () => {
       if (a) {
-        for (const T of Object.values(r)) T.style.zIndex = "20";
+        for (const U of Object.values(r)) U.style.zIndex = "20";
         r[v].style.zIndex = "30";
       }
     }, { capture: !0 });
     const P = u[v];
-    m(P, "pointerdown", (T) => {
-      if (!a || T.button !== 0 || T.target.closest("button,input,select,textarea,a,label")) return;
-      T.preventDefault();
+    m(P, "pointerdown", (U) => {
+      if (!a || U.button !== 0 || U.target.closest("button,input,select,textarea,a,label")) return;
+      U.preventDefault();
       const j = E(r[v]);
-      b = { id: v, pointer: T.pointerId, x: T.clientX, y: T.clientY, left: j.x, top: j.y }, P.setPointerCapture(T.pointerId);
-    }), m(P, "pointermove", (T) => {
-      b?.id === v && b.pointer === T.pointerId && k(r[v], b.left + T.clientX - b.x, b.top + T.clientY - b.y);
+      b = { id: v, pointer: U.pointerId, x: U.clientX, y: U.clientY, left: j.x, top: j.y }, P.setPointerCapture(U.pointerId);
+    }), m(P, "pointermove", (U) => {
+      b?.id === v && b.pointer === U.pointerId && k(r[v], b.left + U.clientX - b.x, b.top + U.clientY - b.y);
     });
     const B = () => {
       b = null;
     };
-    m(P, "pointerup", B), m(P, "pointercancel", B), m(P, "lostpointercapture", B), m(P, "keydown", (T) => {
-      if (!a || T.target !== P || !T.key.startsWith("Arrow")) return;
-      T.preventDefault();
-      const j = E(r[v]), W = T.shiftKey ? 32 : 8;
-      k(r[v], j.x + ({ ArrowLeft: -W, ArrowRight: W }[T.key] || 0), j.y + ({ ArrowUp: -W, ArrowDown: W }[T.key] || 0));
+    m(P, "pointerup", B), m(P, "pointercancel", B), m(P, "lostpointercapture", B), m(P, "keydown", (U) => {
+      if (!a || U.target !== P || !U.key.startsWith("Arrow")) return;
+      U.preventDefault();
+      const j = E(r[v]), W = U.shiftKey ? 32 : 8;
+      k(r[v], j.x + ({ ArrowLeft: -W, ArrowRight: W }[U.key] || 0), j.y + ({ ArrowUp: -W, ArrowDown: W }[U.key] || 0));
     });
   }
   m(document, "fullscreenchange", () => {
@@ -2577,10 +2577,10 @@ function Zt(t) {
     x(), n.abort(), D.disconnect();
   } };
 }
-const je = pe.filter.source, U = (t) => document.getElementById("spice-" + t), re = U("app");
+const je = pe.filter.source, T = (t) => document.getElementById("spice-" + t), re = T("app");
 if (re) {
   let S = function(O) {
-    const A = U("example-info");
+    const A = T("example-info");
     if (A && (A.replaceChildren(), !!O && (A.append(document.createTextNode(O.description + " ")), O.url))) {
       const Q = document.createElement("a");
       Q.href = O.url, Q.target = "_blank", Q.rel = "noopener noreferrer", Q.textContent = O.reference, A.append(Q);
@@ -2593,9 +2593,9 @@ if (re) {
       const $ = document.createElement("li");
       $.className = A, $.textContent = `${A.toUpperCase()}${M && M !== "input.cir" ? " · " + M : ""}${Q ? " · line " + Q : ""}: ${V}`, o.append($);
     }
-    U("messages").open = O.some((A) => A.severity !== "info"), U("message-count").textContent = `${O.length} message${O.length === 1 ? "" : "s"}`;
+    T("messages").open = O.some((A) => A.severity !== "info"), T("message-count").textContent = `${O.length} message${O.length === 1 ? "" : "s"}`;
   }, w = function() {
-    e.querySelector("svg")?.setAttribute("viewBox", `${g.x} ${g.y} ${g.w} ${g.h}`), U("zoom-level").textContent = Math.round(_.w / g.w * 100) + "%";
+    e.querySelector("svg")?.setAttribute("viewBox", `${g.x} ${g.y} ${g.w} ${g.h}`), T("zoom-level").textContent = Math.round(_.w / g.w * 100) + "%";
   }, x = function(O, A = g.x + g.w / 2, Q = g.y + g.h / 2) {
     if (!e.querySelector("svg")) return;
     const V = Math.max(0.05, Math.min(10, g.w * O / _.w)) * _.w / g.w;
@@ -2609,18 +2609,18 @@ if (re) {
     l = new URLSearchParams(location.hash.slice(1)).get("instance") || "";
   }, B = function() {
     const O = !!(p && p !== l && d?.contexts[p]);
-    U("selection-actions").hidden = !O, U("open-instance").href = "#" + new URLSearchParams({ instance: p });
-  }, T = function() {
-    U("breadcrumbs").replaceChildren();
+    T("selection-actions").hidden = !O, T("open-instance").href = "#" + new URLSearchParams({ instance: p });
+  }, U = function() {
+    T("breadcrumbs").replaceChildren();
     const O = (Q, V) => {
       const M = document.createElement("button");
-      M.type = "button", M.textContent = Q, M.onclick = () => v(V), M.disabled = V === l, U("breadcrumbs").append(M);
+      M.type = "button", M.textContent = Q, M.onclick = () => v(V), M.disabled = V === l, T("breadcrumbs").append(M);
     };
     if (O("Top", ""), l) {
       const Q = d.contexts[l].path;
       for (let V = 0; V < Q.length; V++) O(Q[V], Q.slice(0, V + 1).map(encodeURIComponent).join("/"));
     }
-    U("instances").replaceChildren();
+    T("instances").replaceChildren();
     const A = (Q, V) => {
       for (const M of Q.children) {
         const $ = document.createElement("div");
@@ -2632,13 +2632,13 @@ if (re) {
           const K = document.createElement("details"), Y = document.createElement("summary");
           Y.textContent = "Parameters", K.append(Y, te), $.append(K);
         }
-        U("instances").append($), A(M, V + 1);
+        T("instances").append($), A(M, V + 1);
       }
     };
-    A(d.contexts[l], 0), U("hierarchy-panel").hidden = !d.contexts[l].children.length, U("focus-title").textContent = l ? l + " / " + d.contexts[l].definition : "Top-level schematic", B();
+    A(d.contexts[l], 0), T("hierarchy-panel").hidden = !d.contexts[l].children.length, T("focus-title").textContent = l ? l + " / " + d.contexts[l].definition : "Top-level schematic", B();
   };
   Zt(re);
-  const t = U("input"), e = U("preview"), n = U("status"), o = U("diagnostics");
+  const t = T("input"), e = T("preview"), n = T("status"), o = T("diagnostics");
   let r = null, u = null, f = !1, i = "", c, d, a, y = "", l = "", p = "", b = !1, g = { x: 0, y: 0, w: 1, h: 1 }, _ = { ...g }, m, h = !1, I = {};
   try {
     I = JSON.parse(sessionStorage.getItem("spice-libraries-v3") || "{}");
@@ -2648,13 +2648,13 @@ if (re) {
     b && O.target.closest('a[href^="#"]') && O.preventDefault();
   });
   const E = () => {
-    U("copy").disabled = U("download").disabled = !i || b, U("download-asc").disabled = U("download-asc-bundle").disabled = !i || !r || b || f;
-  }, k = () => ({ font: U("font").value, fontSize: Number(U("size").value), color: Oe, detailed: U("detailed").checked, conventional: U("conventional").checked }), N = Yt(U, (O, A) => {
+    T("copy").disabled = T("download").disabled = !i || b, T("download-asc").disabled = T("download-asc-bundle").disabled = !i || !r || b || f;
+  }, k = () => ({ font: T("font").value, fontSize: Number(T("size").value), color: Oe, gridSize: T("grid").checked && T("conventional").checked ? Number(T("grid-size").value) : 0, detailed: T("detailed").checked, conventional: T("conventional").checked }), N = Yt(T, (O, A) => {
     const Q = e.querySelector("svg");
     if (!Q) return;
     Kt(Q, A, O);
     const V = Q.cloneNode(!0);
-    V.setAttribute("viewBox", `${_.x} ${_.y} ${_.w} ${_.h}`), i = new XMLSerializer().serializeToString(V), U("source").value = i;
+    V.setAttribute("viewBox", `${_.x} ${_.y} ${_.w} ${_.h}`), i = new XMLSerializer().serializeToString(V), T("source").value = i;
   });
   N.setEnabled(!1), t.value = je;
   try {
@@ -2662,8 +2662,8 @@ if (re) {
   } catch {
   }
   S(Object.values(pe).find((O) => O.source === t.value)), t.addEventListener("input", L);
-  for (const O of ["font", "size", "detailed", "conventional"]) U(O).addEventListener("input", L);
-  U("zoom-in").onclick = () => x(0.8), U("zoom-out").onclick = () => x(1.25), U("fit").onclick = () => {
+  for (const O of ["font", "size", "detailed", "conventional", "grid", "grid-size"]) T(O).addEventListener("input", L);
+  T("zoom-in").onclick = () => x(0.8), T("zoom-out").onclick = () => x(1.25), T("fit").onclick = () => {
     g = { ..._ }, w();
   };
   const D = (O) => {
@@ -2684,7 +2684,7 @@ if (re) {
     const A = m.moved;
     if (m = null, e.hasPointerCapture(O.pointerId) && e.releasePointerCapture(O.pointerId), !A) {
       const Q = document.elementFromPoint(O.clientX, O.clientY)?.closest("[data-component]"), V = c?.components.find((M) => M.name === Q?.dataset.component);
-      V && (p = V.instanceId || "", U("selection").textContent = `${V.raw}
+      V && (p = V.instanceId || "", T("selection").textContent = `${V.raw}
 ${Object.entries(V.terminals).map(([M, $]) => `${M} → ${$}`).join("   ")}`, V.kind === "X" ? v(V.instanceId) : B());
     }
   }), window.addEventListener("hashchange", () => {
@@ -2705,7 +2705,7 @@ ${Object.entries(V.terminals).map(([M, $]) => `${M} → ${$}`).join("   ")}`, V.
   });
   async function j() {
     if (b) return;
-    b = !0, N.setEnabled(!1), r = null, u = null, i = "", E(), U("generate").disabled = !0, t.readOnly = !0, U("file").disabled = !0, U("libraries").disabled = !0;
+    b = !0, N.setEnabled(!1), r = null, u = null, i = "", E(), T("generate").disabled = !0, t.readOnly = !0, T("file").disabled = !0, T("libraries").disabled = !0;
     for (const A of re.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button")) A.disabled = !0;
     n.textContent = "Parsing netlist and routing wires…", e.setAttribute("aria-busy", "true");
     let O = [];
@@ -2769,29 +2769,29 @@ Resolved: ` + R.value + `
           Se.textContent = F.name + " · dotted terminal: " + F.inductors.join(", "), le.append(Se), ce.append(le);
         }
       }
-      r = Q.drawing, i = new XMLSerializer().serializeToString(M), U("source").value = i, e.replaceChildren(document.importNode(M, !0)), w();
+      r = Q.drawing, i = new XMLSerializer().serializeToString(M), T("source").value = i, e.replaceChildren(document.importNode(M, !0)), w();
       const Y = O.filter((R) => R.severity === "warning").length;
-      n.textContent = `${c.components.filter((R) => !R.synthetic).length} components · ${Object.keys(c.nodes).length} nodes · ${c.topology.leafCount} primitive devices verified${c.interfaceAliases.length ? " · Parent-connected ports: " + c.interfaceAliases.map((R) => R.ports.join(" = ")).join("; ") + "." : ""}${Y ? " · Review " + Y + " warning(s); drawing may be partial." : " · Schematic ready."}`, n.textContent += ` Layout rules v${_e}.`, c.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${c.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), c.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found."), N.setCircuit(c, t.value), U("json").value = JSON.stringify({ circuit: c, netlist: A, hierarchy: a }, null, 2), U("selection").textContent = "Click a component to inspect its original statement and pin connections.", T();
+      n.textContent = `${c.components.filter((R) => !R.synthetic).length} components · ${Object.keys(c.nodes).length} nodes · ${c.topology.leafCount} primitive devices verified${c.interfaceAliases.length ? " · Parent-connected ports: " + c.interfaceAliases.map((R) => R.ports.join(" = ")).join("; ") + "." : ""}${Y ? " · Review " + Y + " warning(s); drawing may be partial." : " · Schematic ready."}`, n.textContent += ` Layout rules v${_e}.`, c.layout.report?.gridVerified && (n.textContent += ` Grid ${c.layout.report.gridSize}.`), c.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${c.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), c.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found."), N.setCircuit(c, t.value), T("json").value = JSON.stringify({ circuit: c, netlist: A, hierarchy: a }, null, 2), T("selection").textContent = "Click a component to inspect its original statement and pin connections.", U();
     } catch (A) {
-      if (e.replaceChildren(), i = "", U("source").value = "", U("json").value = "", U("nets").replaceChildren(), U("selection").textContent = "", n.textContent = A.message, !d)
-        U("hierarchy-panel").hidden = !0, U("selection-actions").hidden = !0, U("breadcrumbs").replaceChildren();
+      if (e.replaceChildren(), i = "", T("source").value = "", T("json").value = "", T("nets").replaceChildren(), T("selection").textContent = "", n.textContent = A.message, !d)
+        T("hierarchy-panel").hidden = !0, T("selection-actions").hidden = !0, T("breadcrumbs").replaceChildren();
       else if (!d.contexts[l]) {
         const Q = document.createElement("button");
-        Q.type = "button", Q.textContent = "Return to Top", Q.onclick = () => v(""), U("breadcrumbs").replaceChildren(Q);
+        Q.type = "button", Q.textContent = "Return to Top", Q.onclick = () => v(""), T("breadcrumbs").replaceChildren(Q);
       }
       N.setCircuit(null, t.value), A.diagnostics && (O = A.diagnostics), O.some((Q) => Q.severity === "error") || O.push({ severity: "error", line: 0, message: A.message }), s(O);
     } finally {
-      b = !1, U("generate").disabled = !1, t.readOnly = !1, U("file").disabled = !1, U("libraries").disabled = !1;
+      b = !1, T("generate").disabled = !1, t.readOnly = !1, T("file").disabled = !1, T("libraries").disabled = !1;
       for (const A of re.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button")) A.disabled = !1;
-      d && d.contexts[l] && T(), N.setEnabled(!!i), e.setAttribute("aria-busy", "false"), E(), h && (h = !1, P(), queueMicrotask(j));
+      d && d.contexts[l] && U(), N.setEnabled(!!i), e.setAttribute("aria-busy", "false"), E(), h && (h = !1, P(), queueMicrotask(j));
     }
   }
-  U("generate").onclick = j;
+  T("generate").onclick = j;
   for (const O of re.querySelectorAll("[data-example]")) O.onclick = () => {
     const A = pe[O.dataset.example];
     t.value = A.source, L(), S(A), j();
   };
-  U("file").onchange = async (O) => {
+  T("file").onchange = async (O) => {
     const A = O.target.files[0];
     if (A) {
       if (A.size > 2e6) {
@@ -2806,7 +2806,7 @@ Resolved: ` + R.value + `
         O.target.value = "";
       }
     }
-  }, U("libraries").onchange = async (O) => {
+  }, T("libraries").onchange = async (O) => {
     try {
       for (const A of O.target.files) {
         if (A.size > 16e6) throw Error("Library exceeds 16 MB: " + A.name);
@@ -2816,13 +2816,13 @@ Resolved: ` + R.value + `
         sessionStorage.setItem("spice-libraries-v3", JSON.stringify(I));
       } catch {
       }
-      d = null, y = "", U("library-status").textContent = Object.keys(I).length + " library file(s) loaded", j();
+      d = null, y = "", T("library-status").textContent = Object.keys(I).length + " library file(s) loaded", j();
     } catch (A) {
       n.textContent = A.message;
     } finally {
       O.target.value = "";
     }
-  }, U("library-status").textContent = Object.keys(I).length ? "Libraries restored from this session." : "For .include / .lib dependencies", U("download").onclick = () => {
+  }, T("library-status").textContent = Object.keys(I).length ? "Libraries restored from this session." : "For .include / .lib dependencies", T("download").onclick = () => {
     const O = URL.createObjectURL(new Blob([i], { type: "image/svg+xml;charset=utf-8" })), A = document.createElement("a");
     A.href = O, A.download = "spice-schematic.svg", A.click(), setTimeout(() => URL.revokeObjectURL(O), 1e3);
   };
@@ -2831,7 +2831,7 @@ Resolved: ` + R.value + `
     if (!(!A || b || f)) {
       f = !0, E(), n.textContent = "Generating ASC from the selected layout and checking connections…";
       try {
-        const { exportAsc: Q } = await import("./asc-export-BOgLsAMs.js");
+        const { exportAsc: Q } = await import("./asc-export-BKQT8iWb.js");
         if (r !== A) throw Error("Schematic changed. Generate again before exporting ASC.");
         u ||= Q({ tree: d, circuit: c, drawing: A, source: t.value, libraries: I });
         const V = O ? u.zip : u.ascBytes, M = URL.createObjectURL(new Blob([V], { type: O ? "application/zip" : "application/octet-stream" })), $ = document.createElement("a");
@@ -2845,11 +2845,11 @@ Resolved: ` + R.value + `
       }
     }
   }
-  U("download-asc").onclick = () => W(!1), U("download-asc-bundle").onclick = () => W(!0), U("copy").onclick = async () => {
+  T("download-asc").onclick = () => W(!1), T("download-asc-bundle").onclick = () => W(!0), T("copy").onclick = async () => {
     try {
       await navigator.clipboard.writeText(i), n.textContent = "SVG source copied to clipboard.";
     } catch {
-      U("source-details").open = !0, U("source").focus(), U("source").select(), n.textContent = "Clipboard unavailable. SVG source selected — press Ctrl+C / ⌘C.";
+      T("source-details").open = !0, T("source").focus(), T("source").select(), n.textContent = "Clipboard unavailable. SVG source selected — press Ctrl+C / ⌘C.";
     }
   }, j();
 }
