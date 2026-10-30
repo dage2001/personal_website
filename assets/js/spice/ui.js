@@ -6,6 +6,7 @@ import {examples} from './examples.js';
 import {readSpiceFile} from './file-text.js';
 import {layoutRulesVersion} from './layout-semantics.js';
 import './viewer.css';
+import {createNodeColorControls,colorSvgNets,defaultWireColor} from './node-colors.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
@@ -18,18 +19,20 @@ if (root) {
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting; };
-  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:$('color').value,detailed:$('detailed').checked,conventional:$('conventional').checked});
+  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,detailed:$('detailed').checked,conventional:$('conventional').checked});
+  const nodeColors=createNodeColorControls($,(state,nodes)=>{const svg=preview.querySelector('svg');if(!svg)return;colorSvgNets(svg,nodes,state);const exported=svg.cloneNode(true);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;});
+  nodeColors.setEnabled(false);
   function showExampleInfo(example) {
     const element=$('example-info');if(!element)return;element.replaceChildren();if(!example)return;
     element.append(document.createTextNode(example.description+' '));
     if(example.url){const link=document.createElement('a');link.href=example.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=example.reference;element.append(link);}
   }
-  function invalidate() { drawing=null;ascPackage=null;svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
+  function invalidate() { nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
   input.addEventListener('input', invalidate);
-  for (const id of ['font','size','color','detailed','conventional']) $(id).addEventListener('input', invalidate);
+  for (const id of ['font','size','detailed','conventional']) $(id).addEventListener('input', invalidate);
   function showDiagnostics(items) {
     diagnostics.replaceChildren();
     for (const {severity,line,message,source} of items) {
@@ -125,7 +128,7 @@ if (root) {
   });
   async function generate() {
     if (busy) return;
-    busy=true; drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
+    busy=true; nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
     input.readOnly=true; $('file').disabled=true;$('libraries').disabled=true;
     for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button')) element.disabled=true;
     status.textContent='Parsing netlist and routing wires…'; preview.setAttribute('aria-busy','true');
@@ -215,11 +218,7 @@ if (root) {
       status.textContent+=` Layout rules v${layoutRulesVersion}.`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
-      const rows=Object.values(circuit.nodes).map(n => {
-        const tr=document.createElement('tr');
-        for (const text of [n.displayName,n.terminals.map(t=>t.component+'.'+t.pin).join(', ')]) {const td=document.createElement('td');td.textContent=text;tr.append(td);} return tr;
-      });
-      $('nets').replaceChildren(...rows); $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);
+      nodeColors.setCircuit(circuit,input.value); $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);
       $('selection').textContent='Click a component to inspect its original statement and pin connections.';
       updateHierarchy();
     } catch(error) {
@@ -227,6 +226,7 @@ if (root) {
       $('selection').textContent=''; status.textContent=error.message;
       if(!tree){$('hierarchy-panel').hidden=true;$('selection-actions').hidden=true;$('breadcrumbs').replaceChildren();}
       else if(!tree.contexts[focus]){const home=document.createElement('button');home.type='button';home.textContent='Return to Top';home.onclick=()=>route('');$('breadcrumbs').replaceChildren(home);}
+      nodeColors.setCircuit(null,input.value);
       if(error.diagnostics)items=error.diagnostics;
       if (!items.some(d=>d.severity==='error')) items.push({severity:'error',line:0,message:error.message});
       showDiagnostics(items);
@@ -234,7 +234,7 @@ if (root) {
       busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;$('libraries').disabled=false;
       for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button')) element.disabled=false;
       if(tree&&tree.contexts[focus])updateHierarchy();
-      preview.setAttribute('aria-busy','false');exports();
+      nodeColors.setEnabled(!!svgText);preview.setAttribute('aria-busy','false');exports();
       if(pendingRoute){pendingRoute=false;readRoute();queueMicrotask(generate);}
     }
   }
