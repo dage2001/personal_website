@@ -280,3 +280,10 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 真实 Chrome 浏览器通过可见网格开关、七条初始顶层直线飞线、引脚及线中分支连接、异网拒绝、擦除/撤销/重做、Rload 移位、保留位置自动补线、全屏控件及导出清理。CIR 拓扑签名保持不变。原有浏览器与全屏回归均通过。
 - 手动移动/连线后的 RLC ASC bundle 审计通过，本机 LTspice 重新生成的五器件节点连接与 manifest 一致；该检查不证明动态仿真行为。
 - 日志：`tmp/manual-full.log`、`tmp/manual-browser.log`、`tmp/manual-regression.log`、`tmp/manual-workspace.log`、`tmp/manual-native.log`；截图：`tmp/manual-flywires.png`、`tmp/manual-routed.png`。命令：`npm run test:spice`、生产构建后 `npm run test:spice:interactive`。
+
+## 器件旋转、镜像与预览工具栏
+
+- 153/153 测试通过，无跳过。新增变换模型测试覆盖四次旋转/双次镜像的复原、引脚方向/网格/节点身份、端点断线、撤销/重做和碰撞回滚。
+- Chrome 验证按钮与 R/X/Y 快捷键、实际 SVG 引脚和 Drawing IR 重合、文字不随图形翻转、变换后自动布线及 ASC bundle；全屏验证 Escape 取消布线但保持全屏、Alt+Escape 退出、关闭信息栏后工具仍可用。原有浏览器回归及窄屏/拖动/调整大小/停靠/退出恢复检查通过。
+- 变换后的五器件 RLC ASC 通过本机 LTspice 节点连接检查。日志：`tmp/transforms-full.log`、`tmp/transforms-browser.log`、`tmp/transforms-workspace.log`、`tmp/transforms-regression.log`、`tmp/transforms-native.log`。截图：`tmp/transforms-fullscreen.png`、`tmp/spice-fullscreen-desktop.png`、`tmp/spice-fullscreen-mobile.png`。
+- 当前使用视口应用全屏，替代先前默认的 Fullscreen API；浏览器标签和地址栏由浏览器管理。全屏退出快捷键已统一为 Alt+Escape。

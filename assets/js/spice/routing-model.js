@@ -28,6 +28,17 @@ export class RoutingScene {
     this.pinCache=null;const overlap=this.components.some(m=>m!==n&&n.x<m.x+m.width-eps&&n.x+n.width>m.x+eps&&n.y<m.y+m.height-eps&&n.y+n.height>m.y+eps);
     if(overlap||this.segments.some(s=>!this.validSegment(s,s.bit))||n.ports.some(p=>this.pins().some(q=>q.owner!==id&&q.bit!==p.bit&&key(q)===key(p)))){this.restore(before);throw Error('Drop blocked: a component or another node occupies that position.');}this.remember(before);
   }
+  transform(id,action){
+    const n=this.components.find(n=>n.id===id);if(!n)return;const before=this.snapshot(),w=n.width,h=n.height;
+    const m=action==='rotate'?[0,1,-1,0,h,0]:action==='mirror-x'?[1,0,0,-1,0,h]:action==='mirror-y'?[-1,0,0,1,w,0]:null;if(!m)throw Error('Unknown transform.');
+    const old=n.ports.map(p=>({...p})),apply=p=>({x:m[0]*p.x+m[2]*p.y+m[4],y:m[1]*p.x+m[3]*p.y+m[5]});
+    this.segments=this.segments.filter(s=>!old.some(p=>p.bit===s.bit&&(key(p)===key(s.a)||key(p)===key(s.b))));
+    const sides=action==='rotate'?{NORTH:'EAST',EAST:'SOUTH',SOUTH:'WEST',WEST:'NORTH'}:action==='mirror-x'?{NORTH:'SOUTH',SOUTH:'NORTH'}:{EAST:'WEST',WEST:'EAST'};
+    for(const p of n.ports){const q=apply({x:p.x-n.x,y:p.y-n.y});p.x=n.x+q.x;p.y=n.y+q.y;p.side=sides[p.side]||p.side;}
+    const b=n.editorMatrix||[1,0,0,1,0,0];n.editorMatrix=[m[0]*b[0]+m[2]*b[1],m[1]*b[0]+m[3]*b[1],m[0]*b[2]+m[2]*b[3],m[1]*b[2]+m[3]*b[3],m[0]*b[4]+m[2]*b[5]+m[4],m[1]*b[4]+m[3]*b[5]+m[5]];
+    if(action==='rotate'){n.width=h;n.height=w;}this.pinCache=null;
+    if(n.ports.some(p=>!this.onGrid(p))||this.components.some(q=>q!==n&&n.x<q.x+q.width-eps&&n.x+n.width>q.x+eps&&n.y<q.y+q.height-eps&&n.y+n.height>q.y+eps)||this.segments.some(s=>!this.validSegment(s,s.bit))||n.ports.some(p=>this.pins().some(q=>q.owner!==id&&q.bit!==p.bit&&key(q)===key(p)))){this.restore(before);throw Error('Transform blocked: a component or wire occupies that position.');}this.remember(before);
+  }
   connectivity(){
     if(this.cache)return this.cache;const nets=new Map();for(const p of this.pins()){if(!nets.has(p.bit))nets.set(p.bit,{pins:[],segments:[]});nets.get(p.bit).pins.push(p);}for(const s of this.segments){if(!nets.has(s.bit))nets.set(s.bit,{pins:[],segments:[]});nets.get(s.bit).segments.push(s);}
     const results=[];for(const [bit,net]of nets){const points=new Map(),add=p=>{if(!points.has(key(p)))points.set(key(p),p);};net.pins.forEach(add);for(const s of net.segments){add(s.a);add(s.b);}for(let i=0;i<net.segments.length;i++)for(let j=i+1;j<net.segments.length;j++){const a=net.segments[i],b=net.segments[j];if(same(a.a.x,a.b.x)===same(b.a.x,b.b.x))continue;const v=same(a.a.x,a.b.x)?a:b,h=v===a?b:a,p={x:v.a.x,y:h.a.y};if(pointOnWire(p,v)&&pointOnWire(p,h))add(p);}

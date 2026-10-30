@@ -10,11 +10,13 @@ import {createNodeColorControls,colorSvgNets,defaultWireColor} from './node-colo
 import {createWorkspace} from './workspace.js';
 import {createInteractiveEditor} from './interactive-editor.js';
 import {showCoordinateGrid} from './svg-grid.js';
+import {mountToolIcons} from './tool-icons.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
 const root = $('app');
 if (root) {
+  mountToolIcons(root);
   createWorkspace(root);
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
   let drawing=null,ascPackage=null,ascExporting=false,editor=null,colorState=null,colorNodes=[];
@@ -33,6 +35,7 @@ if (root) {
   $('flywire').onchange=async()=>{$('interactive').checked=true;await enableEditing();if($('flywire').checked)editor.clear();else await editor.autoRoute();exports();};
   $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
   $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();
+  for(const button of root.querySelectorAll('[data-editor-mode]'))button.onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.chooseTool(button.dataset.editorMode);preview.focus({preventScroll:true});};
   nodeColors.setEnabled(false);
   function showExampleInfo(example) {
     const element=$('example-info');if(!element)return;element.replaceChildren();if(!example)return;

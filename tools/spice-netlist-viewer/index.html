@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793390267">
+  <link rel="stylesheet" href="/assets/main.css?v=1793403603">
   <link rel="canonical" href="/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793390267" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793403603" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793390267">
-  <script type="module" src="/assets/spice-viewer/viewer-crbJJwqX.js"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793403603">
+  <script type="module" src="/assets/spice-viewer/viewer-ROXKuZYB.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -148,7 +148,7 @@
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
   <div class="spice-workspace-tools spice-fullscreen-only" role="toolbar" aria-label="Fullscreen workspace">
-    <button type="button" id="spice-exit-fullscreen">Exit fullscreen</button>
+    <button type="button" id="spice-exit-fullscreen" title="Exit fullscreen (Alt+Escape)">Exit fullscreen</button>
     <button type="button" id="spice-show-editor" aria-controls="spice-editor-panel" aria-expanded="true">Netlist</button>
     <button type="button" id="spice-show-info" aria-controls="spice-info-panel" aria-expanded="true">Information</button>
     <button type="button" id="spice-reset-windows">Reset windows</button>
@@ -165,7 +165,7 @@
   </details>
   <div class="spice-workspace">
     <section class="spice-panel" id="spice-editor-panel">
-      <div class="spice-panel-header" data-window-handle="editor"><label for="spice-input" id="spice-editor-title">SPICE netlist</label><span class="spice-caption">01 / Circuit</span><button type="button" class="spice-fullscreen-only" id="spice-close-editor" aria-label="Close netlist window">×</button></div>
+      <div class="spice-panel-header" data-window-handle="editor"><label for="spice-input" id="spice-editor-title">SPICE netlist</label><span class="spice-caption">01 / Circuit</span><button type="button" class="spice-fullscreen-only" id="spice-pin-editor" aria-pressed="true" title="Pin netlist to left edge">Pin</button><button type="button" class="spice-fullscreen-only" id="spice-close-editor" aria-label="Close netlist window">×</button></div>
       <div class="spice-editor-content">
       <textarea id="spice-input" spellcheck="false" aria-label="SPICE netlist" aria-describedby="spice-input-help"></textarea>
       <div class="spice-toolbar">
@@ -183,7 +183,9 @@
     </section>
     <section class="spice-panel" id="spice-canvas-panel">
       <div class="spice-panel-header"><h2>Schematic</h2><span class="spice-caption">02 / Connected SVG</span><button type="button" id="spice-fullscreen" aria-pressed="false">Fullscreen ↗</button></div>
+      <div class="spice-canvas-stage">
       <div class="spice-preview" id="spice-preview" tabindex="0" role="region" aria-label="Schematic preview. Scroll to zoom, drag to pan, F to fit." aria-busy="false"></div>
+      <div class="spice-preview-tools" id="spice-preview-tools" role="toolbar" aria-label="Schematic tools">
       <div class="spice-toolbar" id="spice-canvas-toolbar">
         <button type="button" id="spice-zoom-out" aria-label="Zoom out">−</button>
         <button type="button" id="spice-zoom-in" aria-label="Zoom in">+</button>
@@ -196,18 +198,26 @@
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
         <label><input type="checkbox" id="spice-interactive"> Interactive</label>
         <label><input type="checkbox" id="spice-flywire"> Manual flywires</label>
-        <select id="spice-edit-tool" aria-label="Wiring tool"><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option></select>
+        <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
+        <button type="button" data-editor-mode="move" title="Move / select (V)" aria-pressed="true">Move</button>
+        <button type="button" data-editor-mode="route" title="Route / branch (W)" aria-pressed="false">Wire</button>
+        <button type="button" data-editor-mode="erase" title="Erase wire (D)" aria-pressed="false">Erase</button>
+        <button type="button" data-editor-mode="rotate" title="Rotate selected component 90° clockwise (R)" aria-pressed="false">Rotate 90°</button>
+        <button type="button" data-editor-mode="mirror-x" title="Mirror about horizontal X axis (X)" aria-pressed="false">Mirror X</button>
+        <button type="button" data-editor-mode="mirror-y" title="Mirror about vertical Y axis (Y)" aria-pressed="false">Mirror Y</button>
         <button type="button" id="spice-auto-route">Auto-route</button>
         <button type="button" id="spice-wire-undo">Undo</button><button type="button" id="spice-wire-redo">Redo</button>
         <span id="spice-editor-status" role="status" aria-live="polite">Enable Interactive to move components or wire pins.</span>
       </div>
-      <p class="spice-help spice-edit-help" id="spice-edit-help">Manual flywires starts with placement only. Drag components onto the grid; moving disconnects their attached wire segments. Click a pin to route, click empty grid points for corners, then finish at a pin or same-node wire. Choose Route / branch to start at a wire's middle. Flywires are straight and always on top. Shift-drag pans · Delete removes a selected segment · Escape cancels a route. Generate resets the current sheet; Auto-route keeps positions.</p>
+      </div>
+      </div>
+      <p class="spice-help spice-edit-help" id="spice-edit-help">Manual flywires starts with placement only. Move/select V · Wire W · Erase D · Rotate 90° R · Mirror X / Y · + / − zoom · F fit. Select a component, then transform it, or choose a transform and click a component. Moving or transforming disconnects attached wire segments. Click pins or same-node wires to connect; click empty grid points for waypoints. Shift-drag pans · Delete removes a selected wire · Escape cancels wiring and returns to Move without leaving fullscreen. Generate resets the current sheet; Auto-route keeps positions. Flywires are straight and always on top.</p>
       <p id="spice-selection">Click a component to inspect its pins.</p>
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
   <section id="spice-info-panel">
-    <div class="spice-window-header spice-fullscreen-only" data-window-handle="info"><h2 id="spice-info-title">Information</h2><span class="spice-help">Drag to move · resize from corner</span><button type="button" id="spice-close-info" aria-label="Close information window">×</button></div>
+    <div class="spice-window-header spice-fullscreen-only" data-window-handle="info"><h2 id="spice-info-title">Information</h2><span class="spice-help">Drag to unpin · resize from corner</span><button type="button" id="spice-pin-info" aria-pressed="true" title="Pin information to bottom edge">Pin</button><button type="button" id="spice-close-info" aria-label="Close information window">×</button></div>
     <div class="spice-info-content" id="spice-info-content">
   <p id="spice-status" role="status" aria-live="polite">Loading schematic viewer…</p>
   <p class="spice-help" id="spice-input-help">Paste a netlist or open a file. Scroll to zoom · Drag to pan · + / − to zoom · F to fit. SVG exports always include the full drawing.</p>
@@ -286,7 +296,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793390267"></script>
+<script src="/assets/js/site.js?v=1793403603"></script>
 
 
 
