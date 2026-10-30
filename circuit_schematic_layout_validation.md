@@ -262,3 +262,13 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 独立 `workspace.js` 管理工作区挂载、面板、焦点及生命周期，不依赖 parser / ELK / Drawing IR。提供 enter/exit/showPanel/reset/destroy 及 `spice:workspacechange` 事件，后续 React 容器可通过挂载/清理接入，无需本轮替换渲染框架。使用真实 DOM 的 portal 挂载，避免网站动画容器限制 CSS fixed 全屏；退出时完整恢复 DOM。
 - 浏览器验证通过：原生及 CSS 回退、浏览器原生退出同步、背景满屏与平移、窗口拖动/箭头键移动/角部调整大小、关闭/重开/复位、全屏内编辑生成和节点配色、移动窗口不平移画布、390×844 窄屏边界、Escape 与背景焦点/滚动恢复、普通布局恢复及原有全部浏览器回归（含层级和 SVG/ASC）。此功能不修改电气拓扑和布局算法。
 - 命令：先完成 Vite/Jekyll 生产构建，再 `npm run test:spice:workspace`。日志 `tmp/fullscreen-workspace.log` / `tmp/fullscreen-browser.log`；截图 `tmp/spice-fullscreen-desktop.png` / `tmp/spice-fullscreen-mobile.png`。
+
+## v19：网格布线第一版
+
+- 保留 ELK，新增 `grid-symbols.js`、`grid-align.js`、`grid-layout.js`，分别处理端点/符号适配、二端支路共线和保序整数轨道。默认步长 8，可选 4/16、可关闭；没有加入全图 A*/Lee 寻路。所有模式仍保持独立子页面。
+- 默认 RLC 对照：L1.B、C1.A、Rload.A 共线；交流源 V1 的输出也与 R1/L1 同排。唯一折弯 4→2，线长 814.56→808（约 -0.8%），宽 552.08→568（约 +2.9%），高 237→240。右端原短折线消除，回流支路保持竖直接地。
+- 局部 741：折弯 52→51；线长 18314.32→19152（约 +4.6%）；图幅 2622.44×1283→2664×1312。八组配对及四个经典区域、上下电源轨均保留，无经典布局回退。该例展示网格规整与线长之间的代价，不宣称全面变短。
+- 所有最终物理引脚、导线端点/转角及接点落格；实际 SVG 的每个 `s:pid` 坐标及端子引线起点与布局图严格一致；位号、参数、端口顺序和 Circuit IR 未改变。全局保序映射不合并异网轨道，局部共线候选检查元件碰撞、异网接触和端点重接。
+- 146/146 测试通过、无跳过：原有 134 项及 12 项网格测试，包含三个间距、RLC 共线/紧凑性、经典示例、741、全部 prefix 的 ASC 和私有 VDPO 所有页面。生产页浏览器通过网格开关/4与8切换、实际端点落格、节点配色、层级/字体/下载；全屏浮窗回归通过。
+- VDPO 353 器件、26 页面与 48 组内部投影审计通过，缺失引脚、残留几何回环/非端子叶线为零。5 组原生 LTspice ASC 连接检查通过：grid-filter、grid-focused-sallen、grid-all-prefixes、grid-private-collapsed、grid-private-focused；这不是动态仿真结论。
+- 日志：`tmp/grid-full-tests.log`、`tmp/grid-tests.log`、`tmp/grid-browser.log`、`tmp/grid-workspace.log`、`tmp/grid-vdpo.log`、`tmp/grid-native.log`；预览：`tmp/grid-filter-8.svg` / `tmp/grid-filter-8.png`、`tmp/grid-sallen-key-8.svg` / `tmp/grid-sallen-key-8.png`。

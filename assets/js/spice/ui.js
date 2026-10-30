@@ -21,7 +21,7 @@ if (root) {
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting; };
-  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,detailed:$('detailed').checked,conventional:$('conventional').checked});
+  const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,gridSize:$('grid').checked&&$('conventional').checked?Number($('grid-size').value):0,detailed:$('detailed').checked,conventional:$('conventional').checked});
   const nodeColors=createNodeColorControls($,(state,nodes)=>{const svg=preview.querySelector('svg');if(!svg)return;colorSvgNets(svg,nodes,state);const exported=svg.cloneNode(true);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;});
   nodeColors.setEnabled(false);
   function showExampleInfo(example) {
@@ -34,7 +34,7 @@ if (root) {
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
   input.addEventListener('input', invalidate);
-  for (const id of ['font','size','detailed','conventional']) $(id).addEventListener('input', invalidate);
+  for (const id of ['font','size','detailed','conventional','grid','grid-size']) $(id).addEventListener('input', invalidate);
   function showDiagnostics(items) {
     diagnostics.replaceChildren();
     for (const {severity,line,message,source} of items) {
@@ -217,7 +217,7 @@ if (root) {
       preview.replaceChildren(document.importNode(svg,true)); setView();
       const warnings=items.filter(d=>d.severity==='warning').length;
       status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${circuit.interfaceAliases.length?' · Parent-connected ports: '+circuit.interfaceAliases.map(a=>a.ports.join(' = ')).join('; ')+'.':''}${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
-      status.textContent+=` Layout rules v${layoutRulesVersion}.`;
+      status.textContent+=` Layout rules v${layoutRulesVersion}.`;if(circuit.layout.report?.gridVerified)status.textContent+=` Grid ${circuit.layout.report.gridSize}.`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
       nodeColors.setCircuit(circuit,input.value); $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);

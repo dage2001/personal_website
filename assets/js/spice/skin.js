@@ -1,5 +1,6 @@
 import onml from 'onml';
 import analog from 'netlistsvg/lib/analog.svg?raw';
+import {gridSkin} from './grid-symbols.js';
 
 const path = d => ['path', {d, class: 'symbol'}];
 const txt = (x, y, text) => ['text', {x, y, class: 'pin-label'}, text];
@@ -7,7 +8,7 @@ const originals = onml.parse(analog);
 const find = alias => originals.find(n => Array.isArray(n) && n.some?.(c => Array.isArray(c) && c[0] === 's:alias' && c[1].val === alias));
 const escape = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
 
-export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b29', detailed = false, conventional = true, orientationStrategy = 'signal'} = {}) {
+export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b29', detailed = false, conventional = true, orientationStrategy = 'signal',gridSize=0} = {}) {
   if (!['Arial', 'Helvetica', 'Times New Roman', 'monospace'].includes(font)) font = 'Arial';
   fontSize = Math.max(8, Math.min(24, Number(fontSize) || 12));
   if (!/^#[0-9a-f]{6}$/i.test(color)) color = '#292b29';
@@ -30,14 +31,14 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     if(!detailed&&rawLines.length>2)lines[1]=lines[1]+'…';
     const labelWidth = Math.max((cell.attributes.displayRef||cell.attributes.ref)?.length || 0, ...lines.map(s => s.length)) * fontSize * .68;
     const width = Math.max(104, 90 + labelWidth), height = Math.max(108, fontSize + 12 + lines.length * (fontSize + 4));
-    const group = ['g', {'s:type': alias, 's:width': width, 's:height': height}, ['s:alias', {val: alias}]];
+    const group = ['g', {'s:type': alias, 's:width': width, 's:height': height,...['spice_subckt','spice_device','spice_coupling'].includes(type)?{'data-grid-box':'true'}:{}}, ['s:alias', {val: alias}]];
     const pins = [], geometry = [];let labelsPlaced=false;
     let orientation=cell.spiceLayout?.orientation||(cell.spiceLayout?.horizontal?'horizontal':'vertical');
     if(orientationStrategy.startsWith('flow')&&cell.spiceLayout?.flexible&&cell.spiceLayout.source&&!Object.values(cell.spiceLayout.ports).every(p=>p.potential!==null))orientation=orientationStrategy==='flow'?'horizontal':'horizontal-reversed';
     if(verticalPairs.has(cell)&&cell.spiceLayout?.flexible)orientation=cell.spiceLayout.orientation.startsWith('vertical')?cell.spiceLayout.orientation:'vertical';
     const horizontal=orientation.startsWith('horizontal'),reversed=orientation.endsWith('reversed');
     const terminal = (name, x, y, side, sx, sy) => {
-      geometry.push(path(`M${x},${y} L${sx},${sy}`));
+      geometry.push(['path',{d:`M${x},${y} L${sx},${sy}`,class:'symbol','data-pin-lead':name,'data-inner-x':sx,'data-inner-y':sy}]);
       pins.push(['g', {'s:pid': name, 's:x': x, 's:y': y, 's:position': side, 's:dir': 'lateral'}]);
     };
     if (['spice_subckt','spice_device','spice_coupling'].includes(type)) {
@@ -67,11 +68,11 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
         if(side==='left'||side==='right') {
           const isLeft=side==='left',y=rowStart+i*pitch,x=isLeft?0:blockWidth;
           terminal(p.pin,x,y,side,isLeft?12:blockWidth-12,y);
-          geometry.push(['text',{x:isLeft?18:blockWidth-18,y:y-4,'text-anchor':isLeft?'start':'end',class:'pin-label'},p.label]);
+          geometry.push(['text',{x:isLeft?18:blockWidth-18,y:y-4,'text-anchor':isLeft?'start':'end',class:'pin-label','data-grid-pin-label':p.pin},p.label]);
         }else {
           const x=(i+1)*blockWidth/(ps.length+1),top=side==='top',y=top?0:blockHeight;
           terminal(p.pin,x,y,side,x,top?8:blockHeight-8);
-          geometry.push(['text',{x,y:top?fontSize+12:blockHeight-16,'text-anchor':'middle',class:'pin-label'},p.label]);
+          geometry.push(['text',{x,y:top?fontSize+12:blockHeight-16,'text-anchor':'middle',class:'pin-label','data-grid-pin-label':p.pin},p.label]);
         }
       });
     } else if(type==='spice_port') {
@@ -190,7 +191,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       // Literal text is escaped by onml; no expressions are ever evaluated.
       lines.forEach((line,i) => group.push(['text',{x:labelX,y:fontSize+4+(i+1)*(fontSize+4)},line]));
     }
-    group.push(...pins); templates.push(onml.stringify(group));
+    group.push(...pins);if(gridSize)gridSkin(group,gridSize);templates.push(onml.stringify(group));
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:s="https://github.com/nturley/netlistsvg">
   <s:properties constants="false" splitsAndJoins="false" genericsLaterals="true"><s:layoutEngine
