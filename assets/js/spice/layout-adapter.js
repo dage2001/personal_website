@@ -3,6 +3,8 @@ import {leafDevices,topologySignature} from './flatten.js';
 import {analyzeLayout} from './layout-semantics.js';
 import {mapTransistorMotifs} from './transistor-motifs.js';
 import {bindLayoutDescription} from './layout-description.js';
+import {elaborateCircuit} from './elaborate.js';
+import {bindValue} from './parameters.js';
 
 export function blockInterface(tree,context) {
   const pins=context.ports.map((p,i)=>({pin:'P'+i,name:p.name,label:p.label||p.name,node:p.node,implicit:false}));
@@ -14,6 +16,9 @@ export function blockInterface(tree,context) {
   return pins;
 }
 export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),focus=''}={}) {
+  const parentTree=tree;
+  const caller=tree.contexts[focus];if(!caller)throw Error('Unknown instance: '+focus);
+  if(focus)tree=elaborateCircuit(tree.ir,{isolate:focus});
   const context=tree.contexts[focus];if(!context)throw Error('Unknown instance: '+focus);
   const components=[],extraNodes=[];
   function visit(current) {
@@ -33,10 +38,16 @@ export function projectHierarchy(tree,{mode='hierarchical',expanded=new Set(),fo
   for(const [i,p]of context.ports.entries())components.push({name:'@port/'+focus+'/'+i,kind:'PORT',type:'spice_port',terminals:{A:p.node},layoutLabel:p.name,value:p.name,raw:'Interface port '+p.name,synthetic:true});
   if(components.length>1500)throw Error('This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.');
   const models=Object.assign(record(),...Object.values(tree.contexts).map(c=>c.models));
-  const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,extraNodes),models,diagnostics:tree.ir.diagnostics,mode,focus};
-  circuit.topology=auditProjection(tree,circuit);const description=bindLayoutDescription(tree,circuit);circuit.layout=analyzeLayout(tree,circuit,description);circuit.layout.description=description;return circuit;
+  const circuit={title:focus||tree.ir.title,components,nodes:indexNodes(components,extraNodes),models,diagnostics:tree.ir.diagnostics,mode,focus,localScope:!!focus};
+  circuit.interfaceBindings=context.ports.map((p,i)=>({port:p.name,local:p.node,parent:caller.ports[i].node}));
+  const sharedPorts=new Map();
+  for(const p of caller.ports){if(!sharedPorts.has(p.node))sharedPorts.set(p.node,[]);sharedPorts.get(p.node).push(p.name);}
+  circuit.interfaceAliases=[...sharedPorts].filter(([,ports])=>ports.length>1).map(([node,ports])=>({node,ports}));
+  circuit.topology=auditProjection(parentTree,circuit);const description=bindLayoutDescription(tree,circuit);circuit.layout=analyzeLayout(tree,circuit,description);circuit.layout.description=description;return circuit;
 }
 export function auditProjection(tree,view) {
+  const actual=leafDevices(tree.contexts[view.focus]);
+  if(view.localScope)tree=elaborateCircuit(tree.ir,{isolate:view.focus});
   const represented=[],seen=new Set();
   for(const c of view.components) {
     if(c.synthetic)continue;
@@ -50,7 +61,12 @@ export function auditProjection(tree,view) {
   for(const c of represented){if(seen.has(c.name))throw Error('Projection duplicates '+c.name);seen.add(c.name);}
   const signature=topologySignature(represented),expected=leafDevices(tree.contexts[view.focus]);
   if(signature!==topologySignature(expected))throw Error('Projection lost or changed electrical devices/connections.');
-  return {verified:true,leafCount:represented.length,signature};
+  if(view.localScope){
+    const bindings=new Map(view.interfaceBindings.map(b=>[b.local,b.parent])),node=n=>bindings.get(n)??n;
+    const bound=represented.map(c=>({...c,terminals:Object.fromEntries(Object.entries(c.terminals).map(([pin,n])=>[pin,node(n)])),value:bindValue(c.value,{},node,n=>n)}));
+    if(topologySignature(bound)!==topologySignature(actual))throw Error('Local sheet does not reproduce instance topology when its boundary is bound.');
+  }
+  return {verified:true,leafCount:represented.length,signature,boundSignature:topologySignature(actual),boundaryVerified:true};
 }
 export function toNetlistsvg(circuit) {
   const cells=record(),netnames=record();

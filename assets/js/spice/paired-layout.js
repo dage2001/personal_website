@@ -9,7 +9,7 @@ export function rigidTransistorPairs(motifs,cells,description) {
   const pairs=[],used=new Set();
   const scope=id=>owners.get(id)||cells[id]?.spiceLayout?.owner||'';
   const supported=id=>{const c=cells[id],kind=c?.spiceLayout?.kind;return kind==='Q'?Object.keys(c.connections).length===3:['M','J','Z'].includes(kind)&&!!c.connections.G;};
-  for(const kind of ['differential-pair','current-mirror','darlington-pair','sziklai-pair','cascode-pair'])for(const m of motifs)if(m.kind===kind&&m.confidence==='high'){
+  for(const kind of ['differential-pair','current-mirror','current-limit-pair','darlington-pair','sziklai-pair','cascode-pair'])for(const m of motifs)if(m.kind===kind&&m.confidence==='high'){
     const branches=kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:kind==='current-mirror'?[[m.roles.reference,...m.roles.outputs]]:kind==='push-pull-pair'?[[m.roles.upper,m.roles.lower]]:[[m.roles.driver,m.roles.output]];
     for(const ids of branches){
       if(ids.length!==2||new Set(ids).size!==ids.length||ids.some(id=>used.has(id)||!supported(id))||kind!=='current-mirror'&&ids.some(id=>scope(id)!==scope(ids[0])))continue;
@@ -31,13 +31,20 @@ export function mirroredSkinDevices(skin,cells) {
 
 /** Contract a pair for ELK placement, expose real pin coordinates, then restore it.
  * The tile is invisible and adds no electrical devices or net aliases. */
-export function tileTransistorPairs(graph,pairs,{inputs=[]}={}) {
+export function tileTransistorPairs(graph,pairs,{inputs=[],cells={}}={}) {
   const nodes=new Map(graph.children.map(n=>[n.id,n])),tiles=new Map(),ports=new Map(),owners=new Map(),leads=new Map(),applied=[],inputAttachments=[];
   for(const pair of pairs){const members=pair.members.map(id=>nodes.get(id));if(members.some(n=>!n)||members.some(n=>Math.abs(n.height-members[0].height)>.002))continue;
     const control=n=>n.ports.find(p=>p.id===n.id+'.B'||p.id===n.id+'.G');
     if(members.some((n,i)=>{const p=control(n);return !p||Math.abs(p.x-(pair.controlSides[i]==='left'?0:n.width))>.002;}))continue;
     const id='__transistor_pair_'+tiles.size,gap=32,stagger=pair.placement==='stagger',initialHeight=stagger?members.reduce((sum,n)=>sum+n.height,0)+16:members[0].height,children=[],pp=[];let width=0,height=initialHeight;
     for(const [i,member]of members.entries()){children.push({...member,x:stagger?i*(members[0].width/2+12):width,y:stagger?((pair.rise?1-i:i)*(members[0].height+16)):0});width+=member.width+gap;}width=Math.max(...children.map(n=>n.x+n.width));
+    // The sense resistor belongs to the protection subnet. Letting ELK place
+    // it independently can stretch both short local feedback connections.
+    if(pair.kind==='current-limit-pair'){
+      const bits=pair.members.map(id=>cells[id]?.connections.E?.[0]);
+      const senses=[...nodes.values()].filter(n=>cells[n.id]?.spiceLayout?.kind==='R'&&!owners.has(n.id)&&Object.values(cells[n.id].connections).length===2&&bits.every(bit=>Object.values(cells[n.id].connections).some(([b])=>b===bit)));
+      if(senses.length===1){const resistor=senses[0];children.push({...resistor,x:-resistor.width-20,y:(height-resistor.height)/2});}
+    }
     for(const input of inputs){const at=input.target.lastIndexOf('.'),target=children.find(n=>n.id===input.target.slice(0,at)),marker=nodes.get(input.id);if(!target||!marker||owners.has(marker.id))continue;const pin=target.ports.find(p=>p.id===input.target),a=marker.ports[0],right=pin.layoutOptions?.[opt+'port.side']==='EAST';if(a.layoutOptions?.[opt+'port.side']!==(right?'WEST':'EAST'))continue;
       const child={...marker,x:target.x+pin.x+(right?24:-24)-a.x,y:target.y+pin.y-a.y};if(children.some(n=>child.x<n.x+n.width+4&&child.x+child.width+4>n.x&&child.y<n.y+n.height+4&&child.y+child.height+4>n.y))continue;children.push(child);inputAttachments.push(input.id);
     }

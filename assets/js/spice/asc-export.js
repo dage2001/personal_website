@@ -53,7 +53,7 @@ export function exportAsc({tree,circuit,drawing,source='',libraries={}}) {
   for(const n of drawing.components)for(const p of n.ports){if(!terminals.has(p.bit))terminals.set(p.bit,[]);terminals.get(p.bit).push(p);}
   for(const s of drawing.segments){if(!byNet.has(s.bit))byNet.set(s.bit,[]);byNet.get(s.bit).push(s);}
   const wires=[];for(const [bit,ps]of terminals){const result=simplifyNetGeometry(byNet.get(bit)||[],ps);for(const s of result.segments)wires.push({bit,a:point(s.a),b:point(s.b)});}
-  const maxX=Math.max(...xs.map(xy.x)),maxY=Math.max(...ys.map(xy.y)),lines=['Version 4',`SHEET 1 ${maxX+256} ${maxY+512}`],flags=new Map(),files={},manifest={version:1,focus:circuit.focus,topology:circuit.topology.signature,components:[],nodes:[],warnings:compiled.warnings};
+  const maxX=Math.max(...xs.map(xy.x)),maxY=Math.max(...ys.map(xy.y)),lines=['Version 4',`SHEET 1 ${maxX+256} ${maxY+512}`],flags=new Map(),files={},manifest={version:1,focus:circuit.focus,viewScope:circuit.localScope?'subcircuit-local':'top-level',interfaceBindings:circuit.interfaceBindings||[],interfaceAliases:circuit.interfaceAliases||[],topology:circuit.topology.signature,components:[],nodes:[],warnings:compiled.warnings};
   const label=(p,name)=>{const k=key(p);if(flags.has(k)&&flags.get(k)!==name)throw Error('ASC grid would short two nets at '+k);flags.set(k,name);};
   // Flags at terminals preserve net identity for POLY control glyphs and sheet
   // ports, and make naming deterministic on an LTspice netlist round trip.

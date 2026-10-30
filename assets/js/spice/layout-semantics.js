@@ -4,7 +4,7 @@ import {classicPassiveOrientations} from './classic-orientation.js';
 import {currentLimiterTransistors} from './transistor-flow.js';
 import {declaredTransistorMotifs,recognizeTransistorMotifs} from './transistor-motifs.js';
 
-export const layoutRulesVersion = 16;
+export const layoutRulesVersion = 18;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);
@@ -53,11 +53,14 @@ export function dcPotentials(devices) {
 }
 
 export function analyzeLayout(tree,circuit,description=null) {
-  const dc=dcPotentials(leafDevices(tree.root)),nodes=Object.create(null),cells=Object.create(null);
+  const dc=dcPotentials(leafDevices(circuit.localScope?tree.contexts[circuit.focus]:tree.root)),nodes=Object.create(null),cells=Object.create(null);
   for(const n of Object.values(circuit.nodes)) {
     const named=namingRole(n.name),legacy=legacyRail(n.name);
     nodes[n.name]={role:named!=='unknown'?named:legacy,roleSource:named!=='unknown'?'node-name':legacy!=='unknown'?'legacy-rail-name':'unknown',potential:dc.nodes[n.name]?.known?dc.nodes[n.name].value:null};
   }
+  // Local supply ports have drawing order, not an inferred parent voltage.
+  // Symbolic ranks never enter the electrical IR or source expressions.
+  if(circuit.localScope)for(const b of circuit.interfaceBindings){const n=nodes[b.local],role=interfaceRole(b.port);if(n&&n.potential===null&&['pwr','ret'].includes(role)){n.potential=role==='pwr'?1:/^(?:ret_)?(?:gnd|ground|0)$/i.test(b.port)?0:-1;n.potentialSource='symbolic-port-order';}}
   const motifs=description?.pairs?.length?declaredTransistorMotifs(circuit,nodes,description.pairs):recognizeTransistorMotifs(circuit,nodes),orientations=classicPassiveOrientations(circuit,nodes,motifs),limiters=currentLimiterTransistors(circuit);
   const roleAt=(c,pin,node)=>{
     const base={role:nodes[node].role,roleSource:nodes[node].roleSource};

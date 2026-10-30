@@ -1,6 +1,7 @@
 import {leafDevices} from './flatten.js';
 import {bindValue,parameterEnvironment} from './parameters.js';
 import {nodeName,qualify} from './circuit-ir.js';
+import {elaborateCircuit} from './elaborate.js';
 
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const replaceToken=(text,from,to)=>text.replace(new RegExp('(?<![\\w./%:$])'+escape(from)+'(?![\\w./%:$])','gi'),()=>to);
@@ -8,6 +9,7 @@ const replaceToken=(text,from,to)=>text.replace(new RegExp('(?<![\\w./%:$])'+esc
 /** Compile the current projection. Each collapsed *instance* gets a bound local
  * definition; expanded instances remain real primitives on this same sheet. */
 export function compileAscNetlist(tree,circuit) {
+  if(circuit.localScope)tree=elaborateCircuit(tree.ir,{isolate:circuit.focus});
   const visible=circuit.components.filter(c=>!c.synthetic),all=leafDevices(tree.root),refs=new Map(),owners=new Map(),blocks=visible.filter(c=>c.kind==='X');
   const usedRefs=new Set();const uniqueRef=(kind,name)=>{let ref=name.includes('/')?kind+'_'+name.replaceAll('/','_'):name;ref=ref.replace(/[^a-z0-9_.$@&Ö]/gi,'_');if(!ref.toUpperCase().startsWith(kind))ref=kind+'_'+ref;const base=ref;let serial=1;while(usedRefs.has(ref.toLowerCase()))ref=base+'_'+serial++;usedRefs.add(ref.toLowerCase());return ref;};
   all.forEach(c=>refs.set(c.name,uniqueRef(c.kind,c.name)));
@@ -90,6 +92,9 @@ export function compileAscNetlist(tree,circuit) {
   for(const context of Object.values(tree.contexts)){
     if(context.id&&!leafDevices(context).some(c=>owners.has(c.name)&&(visible.some(v=>v.name===c.name)||blocks.some(b=>b.name===owners.get(c.name)))))continue;
     for(const d of tree.ir.scopes[context.scopeId].directives){
+      // Parent node/device directives cannot be interpreted as local wiring.
+      // Retain parameter/model environment and analysis settings only.
+      if(circuit.localScope&&!context.id&&!/^\.(?:model|title|param|func|global|options?|tran|ac|op|step|temp)\b/i.test(d.text))continue;
       if(/^\.(?:model|param|global|title)\b/i.test(d.text)&&context.id)continue;
       if(/^\.(?:model|title)\b/i.test(d.text))continue;
       if(context.id&&!/^\.(?:func|ic|nodeset)\b/i.test(d.text))throw Error('ASC export: local directive requires scope-preserving export ('+context.id+'): '+d.text);
