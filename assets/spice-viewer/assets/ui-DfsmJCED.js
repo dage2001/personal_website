@@ -12,30 +12,30 @@ const Ge = { 1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "_Q", 7: "Q", 8: "com" }
   OTA: Ze,
   SAMPLEHOLD: Je,
   VARISTOR: et
-}, nt = "A B C D E F G H I J K L M O Q R S T U V W X Z @ & Ö", ie = (t) => t.toLowerCase(), Re = (t) => t === void 0 || t.includes("=") || /^(?:off|on)$/i.test(t), rt = (t) => t.replace(/^\(/, "").replace(/\)$/, "").split(/[\s,]+/).filter(Boolean);
+}, nt = "A B C D E F G H I J K L M O Q R S T U V W X Z @ & Ö", ie = (t) => t.toLowerCase(), xe = (t) => t === void 0 || t.includes("=") || /^(?:off|on)$/i.test(t), rt = (t) => t.replace(/^\(/, "").replace(/\)$/, "").split(/[\s,]+/).filter(Boolean);
 function ot(t, e) {
   const n = (E) => e[ie(E || "")] || Object.entries(e).find(([w]) => w.startsWith(ie(E || "") + "."))?.[1], i = t[0][0].toUpperCase();
-  let r = [], u = [], a = "", o = "", c = [], l = [], d = 0, g = "", p = "", h = "", _ = !0;
+  let r = [], u = [], a = "", o = "", c = [], d = [], l = 0, g = "", p = "", m = "", _ = !0;
   if ("RLC".includes(i))
     r = ["A", "B"], o = ie(i) + "_v";
   else if ("DVIB".includes(i))
     r = ["+", "-"], o = i === "D" ? "d_v" : i === "B" ? "spice_b" : ie(i);
   else if (i === "Q") {
-    r = ["C", "B", "E"], !n(t[4]) && (n(t[5]) || !Re(t[5]) && !/^[+\-\d.{'"]/.test(t[5])) && r.push("S"), a = t[r.length + 1] || "";
+    r = ["C", "B", "E"], !n(t[4]) && (n(t[5]) || !xe(t[5]) && !/^[+\-\d.{'"]/.test(t[5])) && r.push("S"), a = t[r.length + 1] || "";
     const E = n(a)?.type;
     _ = ["NPN", "PNP"].includes(E), o = _ ? (r.length === 3 ? "q_" : "spice_q4_") + ie(E) : "spice_q" + r.length;
   } else if (i === "M") {
-    const E = n(t[4]), w = n(t[5]), f = E?.type === "VDMOS" || !w && (!t[5] || Re(t[5]));
+    const E = n(t[4]), w = n(t[5]), f = E?.type === "VDMOS" || !w && (!t[5] || xe(t[5]));
     r = f ? ["D", "G", "S"] : ["D", "G", "S", "B"], a = t[r.length + 1] || "";
-    const I = n(a), N = I?.type;
-    if (f && I && N !== "VDMOS") throw Error("Monolithic NMOS/PMOS requires a bulk terminal; three-terminal form requires VDMOS.");
-    if (!f && N === "VDMOS") throw Error("VDMOS requires exactly D/G/S terminals.");
-    _ = ["NMOS", "PMOS", "VDMOS"].includes(N);
+    const I = n(a), C = I?.type;
+    if (f && I && C !== "VDMOS") throw Error("Monolithic NMOS/PMOS requires a bulk terminal; three-terminal form requires VDMOS.");
+    if (!f && C === "VDMOS") throw Error("VDMOS requires exactly D/G/S terminals.");
+    _ = ["NMOS", "PMOS", "VDMOS"].includes(C);
     let O = null, v = I;
-    const x = /* @__PURE__ */ new Set();
-    for (; v && !x.has(v.name) && (x.add(v.name), O = /\bpchan(?:\s*=\s*([+\-\d.e]+))?/i.exec(v.raw), !O); )
+    const R = /* @__PURE__ */ new Set();
+    for (; v && !R.has(v.name) && (R.add(v.name), O = /\bpchan(?:\s*=\s*([+\-\d.e]+))?/i.exec(v.raw), !O); )
       v = n(v.baseModel);
-    const P = N === "PMOS" || N === "VDMOS" && O && (O[1] === void 0 || Number(O[1]) >= 0.5);
+    const P = C === "PMOS" || C === "VDMOS" && O && (O[1] === void 0 || Number(O[1]) >= 0.5);
     o = _ ? "spice_" + (P ? "pmos" : "nmos") + (f ? "3" : "") : "spice_m";
   } else if ("JZ".includes(i)) {
     a = t[4] || "";
@@ -49,54 +49,54 @@ function ot(t, e) {
     if (w) {
       const f = Number(w[1]);
       if (f > 128) throw Error("POLY supports at most 128 controlling variables.");
-      let I = E + 1, N = [];
+      let I = E + 1, C = [];
       const O = "EG".includes(i), v = f * (O ? 2 : 1);
-      for (; N.length < v && I < t.length; ) N.push(...rt(t[I++]));
-      if (N.length !== v || I >= t.length) throw Error("POLY control count or coefficient list is incomplete.");
+      for (; C.length < v && I < t.length; ) C.push(...rt(t[I++]));
+      if (C.length !== v || I >= t.length) throw Error("POLY control count or coefficient list is incomplete.");
       if (O) {
-        for (let x = 0; x < f; x++) r.push("C" + (x + 1) + "+", "C" + (x + 1) + "-");
-        u = [t[1], t[2], ...N];
-      } else c = N;
-      d = I, g = "POLY(" + f + ") " + (O ? "" : N.join(" ") + " "), p = "POLY", O && (o = "spice_device");
-    } else /^(?:value|vol|cur|table|laplace|[VI]\s*=)/i.test(t[3] || "") || t[3]?.startsWith("{") ? p = "BEHAVIORAL" : "EG".includes(i) ? (r.push("C+", "C-"), p = /\blaplace\s*=/i.test(t.slice(5).join(" ")) ? "LAPLACE" : /\btable\s*=/i.test(t.slice(5).join(" ")) ? "TABLE" : "LINEAR") : (c = [t[3]], d = 4, g = t[3] + " ");
-    h = { E: "VCVS", G: "VCCS", F: "CCCS", H: "CCVS" }[i] + (p ? " · " + p : "");
+        for (let R = 0; R < f; R++) r.push("C" + (R + 1) + "+", "C" + (R + 1) + "-");
+        u = [t[1], t[2], ...C];
+      } else c = C;
+      l = I, g = "POLY(" + f + ") " + (O ? "" : C.join(" ") + " "), p = "POLY", O && (o = "spice_device");
+    } else /^(?:value|vol|cur|table|laplace|[VI]\s*=)/i.test(t[3] || "") || t[3]?.startsWith("{") ? p = "BEHAVIORAL" : "EG".includes(i) ? (r.push("C+", "C-"), p = /\blaplace\s*=/i.test(t.slice(5).join(" ")) ? "LAPLACE" : /\btable\s*=/i.test(t.slice(5).join(" ")) ? "TABLE" : "LINEAR") : (c = [t[3]], l = 4, g = t[3] + " ");
+    m = { E: "VCVS", G: "VCCS", F: "CCCS", H: "CCVS" }[i] + (p ? " · " + p : "");
   } else if (i === "S")
-    r = ["A", "B", "C+", "C-"], a = t[5] || "", o = "spice_device", h = "Voltage switch";
+    r = ["A", "B", "C+", "C-"], a = t[5] || "", o = "spice_device", m = "Voltage switch";
   else if (i === "W")
-    r = ["A", "B"], c = [t[3]], a = t[4] || "", d = 3, o = "spice_device", h = "Current switch";
+    r = ["A", "B"], c = [t[3]], a = t[4] || "", l = 3, o = "spice_device", m = "Current switch";
   else if ("TO".includes(i))
-    r = ["L+", "L-", "R+", "R-"], i === "O" && (a = t[5] || ""), o = "spice_device", h = i === "T" ? "Transmission line" : "Lossy line";
+    r = ["L+", "L-", "R+", "R-"], i === "O" && (a = t[5] || ""), o = "spice_device", m = i === "T" ? "Transmission line" : "Lossy line";
   else if (i === "U")
-    r = ["N1", "N2", "COM"], a = t[4] || "", o = "spice_device", h = "Distributed RC";
+    r = ["N1", "N2", "COM"], a = t[4] || "", o = "spice_device", m = "Distributed RC";
   else if (i === "A")
-    r = Array.from({ length: 8 }, (E, w) => "P" + (w + 1)), o = "spice_device", h = t[9] || "A function";
+    r = Array.from({ length: 8 }, (E, w) => "P" + (w + 1)), o = "spice_device", m = t[9] || "A function";
   else if (i === "K") {
     if (t.length < 4) throw Error("Mutual coupling requires at least two inductors and a coefficient.");
-    if (l = t.slice(1, -1), l.some((E) => !/^L/i.test(E.split(":").at(-1)))) throw Error("K references must name inductors.");
-    d = t.length - 1, o = "spice_coupling", h = "Magnetic coupling", g = l.join(" ") + " · k=";
+    if (d = t.slice(1, -1), d.some((E) => !/^L/i.test(E.split(":").at(-1)))) throw Error("K references must name inductors.");
+    l = t.length - 1, o = "spice_coupling", m = "Magnetic coupling", g = d.join(" ") + " · k=";
   } else if (i === "@")
-    r = ["IN", "OUT"], o = "spice_device", h = "FRA";
+    r = ["IN", "OUT"], o = "spice_device", m = "FRA";
   else if (i === "&")
-    r = ["O+", "O-", "I+", "I-"], o = "spice_device", h = "FRA probe";
+    r = ["O+", "O-", "I+", "I-"], o = "spice_device", m = "FRA probe";
   else if (i === "Ö")
-    r = ["OUT", "V+", "V-", "IN-", "IN+"], o = "spice_device", h = "Transconductance";
+    r = ["OUT", "V+", "V-", "IN-", "IN+"], o = "spice_device", m = "Transconductance";
   else throw Error("Unknown LTspice element prefix: " + i);
-  if (d || (d = r.length + 1), u.length || (u = t.slice(1, r.length + 1)), u.length !== r.length) throw Error("Incomplete terminal list: expected " + r.length + " nodes.");
-  if (t.length <= d && !["&", "Ö"].includes(i)) throw Error("Missing value, model, or expression after " + r.length + " terminals.");
+  if (l || (l = r.length + 1), u.length || (u = t.slice(1, r.length + 1)), u.length !== r.length) throw Error("Incomplete terminal list: expected " + r.length + " nodes.");
+  if (t.length <= l && !["&", "Ö"].includes(i)) throw Error("Missing value, model, or expression after " + r.length + " terminals.");
   if (u.some((E) => /[=()]/.test(E) && !/^\{[\s\S]*\}$/.test(E))) throw Error("Invalid terminal token; check terminal count.");
-  if (i === "B" && !/\b[VIPR]\s*=/i.test(t.slice(d).join(" "))) throw Error("Behavioral source requires V=, I=, R= or P=.");
-  if (i === "B" && /^R\s*=/i.test(t.slice(d).join(" ")) && (o = "spice_br"), i === "D" && (a = t[3] || ""), i === "@") {
-    const E = t.slice(d).join(" ");
+  if (i === "B" && !/\b[VIPR]\s*=/i.test(t.slice(l).join(" "))) throw Error("Behavioral source requires V=, I=, R= or P=.");
+  if (i === "B" && /^R\s*=/i.test(t.slice(l).join(" ")) && (o = "spice_br"), i === "D" && (a = t[3] || ""), i === "@") {
+    const E = t.slice(l).join(" ");
     for (const w of E.matchAll(/\b(refnode|intnode)\s*=\s*(\{[^}]*\}|"[^"]*"|[^\s]+)/gi))
       r.push(w[1].toUpperCase()), u.push(w[2]);
   }
   if (i === "A" && !t[9]) throw Error("A element requires eight terminals followed by its function name.");
   if (c.some((E) => !E)) throw Error("Missing controlling voltage source.");
-  const m = r.map((E, w) => i === "A" && tt[(t[9] || "").toUpperCase()]?.[String(w + 1)] || E);
-  return { kind: i, pins: r, nodeTokens: u, pinLabels: m, model: a, type: o, controlSource: c[0] || "", controlSources: c, coupledInductors: l, value: g + t.slice(d).join(" "), sourceMode: p, symbol: h, polarityKnown: _ };
+  const h = r.map((E, w) => i === "A" && tt[(t[9] || "").toUpperCase()]?.[String(w + 1)] || E);
+  return { kind: i, pins: r, nodeTokens: u, pinLabels: h, model: a, type: o, controlSource: c[0] || "", controlSources: c, coupledInductors: d, value: g + t.slice(l).join(" "), sourceMode: p, symbol: m, polarityKnown: _ };
 }
 const it = nt, st = new Set(it.split(" ")), we = () => /* @__PURE__ */ Object.create(null), K = (t) => t.toLowerCase();
-function me(t) {
+function he(t) {
   const e = [], n = [];
   let i = "", r = 0, u = "";
   for (let a = 0; a < t.length; a++) {
@@ -128,7 +128,7 @@ function at(t, e = {}) {
   });
   for (const w of c) {
     try {
-      w.tokens = me(w.text);
+      w.tokens = he(w.text);
     } catch (I) {
       o("error", w.line, I.message), w.tokens = [];
     }
@@ -136,57 +136,57 @@ function at(t, e = {}) {
     if (/^\.model$/i.test(f[0] || ""))
       if (f.length < 3) o("error", w.line, ".model requires a name and device type.");
       else {
-        const I = /^ako:(.+)$/i.exec(f[2]), N = I && f[3] && !f[3].startsWith("(") ? f[3].split("(")[0].toUpperCase() : "";
-        u[K(f[1])] = { name: f[1], type: I ? N : f[2].split("(")[0].toUpperCase(), baseModel: I?.[1] || "", raw: w.text };
+        const I = /^ako:(.+)$/i.exec(f[2]), C = I && f[3] && !f[3].startsWith("(") ? f[3].split("(")[0].toUpperCase() : "";
+        u[K(f[1])] = { name: f[1], type: I ? C : f[2].split("(")[0].toUpperCase(), baseModel: I?.[1] || "", raw: w.text };
       }
   }
-  const l = /* @__PURE__ */ new Set();
-  function d(w) {
+  const d = /* @__PURE__ */ new Set();
+  function l(w) {
     const f = u[K(w)];
     if (!f) return "";
     if (f.type) return f.type;
-    if (l.has(K(w))) throw Error("Circular AKO model inheritance: " + w);
-    return l.add(K(w)), f.type = d(f.baseModel), l.delete(K(w)), f.type;
+    if (d.has(K(w))) throw Error("Circular AKO model inheritance: " + w);
+    return d.add(K(w)), f.type = l(f.baseModel), d.delete(K(w)), f.type;
   }
   for (const w of Object.values(u)) if (w.baseModel && !w.type)
     try {
-      d(w.name);
+      l(w.name);
     } catch (f) {
       o("error", 0, f.message);
     }
-  let g = "", p = 0, h = !1, _ = !1;
-  const m = /* @__PURE__ */ new Set(), E = /* @__PURE__ */ new Set([".title", ".model", ".param", ".func", ".tran", ".ac", ".dc", ".op", ".options", ".option", ".ic", ".nodeset", ".save", ".probe", ".print", ".plot", ".meas", ".measure", ".temp", ".step", ".global", ".backanno", ".width", ".four", ".noise", ".pz", ".tf", ".sens"]);
+  let g = "", p = 0, m = !1, _ = !1;
+  const h = /* @__PURE__ */ new Set(), E = /* @__PURE__ */ new Set([".title", ".model", ".param", ".func", ".tran", ".ac", ".dc", ".op", ".options", ".option", ".ic", ".nodeset", ".save", ".probe", ".print", ".plot", ".meas", ".measure", ".temp", ".step", ".global", ".backanno", ".width", ".four", ".noise", ".pz", ".tf", ".sens"]);
   for (const { line: w, text: f, tokens: I } of c) {
     if (!I.length) continue;
-    const N = K(I[0]);
+    const C = K(I[0]);
     if (_) {
       o("warning", w, "Statement after .end is not rendered: " + f);
       continue;
     }
-    if (N === ".control") {
-      h = !0, o("warning", w, ".control script retained but not executed or rendered.");
+    if (C === ".control") {
+      m = !0, o("warning", w, ".control script retained but not executed or rendered.");
       continue;
     }
-    if (N === ".endc") {
-      h = !1;
+    if (C === ".endc") {
+      m = !1;
       continue;
     }
-    if (h) continue;
-    if (N === ".subckt") {
+    if (m) continue;
+    if (C === ".subckt") {
       p++, o("error", w, "Use parseHierarchy() for subcircuit definitions.");
       continue;
     }
-    if (N === ".ends") {
+    if (C === ".ends") {
       p ? p-- : o("error", w, "Unmatched .ends.");
       continue;
     }
     if (p) continue;
-    if (N === ".end") {
+    if (C === ".end") {
       _ = !0;
       continue;
     }
-    if (N.startsWith(".")) {
-      i.push({ line: w, text: f }), N === ".title" ? g = I.slice(1).join(" ") : [".protect", ".unprotect", ".prot", ".unprot"].includes(N) ? o("error", w, "Protected/encrypted model bodies cannot be expanded. Provide an unencrypted definition.") : [".if", ".elseif", ".else", ".endif", ".connect", ".alias"].includes(N) ? o("error", w, "Topology-changing directive is unsupported: " + f) : E.has(N) || o("warning", w, "Directive retained but not resolved: " + f);
+    if (C.startsWith(".")) {
+      i.push({ line: w, text: f }), C === ".title" ? g = I.slice(1).join(" ") : [".protect", ".unprotect", ".prot", ".unprot"].includes(C) ? o("error", w, "Protected/encrypted model bodies cannot be expanded. Provide an unencrypted definition.") : [".if", ".elseif", ".else", ".endif", ".connect", ".alias"].includes(C) ? o("error", w, "Topology-changing directive is unsupported: " + f) : E.has(C) || o("warning", w, "Directive retained but not resolved: " + f);
       continue;
     }
     const O = I[0][0].toUpperCase();
@@ -200,19 +200,19 @@ function at(t, e = {}) {
       continue;
     }
     try {
-      if (m.has(N)) throw Error("Duplicate component name (SPICE names are case insensitive).");
-      const x = ot(I, u), { pins: P, nodeTokens: s, ...y } = x;
-      x.polarityKnown || o("warning", w, `${I[0]}: model polarity unknown; explicit ${P.join("/")} terminals retained.`);
-      const R = we();
+      if (h.has(C)) throw Error("Duplicate component name (SPICE names are case insensitive).");
+      const R = ot(I, u), { pins: P, nodeTokens: s, ...y } = R;
+      R.polarityKnown || o("warning", w, `${I[0]}: model polarity unknown; explicit ${P.join("/")} terminals retained.`);
+      const x = we();
       P.forEach((V, U) => {
         const D = K(s[U]);
-        a[D] || (a[D] = { name: D, displayName: I[U + 1], bit: Object.keys(a).length + 2, terminals: [] }), a[D].terminals.push({ component: I[0], pin: V }), R[V] = D;
-      }), r.push({ ...y, name: I[0], terminals: R, line: w, raw: f }), m.add(N);
-    } catch (x) {
-      o("error", w, `${I[0]}: ${x.message} Statement: ${f}`);
+        a[D] || (a[D] = { name: D, displayName: I[U + 1], bit: Object.keys(a).length + 2, terminals: [] }), a[D].terminals.push({ component: I[0], pin: V }), x[V] = D;
+      }), r.push({ ...y, name: I[0], terminals: x, line: w, raw: f }), h.add(C);
+    } catch (R) {
+      o("error", w, `${I[0]}: ${R.message} Statement: ${f}`);
     }
   }
-  p && o("error", 0, "Unclosed .subckt definition."), h && o("error", 0, "Unclosed .control block."), r.length || o("error", 0, "No supported components to render."), r.length > 300 && o("error", 0, "Phase 1 supports up to 300 components per drawing.");
+  p && o("error", 0, "Unclosed .subckt definition."), m && o("error", 0, "Unclosed .control block."), r.length || o("error", 0, "No supported components to render."), r.length > 300 && o("error", 0, "Phase 1 supports up to 300 components per drawing.");
   for (const w of r) {
     for (const f of w.controlSources || []) !f.includes(":") && !r.some((I) => K(I.name) === K(f) && I.kind === "V") && o("error", w.line, `${w.name}: controlling voltage source ${f} was not found.`);
     for (const f of w.coupledInductors || []) !f.includes(":") && !r.some((I) => K(I.name) === K(f) && I.kind === "L") && o("error", w.line, `${w.name}: coupled inductor ${f} was not found.`);
@@ -220,60 +220,60 @@ function at(t, e = {}) {
   }
   return { title: g, components: r, nodes: a, models: u, directives: i, diagnostics: n };
 }
-const te = (t) => t.replace(/^['"]|['"]$/g, "").replace(/\\/g, "/").replace(/^\.\//, "").toLowerCase(), xe = (t) => te(t).split("/").at(-1);
+const te = (t) => t.replace(/^['"]|['"]$/g, "").replace(/\\/g, "/").replace(/^\.\//, "").toLowerCase(), Re = (t) => te(t).split("/").at(-1);
 function ct(t, { files: e = {}, filename: n = "input.cir" } = {}) {
   const i = new Map(e instanceof Map ? e : Object.entries(e)), r = [], u = [], a = [];
   let o = 0;
-  const c = (d, g) => {
-    const p = te(g).split("/").slice(0, -1).concat(te(d)).join("/"), h = [...i].filter(([m]) => te(m) === te(d) || te(m) === p);
-    if (h.length === 1) return h[0];
-    const _ = [...i].filter(([m]) => xe(m) === xe(d));
-    if (_.length !== 1) throw Error(_.length ? "Ambiguous library filename: " + d : "Missing library " + d + ". Add this file using Library files.");
+  const c = (l, g) => {
+    const p = te(g).split("/").slice(0, -1).concat(te(l)).join("/"), m = [...i].filter(([h]) => te(h) === te(l) || te(h) === p);
+    if (m.length === 1) return m[0];
+    const _ = [...i].filter(([h]) => Re(h) === Re(l));
+    if (_.length !== 1) throw Error(_.length ? "Ambiguous library filename: " + l : "Missing library " + l + ". Add this file using Library files.");
     return _[0];
   };
-  function l(d, g, p = "", h = []) {
+  function d(l, g, p = "", m = []) {
     const _ = te(g) + ":" + p.toLowerCase();
-    if (h.includes(_)) throw Error("Circular library include: " + [...h, _].join(" → "));
-    if (h.length > 32) throw Error("Library nesting exceeds 32 levels.");
-    const m = [], E = /^\s*\.endl\b/im.test(d);
+    if (m.includes(_)) throw Error("Circular library include: " + [...m, _].join(" → "));
+    if (m.length > 32) throw Error("Library nesting exceeds 32 levels.");
+    const h = [], E = /^\s*\.endl\b/im.test(l);
     let w = !p;
-    const f = (N, O) => {
-      if (o += N.length, o > 16e6) throw Error("Expanded library input exceeds 16 MB.");
-      a.push(N), u.push({ file: g, line: O + 1 });
+    const f = (C, O) => {
+      if (o += C.length, o > 16e6) throw Error("Expanded library input exceeds 16 MB.");
+      a.push(C), u.push({ file: g, line: O + 1 });
     };
-    if (d.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((N, O) => {
-      const v = N.trim();
+    if (l.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((C, O) => {
+      const v = C.trim();
       if (/^\.lib\b/i.test(v) && E) {
-        const x = me(v);
-        if (x.length === 2 && !/[.\\/]/.test(x[1])) {
-          m.push(x[1].toLowerCase()), x[1].toLowerCase() === p.toLowerCase() && (w = !0), f("* Library section " + x[1], O);
+        const R = he(v);
+        if (R.length === 2 && !/[.\\/]/.test(R[1])) {
+          h.push(R[1].toLowerCase()), R[1].toLowerCase() === p.toLowerCase() && (w = !0), f("* Library section " + R[1], O);
           return;
         }
       }
       if (/^\.endl\b/i.test(v)) {
-        m.pop(), f("* End library section", O);
+        h.pop(), f("* End library section", O);
         return;
       }
-      if (p && m.length && !m.includes(p.toLowerCase())) {
+      if (p && h.length && !h.includes(p.toLowerCase())) {
         f("* Unselected library section", O);
         return;
       }
       if (/^\.(?:include|inc|lib)\b/i.test(v))
         try {
-          const x = me(v);
-          if (!x[1]) throw Error("Include requires a filename.");
-          const [P, s] = c(x[1], g);
-          f("* Included " + P, O), l(s, P, x[2] || "", [...h, _]);
-        } catch (x) {
-          r.push({ severity: "error", line: O + 1, source: g, message: x.message }), f("* Unresolved include", O);
+          const R = he(v);
+          if (!R[1]) throw Error("Include requires a filename.");
+          const [P, s] = c(R[1], g);
+          f("* Included " + P, O), d(s, P, R[2] || "", [...m, _]);
+        } catch (R) {
+          r.push({ severity: "error", line: O + 1, source: g, message: R.message }), f("* Unresolved include", O);
         }
-      else f(N, O);
+      else f(C, O);
     }), !w) throw Error("Library section " + p + " not found in " + g);
   }
   try {
-    l(t, n);
-  } catch (d) {
-    r.push({ severity: "error", line: 0, source: n, message: d.message });
+    d(t, n);
+  } catch (l) {
+    r.push({ severity: "error", line: 0, source: n, message: l.message });
   }
   return { source: a.join(`
 `), origins: u, diagnostics: r };
@@ -281,17 +281,17 @@ function ct(t, { files: e = {}, filename: n = "input.cir" } = {}) {
 function lt(t) {
   const e = [], n = /* @__PURE__ */ new Map(), i = [0], r = [];
   t.split(/\r?\n/).forEach((o, c) => {
-    const l = o.trim();
-    /^\.subckt\b/i.test(l) && (i.push(c + 1), n.set(c + 1, [])), i.at(-1) ? n.get(i.at(-1)).push({ raw: o, line: c + 1 }) : e[c] = o, /^\.ends\b/i.test(l) && i.length > 1 && i.pop();
+    const d = o.trim();
+    /^\.subckt\b/i.test(d) && (i.push(c + 1), n.set(c + 1, [])), i.at(-1) ? n.get(i.at(-1)).push({ raw: o, line: c + 1 }) : e[c] = o, /^\.ends\b/i.test(d) && i.length > 1 && i.pop();
   });
   const u = Se(Array.from({ length: t.split(/\r?\n/).length }, (o, c) => e[c] || "").join(`
 `));
   r.push(...u.diagnostics);
   const a = /* @__PURE__ */ new Map();
   for (const [o, c] of n) {
-    const l = Se(c.map((d) => d.raw).join(`
+    const d = Se(c.map((l) => l.raw).join(`
 `));
-    a.set(o, l.layout), r.push(...l.diagnostics.map((d) => ({ ...d, line: c[d.line - 1]?.line || o })));
+    a.set(o, d.layout), r.push(...d.diagnostics.map((l) => ({ ...l, line: c[l.line - 1]?.line || o })));
   }
   return { layout: u.layout, scopes: a, diagnostics: r };
 }
@@ -299,63 +299,63 @@ function Se(t) {
   const e = [], n = [];
   let i = !1, r = !1, u = 0;
   if (t.split(/\r?\n/).forEach((f, I) => {
-    const N = f.trim();
-    if (/^\*\s*@layout\s+begin\b/i.test(N)) {
-      (r || i) && e.push({ severity: "error", line: I + 1, message: "Only one @layout block is allowed." }), /^\*\s*@layout\s+begin\s+v1\s*$/i.test(N) || e.push({ severity: "error", line: I + 1, message: "Expected @layout begin v1." }), r = !0, i = !0, u = I + 1;
+    const C = f.trim();
+    if (/^\*\s*@layout\s+begin\b/i.test(C)) {
+      (r || i) && e.push({ severity: "error", line: I + 1, message: "Only one @layout block is allowed." }), /^\*\s*@layout\s+begin\s+v1\s*$/i.test(C) || e.push({ severity: "error", line: I + 1, message: "Expected @layout begin v1." }), r = !0, i = !0, u = I + 1;
       return;
     }
-    if (/^\*\s*@layout\s+end\s*$/i.test(N)) {
+    if (/^\*\s*@layout\s+end\s*$/i.test(C)) {
       i || e.push({ severity: "error", line: I + 1, message: "Unexpected @layout end." }), i = !1;
       return;
     }
-    i && (N.startsWith("*") ? n.push(N.slice(1).trim()) : e.push({ severity: "error", line: I + 1, message: "Every @layout line must be a SPICE * comment." }));
+    i && (C.startsWith("*") ? n.push(C.slice(1).trim()) : e.push({ severity: "error", line: I + 1, message: "Every @layout line must be a SPICE * comment." }));
   }), i && e.push({ severity: "error", line: u, message: "Unclosed @layout block." }), !r) return { layout: null, diagnostics: e };
-  const a = n.join(" "), o = a.match(/[A-Za-z_@][\w./%:@-]*|\d+|[{}]|\S/g) || [], c = [], l = [], d = [], g = [];
-  let p = 0, h = 0, _ = 10;
-  const m = () => o[p++], E = () => {
-    const f = m();
+  const a = n.join(" "), o = a.match(/[A-Za-z_@][\w./%:@-]*|\d+|[{}]|\S/g) || [], c = [], d = [], l = [], g = [];
+  let p = 0, m = 0, _ = 10;
+  const h = () => o[p++], E = () => {
+    const f = h();
     if (!f || !/^[A-Za-z_@][\w./%:@-]*$/.test(f)) throw Error("Expected layout identifier, got " + f);
     return f;
   };
   function w(f) {
     if (c.length >= 256) throw Error("Layout description exceeds 256 groups.");
-    const I = f ? E() : "@row" + h++, N = m();
-    if (!["row", "column", "classic"].includes(N)) throw Error("Expected row, column or classic.");
-    if (m() !== "{") throw Error("Expected { after " + N);
-    const O = { id: I, direction: N, members: [] };
+    const I = f ? E() : "@row" + m++, C = h();
+    if (!["row", "column", "classic"].includes(C)) throw Error("Expected row, column or classic.");
+    if (h() !== "{") throw Error("Expected { after " + C);
+    const O = { id: I, direction: C, members: [] };
     for (c.push(O); p < o.length && o[p] !== "}"; )
-      o[p] === "group" ? (m(), O.members.push(w(!0))) : ["row", "column"].includes(o[p]) ? O.members.push(w(!1)) : O.members.push(E());
-    if (m() !== "}") throw Error("Unclosed group " + I);
+      o[p] === "group" ? (h(), O.members.push(w(!0))) : ["row", "column"].includes(o[p]) ? O.members.push(w(!1)) : O.members.push(E());
+    if (h() !== "}") throw Error("Unclosed group " + I);
     if (!O.members.length) throw Error("Empty layout group " + I);
     return I;
   }
   try {
     for (; p < o.length; )
       if (o[p] === "group")
-        m(), w(!0);
+        h(), w(!0);
       else if (["row", "column"].includes(o[p])) w(!1);
       else if (o[p] === "face") {
-        m();
-        const s = E(), y = m();
+        h();
+        const s = E(), y = h();
         if (!["left", "right"].includes(y)) throw Error("Expected face left or right.");
-        if (g.some((R) => R.device.toLowerCase() === s.toLowerCase())) throw Error("Duplicate face device.");
+        if (g.some((x) => x.device.toLowerCase() === s.toLowerCase())) throw Error("Duplicate face device.");
         g.push({ device: s, side: y });
       } else if (o[p] === "pair") {
-        m();
-        const s = m();
+        h();
+        const s = h();
         if (!["mirror", "differential", "vbe", "darlington", "sziklai", "cascode", "push-pull"].includes(s)) throw Error("Unknown pair kind. Expected mirror, differential, vbe, darlington, sziklai, cascode or push-pull.");
-        if (m() !== "{") throw Error("Expected { after pair kind.");
+        if (h() !== "{") throw Error("Expected { after pair kind.");
         const y = [];
         for (; p < o.length && o[p] !== "}"; ) y.push(E());
-        if (m() !== "}" || !y.length) throw Error("Empty or unclosed pair.");
-        if (d.length >= 256) throw Error("Layout description exceeds 256 pairs.");
-        d.push({ kind: s, members: y });
+        if (h() !== "}" || !y.length) throw Error("Empty or unclosed pair.");
+        if (l.length >= 256) throw Error("Layout description exceeds 256 pairs.");
+        l.push({ kind: s, members: y });
       } else if (o[p] === "priority-cap") {
-        if (m(), _ = Number(m()), !Number.isInteger(_) || _ < 3 || _ > 64) throw Error("priority-cap must be an integer from 3 to 64.");
-      } else if (m() === "place") {
-        const s = E(), y = m(), R = E();
+        if (h(), _ = Number(h()), !Number.isInteger(_) || _ < 3 || _ > 64) throw Error("priority-cap must be an integer from 3 to 64.");
+      } else if (h() === "place") {
+        const s = E(), y = h(), x = E();
         if (!["left-of", "above"].includes(y)) throw Error("Expected left-of or above.");
-        l.push({ a: s, relation: y, b: R });
+        d.push({ a: s, relation: y, b: x });
       } else throw Error("Unknown layout instruction near " + o[p - 1]);
     const f = /* @__PURE__ */ new Set();
     for (const s of c) {
@@ -363,77 +363,77 @@ function Se(t) {
       if (f.has(y)) throw Error("Duplicate layout group " + s.id);
       f.add(y);
     }
-    const I = /* @__PURE__ */ new Set(), N = /* @__PURE__ */ new Set(), O = new Map(c.map((s) => [s.id.toLowerCase(), s])), v = (s) => {
+    const I = /* @__PURE__ */ new Set(), C = /* @__PURE__ */ new Set(), O = new Map(c.map((s) => [s.id.toLowerCase(), s])), v = (s) => {
       if (I.has(s)) throw Error("Circular layout group " + s);
-      if (!N.has(s)) {
+      if (!C.has(s)) {
         I.add(s);
         for (const y of O.get(s).members) O.has(y.toLowerCase()) && v(y.toLowerCase());
-        I.delete(s), N.add(s);
+        I.delete(s), C.add(s);
       }
     };
     for (const s of O.keys()) v(s);
-    const x = /* @__PURE__ */ new Map();
-    for (const s of l) {
+    const R = /* @__PURE__ */ new Map();
+    for (const s of d) {
       if (s.a.toLowerCase() === s.b.toLowerCase()) throw Error("Self-relative layout constraint.");
-      x.has(s.a.toLowerCase()) || x.set(s.a.toLowerCase(), []), x.get(s.a.toLowerCase()).push(s.b.toLowerCase());
+      R.has(s.a.toLowerCase()) || R.set(s.a.toLowerCase(), []), R.get(s.a.toLowerCase()).push(s.b.toLowerCase());
     }
-    I.clear(), N.clear();
+    I.clear(), C.clear();
     const P = (s) => {
       if (I.has(s)) throw Error("Circular place constraints.");
-      if (!N.has(s)) {
+      if (!C.has(s)) {
         I.add(s);
-        for (const y of x.get(s) || []) P(y);
-        I.delete(s), N.add(s);
+        for (const y of R.get(s) || []) P(y);
+        I.delete(s), C.add(s);
       }
     };
-    for (const s of x.keys()) P(s);
+    for (const s of R.keys()) P(s);
   } catch (f) {
     e.push({ severity: "error", line: u, message: "Layout description: " + f.message });
   }
-  return { layout: { version: 1, priorityCap: _, groups: c, relations: l, pairs: d, faces: g }, diagnostics: e };
+  return { layout: { version: 1, priorityCap: _, groups: c, relations: d, pairs: l, faces: g }, diagnostics: e };
 }
 function dt(t, e) {
   const n = e.focus ? t.ir.scopes[t.contexts[e.focus].scopeId].layoutDescription : null;
   let i = e.focus ? n : t.ir.layoutDescription;
   if (!i) return null;
   if (n) {
-    const h = new Set(n.groups.map((m) => m.id.toLowerCase())), _ = (m) => h.has(m.toLowerCase()) ? m : e.components.find((w) => w.synthetic && w.value.toLowerCase() === m.toLowerCase())?.name || e.focus + "/" + m;
-    i = { ...n, groups: n.groups.map((m) => ({ ...m, members: m.members.map(_) })), relations: n.relations.map((m) => ({ ...m, a: _(m.a), b: _(m.b) })), faces: (n.faces || []).map((m) => ({ ...m, device: _(m.device) })), pairs: (n.pairs || []).map((m) => ({ ...m, members: m.members.map(_) })) };
+    const m = new Set(n.groups.map((h) => h.id.toLowerCase())), _ = (h) => m.has(h.toLowerCase()) ? h : e.components.find((w) => w.synthetic && w.value.toLowerCase() === h.toLowerCase())?.name || e.focus + "/" + h;
+    i = { ...n, groups: n.groups.map((h) => ({ ...h, members: h.members.map(_) })), relations: n.relations.map((h) => ({ ...h, a: _(h.a), b: _(h.b) })), faces: (n.faces || []).map((h) => ({ ...h, device: _(h.device) })), pairs: (n.pairs || []).map((h) => ({ ...h, members: h.members.map(_) })) };
   }
-  const r = new Map(i.groups.map((h) => [h.id.toLowerCase(), h])), u = Object.values(t.contexts).flatMap((h) => h.devices.map((_) => _.name)), a = new Set([...Object.keys(t.contexts), ...u, ...e.components.map((h) => h.name)].map((h) => h.toLowerCase()));
-  for (const h of r.values()) if (a.has((n ? e.focus + "/" + h.id : h.id).toLowerCase())) throw Error("Layout group name conflicts with a circuit instance/device: " + h.id);
-  for (const h of r.values()) for (const _ of h.members) if (!r.has(_.toLowerCase()) && !a.has(_.toLowerCase())) throw Error("Unknown @layout instance/device: " + _);
-  for (const h of i.relations) for (const _ of [h.a, h.b]) if (!r.has(_.toLowerCase()) && !a.has(_.toLowerCase())) throw Error("Unknown @layout place target: " + _);
-  const o = (i.pairs || []).map((h) => ({ ...h, members: h.members.map((_) => {
-    const m = e.components.find((E) => E.name.toLowerCase() === _.toLowerCase());
-    if (!m || m.synthetic || m.block) throw Error("Unknown or non-visible @layout pair device: " + _);
-    return m.name;
-  }) })), c = (i.faces || []).map((h) => {
-    const _ = e.components.find((m) => m.name.toLowerCase() === h.device.toLowerCase());
-    if (!_ || !["Q", "M", "J", "Z"].includes(_.kind)) throw Error("Unknown or unsupported @layout face device: " + h.device);
-    return { ...h, device: _.name };
-  }), l = /* @__PURE__ */ new Map(), d = [], g = new Set(Object.keys(t.contexts).map((h) => h.toLowerCase()));
-  for (const h of i.groups) {
+  const r = new Map(i.groups.map((m) => [m.id.toLowerCase(), m])), u = Object.values(t.contexts).flatMap((m) => m.devices.map((_) => _.name)), a = new Set([...Object.keys(t.contexts), ...u, ...e.components.map((m) => m.name)].map((m) => m.toLowerCase()));
+  for (const m of r.values()) if (a.has((n ? e.focus + "/" + m.id : m.id).toLowerCase())) throw Error("Layout group name conflicts with a circuit instance/device: " + m.id);
+  for (const m of r.values()) for (const _ of m.members) if (!r.has(_.toLowerCase()) && !a.has(_.toLowerCase())) throw Error("Unknown @layout instance/device: " + _);
+  for (const m of i.relations) for (const _ of [m.a, m.b]) if (!r.has(_.toLowerCase()) && !a.has(_.toLowerCase())) throw Error("Unknown @layout place target: " + _);
+  const o = (i.pairs || []).map((m) => ({ ...m, members: m.members.map((_) => {
+    const h = e.components.find((E) => E.name.toLowerCase() === _.toLowerCase());
+    if (!h || h.synthetic || h.block) throw Error("Unknown or non-visible @layout pair device: " + _);
+    return h.name;
+  }) })), c = (i.faces || []).map((m) => {
+    const _ = e.components.find((h) => h.name.toLowerCase() === m.device.toLowerCase());
+    if (!_ || !["Q", "M", "J", "Z"].includes(_.kind)) throw Error("Unknown or unsupported @layout face device: " + m.device);
+    return { ...m, device: _.name };
+  }), d = /* @__PURE__ */ new Map(), l = [], g = new Set(Object.keys(t.contexts).map((m) => m.toLowerCase()));
+  for (const m of i.groups) {
     const _ = [];
-    for (const m of h.members) {
-      if (r.has(m.toLowerCase())) {
-        _.push({ group: m });
+    for (const h of m.members) {
+      if (r.has(h.toLowerCase())) {
+        _.push({ group: h });
         continue;
       }
-      for (const E of e.components) if (E.name.toLowerCase() === m.toLowerCase() || E.name.toLowerCase().startsWith(m.toLowerCase() + "/")) {
-        if (l.has(E.name)) throw Error("Overlapping @layout membership: " + E.name);
-        l.set(E.name, h.id), _.push({ cell: E.name, ...g.has(m.toLowerCase()) ? { instance: m } : {} });
+      for (const E of e.components) if (E.name.toLowerCase() === h.toLowerCase() || E.name.toLowerCase().startsWith(h.toLowerCase() + "/")) {
+        if (d.has(E.name)) throw Error("Overlapping @layout membership: " + E.name);
+        d.set(E.name, m.id), _.push({ cell: E.name, ...g.has(h.toLowerCase()) ? { instance: h } : {} });
       }
     }
-    d.push({ id: h.id, direction: h.direction, members: _ });
+    l.push({ id: m.id, direction: m.direction, members: _ });
   }
   const p = /* @__PURE__ */ new Set();
-  for (const h of d) for (const _ of h.members) if (_.group) {
-    const m = _.group.toLowerCase();
-    if (p.has(m)) throw Error("Layout group has multiple parents: " + _.group);
-    p.add(m);
+  for (const m of l) for (const _ of m.members) if (_.group) {
+    const h = _.group.toLowerCase();
+    if (p.has(h)) throw Error("Layout group has multiple parents: " + _.group);
+    p.add(h);
   }
-  return { version: 1, priorityCap: i.priorityCap, groups: d, relations: i.relations, pairs: o, faces: c };
+  return { version: 1, priorityCap: i.priorityCap, groups: l, relations: i.relations, pairs: o, faces: c };
 }
 const ae = () => /* @__PURE__ */ Object.create(null), X = (t) => t.toLowerCase();
 function Qe(t) {
@@ -465,21 +465,21 @@ function ut(t, e = {}) {
   if (t.length > 2e6) throw Error("Netlist exceeds the limit of 2 MB.");
   const n = ct(t, e);
   t = n.source;
-  const i = lt(t), r = [...n.diagnostics, ...i.diagnostics], u = ae(), a = /* @__PURE__ */ new Set(["0"]), o = (f, I, N) => r.push({ severity: f, line: I, message: N }), c = (f, I, N, O = [], v = ae(), x = 0) => {
-    const P = { id: f, name: I, parent: N, ports: O, defaults: v, parameters: ae(), definitions: ae(), devices: [], instances: [], directives: [], line: x, statements: [], layoutDescription: i.scopes.get(x) || null };
+  const i = lt(t), r = [...n.diagnostics, ...i.diagnostics], u = ae(), a = /* @__PURE__ */ new Set(["0"]), o = (f, I, C) => r.push({ severity: f, line: I, message: C }), c = (f, I, C, O = [], v = ae(), R = 0) => {
+    const P = { id: f, name: I, parent: C, ports: O, defaults: v, parameters: ae(), definitions: ae(), devices: [], instances: [], directives: [], line: R, statements: [], layoutDescription: i.scopes.get(R) || null };
     return u[f] = P, P;
-  }, l = c("root", "Top", null), d = [l], g = [];
-  let p = !1, h = !1;
+  }, d = c("root", "Top", null), l = [d], g = [];
+  let p = !1, m = !1;
   t.replace(/^\uFEFF/, "").split(/\r?\n/).forEach((f, I) => {
-    const N = f.trim();
-    !N || N.startsWith("*") || (N.startsWith("+") ? g.length ? g.at(-1).text += " " + N.slice(1).trim() : o("error", I + 1, "Continuation has no preceding statement.") : g.push({ text: N, line: I + 1 }));
+    const C = f.trim();
+    !C || C.startsWith("*") || (C.startsWith("+") ? g.length ? g.at(-1).text += " " + C.slice(1).trim() : o("error", I + 1, "Continuation has no preceding statement.") : g.push({ text: C, line: I + 1 }));
   });
   for (const { text: f, line: I } of g)
     try {
-      const N = me(f);
-      if (!N.length) continue;
-      const O = X(N[0]), v = d.at(-1);
-      if (h) {
+      const C = he(f);
+      if (!C.length) continue;
+      const O = X(C[0]), v = l.at(-1);
+      if (m) {
         o("warning", I, "Statement after .end is not rendered: " + f);
         continue;
       }
@@ -493,49 +493,49 @@ function ut(t, e = {}) {
       }
       if (p) continue;
       if (O === ".subckt") {
-        if (N.length < 2) throw Error(".SUBCKT requires a name.");
-        const [x, P] = Le(N.slice(2)), s = X(N[1]);
-        if (Object.hasOwn(v.definitions, s)) throw Error("Duplicate subcircuit definition: " + N[1]);
-        const y = x.map(X);
-        if (new Set(y).size !== x.length || y.includes("0")) throw Error("Subcircuit formal ports must be unique and cannot be ground 0.");
-        if (x.some((V) => /[{}()=]/.test(V))) throw Error("Invalid formal port.");
-        if (d.length > 64) throw Error("Definition nesting exceeds 64 levels.");
-        const R = v.id + "/" + encodeURIComponent(s);
-        v.definitions[s] = R, d.push(c(R, N[1], v.id, x, P, I));
+        if (C.length < 2) throw Error(".SUBCKT requires a name.");
+        const [R, P] = Le(C.slice(2)), s = X(C[1]);
+        if (Object.hasOwn(v.definitions, s)) throw Error("Duplicate subcircuit definition: " + C[1]);
+        const y = R.map(X);
+        if (new Set(y).size !== R.length || y.includes("0")) throw Error("Subcircuit formal ports must be unique and cannot be ground 0.");
+        if (R.some((V) => /[{}()=]/.test(V))) throw Error("Invalid formal port.");
+        if (l.length > 64) throw Error("Definition nesting exceeds 64 levels.");
+        const x = v.id + "/" + encodeURIComponent(s);
+        v.definitions[s] = x, l.push(c(x, C[1], v.id, R, P, I));
         continue;
       }
       if (O === ".ends") {
-        if (d.length === 1) throw Error("Unmatched .ENDS.");
-        if (N[1] && X(N[1]) !== X(v.name)) throw Error(".ENDS name does not match " + v.name);
-        d.pop();
+        if (l.length === 1) throw Error("Unmatched .ENDS.");
+        if (C[1] && X(C[1]) !== X(v.name)) throw Error(".ENDS name does not match " + v.name);
+        l.pop();
         continue;
       }
       if (O === ".end") {
-        if (d.length > 1) throw Error(".END inside a subcircuit; expected .ENDS.");
-        h = !0;
+        if (l.length > 1) throw Error(".END inside a subcircuit; expected .ENDS.");
+        m = !0;
         continue;
       }
       if (O === ".param") {
-        const x = Qe(N.slice(1));
-        for (const [P, s] of Object.entries(x)) {
+        const R = Qe(C.slice(1));
+        for (const [P, s] of Object.entries(R)) {
           if (Object.hasOwn(v.parameters, P)) throw Error("Repeated .param assignment requires simulator ordering semantics: " + P);
           v.parameters[P] = s;
         }
       }
       if (O === ".global") {
-        if (N.length < 2) throw Error(".GLOBAL requires nodes.");
-        for (const x of N.slice(1)) a.add(X(x));
+        if (C.length < 2) throw Error(".GLOBAL requires nodes.");
+        for (const R of C.slice(1)) a.add(X(R));
       }
       if (O.startsWith(".") && v.directives.push({ line: I, text: f }), O.startsWith("x")) {
-        const [x, P] = Le(N.slice(1));
-        if (!x.length) throw Error("X instance requires a subcircuit name.");
+        const [R, P] = Le(C.slice(1));
+        if (!R.length) throw Error("X instance requires a subcircuit name.");
         const s = /;§pnba\s+(.+)$/i.exec(f)?.[1].split(")");
-        v.instances.push({ name: N[0], nodes: x.slice(0, -1).map(X), definitionName: x.at(-1), definitionId: null, parameters: P, line: I, raw: f, pinNames: s });
+        v.instances.push({ name: C[0], nodes: R.slice(0, -1).map(X), definitionName: R.at(-1), definitionId: null, parameters: P, line: I, raw: f, pinNames: s });
       } else v.statements.push({ line: I, text: f });
-    } catch (N) {
-      o("error", I, N.message + " Statement: " + f);
+    } catch (C) {
+      o("error", I, C.message + " Statement: " + f);
     }
-  d.length > 1 && o("error", d.at(-1).line, "Unclosed .SUBCKT " + d.at(-1).name), p && o("error", 0, "Unclosed .control block.");
+  l.length > 1 && o("error", l.at(-1).line, "Unclosed .SUBCKT " + l.at(-1).name), p && o("error", 0, "Unclosed .control block.");
   function _(f, I) {
     for (; f; ) {
       if (Object.hasOwn(f.definitions, X(I))) return f.definitions[X(I)];
@@ -544,37 +544,37 @@ function ut(t, e = {}) {
     return null;
   }
   for (const f of Object.values(u)) {
-    const I = [...f.statements[0]?.line === 1 ? [] : [{ line: 0, text: "* Scope" }], ...f.statements], N = at(I.map((v) => v.text).join(`
+    const I = [...f.statements[0]?.line === 1 ? [] : [{ line: 0, text: "* Scope" }], ...f.statements], C = at(I.map((v) => v.text).join(`
 `), { models: u[f.parent]?.models });
-    f.devices = N.components.map((v) => ({ ...v, line: I[v.line - 1]?.line || f.line })), f.models = N.models, f === l && (l.title = N.title), r.push(...N.diagnostics.filter((v) => !v.message.includes("No supported components to render.") && !v.message.includes("300 components")).map((v) => ({ ...v, line: I[v.line - 1]?.line || f.line })));
+    f.devices = C.components.map((v) => ({ ...v, line: I[v.line - 1]?.line || f.line })), f.models = C.models, f === d && (d.title = C.title), r.push(...C.diagnostics.filter((v) => !v.message.includes("No supported components to render.") && !v.message.includes("300 components")).map((v) => ({ ...v, line: I[v.line - 1]?.line || f.line })));
     const O = new Set(f.devices.map((v) => X(v.name)));
     for (const v of f.instances)
       if (O.has(X(v.name)) && o("error", v.line, "Duplicate instance/device name: " + v.name), O.add(X(v.name)), v.definitionId = _(f, v.definitionName), !v.definitionId && !/^\{[\s\S]*\}$/.test(v.definitionName)) o("error", v.line, "Undefined subcircuit: " + v.definitionName + " in " + v.name);
       else if (v.definitionId) {
-        const x = u[v.definitionId];
-        x.ports.length !== v.nodes.length && o("error", v.line, `${v.name}: ${x.name} expects ${x.ports.length} ports; got ${v.nodes.length}.`);
+        const R = u[v.definitionId];
+        R.ports.length !== v.nodes.length && o("error", v.line, `${v.name}: ${R.name} expects ${R.ports.length} ports; got ${v.nodes.length}.`);
       }
   }
   for (const f of Object.values(u)) delete f.statements;
-  const m = /* @__PURE__ */ new Set(), E = /* @__PURE__ */ new Set();
+  const h = /* @__PURE__ */ new Set(), E = /* @__PURE__ */ new Set();
   function w(f, I = []) {
-    if (m.has(f)) {
+    if (h.has(f)) {
       o("error", u[f].line, "Circular subcircuit reference: " + [...I, u[f].name].join(" → "));
       return;
     }
     if (!E.has(f)) {
-      if (m.add(f), I.length >= 64) {
-        o("error", u[f].line, "Subcircuit dependency nesting exceeds 64 levels."), m.delete(f), E.add(f);
+      if (h.add(f), I.length >= 64) {
+        o("error", u[f].line, "Subcircuit dependency nesting exceeds 64 levels."), h.delete(f), E.add(f);
         return;
       }
-      for (const N of u[f].instances) N.definitionId && w(N.definitionId, [...I, u[f].name]);
-      m.delete(f), E.add(f);
+      for (const C of u[f].instances) C.definitionId && w(C.definitionId, [...I, u[f].name]);
+      h.delete(f), E.add(f);
     }
   }
   for (const f of Object.keys(u)) w(f);
-  !l.devices.length && !l.instances.length && o("error", 0, "No supported components or instances to render.");
+  !d.devices.length && !d.instances.length && o("error", 0, "No supported components or instances to render.");
   for (const f of r) !f.source && f.line && n.origins[f.line - 1] && (f.source = n.origins[f.line - 1].file, f.line = n.origins[f.line - 1].line);
-  return { kind: "HierarchicalCircuit", version: 2, rootId: "root", title: l.title || "", scopes: u, globals: [...a], diagnostics: r, layoutDescription: i.layout };
+  return { kind: "HierarchicalCircuit", version: 2, rootId: "root", title: d.title || "", scopes: u, globals: [...a], diagnostics: r, layoutDescription: i.layout };
 }
 const W = () => /* @__PURE__ */ Object.create(null), se = (t, e) => [...t, e].map((n) => encodeURIComponent(n)).join("/"), ye = (t, e) => se(t.map((n) => n.toLowerCase()), e.toLowerCase());
 function pt(t, e = []) {
@@ -589,52 +589,52 @@ function ft(t) {
     throw e.diagnostics = t.diagnostics, e;
   }
 }
-const ke = (t) => /^(?:\{[\s\S]*\}|'[\s\S]*')$/.test(t) ? t.slice(1, -1) : t, ht = new RegExp("(?<![\\w.$])[a-z_][\\w.$]*", "gi");
+const ke = (t) => /^(?:\{[\s\S]*\}|'[\s\S]*')$/.test(t) ? t.slice(1, -1) : t, mt = new RegExp("(?<![\\w.$])[a-z_][\\w.$]*", "gi");
 function ge(t, e, n = (r) => r, i = (r) => r) {
   const r = [];
   t = t.replace(/"(?:\\.|[^"\\])*"/g, (a) => (r.push(a), "@@" + (r.length - 1) + "@@")), t = t.replace(/\b(V|I[bcedgsx]?)\s*\(([^()]*)\)/gi, (a, o, c) => {
-    const l = c.split(",").map((g) => g.trim());
-    if (l.some((g) => !g || /[\s{}+*()]/.test(g))) throw Error("Unsupported dynamic voltage/current reference: " + a);
-    const d = o.toUpperCase() + "(" + l.map((g) => o.toLowerCase() === "v" ? n(g) : i(g, o)).join(",") + ")";
-    return r.push(d), "@@" + (r.length - 1) + "@@";
+    const d = c.split(",").map((g) => g.trim());
+    if (d.some((g) => !g || /[\s{}+*()]/.test(g))) throw Error("Unsupported dynamic voltage/current reference: " + a);
+    const l = o.toUpperCase() + "(" + d.map((g) => o.toLowerCase() === "v" ? n(g) : i(g, o)).join(",") + ")";
+    return r.push(l), "@@" + (r.length - 1) + "@@";
   });
   let u = t.length;
-  return t = t.replace(ht, (a, o, c) => {
+  return t = t.replace(mt, (a, o, c) => {
     if (c.slice(o + a.length).trimStart().startsWith("(")) return a;
-    const l = e(a.toLowerCase());
-    if (l === void 0) return a;
-    if (u += l.length + 2, u > 1e5) throw Error("Expanded parameter expression exceeds 100000 characters.");
-    return "(" + l + ")";
+    const d = e(a.toLowerCase());
+    if (d === void 0) return a;
+    if (u += d.length + 2, u > 1e5) throw Error("Expanded parameter expression exceeds 100000 characters.");
+    return "(" + d + ")";
   }), t.replace(/@@(\d+)@@/g, (a, o) => r[Number(o)]);
 }
-function mt(t, e, n, i) {
+function ht(t, e, n, i) {
   const r = { ...e, ...n }, u = W(), a = /* @__PURE__ */ new Set(), o = W();
-  for (const [l, d] of Object.entries(i)) o[l] = ge(ke(d), (g) => t[g]);
-  function c(l) {
-    if (Object.hasOwn(o, l)) return o[l];
-    if (Object.hasOwn(u, l)) return u[l];
-    if (!Object.hasOwn(r, l)) return t[l];
-    if (a.has(l)) {
-      if (Object.hasOwn(t, l)) return t[l];
-      throw Error("Circular parameter dependency: " + [...a, l].join(" → "));
+  for (const [d, l] of Object.entries(i)) o[d] = ge(ke(l), (g) => t[g]);
+  function c(d) {
+    if (Object.hasOwn(o, d)) return o[d];
+    if (Object.hasOwn(u, d)) return u[d];
+    if (!Object.hasOwn(r, d)) return t[d];
+    if (a.has(d)) {
+      if (Object.hasOwn(t, d)) return t[d];
+      throw Error("Circular parameter dependency: " + [...a, d].join(" → "));
     }
-    return a.add(l), u[l] = ge(ke(r[l]), c), a.delete(l), u[l];
+    return a.add(d), u[d] = ge(ke(r[d]), c), a.delete(d), u[d];
   }
-  for (const l of Object.keys(r)) c(l);
+  for (const d of Object.keys(r)) c(d);
   return Object.assign(W(), t, u, o);
 }
 function Pe(t, e, n, i) {
   let r = "";
   for (let c = 0; c < t.length; ) {
-    const l = t[c];
-    if (l !== "{" && l !== "'") {
-      r += l, c++;
+    const d = t[c];
+    if (d !== "{" && d !== "'") {
+      r += d, c++;
       continue;
     }
-    const d = c++;
+    const l = c++;
     let g = 1, p = "";
     for (; c < t.length && g; c++) {
-      if (l === "'") {
+      if (d === "'") {
         t[c] === "'" && (g = 0);
         continue;
       }
@@ -649,30 +649,30 @@ function Pe(t, e, n, i) {
       t[c] === "{" && g++, t[c] === "}" && g--;
     }
     if (g) throw Error("Unclosed parameter expression.");
-    r += l + ge(t.slice(d + 1, c - 1), (h) => e[h], n, i) + (l === "{" ? "}" : "'");
+    r += d + ge(t.slice(l + 1, c - 1), (m) => e[m], n, i) + (d === "{" ? "}" : "'");
   }
   const u = [];
   let a = 0, o = "";
   for (let c = 0; c < r.length; c++) {
-    const l = r[c];
+    const d = r[c];
     if (o) {
-      l === o && r[c - 1] !== "\\" && (o = "");
+      d === o && r[c - 1] !== "\\" && (o = "");
       continue;
     }
-    if (l === '"' || l === "'") {
-      o = l;
+    if (d === '"' || d === "'") {
+      o = d;
       continue;
     }
-    if ("({".includes(l) && a++, ")}".includes(l) && a--, !a && (c === 0 || /\s/.test(r[c - 1]))) {
-      const d = /^([a-z_][\w.$]*)\s*=(?!=)/i.exec(r.slice(c));
-      d && (u.push({ start: c, end: c + d[0].length, key: d[1].toLowerCase() }), c += d[0].length - 1);
+    if ("({".includes(d) && a++, ")}".includes(d) && a--, !a && (c === 0 || /\s/.test(r[c - 1]))) {
+      const l = /^([a-z_][\w.$]*)\s*=(?!=)/i.exec(r.slice(c));
+      l && (u.push({ start: c, end: c + l[0].length, key: l[1].toLowerCase() }), c += l[0].length - 1);
     }
   }
   if (u.length) {
     let c = r.slice(0, u[0].start);
-    u.forEach((l, d) => {
-      const g = u[d + 1]?.start ?? r.length, p = r.slice(l.end, g);
-      c += r.slice(l.start, l.end) + (p.includes("{") || ["refnode", "intnode"].includes(l.key) ? p : ge(p, (h) => e[h], n, i));
+    u.forEach((d, l) => {
+      const g = u[l + 1]?.start ?? r.length, p = r.slice(d.end, g);
+      c += r.slice(d.start, d.end) + (p.includes("{") || ["refnode", "intnode"].includes(d.key) ? p : ge(p, (m) => e[m], n, i));
     }), r = c;
   } else Object.hasOwn(e, t.toLowerCase()) && (r = "{" + e[t.toLowerCase()] + "}");
   return r;
@@ -1022,7 +1022,7 @@ class b {
    * @returns {?jsep.BinaryExpression}
    */
   gobbleBinaryExpression() {
-    let e, n, i, r, u, a, o, c, l;
+    let e, n, i, r, u, a, o, c, d;
     if (a = this.gobbleToken(), !a || (n = this.gobbleBinaryOp(), !n))
       return a;
     for (u = { value: n, prec: b.binaryPrecedence(n), right_a: b.right_associative.has(n) }, o = this.gobbleToken(), o || this.throwError("Expected expression after " + n), r = [a, u, o]; n = this.gobbleBinaryOp(); ) {
@@ -1030,16 +1030,16 @@ class b {
         this.index -= n.length;
         break;
       }
-      u = { value: n, prec: i, right_a: b.right_associative.has(n) }, l = n;
-      const d = (g) => u.right_a && g.right_a ? i > g.prec : i <= g.prec;
-      for (; r.length > 2 && d(r[r.length - 2]); )
+      u = { value: n, prec: i, right_a: b.right_associative.has(n) }, d = n;
+      const l = (g) => u.right_a && g.right_a ? i > g.prec : i <= g.prec;
+      for (; r.length > 2 && l(r[r.length - 2]); )
         o = r.pop(), n = r.pop().value, a = r.pop(), e = {
           type: b.BINARY_EXP,
           operator: n,
           left: a,
           right: o
         }, r.push(e);
-      e = this.gobbleToken(), e || this.throwError("Expected expression after " + l), r.push(u, e);
+      e = this.gobbleToken(), e || this.throwError("Expected expression after " + d), r.push(u, e);
     }
     for (c = r.length - 1, e = r[c]; c > 1; )
       e = {
@@ -1446,8 +1446,8 @@ function ue(t, e = {}) {
   function r(o) {
     return o = String(o).trim(), /^\{[\s\S]*\}$/.test(o) && (o = o.slice(1, -1)), o = o.replace(new RegExp(`"(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*'|(?<![\\w.])(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:e[+-]?\\d+)?[a-zµμΩ]*\\d*[a-zµμΩ]*(?![\\w.])`, "gi"), (c) => {
       if (c[0] === '"' || c[0] === "'") return c;
-      const [, l, d, g] = /^((?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)([a-zµμΩ]*)(\d*)[a-zµμΩ]*$/i.exec(c), p = d.toLowerCase(), h = p.startsWith("meg") ? 1e6 : p.startsWith("mil") ? 254e-7 : It[p[0]] || 1;
-      return "(" + (g ? +(l + (l.includes(".") ? "" : ".") + g) : Number(l)) * h + ")";
+      const [, d, l, g] = /^((?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)([a-zµμΩ]*)(\d*)[a-zµμΩ]*$/i.exec(c), p = l.toLowerCase(), m = p.startsWith("meg") ? 1e6 : p.startsWith("mil") ? 254e-7 : It[p[0]] || 1;
+      return "(" + (g ? +(d + (d.includes(".") ? "" : ".") + g) : Number(d)) * m + ")";
     }), u(ce(o));
   }
   function u(o) {
@@ -1460,8 +1460,8 @@ function ue(t, e = {}) {
       if (!Object.hasOwn(e, c)) throw Error("Undefined structural parameter: " + o.name);
       if (n.has(c)) throw Error("Circular structural parameter: " + c);
       n.add(c);
-      const l = r(e[c]);
-      return n.delete(c), l;
+      const d = r(e[c]);
+      return n.delete(c), d;
     }
     if (o.type === "ConditionalExpression") return H(u(o.test)) ? u(o.consequent) : u(o.alternate);
     if (o.type === "UnaryExpression") {
@@ -1474,40 +1474,40 @@ function ue(t, e = {}) {
       const c = u(o.left);
       if (o.operator === "&&") return H(c) && H(u(o.right));
       if (o.operator === "||") return H(c) || H(u(o.right));
-      const l = u(o.right);
+      const d = u(o.right);
       switch (o.operator) {
         case "+":
-          return c + l;
+          return c + d;
         case "-":
-          return c - l;
+          return c - d;
         case "*":
-          return c * l;
+          return c * d;
         case "/":
-          return c / l;
+          return c / d;
         case "**":
-          return c ** l;
+          return c ** d;
         case "%":
-          return c % l;
+          return c % d;
         case "^":
-          return H(c) !== H(l);
+          return H(c) !== H(d);
         case "&":
-          return H(c) && H(l);
+          return H(c) && H(d);
         case "|":
-          return H(c) || H(l);
+          return H(c) || H(d);
         case ">":
-          return c > l;
+          return c > d;
         case "<":
-          return c < l;
+          return c < d;
         case ">=":
-          return c >= l;
+          return c >= d;
         case "<=":
-          return c <= l;
+          return c <= d;
         case "==":
         case "===":
-          return c === l;
+          return c === d;
         case "!=":
         case "!==":
-          return c !== l;
+          return c !== d;
       }
     }
     if (o.type === "CallExpression" && o.callee.type === "Identifier") {
@@ -1528,101 +1528,101 @@ function vt(t) {
   ft(t);
   const e = W(), n = /* @__PURE__ */ new Map();
   let i = 0, r = 0;
-  function u(a, o, c, l, d, g, p) {
+  function u(a, o, c, d, l, g, p) {
     if (o.length > 64) throw Error("Instance nesting exceeds 64 levels.");
     if (++i > 2e3) throw Error("Elaboration exceeds 2000 instances.");
-    const h = t.scopes[a], _ = o.length ? se(o.slice(0, -1), o.at(-1)) : "", m = W();
+    const m = t.scopes[a], _ = o.length ? se(o.slice(0, -1), o.at(-1)) : "", h = W();
     if (p.some((O) => O.scopeId === a)) throw Error("Circular subcircuit reference at " + _);
-    const E = mt(l, h.defaults, h.parameters, d);
+    const E = ht(d, m.defaults, m.parameters, l);
     function w(O) {
       if (/^\{[\s\S]*\}$/.test(O)) {
-        const x = ue(O, E);
-        O = String(typeof x == "boolean" ? Number(x) : x);
+        const R = ue(O, E);
+        O = String(typeof R == "boolean" ? Number(R) : R);
       }
       /^"[\s\S]*"$/.test(O) && (O = O.slice(1, -1));
       const v = O.toLowerCase();
-      return Object.hasOwn(c, v) ? c[v] : t.globals.includes(v) ? ye([], v) : m[v] || (m[v] = ye(o, v));
+      return Object.hasOwn(c, v) ? c[v] : t.globals.includes(v) ? ye([], v) : h[v] || (h[v] = ye(o, v));
     }
-    const f = { id: _, path: o, scopeId: a, name: g?.name || "Top", definition: h.name, ports: h.ports.map((O) => ({ name: O, node: w(O) })), params: E, nodes: m, models: W(), devices: [], children: [], raw: g?.raw || "", line: g?.line || 0 };
+    const f = { id: _, path: o, scopeId: a, name: g?.name || "Top", definition: m.name, ports: m.ports.map((O) => ({ name: O, node: w(O) })), params: E, nodes: h, models: W(), devices: [], children: [], raw: g?.raw || "", line: g?.line || 0 };
     e[_] = f, n.set(_, w);
     const I = [...p, f];
-    function N(O) {
+    function C(O) {
       if (!O) return "";
-      let v = h;
+      let v = m;
       for (; v; ) {
-        if (v.directives.some((x) => new RegExp("^\\.model\\s+" + O.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:\\.\\d+)?(?:\\s|$)", "i").test(x.text))) {
-          const x = [...I].reverse().find((P) => P.scopeId === v.id);
-          return se(x?.path || [], O.toLowerCase());
+        if (v.directives.some((R) => new RegExp("^\\.model\\s+" + O.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(?:\\.\\d+)?(?:\\s|$)", "i").test(R.text))) {
+          const R = [...I].reverse().find((P) => P.scopeId === v.id);
+          return se(R?.path || [], O.toLowerCase());
         }
         v = t.scopes[v.parent];
       }
       return O;
     }
-    for (const O of h.directives.filter((v) => /^\.model\b/i.test(v.text))) {
+    for (const O of m.directives.filter((v) => /^\.model\b/i.test(v.text))) {
       const v = /^\.model\s+(\S+)/i.exec(O.text)?.[1];
       if (!v) continue;
-      const x = N(v), P = h.models[v.toLowerCase()], s = Pe(O.text, E, w, (y) => se(o, y));
-      f.models[x] = { ...P, name: x, raw: s.replace(/^(\.model\s+)\S+/i, (y, R) => R + x), instanceId: _, parameters: E };
+      const R = C(v), P = m.models[v.toLowerCase()], s = Pe(O.text, E, w, (y) => se(o, y));
+      f.models[R] = { ...P, name: R, raw: s.replace(/^(\.model\s+)\S+/i, (y, x) => x + R), instanceId: _, parameters: E };
     }
-    for (const O of h.devices) {
+    for (const O of m.devices) {
       if (++r > 3e3) throw Error("Elaboration exceeds 3000 primitive devices.");
       const v = W();
       for (const [P, s] of Object.entries(O.terminals)) v[P] = w(s);
-      const x = N(O.model);
-      f.devices.push({ ...O, name: se(o, O.name), localName: O.name, instanceId: _, terminals: v, model: x, parameters: E });
+      const R = C(O.model);
+      f.devices.push({ ...O, name: se(o, O.name), localName: O.name, instanceId: _, terminals: v, model: R, parameters: E });
     }
-    for (const O of h.instances) {
+    for (const O of m.instances) {
       let v = O.definitionId;
       if (!v) {
         const y = String(ue(O.definitionName, E)).toLowerCase();
-        let R = h;
-        for (; R && !v; )
-          v = R.definitions[y], R = t.scopes[R.parent];
+        let x = m;
+        for (; x && !v; )
+          v = x.definitions[y], x = t.scopes[x.parent];
         if (!v) throw Error("Undefined selected subcircuit: " + y);
       }
-      const x = t.scopes[v], P = W();
-      if (x.ports.length !== O.nodes.length) throw Error(O.name + ": expected " + x.ports.length + " ports; got " + O.nodes.length);
-      x.ports.forEach((y, R) => {
-        P[y.toLowerCase()] = w(O.nodes[R]);
+      const R = t.scopes[v], P = W();
+      if (R.ports.length !== O.nodes.length) throw Error(O.name + ": expected " + R.ports.length + " ports; got " + O.nodes.length);
+      R.ports.forEach((y, x) => {
+        P[y.toLowerCase()] = w(O.nodes[x]);
       });
       const s = u(v, [...o, O.name], P, E, O.parameters, O, I);
-      O.pinNames?.length === s.ports.length && s.ports.forEach((y, R) => {
-        y.label = O.pinNames[R];
+      O.pinNames?.length === s.ports.length && s.ports.forEach((y, x) => {
+        y.label = O.pinNames[x];
       }), f.children.push(s);
     }
     return f;
   }
   try {
-    let d = function(g, p) {
-      const h = p.split(":");
-      if (h.length === 1) return { owner: g, name: p };
-      const _ = h.pop();
-      for (const m of [[...g.path, ...h], h]) {
-        const E = o.get(m.map(encodeURIComponent).join("/").toLowerCase());
+    let l = function(g, p) {
+      const m = p.split(":");
+      if (m.length === 1) return { owner: g, name: p };
+      const _ = m.pop();
+      for (const h of [[...g.path, ...m], m]) {
+        const E = o.get(h.map(encodeURIComponent).join("/").toLowerCase());
         if (E) return { owner: E, name: _ };
       }
       throw Error("Unknown hierarchical reference: " + p);
     };
-    const a = u(t.rootId, [], W(), W(), W(), null, []), o = new Map(Object.values(e).map((g) => [g.id.toLowerCase(), g])), c = Object.assign(W(), ...Object.values(e).map((g) => g.models)), l = (g) => c[g] || Object.entries(c).find(([p]) => p.startsWith(g + "."))?.[1];
+    const a = u(t.rootId, [], W(), W(), W(), null, []), o = new Map(Object.values(e).map((g) => [g.id.toLowerCase(), g])), c = Object.assign(W(), ...Object.values(e).map((g) => g.models)), d = (g) => c[g] || Object.entries(c).find(([p]) => p.startsWith(g + "."))?.[1];
     for (const g of Object.values(e)) for (const p of g.devices) {
-      const h = t.scopes[g.scopeId].devices.find((E) => E.name === p.localName), _ = (E) => {
-        const w = d(g, E);
+      const m = t.scopes[g.scopeId].devices.find((E) => E.name === p.localName), _ = (E) => {
+        const w = l(g, E);
         return n.get(w.owner.id)(w.name);
-      }, m = (E, w = "", f = "") => {
-        const I = d(g, E), N = I.owner.devices.find((O) => O.localName.toLowerCase() === I.name.toLowerCase());
+      }, h = (E, w = "", f = "") => {
+        const I = l(g, E), C = I.owner.devices.find((O) => O.localName.toLowerCase() === I.name.toLowerCase());
         if (w.toLowerCase() === "ix") {
-          const O = I.owner.ports.find((v, x) => v.name.toLowerCase() === I.name.toLowerCase() || String(x + 1) === I.name);
+          const O = I.owner.ports.find((v, R) => v.name.toLowerCase() === I.name.toLowerCase() || String(R + 1) === I.name);
           if (O) return I.owner.id + ":" + O.name;
         }
-        if (!N) {
+        if (!C) {
           if (f) throw Error(p.name + ": referenced " + f + " device " + E + " was not found.");
           return se(I.owner.path, I.name);
         }
-        if (f && N.kind !== f) throw Error(p.name + ": " + E + " must be a " + f + " device.");
-        return N.name;
+        if (f && C.kind !== f) throw Error(p.name + ": " + E + " must be a " + f + " device.");
+        return C.name;
       };
-      if (p.value = Pe(h.value, g.params, _, m), h.model && (p.value = p.value.replace(h.model, p.model)), p.kind === "M" && Object.keys(p.terminals).length === 3) {
-        let E = l(p.model), w = !1;
+      if (p.value = Pe(m.value, g.params, _, h), m.model && (p.value = p.value.replace(m.model, p.model)), p.kind === "M" && Object.keys(p.terminals).length === 3) {
+        let E = d(p.model), w = !1;
         const f = /* @__PURE__ */ new Set();
         for (; E?.type === "VDMOS" && !f.has(E.name); ) {
           f.add(E.name);
@@ -1631,15 +1631,15 @@ function vt(t) {
             w = I[1] === void 0 || Number(ue(I[1], E.parameters)) >= 0.5;
             break;
           }
-          const N = E.name.includes("/") ? E.name.slice(0, E.name.lastIndexOf("/") + 1) : "";
-          E = l(N + (E.baseModel || "").toLowerCase()) || l((E.baseModel || "").toLowerCase());
+          const C = E.name.includes("/") ? E.name.slice(0, E.name.lastIndexOf("/") + 1) : "";
+          E = d(C + (E.baseModel || "").toLowerCase()) || d((E.baseModel || "").toLowerCase());
         }
         f.size && (p.type = "spice_" + (w ? "pmos3" : "nmos3"));
       }
-      p.controlSources = (h.controlSources || []).map((E) => m(E, "", "V")), p.controlSource = p.controlSources[0] || "", p.coupledInductors = (h.coupledInductors || []).map((E) => m(E, "", "L"));
-      for (const E of /* @__PURE__ */ new Set([...h.controlSources || [], ...h.coupledInductors || []])) {
+      p.controlSources = (m.controlSources || []).map((E) => h(E, "", "V")), p.controlSource = p.controlSources[0] || "", p.coupledInductors = (m.coupledInductors || []).map((E) => h(E, "", "L"));
+      for (const E of /* @__PURE__ */ new Set([...m.controlSources || [], ...m.coupledInductors || []])) {
         const w = E.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        p.value = p.value.replace(new RegExp("(?<![\\w./%])" + w + "(?![\\w.$])", "g"), () => m(E));
+        p.value = p.value.replace(new RegExp("(?<![\\w./%])" + w + "(?![\\w.$])", "g"), () => h(E));
       }
     }
     return { kind: "ElaboratedHierarchy", ir: t, root: a, contexts: e };
@@ -1665,84 +1665,84 @@ function Ce(t, e = {}) {
         r.has($) || r.set($, []), r.get($).push(s);
       }
     }
-    const y = s.kind === "Q" ? "bjt" : ["M", "J", "Z"].includes(s.kind) ? "fet" : null, R = y === "bjt" ? /_(npn|pnp)$/.exec(s.type)?.[1] : /_(nmos|pmos|jfet_n|jfet_p|mesfet_n|mesfet_p)$/.exec(s.type)?.[1];
-    if (!y || !R) continue;
+    const y = s.kind === "Q" ? "bjt" : ["M", "J", "Z"].includes(s.kind) ? "fet" : null, x = y === "bjt" ? /_(npn|pnp)$/.exec(s.type)?.[1] : /_(nmos|pmos|jfet_n|jfet_p|mesfet_n|mesfet_p)$/.exec(s.type)?.[1];
+    if (!y || !x) continue;
     const V = s.terminals, U = V[y === "bjt" ? "B" : "G"], D = V[y === "bjt" ? "C" : "D"], G = V[y === "bjt" ? "E" : "S"];
-    [U, D, G].some((Q) => Q === void 0) || U === G || D === G || u.push({ id: s.name, family: y, polarity: R, control: U, drain: D, source: G, body: s.kind === "M" ? V.B : void 0 });
+    [U, D, G].some((Q) => Q === void 0) || U === G || D === G || u.push({ id: s.name, family: y, polarity: x, control: U, drain: D, source: G, body: s.kind === "M" ? V.B : void 0 });
   }
-  const c = [], l = /* @__PURE__ */ new Set(), d = (s, y, R, V, U, D = "basic", G = [], Q = "high") => {
+  const c = [], d = /* @__PURE__ */ new Set(), l = (s, y, x, V, U, D = "basic", G = [], Q = "high") => {
     const $ = [.../* @__PURE__ */ new Set([...y, ...G])], j = JSON.stringify([s, D, [...$].sort()]);
-    l.has(j) || (l.add(j), c.push({ id: "motif" + c.length, kind: s, variant: D, transistors: y, members: $, roles: R, nets: V, evidence: U, confidence: Q }));
-  }, g = (s, y) => s.family === y.family && s.polarity === y.polarity, p = /* @__PURE__ */ new Map(), h = /* @__PURE__ */ new Map(), _ = /* @__PURE__ */ new Map(), m = new Map(u.map((s) => [s.id, s])), E = (s, y, R) => {
-    s.has(y) || s.set(y, []), s.get(y).push(R);
+    d.has(j) || (d.add(j), c.push({ id: "motif" + c.length, kind: s, variant: D, transistors: y, members: $, roles: x, nets: V, evidence: U, confidence: Q }));
+  }, g = (s, y) => s.family === y.family && s.polarity === y.polarity, p = /* @__PURE__ */ new Map(), m = /* @__PURE__ */ new Map(), _ = /* @__PURE__ */ new Map(), h = new Map(u.map((s) => [s.id, s])), E = (s, y, x) => {
+    s.has(y) || s.set(y, []), s.get(y).push(x);
   }, w = (s, y) => JSON.stringify([s.family, s.polarity, y]);
   for (const s of u)
-    E(p, w(s, s.control), s), E(h, w(s, s.source), s), s.family === "bjt" && (i.get(s.source) || []).some((y) => {
-      const R = m.get(y.device);
-      return R && R.family === "bjt" && !g(s, R) && R.source === s.source;
+    E(p, w(s, s.control), s), E(m, w(s, s.source), s), s.family === "bjt" && (i.get(s.source) || []).some((y) => {
+      const x = h.get(y.device);
+      return x && x.family === "bjt" && !g(s, x) && x.source === s.source;
     }) && E(_, w(s, s.drain), s);
   const f = (s) => [{ node: s.source, resistor: null }, ...(i.get(s.source) || []).flatMap((y) => {
-    const R = n.get(y.device);
-    if (R.kind !== "R") return [];
-    const V = Object.values(R.terminals).find((U) => U !== s.source);
-    return V !== void 0 && V !== s.control && V !== s.drain ? [{ node: V, resistor: R.name }] : [];
+    const x = n.get(y.device);
+    if (x.kind !== "R") return [];
+    const V = Object.values(x.terminals).find((U) => U !== s.source);
+    return V !== void 0 && V !== s.control && V !== s.drain ? [{ node: V, resistor: x.name }] : [];
   })];
-  for (const s of u) s.control === s.drain && d("diode-connected", [s.id], { reference: s.id }, { control: s.control, return: s.source }, ["control-drain-short", s.family]);
+  for (const s of u) s.control === s.drain && l("diode-connected", [s.id], { reference: s.id }, { control: s.control, return: s.source }, ["control-drain-short", s.family]);
   for (const s of u) {
     const y = p.get(w(s, s.control));
     if (y.filter((Q) => Q.control === Q.drain).length > 1) continue;
-    let R = null;
-    if (s.control !== s.drain && s.family === "bjt" && (R = (p.get(w(s, s.drain)) || []).find((Q) => Q.id !== s.id && g(Q, s) && Q.control === s.drain && Q.source === s.control && o(Q.drain))), s.control !== s.drain && !R) continue;
+    let x = null;
+    if (s.control !== s.drain && s.family === "bjt" && (x = (p.get(w(s, s.drain)) || []).find((Q) => Q.id !== s.id && g(Q, s) && Q.control === s.drain && Q.source === s.control && o(Q.drain))), s.control !== s.drain && !x) continue;
     const V = f(s), U = [];
     let D = null, G = [];
     for (const Q of y) {
-      if (Q.id === s.id || Q.id === R?.id || Q.drain === s.drain || Q.drain === Q.control) continue;
+      if (Q.id === s.id || Q.id === x?.id || Q.drain === s.drain || Q.drain === Q.control) continue;
       const $ = V.flatMap((j) => f(Q).filter((ne) => j.node === ne.node).map((ne) => ({ node: j.node, rs: [j.resistor, ne.resistor].filter(Boolean) }))).find((j) => D === null || j.node === D);
       $ && (D = $.node, U.push(Q.id), G.push(...$.rs));
     }
     if (U.length) {
-      const Q = U.every(($) => m.get($).body === s.body);
-      d("current-mirror", [s.id, ...U, ...R ? [R.id] : []], { reference: s.id, outputs: U, ...R ? { helper: R.id } : {} }, { control: s.control, return: D }, ["same-polarity", "shared-control", R ? "emitter-follower-reference" : "diode-reference", G.length ? "resistive-common-return" : "shared-return", Q ? "compatible-bodies" : "different-body-connections"], R ? "assisted" : G.length ? "degenerated" : "basic", [...G, ...R ? [R.id] : []], Q ? "high" : "medium");
+      const Q = U.every(($) => h.get($).body === s.body);
+      l("current-mirror", [s.id, ...U, ...x ? [x.id] : []], { reference: s.id, outputs: U, ...x ? { helper: x.id } : {} }, { control: s.control, return: D }, ["same-polarity", "shared-control", x ? "emitter-follower-reference" : "diode-reference", G.length ? "resistive-common-return" : "shared-return", Q ? "compatible-bodies" : "different-body-connections"], x ? "assisted" : G.length ? "degenerated" : "basic", [...G, ...x ? [x.id] : []], Q ? "high" : "medium");
     }
   }
-  const I = [], N = /* @__PURE__ */ new Set(), O = (s, y) => {
-    const R = JSON.stringify([s.id, y.id].sort());
-    N.has(R) || (N.add(R), I.push([s, y]));
+  const I = [], C = /* @__PURE__ */ new Set(), O = (s, y) => {
+    const x = JSON.stringify([s.id, y.id].sort());
+    C.has(x) || (C.add(x), I.push([s, y]));
   };
-  for (const s of h.values()) if (!o(s[0].source)) {
-    const y = s.filter((R) => R.control !== R.drain);
-    y.length === 2 ? O(...y) : y.length > 2 && new Set(y.map((R) => R.control)).size > 1 && d("differential-pair", y.map((R) => R.id), { inputs: y.map((R) => R.id) }, { tail: y[0].source }, ["shared-tail", "multi-input-tail"], "multi-input", [], "medium");
+  for (const s of m.values()) if (!o(s[0].source)) {
+    const y = s.filter((x) => x.control !== x.drain);
+    y.length === 2 ? O(...y) : y.length > 2 && new Set(y.map((x) => x.control)).size > 1 && l("differential-pair", y.map((x) => x.id), { inputs: y.map((x) => x.id) }, { tail: y[0].source }, ["shared-tail", "multi-input-tail"], "multi-input", [], "medium");
   }
-  for (const s of _.values()) for (let y = 0; y < s.length; y++) for (let R = y + 1; R < s.length; R++) O(s[y], s[R]);
+  for (const s of _.values()) for (let y = 0; y < s.length; y++) for (let x = y + 1; x < s.length; x++) O(s[y], s[x]);
   for (const [s, y] of I) {
     if (s.control === y.control || s.control === s.drain || y.control === y.drain) continue;
     if (s.source === y.source && s.drain !== y.drain && !o(s.source)) {
-      const U = (i.get(s.source) || []).some((G) => G.device !== s.id && G.device !== y.id), D = h.get(w(s, s.source)).length === 2;
-      d("differential-pair", [s.id, y.id], { inputs: [s.id, y.id] }, { tail: s.source }, ["same-polarity", "distinct-controls", "shared-tail", U ? "tail-bias-connection" : "unbiased-tail", D ? "two-input-tail" : "multi-input-tail"], "basic", [], U && D && s.body === y.body ? "high" : "medium");
+      const U = (i.get(s.source) || []).some((G) => G.device !== s.id && G.device !== y.id), D = m.get(w(s, s.source)).length === 2;
+      l("differential-pair", [s.id, y.id], { inputs: [s.id, y.id] }, { tail: s.source }, ["same-polarity", "distinct-controls", "shared-tail", U ? "tail-bias-connection" : "unbiased-tail", D ? "two-input-tail" : "multi-input-tail"], "basic", [], U && D && s.body === y.body ? "high" : "medium");
     }
     if (s.family !== "bjt" || s.drain !== y.drain || s.source === y.source) continue;
-    const R = u.filter((U) => U.family === "bjt" && U.polarity !== s.polarity && U.source === s.source), V = u.filter((U) => U.family === "bjt" && U.polarity !== s.polarity && U.source === y.source);
-    for (const U of R) for (const D of V) U.id !== D.id && U.control === D.control && U.drain !== D.drain && U.control !== U.drain && D.control !== D.drain && d("differential-pair", [s.id, y.id, U.id, D.id], { inputs: [s.id, y.id], commonBase: [U.id, D.id] }, { inputCollectors: s.drain, bias: U.control }, ["same-polarity-inputs", "distinct-controls", "complementary-emitter-pairs", "shared-common-base"], "complementary-common-base");
+    const x = u.filter((U) => U.family === "bjt" && U.polarity !== s.polarity && U.source === s.source), V = u.filter((U) => U.family === "bjt" && U.polarity !== s.polarity && U.source === y.source);
+    for (const U of x) for (const D of V) U.id !== D.id && U.control === D.control && U.drain !== D.drain && U.control !== U.drain && D.control !== D.drain && l("differential-pair", [s.id, y.id, U.id, D.id], { inputs: [s.id, y.id], commonBase: [U.id, D.id] }, { inputCollectors: s.drain, bias: U.control }, ["same-polarity-inputs", "distinct-controls", "complementary-emitter-pairs", "shared-common-base"], "complementary-common-base");
   }
   for (const s of u) if (s.family === "bjt" && s.control !== s.drain) {
-    const y = r.get(a(s.drain, s.control)) || [], R = r.get(a(s.control, s.source)) || [];
-    y.length === 1 && R.length === 1 && d("vbe-multiplier", [s.id], { transistor: s.id, collectorResistor: y[0].name, emitterResistor: R[0].name }, { control: s.control, collector: s.drain, emitter: s.source }, ["collector-base-resistor", "base-emitter-resistor"], "basic", [y[0].name, R[0].name]);
+    const y = r.get(a(s.drain, s.control)) || [], x = r.get(a(s.control, s.source)) || [];
+    y.length === 1 && x.length === 1 && l("vbe-multiplier", [s.id], { transistor: s.id, collectorResistor: y[0].name, emitterResistor: x[0].name }, { control: s.control, collector: s.drain, emitter: s.source }, ["collector-base-resistor", "base-emitter-resistor"], "basic", [y[0].name, x[0].name]);
   }
-  const v = u.filter((s) => s.family === "bjt"), x = /* @__PURE__ */ new Map();
-  for (const s of v) E(x, s.control, s);
-  const P = (s) => (i.get(s) || []).filter((y) => m.has(y.device));
+  const v = u.filter((s) => s.family === "bjt"), R = /* @__PURE__ */ new Map();
+  for (const s of v) E(R, s.control, s);
+  const P = (s) => (i.get(s) || []).filter((y) => h.has(y.device));
   for (const s of v) if (s.control !== s.drain) {
-    for (const y of x.get(s.source) || []) y.id !== s.id && g(s, y) && y.control !== y.drain && s.drain === y.drain && y.source !== s.control && d("darlington-pair", [s.id, y.id], { driver: s.id, output: y.id }, { link: s.source, collector: s.drain }, ["same-polarity", "shared-collector", "emitter-to-base"], "basic", [], (x.get(s.source) || []).length === 1 ? "high" : "medium");
-    for (const y of x.get(s.drain) || []) y.id !== s.id && !g(s, y) && y.control !== y.drain && s.source === y.drain && y.source !== s.control && P(s.drain).length === 2 && d("sziklai-pair", [s.id, y.id], { driver: s.id, output: y.id }, { link: s.drain, feedback: s.source }, ["opposite-polarity", "collector-to-base", "emitter-to-collector", "unambiguous-drive-node"]);
+    for (const y of R.get(s.source) || []) y.id !== s.id && g(s, y) && y.control !== y.drain && s.drain === y.drain && y.source !== s.control && l("darlington-pair", [s.id, y.id], { driver: s.id, output: y.id }, { link: s.source, collector: s.drain }, ["same-polarity", "shared-collector", "emitter-to-base"], "basic", [], (R.get(s.source) || []).length === 1 ? "high" : "medium");
+    for (const y of R.get(s.drain) || []) y.id !== s.id && !g(s, y) && y.control !== y.drain && s.source === y.drain && y.source !== s.control && P(s.drain).length === 2 && l("sziklai-pair", [s.id, y.id], { driver: s.id, output: y.id }, { link: s.drain, feedback: s.source }, ["opposite-polarity", "collector-to-base", "emitter-to-collector", "unambiguous-drive-node"]);
     for (const y of i.get(s.drain) || []) {
-      const R = m.get(y.device);
-      !R || R.family !== "bjt" || R.id === s.id || !g(s, R) || R.source !== s.drain || o(s.drain) || R.control === s.control || R.control === R.drain || R.drain === s.source || P(s.drain).length !== 2 || d("cascode-pair", [s.id, R.id], { driver: s.id, output: R.id }, { link: s.drain }, ["same-polarity", "collector-to-emitter", "distinct-controls", "unambiguous-internal-node"]);
+      const x = h.get(y.device);
+      !x || x.family !== "bjt" || x.id === s.id || !g(s, x) || x.source !== s.drain || o(s.drain) || x.control === s.control || x.control === x.drain || x.drain === s.source || P(s.drain).length !== 2 || l("cascode-pair", [s.id, x.id], { driver: s.id, output: x.id }, { link: s.drain }, ["same-polarity", "collector-to-emitter", "distinct-controls", "unambiguous-internal-node"]);
     }
   }
-  for (const s of v.filter((y) => y.polarity === "npn" && o(y.drain))) for (const y of v.filter((R) => R.polarity === "pnp" && o(R.drain))) {
+  for (const s of v.filter((y) => y.polarity === "npn" && o(y.drain))) for (const y of v.filter((x) => x.polarity === "pnp" && o(x.drain))) {
     if (e[s.drain].potential <= e[y.drain].potential) continue;
-    const R = f(s).flatMap((V) => f(y).filter((U) => V.node === U.node && !o(V.node)).map((U) => ({ node: V.node, rs: [V.resistor, U.resistor].filter(Boolean) })))[0];
-    R && d("push-pull-pair", [s.id, y.id], { upper: s.id, lower: y.id }, { output: R.node }, ["complementary-polarity", "ordered-collector-supplies", R.rs.length ? "resistive-common-output" : "shared-emitter-output"], "emitter-follower", R.rs);
+    const x = f(s).flatMap((V) => f(y).filter((U) => V.node === U.node && !o(V.node)).map((U) => ({ node: V.node, rs: [V.resistor, U.resistor].filter(Boolean) })))[0];
+    x && l("push-pull-pair", [s.id, y.id], { upper: s.id, lower: y.id }, { output: x.node }, ["complementary-polarity", "ordered-collector-supplies", x.rs.length ? "resistive-common-output" : "shared-emitter-output"], "emitter-follower", x.rs);
   }
   return c;
 }
@@ -1756,48 +1756,48 @@ function Ot(t, e, n) {
     if (new Set(a.members).size !== a.members.length) throw Error("Duplicate @layout pair member.");
     const o = a.members.map((p) => u.get(p));
     if (o.some((p) => !p)) throw Error("Unknown @layout pair device.");
-    const c = { mirror: "current-mirror", differential: "differential-pair", vbe: "vbe-multiplier", darlington: "darlington-pair", sziklai: "sziklai-pair", cascode: "cascode-pair", "push-pull": "push-pull-pair" }[a.kind], l = a.kind === "differential" && o.length === 2 ? t.components.filter((p) => !a.members.includes(p.name) && Object.values(p.terminals).includes(o[0].terminals.E ?? o[0].terminals.S)) : [], d = Ce({ ...t, components: [...o, ...l] }, e), g = d.find((p) => p.kind === c && p.confidence === "high" && a.members.every((h) => p.members.includes(h)));
+    const c = { mirror: "current-mirror", differential: "differential-pair", vbe: "vbe-multiplier", darlington: "darlington-pair", sziklai: "sziklai-pair", cascode: "cascode-pair", "push-pull": "push-pull-pair" }[a.kind], d = a.kind === "differential" && o.length === 2 ? t.components.filter((p) => !a.members.includes(p.name) && Object.values(p.terminals).includes(o[0].terminals.E ?? o[0].terminals.S)) : [], l = Ce({ ...t, components: [...o, ...d] }, e), g = l.find((p) => p.kind === c && p.confidence === "high" && a.members.every((m) => p.members.includes(m)));
     if (!g) throw Error("Invalid @layout pair " + a.kind + " { " + a.members.join(" ") + " }: electrical structure does not match.");
-    for (const p of d.filter((h) => h === g || h.kind === "diode-connected" && h.members.every((_) => g.members.includes(_)))) {
-      const h = JSON.stringify([p.kind, [...p.members].sort()]);
-      r.has(h) || (r.add(h), i.push({ ...p, id: "motif" + i.length, origin: "annotation" }));
+    for (const p of l.filter((m) => m === g || m.kind === "diode-connected" && m.members.every((_) => g.members.includes(_)))) {
+      const m = JSON.stringify([p.kind, [...p.members].sort()]);
+      r.has(m) || (r.add(m), i.push({ ...p, id: "motif" + i.length, origin: "annotation" }));
     }
   }
   return i;
 }
-function Rt(t, e, n = Ce(t, e)) {
-  const i = /* @__PURE__ */ new Map(), r = t.components.filter((p) => p.kind === "R"), u = t.components.filter((p) => p.kind === "Q"), a = new Map(t.components.map((p) => [p.name, p])), o = /* @__PURE__ */ new Map(), c = /* @__PURE__ */ new Map(), l = (p) => Object.values(p.terminals), d = (p, h, _) => {
-    p && i.set(p.name, { reverse: l(p)[0] !== h, reason: _ });
+function xt(t, e, n = Ce(t, e)) {
+  const i = /* @__PURE__ */ new Map(), r = t.components.filter((p) => p.kind === "R"), u = t.components.filter((p) => p.kind === "Q"), a = new Map(t.components.map((p) => [p.name, p])), o = /* @__PURE__ */ new Map(), c = /* @__PURE__ */ new Map(), d = (p) => Object.values(p.terminals), l = (p, m, _) => {
+    p && i.set(p.name, { reverse: d(p)[0] !== m, reason: _ });
   };
   for (const p of u) {
-    const { C: h, B: _, E: m } = p.terminals, E = p.type.endsWith("pnp"), w = p.type.endsWith("npn");
-    !E && !w || (o.has(m) || o.set(m, []), o.get(m).push(p), h === _ && e[m]?.potential !== null && e[m]?.potential !== void 0 && c.set(h, { potential: e[m].potential }));
+    const { C: m, B: _, E: h } = p.terminals, E = p.type.endsWith("pnp"), w = p.type.endsWith("npn");
+    !E && !w || (o.has(h) || o.set(h, []), o.get(h).push(p), m === _ && e[h]?.potential !== null && e[h]?.potential !== void 0 && c.set(m, { potential: e[h].potential }));
   }
   for (const p of n) if (p.kind === "vbe-multiplier" && p.confidence === "high") {
-    const h = a.get(p.roles.transistor), _ = h.type.endsWith("pnp"), m = a.get(_ ? p.roles.emitterResistor : p.roles.collectorResistor), E = a.get(_ ? p.roles.collectorResistor : p.roles.emitterResistor);
-    d(m, h.terminals[_ ? "E" : "C"], "recognized VBE multiplier"), d(E, h.terminals.B, "recognized VBE multiplier");
+    const m = a.get(p.roles.transistor), _ = m.type.endsWith("pnp"), h = a.get(_ ? p.roles.emitterResistor : p.roles.collectorResistor), E = a.get(_ ? p.roles.collectorResistor : p.roles.emitterResistor);
+    l(h, m.terminals[_ ? "E" : "C"], "recognized VBE multiplier"), l(E, m.terminals.B, "recognized VBE multiplier");
   }
   for (const p of r) {
-    const [h, _] = l(p), m = c.get(h), E = c.get(_);
-    m && E && m.potential !== E.potential && d(p, m.potential > E.potential ? h : _, "diode-connected bias reference");
+    const [m, _] = d(p), h = c.get(m), E = c.get(_);
+    h && E && h.potential !== E.potential && l(p, h.potential > E.potential ? m : _, "diode-connected bias reference");
   }
   const g = /* @__PURE__ */ new Map();
   for (const p of r) {
-    const h = l(p);
-    if (!h.some((_) => e[_]?.potential !== null && e[_]?.potential !== void 0))
-      for (const _ of h)
+    const m = d(p);
+    if (!m.some((_) => e[_]?.potential !== null && e[_]?.potential !== void 0))
+      for (const _ of m)
         g.has(_) || g.set(_, []), g.get(_).push(p);
   }
-  for (const [p, h] of g)
-    if (!(h.length > 12))
-      for (const _ of h) for (const m of h) {
-        if (_ === m) continue;
-        const E = l(_).find((N) => N !== p), w = l(m).find((N) => N !== p), f = o.get(E)?.find((N) => N.type.endsWith("npn")), I = o.get(w)?.find((N) => N.type.endsWith("pnp"));
-        f && I && (d(_, E, "complementary emitter output"), d(m, p, "complementary emitter output"));
+  for (const [p, m] of g)
+    if (!(m.length > 12))
+      for (const _ of m) for (const h of m) {
+        if (_ === h) continue;
+        const E = d(_).find((C) => C !== p), w = d(h).find((C) => C !== p), f = o.get(E)?.find((C) => C.type.endsWith("npn")), I = o.get(w)?.find((C) => C.type.endsWith("pnp"));
+        f && I && (l(_, E, "complementary emitter output"), l(h, p, "complementary emitter output"));
       }
   return i;
 }
-function xt(t) {
+function Rt(t) {
   const e = t.components.filter((u) => u.kind === "Q"), n = /* @__PURE__ */ new Map(), i = new Set(t.components.filter((u) => u.kind === "R").map((u) => Object.values(u.terminals).sort().join("|"))), r = /* @__PURE__ */ new Set();
   for (const u of e) {
     const a = u.terminals.E;
@@ -1806,16 +1806,16 @@ function xt(t) {
   for (const u of e) {
     const { B: a, C: o, E: c } = u.terminals;
     if (a === c || !i.has([a, c].sort().join("|"))) continue;
-    const l = n.get(a) || [];
-    if (!(l.length > 16))
-      for (const d of l) {
-        if (d === u) continue;
-        if (d.terminals.B === o) {
+    const d = n.get(a) || [];
+    if (!(d.length > 16))
+      for (const l of d) {
+        if (l === u) continue;
+        if (l.terminals.B === o) {
           r.add(u.name);
           break;
         }
-        const g = n.get(d.terminals.B) || [];
-        if (g.length <= 16 && g.some((p) => p !== u && p !== d && p.terminals.B === o)) {
+        const g = n.get(l.terminals.B) || [];
+        if (g.length <= 16 && g.some((p) => p !== u && p !== l && p.terminals.B === o)) {
           r.add(u.name);
           break;
         }
@@ -1823,7 +1823,7 @@ function xt(t) {
   }
   return r;
 }
-const _e = 14;
+const _e = 15;
 function Ne(t) {
   const e = String(t).split("/").at(-1);
   let n;
@@ -1848,11 +1848,11 @@ function kt(t) {
         let o = a.value.trim();
         const c = /\bRser\s*=\s*(\{[^}]*\}|\([^)]*\)|[^\s]+)/i.exec(o);
         if (c && Number(ue(c[1], a.parameters)) !== 0 || (o = o.replace(/\bRser\s*=\s*(\{[^}]*\}|\([^)]*\)|[^\s]+)/i, "").trim(), /\b(?:PULSE|PWL|SINE|SIN|EXP|SFFM|AM|TRNOISE|Rpar|Cpar)\b/i.test(o))) continue;
-        const l = /^(?:DC\s+)?(\{[^}]*\}|\S+)(?:\s+AC\s+[^\s]+(?:\s+[^\s]+)?)?$/i.exec(o);
-        if (!l) continue;
-        const d = ue(l[1], a.parameters);
-        if (typeof d != "number" || !Number.isFinite(d)) continue;
-        i(a.terminals["-"], a.terminals["+"], d), i(a.terminals["+"], a.terminals["-"], -d);
+        const d = /^(?:DC\s+)?(\{[^}]*\}|\S+)(?:\s+AC\s+[^\s]+(?:\s+[^\s]+)?)?$/i.exec(o);
+        if (!d) continue;
+        const l = ue(d[1], a.parameters);
+        if (typeof l != "number" || !Number.isFinite(l)) continue;
+        i(a.terminals["-"], a.terminals["+"], l), i(a.terminals["+"], a.terminals["-"], -l);
       } catch {
       }
   const r = /* @__PURE__ */ Object.create(null), u = /* @__PURE__ */ new Set();
@@ -1860,34 +1860,34 @@ function kt(t) {
     if (u.has(a)) continue;
     const o = /* @__PURE__ */ new Map([[a, 0]]), c = [a];
     u.add(a);
-    let l = !1;
-    for (let d = 0; d < c.length; d++) for (const g of e.get(c[d]) || []) {
-      const p = o.get(c[d]) + g.delta;
-      o.has(g.node) ? Math.abs(o.get(g.node) - p) > 1e-8 * Math.max(1, Math.abs(p)) && (l = !0) : (o.set(g.node, p), u.add(g.node), c.push(g.node));
+    let d = !1;
+    for (let l = 0; l < c.length; l++) for (const g of e.get(c[l]) || []) {
+      const p = o.get(c[l]) + g.delta;
+      o.has(g.node) ? Math.abs(o.get(g.node) - p) > 1e-8 * Math.max(1, Math.abs(p)) && (d = !0) : (o.set(g.node, p), u.add(g.node), c.push(g.node));
     }
-    l && n.push({ severity: "warning", message: "Layout: inconsistent ideal DC voltage constraints; conflicting potentials are not used." });
-    for (const [d, g] of o) r[d] = { value: g, reference: a, known: a === "0" && !l, consistent: !l };
+    d && n.push({ severity: "warning", message: "Layout: inconsistent ideal DC voltage constraints; conflicting potentials are not used." });
+    for (const [l, g] of o) r[l] = { value: g, reference: a, known: a === "0" && !d, consistent: !d };
   }
   return { nodes: r, diagnostics: n };
 }
 function Pt(t, e, n = null) {
   const i = kt(pe(t.root)), r = /* @__PURE__ */ Object.create(null), u = /* @__PURE__ */ Object.create(null);
-  for (const d of Object.values(e.nodes)) {
-    const g = Ne(d.name), p = De(d.name);
-    r[d.name] = { role: g !== "unknown" ? g : p, roleSource: g !== "unknown" ? "node-name" : p !== "unknown" ? "legacy-rail-name" : "unknown", potential: i.nodes[d.name]?.known ? i.nodes[d.name].value : null };
+  for (const l of Object.values(e.nodes)) {
+    const g = Ne(l.name), p = De(l.name);
+    r[l.name] = { role: g !== "unknown" ? g : p, roleSource: g !== "unknown" ? "node-name" : p !== "unknown" ? "legacy-rail-name" : "unknown", potential: i.nodes[l.name]?.known ? i.nodes[l.name].value : null };
   }
-  const a = n?.pairs?.length ? Ot(e, r, n.pairs) : Ce(e, r), o = Rt(e, r, a), c = xt(e), l = (d, g, p) => {
-    const h = { role: r[p].role, roleSource: r[p].roleSource }, _ = d.block?.ports.find((w) => w.pin === g);
-    if (_?.implicit || !d.block && !d.synthetic) return h;
-    const m = d.synthetic ? d.value : _?.name || _?.label, E = Lt(m);
-    return E !== "unknown" ? { role: E, roleSource: Ne(m) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : fe(h.role) ? { ...h, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
+  const a = n?.pairs?.length ? Ot(e, r, n.pairs) : Ce(e, r), o = xt(e, r, a), c = Rt(e), d = (l, g, p) => {
+    const m = { role: r[p].role, roleSource: r[p].roleSource }, _ = l.block?.ports.find((w) => w.pin === g);
+    if (_?.implicit || !l.block && !l.synthetic) return m;
+    const h = l.synthetic ? l.value : _?.name || _?.label, E = Lt(h);
+    return E !== "unknown" ? { role: E, roleSource: Ne(h) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : fe(m.role) ? { ...m, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
   };
-  for (const d of e.components) {
-    const g = Object.fromEntries(Object.entries(d.terminals).map(([P, s]) => [P, { ...r[s], ...l(d, P, s) }])), p = Object.values(g), h = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(d.type), _ = h && !o.has(d.name) && p.length === 2 && p.every((P) => !fe(P.role) && (P.potential === null || P.role !== "unknown")), m = d.terminals["+"], E = d.terminals["-"], w = [m, E].filter((P) => P && P !== "0"), f = d.kind === "V" && w.some((P) => fe(r[P]?.role)) && !w.some((P) => ["in", "out", "io", "fb"].includes(r[P]?.role)) && [m, E].every((P) => i.nodes[P]?.known), I = m === "0" ? E : m, N = Object.keys(d.terminals), O = (P) => fe(P.role) ? P.potential !== null ? P.potential > 0 ? "high" : "low" : P.role === "ret" ? "low" : "high" : "signal";
+  for (const l of e.components) {
+    const g = Object.fromEntries(Object.entries(l.terminals).map(([P, s]) => [P, { ...r[s], ...d(l, P, s) }])), p = Object.values(g), m = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(l.type), _ = m && !o.has(l.name) && p.length === 2 && p.every((P) => !fe(P.role) && (P.potential === null || P.role !== "unknown")), h = l.terminals["+"], E = l.terminals["-"], w = [h, E].filter((P) => P && P !== "0"), f = l.kind === "V" && w.some((P) => fe(r[P]?.role)) && !w.some((P) => ["in", "out", "io", "fb"].includes(r[P]?.role)) && [h, E].every((P) => i.nodes[P]?.known), I = h === "0" ? E : h, C = Object.keys(l.terminals), O = (P) => fe(P.role) ? P.potential !== null ? P.potential > 0 ? "high" : "low" : P.role === "ret" ? "low" : "high" : "signal";
     let v = !1;
-    N.length === 2 && (d.kind === "V" && p.every((P) => P.potential !== null) ? v = p[0].potential < p[1].potential : d.terminals[N[0]] === "0" ? v = !0 : d.terminals[N[1]] === "0" ? v = !1 : p.every((P) => P.potential !== null) ? v = p[0].potential < p[1].potential : v = O(p[0]) === "low" || O(p[1]) === "high" && O(p[0]) === "signal"), o.has(d.name) && (v = o.get(d.name).reverse);
-    const x = d.synthetic ? "" : d.name.startsWith(e.focus + "/") ? d.name.slice(e.focus.length + 1) : d.name;
-    u[d.name] = { version: _e, kind: d.kind, polarity: d.type.endsWith("pnp") ? "p" : d.type.endsWith("npn") ? "n" : null, currentLimiter: c.has(d.name), orientationReason: o.get(d.name)?.reason || null, owner: x.includes("/") ? x.slice(0, x.lastIndexOf("/")) : "", passive: h, source: ["V", "I", "E", "F", "G", "H"].includes(d.kind) || d.kind === "B" && !h, ports: g, horizontal: _, orientation: _ ? "horizontal" : v ? "vertical-reversed" : "vertical", flexible: N.length === 2 && (h || ["V", "I", "B", "F", "H"].includes(d.kind)), supply: !!f, voltage: f ? i.nodes[I].value : null };
+    C.length === 2 && (l.kind === "V" && p.every((P) => P.potential !== null) ? v = p[0].potential < p[1].potential : l.terminals[C[0]] === "0" ? v = !0 : l.terminals[C[1]] === "0" ? v = !1 : p.every((P) => P.potential !== null) ? v = p[0].potential < p[1].potential : v = O(p[0]) === "low" || O(p[1]) === "high" && O(p[0]) === "signal"), o.has(l.name) && (v = o.get(l.name).reverse);
+    const R = l.synthetic ? "" : l.name.startsWith(e.focus + "/") ? l.name.slice(e.focus.length + 1) : l.name;
+    u[l.name] = { version: _e, kind: l.kind, polarity: l.type.endsWith("pnp") ? "p" : l.type.endsWith("npn") ? "n" : null, currentLimiter: c.has(l.name), orientationReason: o.get(l.name)?.reason || null, owner: R.includes("/") ? R.slice(0, R.lastIndexOf("/")) : "", passive: m, source: ["V", "I", "E", "F", "G", "H"].includes(l.kind) || l.kind === "B" && !m, ports: g, horizontal: _, orientation: _ ? "horizontal" : v ? "vertical-reversed" : "vertical", flexible: C.length === 2 && (m || ["V", "I", "B", "F", "H"].includes(l.kind)), supply: !!f, voltage: f ? i.nodes[I].value : null };
   }
   return { version: _e, nodes: r, cells: u, motifs: a, diagnostics: i.diagnostics };
 }
@@ -1904,32 +1904,32 @@ function At(t, { mode: e = "hierarchical", expanded: n = /* @__PURE__ */ new Set
   if (!r) throw Error("Unknown instance: " + i);
   const u = [], a = [];
   function o(g) {
-    a.push(...Object.values(g.nodes), ...g.ports.map((h) => h.node));
-    const p = [...g.devices.map((h) => ({ line: h.line, device: h })), ...g.children.map((h) => ({ line: h.line, child: h }))].sort((h, _) => h.line - _.line);
-    for (const h of p) {
-      if (h.device) {
-        const w = h.device;
+    a.push(...Object.values(g.nodes), ...g.ports.map((m) => m.node));
+    const p = [...g.devices.map((m) => ({ line: m.line, device: m })), ...g.children.map((m) => ({ line: m.line, child: m }))].sort((m, _) => m.line - _.line);
+    for (const m of p) {
+      if (m.device) {
+        const w = m.device;
         u.push({ ...w, layoutLabel: [...g.path.slice(r.path.length), w.localName].join("/") });
         continue;
       }
-      const _ = h.child;
+      const _ = m.child;
       if (e === "flat" || n.has(_.id)) {
         o(_);
         continue;
       }
-      const m = Ve(t, _), E = W();
-      m.forEach((w) => {
+      const h = Ve(t, _), E = W();
+      h.forEach((w) => {
         E[w.pin] = w.node;
-      }), u.push({ name: _.id, kind: "X", type: "spice_subckt", terminals: E, value: _.definition, raw: _.raw, line: _.line, instanceId: _.id, layoutLabel: _.path.slice(r.path.length).join("/"), block: { definitionId: _.scopeId, ports: m, parameters: _.params } });
+      }), u.push({ name: _.id, kind: "X", type: "spice_subckt", terminals: E, value: _.definition, raw: _.raw, line: _.line, instanceId: _.id, layoutLabel: _.path.slice(r.path.length).join("/"), block: { definitionId: _.scopeId, ports: h, parameters: _.params } });
     }
   }
   o(r);
   for (const [g, p] of r.ports.entries()) u.push({ name: "@port/" + i + "/" + g, kind: "PORT", type: "spice_port", terminals: { A: p.node }, layoutLabel: p.name, value: p.name, raw: "Interface port " + p.name, synthetic: !0 });
   if (u.length > 1500) throw Error("This sheet exceeds 1500 symbols. Collapse instances or open a subcircuit.");
-  const c = Object.assign(W(), ...Object.values(t.contexts).map((g) => g.models)), l = { title: i || t.ir.title, components: u, nodes: pt(u, a), models: c, diagnostics: t.ir.diagnostics, mode: e, focus: i };
-  l.topology = Tt(t, l);
-  const d = dt(t, l);
-  return l.layout = Pt(t, l, d), l.layout.description = d, l;
+  const c = Object.assign(W(), ...Object.values(t.contexts).map((g) => g.models)), d = { title: i || t.ir.title, components: u, nodes: pt(u, a), models: c, diagnostics: t.ir.diagnostics, mode: e, focus: i };
+  d.topology = Tt(t, d);
+  const l = dt(t, d);
+  return d.layout = Pt(t, d, l), d.layout.description = l, d;
 }
 function Tt(t, e) {
   const n = [], i = /* @__PURE__ */ new Set();
@@ -1939,7 +1939,7 @@ function Tt(t, e) {
         const o = t.contexts[a.instanceId];
         if (!o) throw Error("Projection contains an unknown block.");
         const c = Ve(t, o);
-        if (JSON.stringify(Object.entries(a.terminals)) !== JSON.stringify(c.map((l) => [l.pin, l.node]))) throw Error("Block interface topology mismatch: " + a.name);
+        if (JSON.stringify(Object.entries(a.terminals)) !== JSON.stringify(c.map((d) => [d.pin, d.node]))) throw Error("Block interface topology mismatch: " + a.name);
         n.push(...pe(o));
       } else n.push(a);
   for (const a of n) {
@@ -1967,15 +1967,15 @@ function Ut(t) {
   return { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: e, netnames: n, spiceMotifs: Ie(t.layout?.motifs || [], (i) => i, (i) => t.nodes[i].bit), spiceLayoutDescription: t.layout?.description || null } } };
 }
 function Mt(t) {
-  const e = /* @__PURE__ */ new Map(), n = /* @__PURE__ */ new Map(), i = {}, r = (l) => (n.has(l) || n.set(l, n.size + 2), n.get(l));
-  Object.entries(t.modules.circuit.cells).forEach(([l, d], g) => {
+  const e = /* @__PURE__ */ new Map(), n = /* @__PURE__ */ new Map(), i = {}, r = (d) => (n.has(d) || n.set(d, n.size + 2), n.get(d));
+  Object.entries(t.modules.circuit.cells).forEach(([d, l], g) => {
     const p = "c" + g;
-    e.set(p, l);
-    const h = Object.fromEntries(Object.entries(d.connections).map(([_, m]) => [_, m.map(r)]));
-    i[p] = { type: d.type, connections: h, port_directions: d.port_directions, attributes: { displayRef: d.attributes.displayRef || d.attributes.ref || "", value: d.attributes.value || "", name: d.attributes.name || "" } }, d.spiceBlock && (i[p].spiceBlock = d.spiceBlock), d.spiceSymbol && (i[p].spiceSymbol = d.spiceSymbol), d.spiceLayout && (i[p].spiceLayout = d.spiceLayout);
+    e.set(p, d);
+    const m = Object.fromEntries(Object.entries(l.connections).map(([_, h]) => [_, h.map(r)]));
+    i[p] = { type: l.type, connections: m, port_directions: l.port_directions, attributes: { displayRef: l.attributes.displayRef || l.attributes.ref || "", value: l.attributes.value || "", name: l.attributes.name || "" } }, l.spiceBlock && (i[p].spiceBlock = l.spiceBlock), l.spiceSymbol && (i[p].spiceSymbol = l.spiceSymbol), l.spiceLayout && (i[p].spiceLayout = l.spiceLayout);
   });
-  const u = new Map([...e].map(([l, d]) => [d, l])), a = t.modules.circuit.spiceLayoutDescription, o = a ? { ...a, faces: (a.faces || []).map((l) => ({ ...l, device: u.get(l.device) })), pairs: (a.pairs || []).map((l) => ({ ...l, members: l.members.map((d) => u.get(d)) })), groups: a.groups.map((l) => ({ ...l, members: l.members.map((d) => d.cell ? { ...d, cell: u.get(d.cell) } : d) })), relations: a.relations.map((l) => ({ ...l, a: u.get(l.a) || l.a, b: u.get(l.b) || l.b })) } : null, c = Ie(t.modules.circuit.spiceMotifs || [], (l) => u.get(l), r);
-  return { netlist: { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: i, spiceMotifs: c, spiceLayoutDescription: o } } }, ids: e, bits: new Map([...n].map(([l, d]) => [d, l])) };
+  const u = new Map([...e].map(([d, l]) => [l, d])), a = t.modules.circuit.spiceLayoutDescription, o = a ? { ...a, faces: (a.faces || []).map((d) => ({ ...d, device: u.get(d.device) })), pairs: (a.pairs || []).map((d) => ({ ...d, members: d.members.map((l) => u.get(l)) })), groups: a.groups.map((d) => ({ ...d, members: d.members.map((l) => l.cell ? { ...l, cell: u.get(l.cell) } : l) })), relations: a.relations.map((d) => ({ ...d, a: u.get(d.a) || d.a, b: u.get(d.b) || d.b })) } : null, c = Ie(t.modules.circuit.spiceMotifs || [], (d) => u.get(d), r);
+  return { netlist: { modules: { circuit: { attributes: { top: 1 }, ports: {}, cells: i, spiceMotifs: c, spiceLayoutDescription: o } } }, ids: e, bits: new Map([...n].map(([d, l]) => [l, d])) };
 }
 const ee = /* @__PURE__ */ new Map();
 async function Qt(t, e) {
@@ -1985,25 +1985,28 @@ async function Qt(t, e) {
   const u = new DOMParser().parseFromString(r.svg, "image/svg+xml");
   if (u.querySelector("parsererror")) throw Error("Renderer produced invalid SVG.");
   for (const c of u.querySelectorAll("[id],[class]")) {
-    const l = c.getAttribute("id");
-    l?.startsWith("cell_") && n.ids.has(l.slice(5)) && c.setAttribute("id", "cell_" + n.ids.get(l.slice(5)));
-    const d = c.getAttribute("class");
-    d && c.setAttribute("class", d.split(/\s+/).map((g) => g.startsWith("cell_") && n.ids.has(g.slice(5)) ? "cell_" + n.ids.get(g.slice(5)) : /^net_\d+$/.test(g) && n.bits.has(Number(g.slice(4))) ? "net_" + n.bits.get(Number(g.slice(4))) : g).join(" "));
+    const d = c.getAttribute("id");
+    d?.startsWith("cell_") && n.ids.has(d.slice(5)) && c.setAttribute("id", "cell_" + n.ids.get(d.slice(5)));
+    const l = c.getAttribute("class");
+    l && c.setAttribute("class", l.split(/\s+/).map((g) => g.startsWith("cell_") && n.ids.has(g.slice(5)) ? "cell_" + n.ids.get(g.slice(5)) : /^net_\d+$/.test(g) && n.bits.has(Number(g.slice(4))) ? "net_" + n.bits.get(Number(g.slice(4))) : g).join(" "));
   }
   const a = r.drawing ? structuredClone(r.drawing) : null, o = u.querySelector("#spice-layout-report");
   if (o) {
-    const c = JSON.parse(o.textContent), l = (d) => n.ids.get(d) || d;
-    c.mirroredTransistors = (c.mirroredTransistors || []).map(l), c.orientationDevicesTested = (c.orientationDevicesTested || []).map(l), c.recognizedMotifs = Ie(c.recognizedMotifs || [], l, (d) => n.bits.get(d) ?? d);
-    for (const d of c.pairConstraints || []) d.members = d.members.map(l);
-    for (const d of c.motifMeasurements || [])
-      d.members = d.members.map(l), d.interlopers && (d.interlopers = d.interlopers.map(l));
-    for (const d of c.voltageRails || []) d.bit !== void 0 && (d.bit = n.bits.get(d.bit) ?? d.bit);
+    const c = JSON.parse(o.textContent), d = (l) => n.ids.get(l) || l;
+    c.mirroredTransistors = (c.mirroredTransistors || []).map(d), c.orientationDevicesTested = (c.orientationDevicesTested || []).map(d), c.recognizedMotifs = Ie(c.recognizedMotifs || [], d, (l) => n.bits.get(l) ?? l);
+    for (const l of c.pairCompactions || [])
+      l.members = l.members.map(d), l.moved = d(l.moved);
+    for (const l of c.pairConstraints || []) l.members = l.members.map(d);
+    for (const l of c.pairProximity || []) l.members = l.members.map(d);
+    for (const l of c.motifMeasurements || [])
+      l.members = l.members.map(d), l.interlopers && (l.interlopers = l.interlopers.map(d));
+    for (const l of c.voltageRails || []) l.bit !== void 0 && (l.bit = n.bits.get(l.bit) ?? l.bit);
     o.textContent = JSON.stringify(c);
   }
   if (a) {
     for (const c of a.components) {
       c.id = n.ids.get(c.id) || c.id;
-      for (const l of c.ports) l.bit = n.bits.get(l.bit) ?? l.bit;
+      for (const d of c.ports) d.bit = n.bits.get(d.bit) ?? d.bit;
     }
     for (const c of a.segments) c.bit = n.bits.get(c.bit) ?? c.bit;
   }
@@ -2012,12 +2015,12 @@ async function Qt(t, e) {
 function Dt(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("render-worker-2wpd7Otj.js", import.meta.url).href,
+    "" + new URL("render-worker-CrfDjSPf.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((i, r) => {
-    const u = (c, l) => {
-      clearTimeout(o), n.terminate(), c ? r(Error(c)) : i(l);
+    const u = (c, d) => {
+      clearTimeout(o), n.terminate(), c ? r(Error(c)) : i(d);
     }, a = Object.keys(t.modules.circuit.cells).length > 300 ? 6e4 : 3e4, o = setTimeout(() => u("Layout timed out. Open a subcircuit sheet or collapse instances."), a);
     n.onmessage = ({ data: c }) => u(c.error, { svg: c.svg, drawing: c.drawing }), n.onerror = (c) => u(c.message || "Layout worker failed."), n.postMessage({ netlist: t, settings: e });
   });
@@ -2281,7 +2284,7 @@ R10 OUT_SIG N_OUTPUT_LOW 50\r
 .model Q741_P PNP(IS=10f BF=50 BR=4 VAF=50 CJE=1p CJC=2p TF=30n)\r
 \r
 .end\r
-`, he = {
+`, me = {
   filter: { source: Vt, description: "Series R–L / shunt C low-pass with a resistive load; illustrative component values.", url: "https://circuits.mit.edu/S26/psets/12/series_filters", reference: "MIT 6.200, Series RLC: Filters" },
   amplifier: { source: Bt, description: "Voltage-divider biased common-emitter amplifier.", url: "https://wiki.analog.com/university/courses/electronics/text/chapter-9", reference: "Analog Devices, chapter 9.2" },
   follower: { source: jt, description: "Common-collector emitter follower.", url: "https://wiki.analog.com/university/courses/electronics/text/chapter-9", reference: "Analog Devices, chapter 9.4" },
@@ -2301,51 +2304,51 @@ function Ft(t) {
 async function Ue(t) {
   return Ft(await t.arrayBuffer());
 }
-const Me = he.filter.source, k = (t) => document.getElementById("spice-" + t), de = k("app");
+const Me = me.filter.source, k = (t) => document.getElementById("spice-" + t), de = k("app");
 if (de) {
-  let x = function(C) {
+  let R = function(N) {
     const L = k("example-info");
-    if (L && (L.replaceChildren(), !!C && (L.append(document.createTextNode(C.description + " ")), C.url))) {
+    if (L && (L.replaceChildren(), !!N && (L.append(document.createTextNode(N.description + " ")), N.url))) {
       const T = document.createElement("a");
-      T.href = C.url, T.target = "_blank", T.rel = "noopener noreferrer", T.textContent = C.reference, L.append(T);
+      T.href = N.url, T.target = "_blank", T.rel = "noopener noreferrer", T.textContent = N.reference, L.append(T);
     }
   }, P = function() {
-    r = null, u = null, o = "", O(), x(Object.values(he).find((C) => C.source === t.value)), n.textContent = "Input changed — generate to refresh the schematic.";
-  }, s = function(C) {
+    r = null, u = null, o = "", O(), R(Object.values(me).find((N) => N.source === t.value)), n.textContent = "Input changed — generate to refresh the schematic.";
+  }, s = function(N) {
     i.replaceChildren();
-    for (const { severity: L, line: T, message: M, source: A } of C) {
+    for (const { severity: L, line: T, message: M, source: A } of N) {
       const F = document.createElement("li");
       F.className = L, F.textContent = `${L.toUpperCase()}${A && A !== "input.cir" ? " · " + A : ""}${T ? " · line " + T : ""}: ${M}`, i.append(F);
     }
-    k("messages").open = C.some((L) => L.severity !== "info"), k("message-count").textContent = `${C.length} message${C.length === 1 ? "" : "s"}`;
+    k("messages").open = N.some((L) => L.severity !== "info"), k("message-count").textContent = `${N.length} message${N.length === 1 ? "" : "s"}`;
   }, y = function() {
-    e.querySelector("svg")?.setAttribute("viewBox", `${m.x} ${m.y} ${m.w} ${m.h}`), k("zoom-level").textContent = Math.round(E.w / m.w * 100) + "%";
-  }, R = function(C, L = m.x + m.w / 2, T = m.y + m.h / 2) {
+    e.querySelector("svg")?.setAttribute("viewBox", `${h.x} ${h.y} ${h.w} ${h.h}`), k("zoom-level").textContent = Math.round(E.w / h.w * 100) + "%";
+  }, x = function(N, L = h.x + h.w / 2, T = h.y + h.h / 2) {
     if (!e.querySelector("svg")) return;
-    const M = Math.max(0.05, Math.min(10, m.w * C / E.w)) * E.w / m.w;
-    m = { x: L + (m.x - L) * M, y: T + (m.y - T) * M, w: m.w * M, h: m.h * M }, y();
-  }, U = function(C) {
+    const M = Math.max(0.05, Math.min(10, h.w * N / E.w)) * E.w / h.w;
+    h = { x: L + (h.x - L) * M, y: T + (h.y - T) * M, w: h.w * M, h: h.h * M }, y();
+  }, U = function(N) {
     const L = new URLSearchParams();
-    C && L.set("instance", C);
+    N && L.set("instance", N);
     const T = L.toString();
-    location.hash.slice(1) === T ? (p = C, j()) : location.hash = T;
+    location.hash.slice(1) === T ? (p = N, j()) : location.hash = T;
   }, D = function() {
     p = new URLSearchParams(location.hash.slice(1)).get("instance") || "";
-  }, G = function(C) {
-    const L = l.contexts[C].path;
+  }, G = function(N) {
+    const L = d.contexts[N].path;
     for (let T = 1; T <= L.length; T++) f.add(L.slice(0, T).map(encodeURIComponent).join("/"));
   }, Q = function() {
-    const C = !!(h && h !== p && l?.contexts[h]);
-    k("selection-actions").hidden = !C, k("toggle-instance").textContent = f.has(h) ? "Collapse instance" : "Expand instance", k("toggle-instance").disabled = !1, k("open-instance").href = "#" + new URLSearchParams({ instance: h });
+    const N = !!(m && m !== p && d?.contexts[m]);
+    k("selection-actions").hidden = !N, k("toggle-instance").textContent = f.has(m) ? "Collapse instance" : "Expand instance", k("toggle-instance").disabled = !1, k("open-instance").href = "#" + new URLSearchParams({ instance: m });
   }, $ = function() {
     k("breadcrumbs").replaceChildren();
-    const C = (T, M) => {
+    const N = (T, M) => {
       const A = document.createElement("button");
       A.type = "button", A.textContent = T, A.onclick = () => U(M), A.disabled = M === p, k("breadcrumbs").append(A);
     };
-    if (C("Top", ""), p) {
-      const T = l.contexts[p].path;
-      for (let M = 0; M < T.length; M++) C(T[M], T.slice(0, M + 1).map(encodeURIComponent).join("/"));
+    if (N("Top", ""), p) {
+      const T = d.contexts[p].path;
+      for (let M = 0; M < T.length; M++) N(T[M], T.slice(0, M + 1).map(encodeURIComponent).join("/"));
     }
     k("instances").replaceChildren();
     const L = (T, M) => {
@@ -2354,7 +2357,7 @@ if (de) {
         F.className = "spice-instance-row", F.style.setProperty("--depth", Math.min(M, 8)), F.dataset.instance = A.id;
         const Y = document.createElement("button");
         Y.type = "button", Y.textContent = f.has(A.id) ? "−" : "+", Y.title = (f.has(A.id) ? "Collapse " : "Expand ") + A.id, Y.setAttribute("aria-label", Y.title), Y.setAttribute("aria-expanded", String(f.has(A.id))), Y.onclick = () => {
-          f.has(A.id) ? f.delete(A.id) : G(A.id), h = A.id, j();
+          f.has(A.id) ? f.delete(A.id) : G(A.id), m = A.id, j();
         };
         const re = document.createElement("a");
         re.href = "#" + new URLSearchParams({ instance: A.id }), re.textContent = A.name + " · " + A.definition, re.title = "Open " + A.id + " as its own sheet";
@@ -2366,18 +2369,18 @@ if (de) {
         k("instances").append(F), L(A, M + 1);
       }
     };
-    L(l.contexts[p], 0), k("hierarchy-panel").hidden = !l.contexts[p].children.length, k("focus-title").textContent = p ? p + " / " + l.contexts[p].definition : "Top-level schematic", Q();
+    L(d.contexts[p], 0), k("hierarchy-panel").hidden = !d.contexts[p].children.length, k("focus-title").textContent = p ? p + " / " + d.contexts[p].definition : "Top-level schematic", Q();
   };
   const t = k("input"), e = k("preview"), n = k("status"), i = k("diagnostics");
-  let r = null, u = null, a = !1, o = "", c, l, d, g = "", p = "", h = "", _ = !1, m = { x: 0, y: 0, w: 1, h: 1 }, E = { ...m }, w;
+  let r = null, u = null, a = !1, o = "", c, d, l, g = "", p = "", m = "", _ = !1, h = { x: 0, y: 0, w: 1, h: 1 }, E = { ...h }, w;
   const f = /* @__PURE__ */ new Set();
-  let I = !1, N = {};
+  let I = !1, C = {};
   try {
-    N = JSON.parse(sessionStorage.getItem("spice-libraries-v3") || "{}");
+    C = JSON.parse(sessionStorage.getItem("spice-libraries-v3") || "{}");
   } catch {
   }
-  de.addEventListener("click", (C) => {
-    _ && C.target.closest('a[href^="#"]') && C.preventDefault();
+  de.addEventListener("click", (N) => {
+    _ && N.target.closest('a[href^="#"]') && N.preventDefault();
   });
   const O = () => {
     k("copy").disabled = k("download").disabled = !o || _, k("download-asc").disabled = k("download-asc-bundle").disabled = !o || !r || _ || a;
@@ -2387,30 +2390,30 @@ if (de) {
     t.value = sessionStorage.getItem("spice-netlist-v2") || Me;
   } catch {
   }
-  x(Object.values(he).find((C) => C.source === t.value)), t.addEventListener("input", P);
-  for (const C of ["font", "size", "color", "detailed", "conventional"]) k(C).addEventListener("input", P);
-  k("zoom-in").onclick = () => R(0.8), k("zoom-out").onclick = () => R(1.25), k("fit").onclick = () => {
-    m = { ...E }, y();
+  R(Object.values(me).find((N) => N.source === t.value)), t.addEventListener("input", P);
+  for (const N of ["font", "size", "color", "detailed", "conventional"]) k(N).addEventListener("input", P);
+  k("zoom-in").onclick = () => x(0.8), k("zoom-out").onclick = () => x(1.25), k("fit").onclick = () => {
+    h = { ...E }, y();
   };
-  const V = (C) => {
+  const V = (N) => {
     const L = e.querySelector("svg");
-    return L ? new DOMPoint(C.clientX, C.clientY).matrixTransform(L.getScreenCTM().inverse()) : null;
+    return L ? new DOMPoint(N.clientX, N.clientY).matrixTransform(L.getScreenCTM().inverse()) : null;
   };
-  e.addEventListener("wheel", (C) => {
-    const L = V(C);
-    L && (C.preventDefault(), R(C.deltaY > 0 ? 1.12 : 1 / 1.12, L.x, L.y));
-  }, { passive: !1 }), e.addEventListener("pointerdown", (C) => {
-    C.button !== 0 || !e.querySelector("svg") || (w = { start: V(C), x: C.clientX, y: C.clientY, view: { ...m }, moved: !1 }, e.setPointerCapture(C.pointerId));
-  }), e.addEventListener("pointermove", (C) => {
+  e.addEventListener("wheel", (N) => {
+    const L = V(N);
+    L && (N.preventDefault(), x(N.deltaY > 0 ? 1.12 : 1 / 1.12, L.x, L.y));
+  }, { passive: !1 }), e.addEventListener("pointerdown", (N) => {
+    N.button !== 0 || !e.querySelector("svg") || (w = { start: V(N), x: N.clientX, y: N.clientY, view: { ...h }, moved: !1 }, e.setPointerCapture(N.pointerId));
+  }), e.addEventListener("pointermove", (N) => {
     if (!w) return;
-    const L = V(C);
-    Math.hypot(C.clientX - w.x, C.clientY - w.y) > 4 && (w.moved = !0), m.x += w.start.x - L.x, m.y += w.start.y - L.y, y();
-  }), e.addEventListener("pointerup", (C) => {
+    const L = V(N);
+    Math.hypot(N.clientX - w.x, N.clientY - w.y) > 4 && (w.moved = !0), h.x += w.start.x - L.x, h.y += w.start.y - L.y, y();
+  }), e.addEventListener("pointerup", (N) => {
     if (!w) return;
     const L = w.moved;
-    if (w = null, e.hasPointerCapture(C.pointerId) && e.releasePointerCapture(C.pointerId), !L) {
-      const T = document.elementFromPoint(C.clientX, C.clientY)?.closest("[data-component]"), M = c?.components.find((A) => A.name === T?.dataset.component);
-      M && (h = M.instanceId || "", k("selection").textContent = `${M.raw}
+    if (w = null, e.hasPointerCapture(N.pointerId) && e.releasePointerCapture(N.pointerId), !L) {
+      const T = document.elementFromPoint(N.clientX, N.clientY)?.closest("[data-component]"), M = c?.components.find((A) => A.name === T?.dataset.component);
+      M && (m = M.instanceId || "", k("selection").textContent = `${M.raw}
 ${Object.entries(M.terminals).map(([A, F]) => `${A} → ${F}`).join("   ")}`, M.kind === "X" ? (G(M.instanceId), j()) : Q());
     }
   }), window.addEventListener("hashchange", () => {
@@ -2418,61 +2421,61 @@ ${Object.entries(M.terminals).map(([A, F]) => `${A} → ${F}`).join("   ")}`, M.
       I = !0;
       return;
     }
-    D(), h = "", j();
+    D(), m = "", j();
   }), k("collapse-all").onclick = () => {
     f.clear(), j();
   }, k("expand-all").onclick = () => {
-    for (const C of Object.keys(l?.contexts || {})) C && f.add(C);
+    for (const N of Object.keys(d?.contexts || {})) N && f.add(N);
     j();
   }, k("toggle-instance").onclick = () => {
-    f.has(h) ? f.delete(h) : G(h), j();
+    f.has(m) ? f.delete(m) : G(m), j();
   }, e.addEventListener("pointercancel", () => {
     w = null;
-  }), e.addEventListener("keydown", (C) => {
-    const L = C.target.closest("[data-instance]");
-    if (L && (C.key === "Enter" || C.key === " ")) {
-      C.preventDefault(), h = L.dataset.instance, G(h), j();
+  }), e.addEventListener("keydown", (N) => {
+    const L = N.target.closest("[data-instance]");
+    if (L && (N.key === "Enter" || N.key === " ")) {
+      N.preventDefault(), m = L.dataset.instance, G(m), j();
       return;
     }
-    C.key === "+" || C.key === "=" ? R(0.8) : C.key === "-" ? R(1.25) : C.key.toLowerCase() === "f" ? (m = { ...E }, y()) : C.key.startsWith("Arrow") && (C.preventDefault(), m.x += ({ ArrowLeft: -0.08, ArrowRight: 0.08 }[C.key] || 0) * m.w, m.y += ({ ArrowUp: -0.08, ArrowDown: 0.08 }[C.key] || 0) * m.h, y());
+    N.key === "+" || N.key === "=" ? x(0.8) : N.key === "-" ? x(1.25) : N.key.toLowerCase() === "f" ? (h = { ...E }, y()) : N.key.startsWith("Arrow") && (N.preventDefault(), h.x += ({ ArrowLeft: -0.08, ArrowRight: 0.08 }[N.key] || 0) * h.w, h.y += ({ ArrowUp: -0.08, ArrowDown: 0.08 }[N.key] || 0) * h.h, y());
   });
   async function j() {
     if (_) return;
     _ = !0, r = null, u = null, o = "", O(), k("generate").disabled = !0, t.readOnly = !0, k("file").disabled = !0, k("libraries").disabled = !0;
     for (const L of de.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance")) L.disabled = !0;
     n.textContent = "Parsing netlist and routing wires…", e.setAttribute("aria-busy", "true");
-    let C = [];
+    let N = [];
     try {
-      if (g !== t.value || !l) {
-        if (d = ut(t.value, { files: N }), C = [...d.diagnostics], C.some((S) => S.severity === "error"))
-          throw l = null, Error("Fix the parser errors below before generating.");
-        l = vt(d), g && g !== t.value ? (f.clear(), p = "", h = "", history.replaceState(null, "", location.pathname + location.search)) : D(), g = t.value;
+      if (g !== t.value || !d) {
+        if (l = ut(t.value, { files: C }), N = [...l.diagnostics], N.some((S) => S.severity === "error"))
+          throw d = null, Error("Fix the parser errors below before generating.");
+        d = vt(l), g && g !== t.value ? (f.clear(), p = "", m = "", history.replaceState(null, "", location.pathname + location.search)) : D(), g = t.value;
         try {
           sessionStorage.setItem("spice-netlist-v2", t.value);
         } catch {
         }
       }
-      if (C = [...d.diagnostics], s(C), C.some((S) => S.severity === "error")) throw Error("Fix the parser errors below before generating.");
-      c = At(l, { expanded: f, focus: p });
+      if (N = [...l.diagnostics], s(N), N.some((S) => S.severity === "error")) throw Error("Fix the parser errors below before generating.");
+      c = At(d, { expanded: f, focus: p });
       const L = Ut(c);
-      v().conventional && C.push(...c.layout.diagnostics);
+      v().conventional && N.push(...c.layout.diagnostics);
       const T = await Qt(L, v()), M = new DOMParser().parseFromString(T.svg, "image/svg+xml");
       if (M.querySelector("parsererror")) throw Error("Renderer produced invalid SVG.");
       const A = M.documentElement, F = A.querySelector("#spice-layout-report");
       if (F) {
         c.layout.report = JSON.parse(F.textContent);
         const S = c.layout.report;
-        if (C.push({ severity: "info", message: `Layout: compact signal flow; ${S.powerSourcesChecked} DC/ground symbols checked, ${S.powerOrderViolations} DC order preference(s) unmet. ${S.powerPass}. ${S.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), S.classicTemplateFallback && C.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), S.groundPlacement && C.push({ severity: "info", message: `Ground: ${S.groundPlacement}; ${S.straightenedGroundDrops || 0} return-path simplification(s).` }), S.explicitGroups && C.push({ severity: "info", message: `Layout comments: ${S.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), S.classicRails && C.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${S.railCount} shared voltage rails.` }), S.localClassicInstances?.length && C.push({ severity: "info", message: `${S.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), S.localClassicStages?.length && C.push({ severity: "info", message: `Classic transistor proximity active: ${S.localClassicStages.join(", ")}.` }), S.sharedClassicRails && C.push({ severity: "info", message: "Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes." }), S.mirroredTransistors?.length && C.push({ severity: "info", message: `Control-pin mirror choices: ${S.mirroredTransistors.join(", ")}.` }), S.recognizedMotifs?.length && C.push({ severity: "info", message: `Transistor structures: ${S.recognizedMotifs.map((B) => `${B.kind} (${B.members.join(", ")}; ${B.confidence})`).join("; ")}.` }), S.appliedMotifs?.length && C.push({ severity: "info", message: `Topology preferences applied to ${S.appliedMotifs.length} local structure(s); ELK still determines placement and routing.` }), S.compoundPairFallback && C.push({ severity: "warning", message: "Compound-pair placement fell back to proximity rules: " + S.compoundPairFallback }), S.pairConstraints?.length) {
-          const B = S.pairConstraints.filter((z) => z.crossRegion).length;
-          C.push({ severity: "info", message: `${S.pairConstraints.length - B} adjacent transistor pair(s); ${B} cross-region mirror row constraint(s).` });
+        if (N.push({ severity: "info", message: `Layout: compact signal flow; ${S.powerSourcesChecked} DC/ground symbols checked, ${S.powerOrderViolations} DC order preference(s) unmet. ${S.powerPass}. ${S.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), S.classicTemplateFallback && N.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), S.groundPlacement && N.push({ severity: "info", message: `Ground: ${S.groundPlacement}; ${S.straightenedGroundDrops || 0} return-path simplification(s).` }), S.explicitGroups && N.push({ severity: "info", message: `Layout comments: ${S.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), S.classicRails && N.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${S.railCount} shared voltage rails.` }), S.localClassicInstances?.length && N.push({ severity: "info", message: `${S.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), S.localClassicStages?.length && N.push({ severity: "info", message: `Classic transistor proximity active: ${S.localClassicStages.join(", ")}.` }), S.sharedClassicRails && N.push({ severity: "info", message: "Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes." }), S.mirroredTransistors?.length && N.push({ severity: "info", message: `Control-pin mirror choices: ${S.mirroredTransistors.join(", ")}.` }), S.recognizedMotifs?.length && N.push({ severity: "info", message: `Transistor structures: ${S.recognizedMotifs.map((B) => `${B.kind} (${B.members.join(", ")}; ${B.confidence})`).join("; ")}.` }), S.appliedMotifs?.length && N.push({ severity: "info", message: `Topology preferences applied to ${S.appliedMotifs.length} local structure(s); ELK still determines placement and routing.` }), S.pairCompactionFallback && N.push({ severity: "warning", message: "Pair proximity kept the original regions: " + S.pairCompactionFallback }), S.compoundPairFallback && N.push({ severity: "warning", message: "Compound-pair placement fell back to proximity rules: " + S.compoundPairFallback }), S.pairConstraints?.length) {
+          const B = S.pairConstraints.filter((z) => z.crossRegion && !z.compacted).length;
+          N.push({ severity: "info", message: `${S.pairConstraints.length - B} adjacent transistor pair(s); ${B} cross-region mirror row constraint(s).` });
         }
-        S.netShortcuts && C.push({ severity: "info", message: `${S.netShortcuts} safe straight net shortcut(s); ${S.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.` }), S.sharedRailFallback && C.push({ severity: "warning", message: `Shared rail layout uses an automatic fallback: ${S.sharedRailFallback}.` });
-        for (const B of S.localClassicFallbacks || []) B.stage && C.push({ severity: "info", message: `Classic stage ${B.stage} uses automatic layout: ${B.reason || "No unobstructed local template"}.` });
-        S.geometricConnectivityVerified && C.push({ severity: "info", message: `Net geometry verified; ${S.cyclesRemoved} same-net loop(s) and ${S.leavesRemoved} unused wire branch(es) removed.` }), s(C);
+        S.netShortcuts && N.push({ severity: "info", message: `${S.netShortcuts} safe straight net shortcut(s); ${S.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.` }), S.sharedRailFallback && N.push({ severity: "warning", message: `Shared rail layout uses an automatic fallback: ${S.sharedRailFallback}.` });
+        for (const B of S.localClassicFallbacks || []) B.stage && N.push({ severity: "info", message: `Classic stage ${B.stage} uses automatic layout: ${B.reason || "No unobstructed local template"}.` });
+        S.geometricConnectivityVerified && N.push({ severity: "info", message: `Net geometry verified; ${S.cyclesRemoved} same-net loop(s) and ${S.leavesRemoved} unused wire branch(es) removed.` }), s(N);
       }
       if (A.localName !== "svg" || A.querySelector("script,foreignObject")) throw Error("Invalid schematic output.");
       const Y = Number(A.getAttribute("width")), re = Number(A.getAttribute("height"));
-      E = { x: -20, y: -20, w: Y + 40, h: re + 40 }, m = { ...E }, A.setAttribute("viewBox", `${E.x} ${E.y} ${E.w} ${E.h}`), A.setAttribute("width", String(E.w)), A.setAttribute("height", String(E.h)), A.setAttribute("role", "img"), A.setAttribute("aria-label", c.title || "SPICE schematic"), A.setAttribute("style", "background:white");
+      E = { x: -20, y: -20, w: Y + 40, h: re + 40 }, h = { ...E }, A.setAttribute("viewBox", `${E.x} ${E.y} ${E.w} ${E.h}`), A.setAttribute("width", String(E.w)), A.setAttribute("height", String(E.h)), A.setAttribute("role", "img"), A.setAttribute("aria-label", c.title || "SPICE schematic"), A.setAttribute("style", "background:white");
       for (const S of c.components) {
         const B = M.getElementById("cell_" + S.name);
         if (!B) throw Error("Renderer omitted component " + S.name);
@@ -2502,7 +2505,7 @@ Resolved: ` + S.value + `
         }
       }
       r = T.drawing, o = new XMLSerializer().serializeToString(A), k("source").value = o, e.replaceChildren(document.importNode(A, !0)), y();
-      const J = C.filter((S) => S.severity === "warning").length;
+      const J = N.filter((S) => S.severity === "warning").length;
       n.textContent = `${c.components.filter((S) => !S.synthetic).length} components · ${Object.keys(c.nodes).length} nodes · ${c.topology.leafCount} primitive devices verified${J ? " · Review " + J + " warning(s); drawing may be partial." : " · Schematic ready."}`, n.textContent += ` Layout rules v${_e}.`, c.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${c.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), c.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found.");
       const oe = Object.values(c.nodes).map((S) => {
         const B = document.createElement("tr");
@@ -2512,28 +2515,28 @@ Resolved: ` + S.value + `
         }
         return B;
       });
-      k("nets").replaceChildren(...oe), k("json").value = JSON.stringify({ circuit: c, netlist: L, hierarchy: d }, null, 2), k("selection").textContent = "Click a component to inspect its original statement and pin connections.", $();
+      k("nets").replaceChildren(...oe), k("json").value = JSON.stringify({ circuit: c, netlist: L, hierarchy: l }, null, 2), k("selection").textContent = "Click a component to inspect its original statement and pin connections.", $();
     } catch (L) {
-      if (e.replaceChildren(), o = "", k("source").value = "", k("json").value = "", k("nets").replaceChildren(), k("selection").textContent = "", n.textContent = L.message, !l)
+      if (e.replaceChildren(), o = "", k("source").value = "", k("json").value = "", k("nets").replaceChildren(), k("selection").textContent = "", n.textContent = L.message, !d)
         k("hierarchy-panel").hidden = !0, k("selection-actions").hidden = !0, k("breadcrumbs").replaceChildren();
-      else if (!l.contexts[p]) {
+      else if (!d.contexts[p]) {
         const T = document.createElement("button");
         T.type = "button", T.textContent = "Return to Top", T.onclick = () => U(""), k("breadcrumbs").replaceChildren(T);
       }
-      L.diagnostics && (C = L.diagnostics), C.some((T) => T.severity === "error") || C.push({ severity: "error", line: 0, message: L.message }), s(C);
+      L.diagnostics && (N = L.diagnostics), N.some((T) => T.severity === "error") || N.push({ severity: "error", line: 0, message: L.message }), s(N);
     } finally {
       _ = !1, k("generate").disabled = !1, t.readOnly = !1, k("file").disabled = !1, k("libraries").disabled = !1;
       for (const L of de.querySelectorAll("[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-collapse-all, #spice-expand-all")) L.disabled = !1;
-      l && l.contexts[p] && $(), e.setAttribute("aria-busy", "false"), O(), I && (I = !1, D(), queueMicrotask(j));
+      d && d.contexts[p] && $(), e.setAttribute("aria-busy", "false"), O(), I && (I = !1, D(), queueMicrotask(j));
     }
   }
   k("generate").onclick = j;
-  for (const C of de.querySelectorAll("[data-example]")) C.onclick = () => {
-    const L = he[C.dataset.example];
-    t.value = L.source, P(), x(L), j();
+  for (const N of de.querySelectorAll("[data-example]")) N.onclick = () => {
+    const L = me[N.dataset.example];
+    t.value = L.source, P(), R(L), j();
   };
-  k("file").onchange = async (C) => {
-    const L = C.target.files[0];
+  k("file").onchange = async (N) => {
+    const L = N.target.files[0];
     if (L) {
       if (L.size > 2e6) {
         n.textContent = "File exceeds 2 MB.";
@@ -2544,39 +2547,39 @@ Resolved: ` + S.value + `
       } catch (T) {
         n.textContent = "File could not be read: " + T.message;
       } finally {
-        C.target.value = "";
+        N.target.value = "";
       }
     }
-  }, k("libraries").onchange = async (C) => {
+  }, k("libraries").onchange = async (N) => {
     try {
-      for (const L of C.target.files) {
+      for (const L of N.target.files) {
         if (L.size > 16e6) throw Error("Library exceeds 16 MB: " + L.name);
-        N[L.webkitRelativePath || L.name] = await Ue(L);
+        C[L.webkitRelativePath || L.name] = await Ue(L);
       }
       try {
-        sessionStorage.setItem("spice-libraries-v3", JSON.stringify(N));
+        sessionStorage.setItem("spice-libraries-v3", JSON.stringify(C));
       } catch {
       }
-      l = null, g = "", k("library-status").textContent = Object.keys(N).length + " library file(s) loaded", j();
+      d = null, g = "", k("library-status").textContent = Object.keys(C).length + " library file(s) loaded", j();
     } catch (L) {
       n.textContent = L.message;
     } finally {
-      C.target.value = "";
+      N.target.value = "";
     }
-  }, k("library-status").textContent = Object.keys(N).length ? "Libraries restored from this session." : "For .include / .lib dependencies", k("download").onclick = () => {
-    const C = URL.createObjectURL(new Blob([o], { type: "image/svg+xml;charset=utf-8" })), L = document.createElement("a");
-    L.href = C, L.download = "spice-schematic.svg", L.click(), setTimeout(() => URL.revokeObjectURL(C), 1e3);
+  }, k("library-status").textContent = Object.keys(C).length ? "Libraries restored from this session." : "For .include / .lib dependencies", k("download").onclick = () => {
+    const N = URL.createObjectURL(new Blob([o], { type: "image/svg+xml;charset=utf-8" })), L = document.createElement("a");
+    L.href = N, L.download = "spice-schematic.svg", L.click(), setTimeout(() => URL.revokeObjectURL(N), 1e3);
   };
-  async function ne(C) {
+  async function ne(N) {
     const L = r;
     if (!(!L || _ || a)) {
       a = !0, O(), n.textContent = "Generating ASC from the selected layout and checking connections…";
       try {
-        const { exportAsc: T } = await import("./asc-export-DV8dxjeG.js");
+        const { exportAsc: T } = await import("./asc-export-Bd9SdDhN.js");
         if (r !== L) throw Error("Schematic changed. Generate again before exporting ASC.");
-        u ||= T({ tree: l, circuit: c, drawing: L, source: t.value, libraries: N });
-        const M = C ? u.zip : u.ascBytes, A = URL.createObjectURL(new Blob([M], { type: C ? "application/zip" : "application/octet-stream" })), F = document.createElement("a");
-        F.href = A, F.download = C ? "spice-schematic-asc.zip" : "spice-schematic.asc", F.click(), setTimeout(() => URL.revokeObjectURL(A), 1e3), n.textContent = "ASC connections verified · " + u.manifest.audit.symbols + " symbols. " + (C ? "Extract all files together, then open spice-schematic.asc in LTspice." : "This ASC requires its generated .asy symbols. Download the ASC bundle and keep all files together."), u.manifest.warnings.length && (n.textContent += " " + u.manifest.warnings.join(" "));
+        u ||= T({ tree: d, circuit: c, drawing: L, source: t.value, libraries: C });
+        const M = N ? u.zip : u.ascBytes, A = URL.createObjectURL(new Blob([M], { type: N ? "application/zip" : "application/octet-stream" })), F = document.createElement("a");
+        F.href = A, F.download = N ? "spice-schematic-asc.zip" : "spice-schematic.asc", F.click(), setTimeout(() => URL.revokeObjectURL(A), 1e3), n.textContent = "ASC connections verified · " + u.manifest.audit.symbols + " symbols. " + (N ? "Extract all files together, then open spice-schematic.asc in LTspice." : "This ASC requires its generated .asy symbols. Download the ASC bundle and keep all files together."), u.manifest.warnings.length && (n.textContent += " " + u.manifest.warnings.join(" "));
       } catch (T) {
         n.textContent = "ASC export failed: " + T.message;
         const M = document.createElement("li");
@@ -2598,5 +2601,5 @@ export {
   Pe as b,
   pe as l,
   ye as n,
-  mt as p
+  ht as p
 };

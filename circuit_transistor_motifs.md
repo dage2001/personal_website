@@ -57,3 +57,10 @@ LM741 已内嵌六条结构声明与八个自由晶体管的 `face`。Q12/Q13 �
 LM741 的 Q16/Q17 显式声明为 Darlington，Q14/Q20 与 R9/R10 显式声明为互补推挽；Q16/Q17 的 B 均朝左。镜及差分结构优先处理重叠。复杂整图新模板无法安全恢复电源轨时保留原有经典布局并报告 `compoundPairFallback`。
 
 跨区域电流镜之前仅约束 B/G 同高，仍沿旧区域边界绕行。对真实同网、同高的镜控制极增加无长度上限的直连候选，并优先处理这些网；候选必须通过符号避障、异网终端/接触和全端点连接检查。一般局部捷径仍保留原 240 单位上限。修正同时写回 SVG 与 ASC 的公共图形数据。
+
+
+## v15：配对邻近与视觉区域
+
+结构识别及注释语法不变。新增布局适配层的 `compactPairGroups`，对同一真实实例、同级 row 的 classic 区域尝试配对重归属。Q13 从 OUTPUT 的布局区域临时迁到 BIAS，与 Q12 同排相邻；电气 IR 与原声明仍保留原值。重归属记录的器件 ID 通过 renderer 还原为真实实例名称。
+
+`pairProximity` / `pairSeparationPenalty` 覆盖所有高置信度 `motifPairs`，包括软推挽和跨区域镜。`pairConstraints[].compacted` 与 `pairCompactions` 表示实际完成；不满足公共供电轨或经典区域检查时返回原布局并记录原因。

@@ -4,7 +4,7 @@ import {classicPassiveOrientations} from './classic-orientation.js';
 import {currentLimiterTransistors} from './transistor-flow.js';
 import {declaredTransistorMotifs,recognizeTransistorMotifs} from './transistor-motifs.js';
 
-export const layoutRulesVersion = 14;
+export const layoutRulesVersion = 15;
 /** Names are hints in their own scope, never aliases or electrical directions. */
 export function namingRole(name) {
   const local=String(name).split('/').at(-1);

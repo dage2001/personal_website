@@ -217,3 +217,12 @@ classic 成员的书写顺序不指定 B/G 朝向。viewer 可按真实同网邻
 同区域的差分与电流镜优先保留，重叠器件不重复硬打包。复杂整图若新双管模板妨碍安全供电接入，会明确提示退回邻近布局；不会牺牲原有共用供电轨或静默丢器件。可通过分为合适的 `classic` 功能区域提高模板适用性。
 
 定义参考：[ADI 的 Darlington / Cascode 术语](https://wiki.analog.com/university/courses/electronics/text/glossary)、[ADI 的 Sziklai 应用实例](https://www.analog.com/en/resources/design-notes/4096v-80ma-precision-reference.html)。
+
+
+## 配对邻近优先级（layout v15）
+
+无需增加新的注释语法。已声明或自动识别的高置信度 pair 会同时影响邻近评分；不再将“跨功能区域”作为豁免距离惩罚的理由。推挽对仍允许给输出电阻等留空间，邻近偏好不等同于强制全部同排。
+
+`classic` 功能区域是视觉分组，不是电气隔离边界。同一 row 下、属于同一真实实例的两个 classic 区域，允许在布局适配层把配对输出管临时放到参考管/驱动管附近，以实现相邻模板。例如 Q12/Q13 可相邻放置，不必让 Q13 留在 OUTPUT 最右侧。原 `.cir`、Circuit IR、X 层级和用户注释不会被改写；实际布局调整记录在 report 的 `pairCompactions` 中。
+
+真实子电路边界、折叠 block、实例包装、上下区域关系与每个 classic 区域最多 12 个有源器件的限制保持。如果尝试紧邻后无法保留全部配对、经典区域和公共供电轨，则明确提示回退原分区，不能声称已经完成紧邻布局。
