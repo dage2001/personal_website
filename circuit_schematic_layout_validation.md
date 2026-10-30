@@ -253,3 +253,12 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 颜色在已完成布局的 SVG 上应用，仅修改根节点下带 `data-net` 的导线和接点黑点，不改符号内部引线/引脚/文本/地符号，不参与 ELK 和 Drawing IR，也不改变电气网表。预览、复制、下载及 SVG 源码同步，导出始终使用完整图幅，避免将预览缩放写入下载图幅。ASC 保留电气拓扑，不模拟 SVG 导线配色。
 
 134/134 单元及布局/导出回归测试通过。生产页浏览器新增检查：整体颜色控件不存在、按端子搜索和无结果、可见行全选、批量/逐节点/色卡/自动颜色、手动优先、清除与刷新保留、元件 DOM 和所有导线坐标不变、配色不启动新布局 worker、SVG 下载内容一致。预览 `tmp/spice-node-colors-panel.png`，日志 `tmp/node-colors-tests.log` / `tmp/node-colors-browser.log`。
+
+## Fullscreen workspace：背景画布与独立浮窗
+
+- 新增 Fullscreen 入口：优先使用浏览器 Fullscreen API，不可用时铺满浏览器视口；Exit fullscreen / Escape 退出。原生全屏被浏览器退出时同步恢复普通视图。
+- schematic 为全视口背景。网表编辑器及下方信息区成为可关闭、重新打开、拖动和角部缩放的非模态浮窗；顶部 Netlist / Information 切换可见性，Reset windows 恢复窗口布局。层级面包屑、缩放、Fit、SVG/ASC 导出保持可用。
+- 实例列表、选中元件信息、节点配色、解析消息、外观及源码/JSON 位于信息浮窗中。关闭浮窗不销毁控件或 SVG，不丢失输入、选中状态和事件；退出后回到原布局及滚动位置。浮窗的位置/尺寸不会泄漏到普通页面。
+- 独立 `workspace.js` 管理工作区挂载、面板、焦点及生命周期，不依赖 parser / ELK / Drawing IR。提供 enter/exit/showPanel/reset/destroy 及 `spice:workspacechange` 事件，后续 React 容器可通过挂载/清理接入，无需本轮替换渲染框架。使用真实 DOM 的 portal 挂载，避免网站动画容器限制 CSS fixed 全屏；退出时完整恢复 DOM。
+- 浏览器验证通过：原生及 CSS 回退、浏览器原生退出同步、背景满屏与平移、窗口拖动/箭头键移动/角部调整大小、关闭/重开/复位、全屏内编辑生成和节点配色、移动窗口不平移画布、390×844 窄屏边界、Escape 与背景焦点/滚动恢复、普通布局恢复及原有全部浏览器回归（含层级和 SVG/ASC）。此功能不修改电气拓扑和布局算法。
+- 命令：先完成 Vite/Jekyll 生产构建，再 `npm run test:spice:workspace`。日志 `tmp/fullscreen-workspace.log` / `tmp/fullscreen-browser.log`；截图 `tmp/spice-fullscreen-desktop.png` / `tmp/spice-fullscreen-mobile.png`。

@@ -7,11 +7,13 @@ import {readSpiceFile} from './file-text.js';
 import {layoutRulesVersion} from './layout-semantics.js';
 import './viewer.css';
 import {createNodeColorControls,colorSvgNets,defaultWireColor} from './node-colors.js';
+import {createWorkspace} from './workspace.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
 const root = $('app');
 if (root) {
+  createWorkspace(root);
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
   let drawing=null,ascPackage=null,ascExporting=false;
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
