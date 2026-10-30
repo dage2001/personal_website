@@ -272,3 +272,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 146/146 测试通过、无跳过：原有 134 项及 12 项网格测试，包含三个间距、RLC 共线/紧凑性、经典示例、741、全部 prefix 的 ASC 和私有 VDPO 所有页面。生产页浏览器通过网格开关/4与8切换、实际端点落格、节点配色、层级/字体/下载；全屏浮窗回归通过。
 - VDPO 353 器件、26 页面与 48 组内部投影审计通过，缺失引脚、残留几何回环/非端子叶线为零。5 组原生 LTspice ASC 连接检查通过：grid-filter、grid-focused-sallen、grid-all-prefixes、grid-private-collapsed、grid-private-focused；这不是动态仿真结论。
 - 日志：`tmp/grid-full-tests.log`、`tmp/grid-tests.log`、`tmp/grid-browser.log`、`tmp/grid-workspace.log`、`tmp/grid-vdpo.log`、`tmp/grid-native.log`；预览：`tmp/grid-filter-8.svg` / `tmp/grid-filter-8.png`、`tmp/grid-sallen-key-8.svg` / `tmp/grid-sallen-key-8.png`。
+
+## 可交互网格布线第一版
+
+- `svg-grid.js` 负责可见网格；`routing-model.js` 独立管理连通分量、直线飞线、网格路径、移动与撤销；`interactive-editor.js` 处理 SVG 交互，继续复用原 parser、ELK 与 ASC 导出器。
+- 151/151 测试通过，包括新增五项模型测试：导线中段分支、连接后飞线消失、异网交叉隔离、非法路径/移动回滚、网格吸附与撤销、移动后的自动补线。私有 VDPO 测试无跳过。
+- 真实 Chrome 浏览器通过可见网格开关、七条初始顶层直线飞线、引脚及线中分支连接、异网拒绝、擦除/撤销/重做、Rload 移位、保留位置自动补线、全屏控件及导出清理。CIR 拓扑签名保持不变。原有浏览器与全屏回归均通过。
+- 手动移动/连线后的 RLC ASC bundle 审计通过，本机 LTspice 重新生成的五器件节点连接与 manifest 一致；该检查不证明动态仿真行为。
+- 日志：`tmp/manual-full.log`、`tmp/manual-browser.log`、`tmp/manual-regression.log`、`tmp/manual-workspace.log`、`tmp/manual-native.log`；截图：`tmp/manual-flywires.png`、`tmp/manual-routed.png`。命令：`npm run test:spice`、生产构建后 `npm run test:spice:interactive`。

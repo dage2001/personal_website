@@ -8,6 +8,8 @@ import {layoutRulesVersion} from './layout-semantics.js';
 import './viewer.css';
 import {createNodeColorControls,colorSvgNets,defaultWireColor} from './node-colors.js';
 import {createWorkspace} from './workspace.js';
+import {createInteractiveEditor} from './interactive-editor.js';
+import {showCoordinateGrid} from './svg-grid.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
@@ -15,21 +17,29 @@ const root = $('app');
 if (root) {
   createWorkspace(root);
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
-  let drawing=null,ascPackage=null,ascExporting=false;
+  let drawing=null,ascPackage=null,ascExporting=false,editor=null,colorState=null,colorNodes=[];
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
   let pendingRoute=false,libraries={};
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
-  const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting; };
+  const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,gridSize:$('grid').checked&&$('conventional').checked?Number($('grid-size').value):0,detailed:$('detailed').checked,conventional:$('conventional').checked});
-  const nodeColors=createNodeColorControls($,(state,nodes)=>{const svg=preview.querySelector('svg');if(!svg)return;colorSvgNets(svg,nodes,state);const exported=svg.cloneNode(true);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;});
+  function syncSource(){const svg=preview.querySelector('svg');if(!svg)return;if(colorState)colorSvgNets(svg,colorNodes,colorState);editor?.refreshColors();showCoordinateGrid(svg,circuit?.layout.report?.gridSize||0,$('show-grid').checked,view);const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,circuit?.layout.report?.gridSize||0,$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;}
+  const nodeColors=createNodeColorControls($,(state,nodes)=>{colorState=state;colorNodes=nodes;syncSource();});
+  editor=createInteractiveEditor(preview,$,{getNetColor:bit=>{const n=colorNodes.find(n=>n.bit===bit);return n&&colorState&&(colorState.auto||colorState.manual.has(n.name))?colorState.color(n.name):null;},inspect:id=>{const c=circuit?.components.find(c=>c.name===id);if(c){selectedInstance=c.instanceId||'';$('selection').textContent=c.raw;updateSelection();}},changed:(next,stats,bounds)=>{drawing=next;ascPackage=null;full=bounds;const svg=preview.querySelector('svg');if(svg){svg.setAttribute('width',String(full.w));svg.setAttribute('height',String(full.h));const meta=svg.querySelector('#spice-layout-report');if(meta){const r=JSON.parse(meta.textContent);r.manualWiring=stats;r.verifiedTerminals=!stats.unrouted;r.geometricConnectivityVerified=!stats.unrouted;meta.textContent=JSON.stringify(r);}}if(circuit&&ir)$('json').value=JSON.stringify({circuit,netlist:toNetlistsvg(circuit),hierarchy:ir,interactive:{...stats,drawing:next}},null,2);syncSource();exports();}});
+  $('show-grid').onchange=syncSource;
+  async function enableEditing(){if(!drawing||!circuit?.layout.report?.gridVerified){$('grid').checked=true;$('conventional').checked=true;await generate({resetEditor:true});}editor.setEnabled($('interactive').checked);exports();}
+  $('interactive').onchange=enableEditing;
+  $('flywire').onchange=async()=>{$('interactive').checked=true;await enableEditing();if($('flywire').checked)editor.clear();else await editor.autoRoute();exports();};
+  $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
+  $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();
   nodeColors.setEnabled(false);
   function showExampleInfo(example) {
     const element=$('example-info');if(!element)return;element.replaceChildren();if(!example)return;
     element.append(document.createTextNode(example.description+' '));
     if(example.url){const link=document.createElement('a');link.href=example.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent=example.reference;element.append(link);}
   }
-  function invalidate() { nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
+  function invalidate() { editor.invalidate();nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText = ''; exports(); showExampleInfo(Object.values(examples).find(e=>e.source===input.value));status.textContent = 'Input changed — generate to refresh the schematic.'; }
   input.value = filter;
   try {input.value=sessionStorage.getItem('spice-netlist-v2')||filter;}catch{}
   showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
@@ -46,6 +56,7 @@ if (root) {
   }
   function setView() {
     preview.querySelector('svg')?.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`);
+    const svg=preview.querySelector('svg');if(svg)showCoordinateGrid(svg,circuit?.layout.report?.gridSize||0,$('show-grid').checked,view);
     $('zoom-level').textContent = Math.round(full.w / view.w * 100) + '%';
   }
   function zoom(factor, cx = view.x + view.w/2, cy = view.y + view.h/2) {
@@ -62,7 +73,7 @@ if (root) {
   };
   preview.addEventListener('wheel', event => { const p=svgPoint(event); if (!p) return; event.preventDefault(); zoom(event.deltaY>0?1.12:1/1.12,p.x,p.y); }, {passive:false});
   preview.addEventListener('pointerdown', event => {
-    if (event.button !== 0 || !preview.querySelector('svg')) return;
+    if (![0,1].includes(event.button) || !preview.querySelector('svg')) return;
     drag = {start:svgPoint(event), x:event.clientX, y:event.clientY, view:{...view}, moved:false}; preview.setPointerCapture(event.pointerId);
   });
   preview.addEventListener('pointermove', event => {
@@ -128,9 +139,9 @@ if (root) {
     else if (event.key.toLowerCase() === 'f') {view={...full};setView();}
     else if (event.key.startsWith('Arrow')) {event.preventDefault();view.x+=({'ArrowLeft':-.08,'ArrowRight':.08}[event.key]||0)*view.w;view.y+=({'ArrowUp':-.08,'ArrowDown':.08}[event.key]||0)*view.h;setView();}
   });
-  async function generate() {
+  async function generate({resetEditor=false}={}) {
     if (busy) return;
-    busy=true; nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
+    busy=true; editor.invalidate();nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
     input.readOnly=true; $('file').disabled=true;$('libraries').disabled=true;
     for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button')) element.disabled=true;
     status.textContent='Parsing netlist and routing wires…'; preview.setAttribute('aria-busy','true');
@@ -220,7 +231,7 @@ if (root) {
       status.textContent+=` Layout rules v${layoutRulesVersion}.`;if(circuit.layout.report?.gridVerified)status.textContent+=` Grid ${circuit.layout.report.gridSize}.`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
-      nodeColors.setCircuit(circuit,input.value); $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);
+      $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);nodeColors.setCircuit(circuit,input.value);editor.mount(preview.querySelector('svg'),drawing,circuit,netlist,settings(),{reset:resetEditor});syncSource();
       $('selection').textContent='Click a component to inspect its original statement and pin connections.';
       updateHierarchy();
     } catch(error) {
@@ -240,7 +251,7 @@ if (root) {
       if(pendingRoute){pendingRoute=false;readRoute();queueMicrotask(generate);}
     }
   }
-  $('generate').onclick=generate;
+  $('generate').onclick=()=>generate({resetEditor:true});
   for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{const example=examples[button.dataset.example];input.value=example.source;invalidate();showExampleInfo(example);generate();};
   $('file').onchange=async event=>{
     const file=event.target.files[0];if (!file)return;
