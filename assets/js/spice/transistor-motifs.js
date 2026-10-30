@@ -59,6 +59,10 @@ export function recognizeTransistorMotifs(circuit,nodes={}) {
   for(const a of bjts)index(bjtControls,a.control,a);
   const activePins=node=>(pins.get(node)||[]).filter(p=>activeById.has(p.device));
   for(const driver of bjts)if(driver.control!==driver.drain){
+    for(const output of bjtControls.get(driver.source)||[])if(output.id!==driver.id&&same(driver,output)&&output.drain===driver.control&&output.source!==driver.drain){
+      const sense=resistors.get(pair(driver.source,output.source))||[];
+      if(sense.length===1)emit('current-limit-pair',[driver.id,output.id],{driver:driver.id,output:output.id,senseResistor:sense[0].name},{sense:driver.source,drive:driver.control,output:output.source},['same-polarity','emitter-to-base','base-to-collector','emitter-sense-resistor'],'emitter-sense',[sense[0].name]);
+    }
     for(const output of bjtControls.get(driver.source)||[])if(output.id!==driver.id&&same(driver,output)&&output.control!==output.drain&&driver.drain===output.drain&&output.source!==driver.control){
       emit('darlington-pair',[driver.id,output.id],{driver:driver.id,output:output.id},{link:driver.source,collector:driver.drain},['same-polarity','shared-collector','emitter-to-base'],'basic',[],(bjtControls.get(driver.source)||[]).length===1?'high':'medium');
     }
@@ -90,7 +94,7 @@ export function declaredTransistorMotifs(circuit,nodes,pairs) {
   for(const pair of pairs){
     if(new Set(pair.members).size!==pair.members.length)throw Error('Duplicate @layout pair member.');
     const members=pair.members.map(id=>devices.get(id));if(members.some(c=>!c))throw Error('Unknown @layout pair device.');
-    const kind={mirror:'current-mirror',differential:'differential-pair',vbe:'vbe-multiplier',darlington:'darlington-pair',sziklai:'sziklai-pair',cascode:'cascode-pair','push-pull':'push-pull-pair'}[pair.kind];
+    const kind={mirror:'current-mirror',differential:'differential-pair',vbe:'vbe-multiplier',darlington:'darlington-pair',sziklai:'sziklai-pair',cascode:'cascode-pair','current-limit':'current-limit-pair','push-pull':'push-pull-pair'}[pair.kind];
     // Preserve tail-bias evidence for a declared basic differential pair.
     const extra=pair.kind==='differential'&&members.length===2?circuit.components.filter(c=>!pair.members.includes(c.name)&&Object.values(c.terminals).includes(members[0].terminals.E??members[0].terminals.S)):[];
     const matches=recognizeTransistorMotifs({...circuit,components:[...members,...extra]},nodes),match=matches.find(m=>m.kind===kind&&m.confidence==='high'&&pair.members.every(id=>m.members.includes(id)));

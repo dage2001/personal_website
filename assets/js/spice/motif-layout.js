@@ -1,6 +1,6 @@
 const opt='org.eclipse.elk.';
 export function motifPairs(m) {
-  return m.kind==='current-mirror'?[[m.roles.reference,...m.roles.outputs]]:m.kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:['darlington-pair','sziklai-pair','cascode-pair'].includes(m.kind)?[[m.roles.driver,m.roles.output]]:m.kind==='push-pull-pair'?[[m.roles.upper,m.roles.lower]]:[];
+  return m.kind==='current-mirror'?[[m.roles.reference,...m.roles.outputs]]:m.kind==='differential-pair'?[m.roles.inputs,...m.roles.commonBase?[m.roles.commonBase]:[]]:['darlington-pair','sziklai-pair','cascode-pair','current-limit-pair'].includes(m.kind)?[[m.roles.driver,m.roles.output]]:m.kind==='push-pull-pair'?[[m.roles.upper,m.roles.lower]]:[];
 }
 
 /** Soft ELK preferences on real nodes/edges, without extra boxes or guide wires. */

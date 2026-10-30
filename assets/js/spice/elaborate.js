@@ -3,13 +3,16 @@ import {parameterEnvironment,bindValue} from './parameters.js';
 import {structuralValue} from './structural-expression.js';
 
 /** Resolve instance contexts without destroying definition/instance hierarchy. */
-export function elaborateCircuit(ir) {
+export function elaborateCircuit(ir,{isolate=''}={}) {
   assertValid(ir);
   const contexts=record(),nodeResolvers=new Map();let count=0,deviceCount=0;
   function build(scopeId,path,bindings,parentParams,overrides,instance,ancestors) {
     if(path.length>64)throw Error('Instance nesting exceeds 64 levels.');
     if(++count>2000)throw Error('Elaboration exceeds 2000 instances.');
     const scope=ir.scopes[scopeId],id=path.length?qualify(path.slice(0,-1),path.at(-1)):'',nodes=record();
+    // A local sheet starts at formal ports, before caller actuals are bound.
+    // Descendants still bind to this local scope in their original port order.
+    if(isolate&&id===isolate)bindings=record();
     if(ancestors.some(c=>c.scopeId===scopeId))throw Error('Circular subcircuit reference at '+id);
     const params=parameterEnvironment(parentParams,scope.defaults,scope.parameters,overrides);
     function resolveNode(name) {

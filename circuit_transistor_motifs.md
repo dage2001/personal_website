@@ -73,3 +73,19 @@ pair 模板具有更高 ELK 布局优先级；输入接口标记按实际 B/G �
 新增 `pairSideChoices`：按外部非供电网距离筛选最多两个整对反射候选，避开固定 face；最终由完整路由成本验收。`pairOrientationTrials` 和 `flippedPairs` 保留可审阅记录，并映射回真实实例名称。LM741 的 Q10/Q11 选择输出管在左、参考管在右。
 
 `inputAttachments`、`mirroredInputPorts`、`deferredRailBranches` 记录端口/支路处理结果。Q12 B–C 的本地 L 形候选及竖直接轨路径保护共用网络树简化器，避免 SVG 与 ASC 几何分叉。
+
+## v17：接点恢复与输出限流保护对
+
+最终网络几何重建时，将真实器件引脚计入分支度数；修复镜像/二极管连接子网内物理引脚的黑点缺失。单纯折角、异网交叉仍无黑点。
+
+新增 `current-limit-pair`，校验同极性 E→B、B→C 及跨 E 采样电阻；支持自动回退识别和 `pair current-limit` 显式声明。优先于其他级联双管硬打包，与差分、电流镜的既有优先级兼容。741 的 Q14/Q15/R9 作为紧凑子网，保留 Q14 B 右、Q15 B 左。采样电阻纳入子网，避免固定双管后反而将 R9 推远；推挽 Q14/Q20 继续软约束。
+
+`circuit.interfaceAliases` 记录聚焦页多个 formal port 共享的真实父节点，状态栏和消息显示该关系。不参与修改/合并网络。Sallen–Key 的 IN_N/OUT_SIG 共网来自 XU1 的实际参数，而非 `.SUBCKT` 定义。
+
+## v18：局部作用域与层级边界
+
+`elaborateCircuit(ir, {isolate: instanceId})` 在选定边界使用独立形式端口。`projectHierarchy` 的所有聚焦页面使用此作用域，`auditProjection` 同时校验局部拓扑和重新绑定后的实例拓扑。父级共网只记于边界，不能成为内部连接。`analyzeLayout` 不再读取父级 DC 源；局部供电端口可使用明确标记的符号顺序，不冒充已知物理电压。
+
+已删除网页上的全部展开/折叠操作，块点击和键盘操作均进入独立页面；相同局部拓扑可复用 canonical layout，即使父级接线、供电极性、实际电压不同。内部仿真参数仍按实例绑定，因此参数改变确实影响局部拓扑或数值时仍应得到不同结果。
+
+本节取代 v17 中将父级反馈保留在聚焦图内的处理。黑点恢复及 Q14/Q15/R9 限流保护对子网继续生效。

@@ -33,7 +33,10 @@ export function simplifyNetGeometry(segments,terminals=[],protectedSegments=[]) 
     if(same(p.x,q.x)&&same(q.x,r.x)||same(p.y,q.y)&&same(q.y,r.y)){adj.get(a).delete(k);adj.get(b).delete(k);adj.get(a).add(b);adj.get(b).add(a);neighbors.clear();}
   }
   const output=[],seen=new Set();for(const [a,neighbors]of adj)for(const b of neighbors){const id=[a,b].sort().join('|');if(seen.has(id))continue;seen.add(id);output.push({a:points.get(a),b:points.get(b)});}
-  return {segments:output,junctions:[...adj].filter(([,v])=>v.size>=3).map(([k])=>points.get(k)),cyclesRemoved,leavesRemoved,wireLength:output.reduce((n,s)=>n+distance(s.a,s.b),0)};
+  // A physical pin contributes a third branch through the symbol's lead.
+  // Counting only external wires misses B/C taps inside compact pair tiles.
+  const physicalPins=new Set(terminalKeys);
+  return {segments:output,junctions:[...adj].filter(([k,v])=>v.size>=3||v.size>=2&&physicalPins.has(k)).map(([k])=>points.get(k)),cyclesRemoved,leavesRemoved,wireLength:output.reduce((n,s)=>n+distance(s.a,s.b),0)};
 }
 
 export function normalizeSvgNets(source,netlist) {

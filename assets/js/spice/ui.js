@@ -14,7 +14,7 @@ if (root) {
   const input = $('input'), preview = $('preview'), status = $('status'), diagnostics = $('diagnostics');
   let drawing=null,ascPackage=null,ascExporting=false;
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
-  const expanded=new Set();let pendingRoute=false,libraries={};
+  let pendingRoute=false,libraries={};
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy; $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting; };
@@ -74,7 +74,7 @@ if (root) {
       if (component) {
         selectedInstance=component.instanceId||'';
         $('selection').textContent = `${component.raw}\n${Object.entries(component.terminals).map(([p,n])=>`${p} → ${n}`).join('   ')}`;
-        if(component.kind==='X'){expandInstance(component.instanceId);generate();}
+        if(component.kind==='X')route(component.instanceId);
         else updateSelection();
       }
     }
@@ -85,13 +85,10 @@ if (root) {
     if(location.hash.slice(1)===hash){focus=instance;generate();}else location.hash=hash;
   }
   function readRoute(){focus=new URLSearchParams(location.hash.slice(1)).get('instance')||'';}
-  function expandInstance(id){const path=tree.contexts[id].path;for(let i=1;i<=path.length;i++)expanded.add(path.slice(0,i).map(encodeURIComponent).join('/'));}
   window.addEventListener('hashchange',()=>{if(busy){pendingRoute=true;return;}readRoute();selectedInstance='';generate();});
   function updateSelection() {
     const valid=Boolean(selectedInstance&&selectedInstance!==focus&&tree?.contexts[selectedInstance]);
     $('selection-actions').hidden=!valid;
-    $('toggle-instance').textContent=expanded.has(selectedInstance)?'Collapse instance':'Expand instance';
-    $('toggle-instance').disabled=false;
     $('open-instance').href='#'+new URLSearchParams({instance:selectedInstance});
   }
   function updateHierarchy() {
@@ -106,11 +103,9 @@ if (root) {
     const walk=(current,depth)=>{
       for(const child of current.children) {
         const row=document.createElement('div');row.className='spice-instance-row';row.style.setProperty('--depth',Math.min(depth,8));row.dataset.instance=child.id;
-        const toggle=document.createElement('button');toggle.type='button';toggle.textContent=expanded.has(child.id)?'−':'+';toggle.title=(expanded.has(child.id)?'Collapse ':'Expand ')+child.id;
-        toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(expanded.has(child.id)));toggle.onclick=()=>{expanded.has(child.id)?expanded.delete(child.id):expandInstance(child.id);selectedInstance=child.id;generate();};
         const link=document.createElement('a');link.href='#'+new URLSearchParams({instance:child.id});link.textContent=child.name+' · '+child.definition;link.title='Open '+child.id+' as its own sheet';
         const params=document.createElement('span');params.className='spice-help';params.textContent=Object.entries(child.params).map(([k,v])=>k+'='+v).join(' · ');
-        row.append(toggle,link);if(params.textContent){const detail=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Parameters';detail.append(summary,params);row.append(detail);}
+        row.append(link);if(params.textContent){const detail=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Parameters';detail.append(summary,params);row.append(detail);}
         $('instances').append(row);walk(child,depth+1);
       }
     };
@@ -119,13 +114,10 @@ if (root) {
     $('focus-title').textContent=focus?focus+' / '+tree.contexts[focus].definition:'Top-level schematic';
     updateSelection();
   }
-  $('collapse-all').onclick=()=>{expanded.clear();generate();};
-  $('expand-all').onclick=()=>{for(const id of Object.keys(tree?.contexts||{}))if(id)expanded.add(id);generate();};
-  $('toggle-instance').onclick=()=>{expanded.has(selectedInstance)?expanded.delete(selectedInstance):expandInstance(selectedInstance);generate();};
   preview.addEventListener('pointercancel', () => {drag=null;});
   preview.addEventListener('keydown', event => {
     const block=event.target.closest('[data-instance]');
-    if(block&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;expandInstance(selectedInstance);generate();return;}
+    if(block&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;route(selectedInstance);return;}
     if (event.key === '+' || event.key === '=') zoom(.8);
     else if (event.key === '-') zoom(1.25);
     else if (event.key.toLowerCase() === 'f') {view={...full};setView();}
@@ -135,7 +127,7 @@ if (root) {
     if (busy) return;
     busy=true; drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
     input.readOnly=true; $('file').disabled=true;$('libraries').disabled=true;
-    for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button, #spice-collapse-all, #spice-expand-all, #spice-toggle-instance')) element.disabled=true;
+    for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button')) element.disabled=true;
     status.textContent='Parsing netlist and routing wires…'; preview.setAttribute('aria-busy','true');
     let items=[];
     try {
@@ -143,14 +135,15 @@ if (root) {
         ir=parseHierarchy(input.value,{files:libraries});items=[...ir.diagnostics];
         if(items.some(d=>d.severity==='error')){tree=null;throw Error('Fix the parser errors below before generating.');}
         tree=elaborateCircuit(ir);
-        if(lastSource&&lastSource!==input.value){expanded.clear();focus='';selectedInstance='';history.replaceState(null,'',location.pathname+location.search);}
+        if(lastSource&&lastSource!==input.value){focus='';selectedInstance='';history.replaceState(null,'',location.pathname+location.search);}
         else readRoute();
         lastSource=input.value;
         try{sessionStorage.setItem('spice-netlist-v2',input.value);}catch{}
       }
       items=[...ir.diagnostics];showDiagnostics(items);
       if (items.some(d=>d.severity==='error')) throw Error('Fix the parser errors below before generating.');
-      circuit=projectHierarchy(tree,{expanded,focus});
+      circuit=projectHierarchy(tree,{focus});
+      for(const alias of circuit.interfaceAliases)items.push({severity:'info',message:`Instance boundary: ${alias.ports.join(' = ')} share parent node ${alias.node}. This connection belongs to the parent sheet only; local formal ports remain independent.`});
       const netlist=toNetlistsvg(circuit);
       if(settings().conventional)items.push(...circuit.layout.diagnostics);
       const rendered=await renderSchematic(netlist,settings());
@@ -193,7 +186,7 @@ if (root) {
         const element=documentSVG.getElementById('cell_'+c.name);
         if (!element) throw Error('Renderer omitted component '+c.name);
         element.setAttribute('data-component',c.name);
-        if(c.kind==='X'){element.setAttribute('data-instance',c.instanceId);element.setAttribute('role','button');element.setAttribute('tabindex','0');element.setAttribute('aria-label','Expand '+c.name);}
+        if(c.kind==='X'){element.setAttribute('data-instance',c.instanceId);element.setAttribute('role','button');element.setAttribute('tabindex','0');element.setAttribute('aria-label','Open '+c.name);}
         const title=documentSVG.createElementNS(svg.namespaceURI,'title');title.textContent=c.raw+'\nResolved: '+c.value+'\n'+Object.entries(c.terminals).map(([p,n])=>p+': '+n).join(', ');element.prepend(title);
       }
       for (const n of Object.values(circuit.nodes)) {
@@ -218,7 +211,7 @@ if (root) {
       drawing=rendered.drawing;svgText=new XMLSerializer().serializeToString(svg); $('source').value=svgText;
       preview.replaceChildren(document.importNode(svg,true)); setView();
       const warnings=items.filter(d=>d.severity==='warning').length;
-      status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
+      status.textContent=`${circuit.components.filter(c=>!c.synthetic).length} components · ${Object.keys(circuit.nodes).length} nodes · ${circuit.topology.leafCount} primitive devices verified${circuit.interfaceAliases.length?' · Parent-connected ports: '+circuit.interfaceAliases.map(a=>a.ports.join(' = ')).join('; ')+'.':''}${warnings?' · Review '+warnings+' warning(s); drawing may be partial.':' · Schematic ready.'}`;
       status.textContent+=` Layout rules v${layoutRulesVersion}.`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
@@ -239,7 +232,7 @@ if (root) {
       showDiagnostics(items);
     } finally {
       busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;$('libraries').disabled=false;
-      for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-collapse-all, #spice-expand-all')) element.disabled=false;
+      for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button')) element.disabled=false;
       if(tree&&tree.contexts[focus])updateHierarchy();
       preview.setAttribute('aria-busy','false');exports();
       if(pendingRoute){pendingRoute=false;readRoute();queueMicrotask(generate);}

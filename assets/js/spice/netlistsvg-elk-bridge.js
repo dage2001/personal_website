@@ -151,7 +151,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(wrapping)options[option+'layered.wrapping.strategy']='MULTI_EDGE';
   if(classic)Object.assign(options,classic.options);
   if(split)options[option+'hierarchyHandling']='SEPARATE_CHILDREN';
-  const tiles=classic?tileTransistorPairs(graph,pairs,{inputs:controlInputs}):null;
+  const tiles=classic?tileTransistorPairs(graph,pairs,{cells,inputs:controlInputs}):null;
   let layout=graph.children.length?await elk.layout(graph,{layoutOptions:options}):{...graph,width:0,height:0};
   if(localPlan?.rowConstraints.length){
     const index=g=>{const map=new Map();const visit=n=>{map.set(n.id,n);for(const c of n.children||[])visit(c);};visit(g);return map;},originals=index(graph);

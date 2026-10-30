@@ -53,6 +53,14 @@ export function shortenLayoutNets(layout,cells,voltageRails=[],pairs=[]) {
     protectedNets.set(rail.bit,protect);
   }
   const preferredSegments=new Map(),preferredPaths=new Map();
+  const preferElbows=(a,b,bit)=>{
+    if(!a||!b)return;if(!preferredPaths.has(bit))preferredPaths.set(bit,[]);
+    for(const corner of [{x:a.x,y:b.y},{x:b.x,y:a.y}])preferredPaths.get(bit).push([{a,b:corner},{a:corner,b}]);
+  };
+  for(const pair of pairs.filter(p=>p.kind==='current-limit-pair')){
+    const [driver,protector]=pair.members;
+    for(const [a,b]of [['E','B'],['B','C']])if(cells[driver].connections[a][0]===cells[protector].connections[b][0])preferElbows(pinPoints.get(driver+'.'+a),pinPoints.get(protector+'.'+b),cells[driver].connections[a][0]);
+  }
   for(const pair of pairs.filter(p=>p.kind==='current-mirror'&&p.members.length===2)){
     const [a,b]=pair.members.map(id=>{const pin=cells[id].spiceLayout.kind==='Q'?'B':'G';return {bit:cells[id].connections[pin][0],point:pinPoints.get(id+'.'+pin)};});
     if(a.bit!==b.bit||!a.point||!b.point||!same(a.point.y,b.point.y))continue;
@@ -60,7 +68,7 @@ export function shortenLayoutNets(layout,cells,voltageRails=[],pairs=[]) {
   }
   for(const [id,c]of Object.entries(cells))if(c.spiceLayout?.kind==='Q'&&c.connections.B?.[0]===c.connections.C?.[0]){
     const a=pinPoints.get(id+'.B'),b=pinPoints.get(id+'.C'),bit=c.connections.B[0];if(!a||!b)continue;
-    if(!preferredPaths.has(bit))preferredPaths.set(bit,[]);for(const corner of [{x:a.x,y:b.y},{x:b.x,y:a.y}])preferredPaths.get(bit).push([{a,b:corner},{a:corner,b}]);
+    preferElbows(a,b,bit);
   }
   const result=shortenNetTrees(nets,terminals,layout.children,protectedNets,{maxCuts:layout.children.length>120?12:48,preferredSegments,preferredPaths}),graphs=new Map([...result.nets].map(([bit,t])=>[bit,adjacency(t.segments)]));
   if(!result.cuts)return {graph:layout,cuts:0,saved:0};
