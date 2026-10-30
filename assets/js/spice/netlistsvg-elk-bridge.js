@@ -14,8 +14,9 @@ import {splitHierarchyEdges,reuniteHierarchyEdges} from './hierarchy-routing.js'
 import {placeOutputShunts} from './output-shunts.js';
 import {layoutLocalClassicInstances} from './local-classic.js';
 import {controlSideChoices,mirrorTransistorSkin} from './transistor-orientation.js';
-import {motifControlChoices,measureMotifs} from './motif-layout.js';
+import {motifControlChoices,measureMotifs,measurePairProximity} from './motif-layout.js';
 import {rigidTransistorPairs,declaredFaceSkin,pairedTransistorSkin,mirroredSkinDevices,tileTransistorPairs} from './paired-layout.js';
+import {compactPairGroups} from './pair-proximity.js';
 import {shortenLayoutNets} from './net-shortcuts.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
@@ -45,8 +46,22 @@ function portRole(port,cells) {
   return 'neutral';
 }
 
-export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,compoundPairs=true,onLayout=null,onRawLayout=null}={}) {
-  const pairCells=netlist.modules.circuit.cells,pairs=pairedDevices&&motifLayout?rigidTransistorPairs(netlist.modules.circuit.spiceMotifs||[],pairCells,netlist.modules.circuit.spiceLayoutDescription).filter(p=>compoundPairs||p.placement!=='stagger'):[];
+export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,compoundPairs=true,compactPairs=true,onLayout=null,onRawLayout=null}={}) {
+  const module=netlist.modules.circuit,compaction=compactPairs&&motifLayout&&pairedDevices?compactPairGroups(module.spiceLayoutDescription,module.spiceMotifs||[],module.cells):{description:module.spiceLayoutDescription,compactions:[]};
+  if(compaction.compactions.length){
+    const planned={...netlist,modules:{...netlist.modules,circuit:{...module,spiceLayoutDescription:compaction.description,spicePairCompactions:compaction.compactions}}};
+    const options={groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs:false};
+    let candidateLayout,candidateRaw;
+    try{
+      const svg=await renderConventional(skin,planned,{...options,onLayout:g=>candidateLayout=g,onRawLayout:onRawLayout?g=>candidateRaw=g:null}),ast=onml.parse(svg),report=JSON.parse(ast.find(n=>n[1]?.id==='spice-layout-report')[2]);
+      if(report.localClassicFallbacks.length||!report.sharedClassicRails||!compaction.compactions.every(c=>report.pairConstraints.some(p=>p.compacted&&p.motif===c.motif&&c.members.every(id=>p.members.includes(id)))))throw Error('Pair compaction did not preserve the classic regions and shared supply rails.');
+      onRawLayout?.(candidateRaw);onLayout?.(candidateLayout);return svg;
+    }catch(error){
+      const ast=onml.parse(await renderConventional(skin,netlist,{...options,onLayout,onRawLayout})),meta=ast.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),pairCompactionFallback:error.message});return onml.stringify(ast);
+    }
+  }
+  const pairCompactions=module.spicePairCompactions||[];
+  const pairCells=netlist.modules.circuit.cells,pairs=pairedDevices&&motifLayout?rigidTransistorPairs(netlist.modules.circuit.spiceMotifs||[],pairCells,netlist.modules.circuit.spiceLayoutDescription).filter(p=>compoundPairs||p.placement!=='stagger').map(p=>pairCompactions.some(c=>c.motif===p.motif&&c.members.every(id=>p.members.includes(id)))?{...p,crossRegion:true,compacted:true}:p):[];
   skin=pairedTransistorSkin(skin,pairCells,pairs);skin=declaredFaceSkin(skin,pairCells,netlist.modules.circuit.spiceLayoutDescription?.faces||[],pairs);Skin.skin=onml.parse(skin);
   const flat=new FlatModule(netlist);flat.createWires();
   const cells=netlist.modules.circuit.cells,motifs=netlist.modules.circuit.spiceMotifs||[],activeMotifs=motifLayout?motifs.filter(m=>compoundPairs||['current-mirror','differential-pair','diode-connected','vbe-multiplier'].includes(m.kind)):[];
@@ -152,9 +167,9 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(split)layout=reuniteHierarchyEdges(layout,split);
   if(classic&&tiles?.pairs.some(p=>p.placement==='stagger'))layout=shortenLayoutNets(layout,cells,[],pairs).graph;
   const railLayout=classic||shared?installClassicRails(layout,classic||shared,cells,graphPackage.ElkModel.wireNameLookup):null;
-  if(shared&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails:false,chooseControlSides,motifLayout,pairedDevices,compoundPairs,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),sharedRailFallback:shared.failure});return onml.stringify(fallback);}
-  if(classic&&!railLayout&&compoundPairs&&tiles?.pairs.some(p=>p.placement==='stagger')){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs:false,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),compoundPairFallback:classic.failure});return onml.stringify(fallback);}
-  if(classic&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),classicTemplateFallback:classic.failure||'Local template unavailable'});return onml.stringify(fallback);}
+  if(shared&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails:false,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),sharedRailFallback:shared.failure});return onml.stringify(fallback);}
+  if(classic&&!railLayout&&compoundPairs&&tiles?.pairs.some(p=>p.placement==='stagger')){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs:false,compactPairs,onLayout,onRawLayout})),meta=fallback.find(n=>n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),compoundPairFallback:classic.failure});return onml.stringify(fallback);}
+  if(classic&&!railLayout){const fallback=onml.parse(await renderConventional(skin,netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout:false,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,onLayout,onRawLayout})),meta=fallback.find(n=>Array.isArray(n)&&n[1]?.id==='spice-layout-report');meta[2]=JSON.stringify({...JSON.parse(meta[2]),classicTemplateFallback:classic.failure||'Local template unavailable'});return onml.stringify(fallback);}
   if(railLayout){layout=railLayout.graph;for(const group of visualGroups){group.x+=railLayout.translation.x;group.y+=railLayout.translation.y;}}
   const shortcuts=shortenLayoutNets(layout,cells,railLayout?.railBands||[],pairs);layout=shortcuts.graph;
   const powerPass=balanced?'compact balanced':'compact signal flow';
@@ -164,7 +179,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     const bit=cells[ground.id].connections.A[0];
     if(!railLayout){straightened+=alignGroundBus(layout,lookup,bit);straightened+=straightenGroundDrops(layout,lookup,bit);}
     const attached=attachGroundSymbol(layout,lookup,ground,netlist);
-    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,onLayout,onRawLayout});
+    if(!attached)return renderConventional(skin,netlist,{groundDecoration:false,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides,motifLayout,pairedDevices,compoundPairs,compactPairs,onLayout,onRawLayout});
     attachments.push(attached);power.push({child:attached.node,voltage:0});
     refreshGroundJunctions(layout,lookup,bit,attached);
   }
@@ -187,7 +202,7 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
     localClassicInstances,
     localClassicStages:localPlan?.stages||[],
     localClassicFallbacks:localPlan?.failures||[],
-    visualGroups,motifSource:motifs.some(m=>m.origin==='annotation')?'annotation':'automatic',netShortcuts:shortcuts.cuts,netWireSaved:shortcuts.saved,pairConstraints:[...(tiles?.pairs||[]),...(localPlan?.pairConstraints||[]),...(localPlan?.crossPairs||[]).map(p=>({...p,crossRegion:true}))],recognizedMotifs:motifs,appliedMotifs:[...new Set([...(classic?.appliedMotifs||[]),...(localPlan?.appliedMotifs||[])])],...measureMotifs(layout,cells,motifs,new Set((localPlan?.crossPairs||[]).map(p=>p.motif))),sharedClassicRails:!!shared&&!!railLayout,
+    visualGroups,pairCompactions,...measurePairProximity(layout,motifs),motifSource:motifs.some(m=>m.origin==='annotation')?'annotation':'automatic',netShortcuts:shortcuts.cuts,netWireSaved:shortcuts.saved,pairConstraints:[...(tiles?.pairs||[]),...(localPlan?.pairConstraints||[]),...(localPlan?.crossPairs||[]).map(p=>({...p,crossRegion:true}))],recognizedMotifs:motifs,appliedMotifs:[...new Set([...(classic?.appliedMotifs||[]),...(localPlan?.appliedMotifs||[])])],...measureMotifs(layout,cells,motifs,new Set((localPlan?.crossPairs||[]).map(p=>p.motif))),sharedClassicRails:!!shared&&!!railLayout,
     outputShunts,classicRails:!!railLayout,railCount:railLayout?.railCount||0,railPitch:railLayout?.railPitch||null,voltageRails:railLayout?.railBands||[],
     width:layout.width,height:layout.height,wireLength,bends,detourLength,affinityGroups,nodeCount:Object.keys(cells).length,aspectRatio:Math.max(layout.width/layout.height,layout.height/layout.width),
     groundPlacement:attachments.some(a=>a.anchor)?'rail-attached':attachments.length?'isolated':Object.values(cells).some(c=>c.attributes.name==='0')?'ELK fallback (no clear ground attachment)':'not-present',groundAttachments:attachments.length,straightenedGroundDrops:straightened,
@@ -202,9 +217,9 @@ export async function renderConventional(skin,netlist,{groundDecoration=true,bal
   if(chooseControlSides&&(classic||localPlan?.stages.length||localPlan?.instances.length)){
     const locked=new Set([...pairs.flatMap(p=>p.members),...(netlist.modules.circuit.spiceLayoutDescription?.faces||[]).map(f=>f.device)]),free=Object.keys(cells).filter(id=>!locked.has(id)&&['Q','M','J','Z'].includes(cells[id].spiceLayout?.kind)),choices=controlSideChoices(layout,cells).filter(id=>!locked.has(id));
     const singles=Object.keys(cells).length<=80?free:choices.slice(0,4),structural=motifControlChoices(layout,cells,activeMotifs).filter(id=>!locked.has(id)),variants=[...structural.length?[structural]:[],...choices.length?[choices]:[],...singles.map(id=>[id])],seen=new Set(['[]']);
-    testedDevices=singles;let best=null,bestCost=baseReport.uniqueWireLength+(baseReport.uniqueBends??baseReport.bends)*8+3*baseReport.motifPenalty;
+    testedDevices=singles;let best=null,bestCost=baseReport.uniqueWireLength+(baseReport.uniqueBends??baseReport.bends)*8+3*baseReport.motifPenalty+3*baseReport.pairSeparationPenalty;
     const evaluate=async ids=>{const signature=JSON.stringify([...ids].sort());if(seen.has(signature))return;seen.add(signature);let candidateLayout,candidateRaw;orientationCandidates++;try{
-      const alternate=await renderConventional(mirrorTransistorSkin(skin,cells,ids),netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides:false,motifLayout,pairedDevices,compoundPairs,onLayout:g=>candidateLayout=g,onRawLayout:onRawLayout?g=>candidateRaw=g:null}),ast=onml.parse(alternate),meta=ast.find(n=>n[1]?.id==='spice-layout-report'),r=JSON.parse(meta[2]),cost=r.uniqueWireLength+(r.uniqueBends??r.bends)*8+3*r.motifPenalty;
+      const alternate=await renderConventional(mirrorTransistorSkin(skin,cells,ids),netlist,{groundDecoration,balanced,wrapping,groupParallel,classicLayout,localClassics,sharedRails,chooseControlSides:false,motifLayout,pairedDevices,compoundPairs,compactPairs,onLayout:g=>candidateLayout=g,onRawLayout:onRawLayout?g=>candidateRaw=g:null}),ast=onml.parse(alternate),meta=ast.find(n=>n[1]?.id==='spice-layout-report'),r=JSON.parse(meta[2]),cost=r.uniqueWireLength+(r.uniqueBends??r.bends)*8+3*r.motifPenalty+3*r.pairSeparationPenalty;
       if(r.pairConstraints.length>=baseReport.pairConstraints.length&&Number(r.sharedClassicRails)>=Number(baseReport.sharedClassicRails)&&r.localClassicStages.length>=baseReport.localClassicStages.length&&Number(r.classicRails)>=Number(baseReport.classicRails)&&cost<bestCost){bestCost=cost;best={ast,meta,r,ids,layout:candidateLayout,raw:candidateRaw};}
     }catch{/* Reject an unsafe alternative; retain a verified candidate. */}};
     for(const ids of variants)await evaluate(ids);

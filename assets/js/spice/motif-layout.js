@@ -40,3 +40,15 @@ export function measureMotifs(graph,cells,motifs,rowOnly=new Set()) {
   }
   return {motifPenalty:penalty,motifMeasurements:measurements};
 }
+
+/** Physical box separation for every recognized high-confidence pair, including
+ * soft output pairs and cross-region matches. Orientation is measured separately. */
+export function measurePairProximity(graph,motifs) {
+  const nodes=new Map(graph.children.map(n=>[n.id,n])),pairProximity=[];let pairSeparationPenalty=0;
+  for(const m of motifs){if(m.confidence!=='high')continue;for(const group of motifPairs(m))for(const other of group.slice(1)){
+    const a=nodes.get(group[0]),b=nodes.get(other);if(!a||!b)continue;
+    const gap=Math.max(0,a.x-b.x-b.width,b.x-a.x-a.width)+Math.max(0,a.y-b.y-b.height,b.y-a.y-a.height),preferredGap=m.kind==='push-pull-pair'?180:48,excess=Math.max(0,gap-preferredGap);
+    pairSeparationPenalty+=excess;pairProximity.push({motif:m.id,kind:m.kind,members:[a.id,b.id],gap,preferredGap,excess});
+  }}
+  return {pairSeparationPenalty,pairProximity};
+}
