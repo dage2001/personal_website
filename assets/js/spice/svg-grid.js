@@ -1,0 +1,7 @@
+const ns='http://www.w3.org/2000/svg';
+export function showCoordinateGrid(svg,step,visible=true,bounds=null){
+  let defs=svg.querySelector('defs[data-coordinate-grid]'),rect=svg.querySelector('rect[data-coordinate-grid]');
+  if(!defs){defs=document.createElementNS(ns,'defs');defs.dataset.coordinateGrid='true';const pattern=document.createElementNS(ns,'pattern');pattern.id='spice-coordinate-grid';pattern.setAttribute('patternUnits','userSpaceOnUse');const path=document.createElementNS(ns,'path');path.setAttribute('fill','none');path.setAttribute('stroke','#737b83');path.setAttribute('stroke-opacity','.23');path.setAttribute('stroke-width','.55');path.setAttribute('vector-effect','non-scaling-stroke');pattern.append(path);defs.append(pattern);rect=document.createElementNS(ns,'rect');rect.dataset.coordinateGrid='true';rect.setAttribute('fill','url(#spice-coordinate-grid)');rect.setAttribute('stroke','none');rect.setAttribute('pointer-events','none');svg.prepend(rect);svg.prepend(defs);}
+  const pattern=defs.firstElementChild,g=step||8;pattern.setAttribute('width',g);pattern.setAttribute('height',g);pattern.firstElementChild.setAttribute('d',`M${g},0 H0 V${g}`);rect.setAttribute('visibility',visible&&step?'visible':'hidden');
+  const b=bounds||(()=>{const p=svg.getAttribute('viewBox').split(/[ ,]+/).map(Number);return {x:p[0],y:p[1],w:p[2],h:p[3]};})();for(const [key,value]of Object.entries({x:b.x,y:b.y,width:b.w,height:b.h}))rect.setAttribute(key,value);
+}

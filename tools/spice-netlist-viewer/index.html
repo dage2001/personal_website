@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793386924">
+  <link rel="stylesheet" href="/assets/main.css?v=1793390267">
   <link rel="canonical" href="https://jordan-wang.win/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793386924" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793390267" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793386924">
-  <script type="module" src="/assets/spice-viewer/viewer-DXQVEDPh.js"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793390267">
+  <script type="module" src="/assets/spice-viewer/viewer-crbJJwqX.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -176,6 +176,15 @@
         <button type="button" id="spice-download-asc" title="ASC file; requires the companion ASY symbols in the bundle" disabled>Download ASC ↓</button>
         <button type="button" id="spice-download-asc-bundle" title="ASC plus all generated symbols; extract together" disabled>ASC bundle ↓</button>
       </div>
+      <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
+        <label><input type="checkbox" id="spice-interactive"> Interactive</label>
+        <label><input type="checkbox" id="spice-flywire"> Manual flywires</label>
+        <select id="spice-edit-tool" aria-label="Wiring tool"><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option></select>
+        <button type="button" id="spice-auto-route">Auto-route</button>
+        <button type="button" id="spice-wire-undo">Undo</button><button type="button" id="spice-wire-redo">Redo</button>
+        <span id="spice-editor-status" role="status" aria-live="polite">Enable Interactive to move components or wire pins.</span>
+      </div>
+      <p class="spice-help spice-edit-help" id="spice-edit-help">Manual flywires starts with placement only. Drag components onto the grid; moving disconnects their attached wire segments. Click a pin to route, click empty grid points for corners, then finish at a pin or same-node wire. Choose Route / branch to start at a wire's middle. Flywires are straight and always on top. Shift-drag pans · Delete removes a selected segment · Escape cancels a route. Generate resets the current sheet; Auto-route keeps positions.</p>
       <p id="spice-selection">Click a component to inspect its pins.</p>
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
@@ -192,6 +201,7 @@
     <label for="spice-conventional"><input type="checkbox" id="spice-conventional" checked> Circuit layout rules</label>
     <label for="spice-grid"><input type="checkbox" id="spice-grid" checked> Grid routing · preview</label>
     <label for="spice-grid-size">Grid step <select id="spice-grid-size"><option>4</option><option selected>8</option><option>16</option></select></label>
+    <label><input type="checkbox" id="spice-show-grid" checked> Show grid</label>
     <span class="spice-help">Change settings, then Generate to apply.</span>
   </div>
   <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces and PWR_/RET_/BIAS_ rails. Optional * @layout comments describe rows, columns and visual groups. <a href="/circuit_pin_naming_convention.md">Naming and layout syntax</a>. Open a block to inspect its independent internal sheet.</p>
@@ -259,7 +269,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793386924"></script>
+<script src="/assets/js/site.js?v=1793390267"></script>
 
 
 

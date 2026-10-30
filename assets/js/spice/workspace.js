@@ -20,7 +20,7 @@ export function createWorkspace(root){
     for(const node of document.body.children)if(node!==root){siblings.push({node,inert:node.inert});node.inert=true;}
     document.documentElement.style.overflow='hidden';document.body.style.overflow='hidden';root.classList.add('spice-is-fullscreen');$('fullscreen').setAttribute('aria-pressed','true');
     for(const id of Object.keys(panels)){styles[id].base=panels[id].style.cssText;if(styles[id].floating)panels[id].style.cssText=styles[id].floating;panels[id].setAttribute('role','dialog');panels[id].setAttribute('aria-modal','false');panels[id].setAttribute('aria-labelledby','spice-'+id+'-title');handles[id].tabIndex=0;handles[id].title='Drag to move; arrow keys move the window';showPanel(id,visible[id]);}
-    for(const id of ['selection-actions','selection','hierarchy-panel'])dock($(id));
+    for(const id of ['selection-actions','selection','edit-help','edit-toolbar','hierarchy-panel'])dock($(id));
     requestAnimationFrame(clamp);$('exit-fullscreen').focus({preventScroll:true});emit();
   }
   function deactivate(){
