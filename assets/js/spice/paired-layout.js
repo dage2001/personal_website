@@ -31,13 +31,17 @@ export function mirroredSkinDevices(skin,cells) {
 
 /** Contract a pair for ELK placement, expose real pin coordinates, then restore it.
  * The tile is invisible and adds no electrical devices or net aliases. */
-export function tileTransistorPairs(graph,pairs) {
-  const nodes=new Map(graph.children.map(n=>[n.id,n])),tiles=new Map(),ports=new Map(),owners=new Map(),leads=new Map(),applied=[];
+export function tileTransistorPairs(graph,pairs,{inputs=[]}={}) {
+  const nodes=new Map(graph.children.map(n=>[n.id,n])),tiles=new Map(),ports=new Map(),owners=new Map(),leads=new Map(),applied=[],inputAttachments=[];
   for(const pair of pairs){const members=pair.members.map(id=>nodes.get(id));if(members.some(n=>!n)||members.some(n=>Math.abs(n.height-members[0].height)>.002))continue;
     const control=n=>n.ports.find(p=>p.id===n.id+'.B'||p.id===n.id+'.G');
     if(members.some((n,i)=>{const p=control(n);return !p||Math.abs(p.x-(pair.controlSides[i]==='left'?0:n.width))>.002;}))continue;
-    const id='__transistor_pair_'+tiles.size,gap=32,stagger=pair.placement==='stagger',height=stagger?members.reduce((sum,n)=>sum+n.height,0)+16:members[0].height,children=[],pp=[];let width=0;
+    const id='__transistor_pair_'+tiles.size,gap=32,stagger=pair.placement==='stagger',initialHeight=stagger?members.reduce((sum,n)=>sum+n.height,0)+16:members[0].height,children=[],pp=[];let width=0,height=initialHeight;
     for(const [i,member]of members.entries()){children.push({...member,x:stagger?i*(members[0].width/2+12):width,y:stagger?((pair.rise?1-i:i)*(members[0].height+16)):0});width+=member.width+gap;}width=Math.max(...children.map(n=>n.x+n.width));
+    for(const input of inputs){const at=input.target.lastIndexOf('.'),target=children.find(n=>n.id===input.target.slice(0,at)),marker=nodes.get(input.id);if(!target||!marker||owners.has(marker.id))continue;const pin=target.ports.find(p=>p.id===input.target),a=marker.ports[0],right=pin.layoutOptions?.[opt+'port.side']==='EAST';if(a.layoutOptions?.[opt+'port.side']!==(right?'WEST':'EAST'))continue;
+      const child={...marker,x:target.x+pin.x+(right?24:-24)-a.x,y:target.y+pin.y-a.y};if(children.some(n=>child.x<n.x+n.width+4&&child.x+child.width+4>n.x&&child.y<n.y+n.height+4&&child.y+child.height+4>n.y))continue;children.push(child);inputAttachments.push(input.id);
+    }
+    const minX=Math.min(0,...children.map(n=>n.x)),minY=Math.min(0,...children.map(n=>n.y));for(const n of children){n.x-=minX;n.y-=minY;}width=Math.max(...children.map(n=>n.x+n.width));height=Math.max(...children.map(n=>n.y+n.height));
     for(const child of children){owners.set(child.id,id);for(const p of child.ports){const pid=id+'.p'+pp.length;ports.set(p.id,pid);const exposed={...p,id:pid,x:child.x+p.x,y:p.y};
       exposed.y+=child.y;
       const side=p.layoutOptions?.[opt+'port.side'],boundary=side==='WEST'?exposed.x===0:side==='EAST'?exposed.x===width:side==='NORTH'?exposed.y===0:exposed.y===height;
@@ -49,12 +53,13 @@ export function tileTransistorPairs(graph,pairs) {
         if(!target)throw Error('No safe paired-device pin escape.');exposed.x=target.x;exposed.y=target.y;exposed.layoutOptions={...p.layoutOptions,[opt+'port.side']:target.side};leads.set(p.id,{tile:id,point});
       }
       pp.push(exposed);}}
-    const tile={id,width,height,ports:pp,layoutOptions:{[opt+'portConstraints']:'FIXED_POS'}};tiles.set(id,{tile,children});applied.push(pair);
+    const tile={id,width,height,ports:pp,layoutOptions:{[opt+'portConstraints']:'FIXED_POS',[opt+'priority']:100},spiceSubnet:true};tiles.set(id,{tile,children});applied.push(pair);
   }
-  if(!tiles.size)return {pairs:[],restore:g=>g};
+  if(!tiles.size)return {pairs:[],inputs:[],restore:g=>g};
   const emitted=new Set();graph.children=graph.children.flatMap(n=>{const tile=owners.get(n.id);if(!tile)return [n];if(emitted.has(tile))return [];emitted.add(tile);return [tiles.get(tile).tile];});
+  graph.children.sort((a,b)=>Number(!!b.spiceSubnet)-Number(!!a.spiceSubnet));
   const originals=new Map();for(const e of graph.edges){originals.set(e.id,{source:e.source,target:e.target,sourcePort:e.sourcePort,targetPort:e.targetPort});e.source=owners.get(e.source)||e.source;e.target=owners.get(e.target)||e.target;e.sourcePort=ports.get(e.sourcePort)||e.sourcePort;e.targetPort=ports.get(e.targetPort)||e.targetPort;}
-  return {pairs:applied,restore:g=>{const positions=new Map(g.children.map(n=>[n.id,n]));g.children=g.children.flatMap(n=>tiles.has(n.id)?tiles.get(n.id).children.map(c=>({...c,x:n.x+c.x,y:n.y+c.y})): [n]);for(const e of g.edges)if(originals.has(e.id)){Object.assign(e,originals.get(e.id));for(const [port,source]of [[e.sourcePort,true],[e.targetPort,false]])if(leads.has(port)){const lead=leads.get(port),tile=positions.get(lead.tile),point={x:tile.x+lead.point.x,y:tile.y+lead.point.y},section=source?e.sections?.[0]:e.sections?.at(-1);if(section){if(source){section.bendPoints=[section.startPoint,...section.bendPoints||[]];section.startPoint=point;}else{section.bendPoints=[...section.bendPoints||[],section.endPoint];section.endPoint=point;}}}}return g;}};
+  return {pairs:applied,inputs:inputAttachments,restore:g=>{const positions=new Map(g.children.map(n=>[n.id,n]));g.children=g.children.flatMap(n=>tiles.has(n.id)?tiles.get(n.id).children.map(c=>({...c,x:n.x+c.x,y:n.y+c.y})): [n]);for(const e of g.edges)if(originals.has(e.id)){Object.assign(e,originals.get(e.id));for(const [port,source]of [[e.sourcePort,true],[e.targetPort,false]])if(leads.has(port)){const lead=leads.get(port),tile=positions.get(lead.tile),point={x:tile.x+lead.point.x,y:tile.y+lead.point.y},section=source?e.sections?.[0]:e.sections?.at(-1);if(section){if(source){section.bendPoints=[section.startPoint,...section.bendPoints||[]];section.startPoint=point;}else{section.bendPoints=[...section.bendPoints||[],section.endPoint];section.endPoint=point;}}}}return g;}};
 }
 
 export function declaredFaceSkin(skin,cells,faces,pairs) {

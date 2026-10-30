@@ -1,6 +1,7 @@
 import {prepareClassicLayout,installClassicRails} from './classic-layout.js';
 import {transistorCurrentRank} from './transistor-flow.js';
 import {shortenLayoutNets} from './net-shortcuts.js';
+import {controlInputTargets} from './subnet-attachments.js';
 import {tileTransistorPairs} from './paired-layout.js';
 const option='org.eclipse.elk.';
 const netOf=(e,lookup)=>Number(lookup[e.id]?.replaceAll(',',''));
@@ -9,8 +10,8 @@ function segments(graph,lookup){return graph.edges.flatMap(e=>(e.sections||[]).f
 function contact(a,b){return onSegment(a.a,b.a,b.b)||onSegment(a.b,b.a,b.b)||onSegment(b.a,a.a,a.b)||onSegment(b.b,a.a,a.b);}
 
 /** Reuse the sheet template inside an expanded instance, before its parent is routed. */
-export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=[],pairs=[]) {
-  const successful=[],stages=[],appliedMotifs=[],pairConstraints=[],hidden=new Map(),failures=[];
+export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=[],pairs=[],{subnetFirst=true}={}) {
+  const successful=[],stages=[],appliedMotifs=[],pairConstraints=[],inputAttachments=[],hidden=new Map(),failures=[];
   async function visit(node) {
     for(const child of node.children||[])if(child.children)await visit(child);
     if(!node.spiceClassic&&!node.spiceGroup?.startsWith('@instance_'))return;
@@ -40,8 +41,8 @@ export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=
       for(const [bit,meta]of selected)if(!Object.values(localCells).some(c=>Object.values(c.connections).some(b=>b[0]===bit))){const id=node.id+'_reference_'+bit;localCells[id]={connections:{A:[bit]},attributes:{value:''},spiceLayout:{kind:'PORT',ports:{A:meta}}};children.push({id,width:0,height:0,ports:[{id:id+'.A',x:0,y:0,width:0,height:0,layoutOptions:{[option+'port.side']:meta.potential>0?'SOUTH':'NORTH'}}]});}
     }
     const local={id:node.id+'_local',children,edges},classic=prepareClassicLayout(local,localCells,lookup,null,{maxActive:node.spiceClassic?12:8,currentFlow:!!node.spiceClassic,motifs});if(!classic){if(node.spiceClassic)failures.push({stage:node.spiceGroup,reason:'Ineligible classic stage'});return;}
-    const tiled=tileTransistorPairs(local,pairs);
-    let installed;try {const placed=tiled.restore(await elk.layout(local,{layoutOptions:{[option+'algorithm']:'layered',[option+'edgeRouting']:'ORTHOGONAL',[option+'separateConnectedComponents']:false,[option+'hierarchyHandling']:'SEPARATE_CHILDREN',...classic.options,...node.spiceClassic?{[option+'direction']:'DOWN',[option+'layered.spacing.nodeNodeBetweenLayers']:32,[option+'spacing.nodeNode']:Math.max(32,...classic.branches.map(n=>n.width+24))}:{}}}));if(tiled.pairs.some(p=>p.placement==='stagger'))shortenLayoutNets(placed,localCells,[],tiled.pairs);installed=installClassicRails(placed,classic,localCells,lookup);}catch(error){failures.push({stage:node.spiceGroup,reason:error.message});return;}
+    const tiled=tileTransistorPairs(local,pairs,{inputs:subnetFirst?controlInputTargets(localCells):[]});
+    let installed;try {const placed=tiled.restore(await elk.layout(local,{layoutOptions:{[option+'algorithm']:'layered',[option+'edgeRouting']:'ORTHOGONAL',[option+'separateConnectedComponents']:false,[option+'hierarchyHandling']:'SEPARATE_CHILDREN',...classic.options,...node.spiceClassic?{[option+'direction']:'DOWN',[option+'layered.spacing.nodeNodeBetweenLayers']:32,[option+'spacing.nodeNode']:Math.max(32,...classic.branches.map(n=>n.width+24))}:{}}}));if(tiled.pairs.length)shortenLayoutNets(placed,localCells,[],tiled.pairs);installed=installClassicRails(placed,classic,localCells,lookup);}catch(error){failures.push({stage:node.spiceGroup,reason:error.message});return;}
     if(!installed){if(node.spiceClassic)failures.push({stage:node.spiceGroup,reason:classic.failure});return;}
     if(node.spiceClassic){const wires=segments(installed.graph,lookup);for(let i=0;i<wires.length;i++)for(let j=i+1;j<wires.length;j++)if(wires[i].bit!==wires[j].bit&&contact(wires[i],wires[j])){failures.push({stage:node.spiceGroup,reason:'Internal wire contact',a:wires[i],b:wires[j]});return;}}
     const placed=installed.graph,byId=new Map(placed.children.map(n=>[n.id,n])),point=p=>{const at=p.lastIndexOf('.'),n=byId.get(p.slice(0,at)),port=n?.ports.find(v=>v.id===p);if(!port)throw Error('Missing local template terminal.');return {x:n.x+port.x,y:n.y+port.y};};
@@ -79,7 +80,7 @@ export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=
     const clean=value=>{if(value&&typeof value==='object'){delete value.$H;for(const v of Object.values(value))clean(v);}return value;};
     for(const e of routed)for(const s of e.sections){const points=[s.startPoint,...s.bendPoints,s.endPoint];for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],hit=physical.find(n=>Math.max(a.x,b.x)>n.x+.02&&Math.min(a.x,b.x)<n.x+n.width-.02&&Math.max(a.y,b.y)>n.y+.02&&Math.min(a.y,b.y)<n.y+n.height-.02);if(hit){failures.push({instance:node.spiceGroup,edge:e.id,symbol:cells[hit.id].attributes.displayRef,segment:{a,b},box:{x:hit.x,y:hit.y,width:hit.width,height:hit.height}});return;}}}
     hidden.set(node.id,{children:clean(physical),edges:clean(routed)});node.ports=resolvedPorts;delete node.children;delete node.edges;node.width=width;node.height=height;node.layoutOptions={...node.layoutOptions,[option+'portConstraints']:'FIXED_POS'};
-    pairConstraints.push(...tiled.pairs);appliedMotifs.push(...classic.appliedMotifs);if(node.spiceClassic)stages.push(node.spiceGroup);else successful.push(node.spiceGroup.slice('@instance_'.length));
+    inputAttachments.push(...tiled.inputs);pairConstraints.push(...tiled.pairs);appliedMotifs.push(...classic.appliedMotifs);if(node.spiceClassic)stages.push(node.spiceGroup);else successful.push(node.spiceGroup.slice('@instance_'.length));
   }
   await visit(graph);
   const crossPairs=[],rowConstraints=[];
@@ -95,5 +96,5 @@ export async function layoutLocalClassicInstances(graph,cells,lookup,elk,motifs=
     parent.layoutOptions={...parent.layoutOptions,[option+'layered.nodePlacement.strategy']:'INTERACTIVE',[option+'layered.nodePlacement.bk.fixedAlignment']:'LEFTUP'};
   }
   alignRows(graph);
-  return {crossPairs,rowConstraints,instances:successful,stages,appliedMotifs,pairConstraints,failures,restore:layout=>{const visit=n=>{if(hidden.has(n.id))Object.assign(n,hidden.get(n.id));for(const child of n.children||[])visit(child);};visit(layout);return layout;}};
+  return {crossPairs,rowConstraints,inputAttachments,instances:successful,stages,appliedMotifs,pairConstraints,failures,restore:layout=>{const visit=n=>{if(hidden.has(n.id))Object.assign(n,hidden.get(n.id));for(const child of n.children||[])visit(child);};visit(layout);return layout;}};
 }

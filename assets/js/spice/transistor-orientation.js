@@ -33,3 +33,22 @@ export function mirrorTransistorSkin(source,cells,ids) {
   }
   return onml.stringify(skin);
 }
+
+/** Rank whole-pair horizontal reflections by external, non-rail net distance.
+ * Shared internal nets count once; movable input markers and rail taps are not anchors. */
+export function pairSideChoices(graph,cells,pairs,faces=[]) {
+  const fixed=new Set(faces.map(f=>f.device)),nodes=new Map(graph.children.map(n=>[n.id,n])),byNet=new Map(),groups=new Map();
+  for(const n of graph.children){const c=cells[n.id];if(!c||c.spiceLayout?.kind==='PORT'||c.spiceLayout?.passive&&Object.values(c.spiceLayout.ports||{}).some(p=>p.potential!==null&&p.potential!==undefined))continue;
+    for(const p of n.ports||[]){const pin=p.id.slice(n.id.length+1),meta=c.spiceLayout?.ports[pin];if(meta?.potential!==null&&meta?.potential!==undefined)continue;const bit=c.connections[pin]?.[0];if(bit===undefined)continue;if(!byNet.has(bit))byNet.set(bit,[]);byNet.get(bit).push({owner:n.id,x:n.x+p.x});}
+  }
+  for(const p of pairs)if(p.placement==='row'){if(!groups.has(p.motif))groups.set(p.motif,[]);groups.get(p.motif).push(p);}
+  const choices=[];
+  for(const [motif,rows]of groups){const members=new Set(rows.flatMap(p=>p.members));if([...members].some(id=>fixed.has(id)))continue;let oldCost=0,newCost=0;
+    for(const row of rows){const ns=row.members.map(id=>nodes.get(id));if(ns.some(n=>!n))continue;const sum=Math.min(...ns.map(n=>n.x))+Math.max(...ns.map(n=>n.x+n.width)),own=new Map();
+      for(const n of ns)for(const p of n.ports){const pin=p.id.slice(n.id.length+1),c=cells[n.id],meta=c.spiceLayout?.ports[pin];if(meta?.potential!==null&&meta?.potential!==undefined)continue;const bit=c.connections[pin]?.[0];if(!own.has(bit))own.set(bit,[]);own.get(bit).push(n.x+p.x);}
+      for(const [bit,xs]of own){const external=(byNet.get(bit)||[]).filter(p=>!members.has(p.owner));if(!external.length)continue;for(const p of external){oldCost+=xs.reduce((s,x)=>s+Math.abs(x-p.x),0)/xs.length/external.length;newCost+=xs.reduce((s,x)=>s+Math.abs(sum-x-p.x),0)/xs.length/external.length;}}
+    }
+    if(oldCost-newCost>1)choices.push({motif,gain:oldCost-newCost,members:[...members]});
+  }
+  return choices.sort((a,b)=>b.gain-a.gain).slice(0,2);
+}
