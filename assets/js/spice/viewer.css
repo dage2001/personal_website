@@ -32,3 +32,31 @@
 @media(min-width:1250px){body:has(.spice-app) .site-container{max-width:1440px}}
 @media(max-width:800px){.spice-workspace{grid-template-columns:1fr}.spice-app #spice-input{height:270px}.spice-preview{height:440px}.spice-settings{gap:12px}.spice-panel-header{padding:12px}.spice-toolbar{padding:12px;gap:6px}.spice-app button{padding:8px}}
 .spice-node-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0;font:12px Arial,sans-serif}.spice-node-tools label{display:flex;align-items:center;gap:7px;margin:0}.spice-node-tools input[type=search]{width:220px;max-width:100%;padding:7px 9px;border:1px solid var(--spice-border);border-radius:5px;background:var(--bg-card,#fff);color:inherit}.spice-node-tools input[type=color],.spice-node-table input[type=color]{width:38px;height:28px;padding:2px;border:1px solid var(--spice-border);background:transparent;cursor:pointer}.spice-node-tools #spice-node-count{color:var(--text-muted,#777)}.spice-app .spice-node-palette{margin:10px 0}.spice-node-swatches{display:grid;grid-template-columns:repeat(9,minmax(18px,1fr));gap:5px;max-width:410px;margin-top:12px}.spice-app .spice-node-swatches button{height:24px;min-width:0;padding:0;border:1px solid #0002;border-radius:3px}.spice-app .spice-node-swatches button:hover:not(:disabled){outline:2px solid #43614f;outline-offset:1px}.spice-app .spice-node-table td:first-child{width:32px}.spice-node-table th:nth-child(2){min-width:100px}.spice-node-table th:nth-child(3){min-width:80px}.spice-app .spice-node-table td{vertical-align:middle}.spice-app .spice-node-table input[type=checkbox]{accent-color:#43614f}
+/* A full-viewport canvas with independent, non-modal workspace windows. */
+.spice-app .spice-fullscreen-only{display:none}
+.spice-app.spice-is-fullscreen{--spice-window-top:112px;position:fixed;inset:0;z-index:2147483000;width:100%;height:100dvh;margin:0;max-width:none;background:#fff;overflow:hidden;isolation:isolate}
+.spice-is-fullscreen .spice-fullscreen-only{display:flex}
+.spice-is-fullscreen .spice-workspace{display:block}
+.spice-is-fullscreen #spice-canvas-panel{position:absolute;inset:0;border:0;border-radius:0;overflow:visible;background:none}
+.spice-is-fullscreen #spice-canvas-panel>.spice-panel-header{display:none}
+.spice-is-fullscreen #spice-preview{position:absolute;inset:0;height:100%;min-height:0;z-index:0}
+.spice-is-fullscreen .spice-workspace-tools,.spice-is-fullscreen #spice-canvas-toolbar,.spice-is-fullscreen .spice-hierarchy-bar{position:absolute;z-index:100;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px;border:1px solid var(--spice-border);border-radius:8px;background:var(--bg-card,#fffffff5);box-shadow:0 3px 14px #24352c12;max-width:calc(100% - 32px);box-sizing:border-box}
+.spice-is-fullscreen .spice-workspace-tools{top:12px;left:16px}
+.spice-is-fullscreen #spice-canvas-toolbar{top:12px;right:16px;padding:8px}
+.spice-is-fullscreen #spice-canvas-toolbar button{padding:7px 8px;font-size:11px}
+.spice-is-fullscreen .spice-hierarchy-bar{top:64px;left:16px;max-height:42px;overflow:auto;margin:0;gap:8px}
+.spice-is-fullscreen .spice-hierarchy-bar>span:first-child{display:none}
+.spice-is-fullscreen #spice-editor-panel,.spice-is-fullscreen #spice-info-panel{position:absolute;z-index:20;display:flex;flex-direction:column;min-width:280px;min-height:160px;max-width:calc(100% - 32px);max-height:calc(100% - 128px);border:1px solid var(--spice-border);border-radius:10px;background:var(--bg-card,#fff);box-shadow:0 8px 32px #24352c26;overflow:hidden;resize:both;box-sizing:border-box}
+.spice-is-fullscreen #spice-editor-panel{left:16px;top:112px;width:380px;height:min(70vh,720px)}
+.spice-is-fullscreen #spice-info-panel{right:16px;bottom:16px;width:min(880px,calc(100% - 430px));height:min(36vh,360px)}
+.spice-is-fullscreen [data-window-handle]{flex-shrink:0;cursor:move;touch-action:none;user-select:none;padding:10px 12px;gap:8px;display:flex;align-items:center;border-bottom:1px solid var(--spice-border);background:var(--bg-primary,#faf9f6)}
+.spice-is-fullscreen [data-window-handle] h2{font:600 13px Arial,sans-serif;margin:0}
+.spice-is-fullscreen [data-window-handle] h2:after{display:none}
+.spice-is-fullscreen [data-window-handle] label{pointer-events:none}
+.spice-is-fullscreen [data-window-handle] button{margin-left:auto;padding:4px 9px;font-size:17px;line-height:1.2;cursor:pointer}
+.spice-is-fullscreen .spice-editor-content,.spice-is-fullscreen .spice-info-content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.spice-is-fullscreen .spice-info-content{padding:0 14px 12px}
+.spice-is-fullscreen #spice-input{height:clamp(180px,38vh,435px);min-height:140px}
+.spice-is-fullscreen #spice-show-editor[aria-expanded=true],.spice-is-fullscreen #spice-show-info[aria-expanded=true]{background:#e5ede5;border-color:#92aa97}
+@media(max-width:1150px){.spice-app.spice-is-fullscreen{--spice-window-top:152px}.spice-is-fullscreen #spice-canvas-toolbar{top:58px;left:16px;right:auto}.spice-is-fullscreen .spice-hierarchy-bar{top:108px}.spice-is-fullscreen #spice-editor-panel{top:152px}.spice-is-fullscreen #spice-info-panel{width:min(700px,calc(100% - 32px))}.spice-is-fullscreen #spice-editor-panel,.spice-is-fullscreen #spice-info-panel{max-height:calc(100% - 168px)}}
+@media(max-width:600px){.spice-app.spice-is-fullscreen{--spice-window-top:192px}.spice-is-fullscreen .spice-workspace-tools{left:8px;top:8px;max-width:calc(100% - 16px);padding:6px}.spice-is-fullscreen .spice-workspace-tools button{padding:7px;font-size:11px}.spice-is-fullscreen #spice-canvas-toolbar{left:8px;right:8px;top:56px;max-width:calc(100% - 16px)}.spice-is-fullscreen .spice-hierarchy-bar{left:8px;top:142px;max-width:calc(100% - 16px)}.spice-is-fullscreen #spice-editor-panel,.spice-is-fullscreen #spice-info-panel{left:8px;right:auto;width:calc(100% - 16px);max-width:calc(100% - 16px);max-height:calc(100% - 208px);min-height:140px}.spice-is-fullscreen #spice-editor-panel{top:192px;height:48vh}.spice-is-fullscreen #spice-info-panel{bottom:8px;height:32vh}.spice-is-fullscreen .spice-window-header .spice-help{display:none}}
