@@ -1,6 +1,7 @@
 import onml from 'onml';
 import analog from 'netlistsvg/lib/analog.svg?raw';
 import {gridSkin} from './grid-symbols.js';
+import {shortSymbolPins} from './short-pins.js';
 
 const path = d => ['path', {d, class: 'symbol'}];
 const txt = (x, y, text) => ['text', {x, y, class: 'pin-label'}, text];
@@ -33,7 +34,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     // Captions are placed after routing; neither their length nor font is geometry.
     const width = 88, height = 112;
     const group = ['g', {'s:type': alias, 's:width': width, 's:height': height,...['spice_subckt','spice_device','spice_coupling'].includes(type)?{'data-grid-box':'true'}:{}}, ['s:alias', {val: alias}]];
-    const pins = [], geometry = [];let labelsPlaced=false;
+    const pins = [], geometry = [];let labelsPlaced=false,body=null;const pinStep=gridSize||8;
     let orientation=cell.spiceLayout?.orientation||(cell.spiceLayout?.horizontal?'horizontal':'vertical');
     if(orientationStrategy.startsWith('flow')&&cell.spiceLayout?.flexible&&cell.spiceLayout.source&&!Object.values(cell.spiceLayout.ports).every(p=>p.potential!==null))orientation=orientationStrategy==='flow'?'horizontal':'horizontal-reversed';
     if(verticalPairs.has(cell)&&cell.spiceLayout?.flexible)orientation=cell.spiceLayout.orientation.startsWith('vertical')?cell.spiceLayout.orientation:'vertical';
@@ -57,6 +58,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       const blockWidth=Math.max(120,24*(Math.max(sides.top.length,sides.bottom.length)+1));
       const topSpace=sides.top.length?24:0,rowStart=topSpace+24,pitch=24;
       const blockHeight=Math.max(72,rowStart+rows*pitch+(sides.bottom.length?32:12));
+      group[1]['data-pin-length']=pinStep;
       group[1]['s:width']=blockWidth;group[1]['s:height']=blockHeight;
       geometry.push(['rect',{x:12,y:8,width:blockWidth-24,height:blockHeight-16,rx:5,class:'subckt-body'}]);
       const caption=type==='spice_subckt'?cell.attributes.value:cell.spiceSymbol.label;
@@ -74,18 +76,18 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
         }
       });
     } else if(type==='spice_port') {
-      group[1]['s:width']=40;group[1]['s:height']=40;
+      group[1]['s:width']=2*pinStep;group[1]['s:height']=2*pinStep;group[1]['data-pin-length']=pinStep;
       const role=conventional?cell.spiceLayout?.ports.A?.role:null;
-      if(role==='in'){terminal('A',group[1]['s:width'],20,'right',group[1]['s:width']-20,20);geometry.push(txt(5,15,cell.attributes.value));}
+      if(role==='in'){terminal('A',2*pinStep,pinStep,'right',pinStep,pinStep);geometry.push(txt(5,15,cell.attributes.value));}
       else if(['pwr','ret','bias'].includes(role)) {
         const potential=cell.spiceLayout.ports.A.potential,low=potential!==null?potential<=0:role==='ret',x=group[1]['s:width']/2;
-        terminal('A',x,low?0:40,low?'top':'bottom',x,20);geometry.push(txt(5,low?35:15,cell.attributes.value));
+        terminal('A',x,low?0:2*pinStep,low?'top':'bottom',x,pinStep);geometry.push(txt(5,low?35:15,cell.attributes.value));
       }
-      else {terminal('A',0,20,'left',20,20);geometry.push(path('M20,14 L30,20 20,26 Z'),txt(35,24,cell.attributes.value));}
+      else {terminal('A',0,pinStep,'left',pinStep,pinStep);geometry.push(path(`M${pinStep},0 L${2*pinStep},${pinStep} ${pinStep},${2*pinStep} Z`),txt(35,24,cell.attributes.value));}
     } else if (type === 'gnd') {
       group[1]['s:width'] = 55; group[1]['s:height'] = 50;
-      geometry.push(path('M25,0 V25 M10,25 H40 M15,31 H35 M21,37 H29'), txt(35,18,'0'));
-      terminal('A',25,0,'top',25,0);
+      geometry.push(path('M10,25 H40 M15,31 H35 M21,37 H29'), txt(35,18,'0'));
+      terminal('A',25,0,'top',25,25);body={x:10,y:25,w:30,h:12};
     } else if(conventional&&['r_v','spice_br','l_v','c_v','d_v'].includes(type)) {
       const original=structuredClone(find(type==='spice_br'?'r_v':type)),glyphWidth=Number(original[1]['s:width']);
       const w=horizontal?72:32;
@@ -93,16 +95,18 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       group[1]['s:width']=w;group[1]['s:height']=h;
       const start=(w-50)/2,ox=8,oy=8;
       const transform=horizontal?(reversed?`translate(${start+50},${head}) rotate(90)`:`translate(${start},${head+glyphWidth}) rotate(-90)`):(reversed?`translate(${ox+glyphWidth},${oy+50}) rotate(180)`:`translate(${ox},${oy})`);
+      const inset=type==='c_v'?20:type==='d_v'?15:type==='l_v'?5:10;
+      body=horizontal?{x:start+inset,y:head,w:50-2*inset,h:glyphWidth}:{x:ox,y:oy+inset,w:glyphWidth,h:50-2*inset};
       for(const n of original.slice(2)) {
-        if(n[0]==='s:alias'||n[0]==='text')continue;
+        if(n[0]==='s:alias'||n[0]==='text'||n[1]?.class?.includes('connect'))continue;
         if(n[0]==='g'&&n[1]['s:pid']) {
           const a=n[1],first=Number(a['s:y'])===0,pid=type==='spice_br'?(a['s:pid']==='A'?'+':'-'):a['s:pid'];
           if(horizontal) {
             const left=first!==reversed,y=head+(reversed?Number(a['s:x']):glyphWidth-Number(a['s:x']));
-            terminal(pid,left?0:w,y,left?'left':'right',left?start:start+50,y);
+            terminal(pid,left?0:w,y,left?'left':'right',left?start+inset:start+50-inset,y);
           }else {
             const top=first!==reversed,x=ox+(reversed?glyphWidth-Number(a['s:x']):Number(a['s:x']));
-            terminal(pid,x,top?0:h,top?'top':'bottom',x,top?oy:oy+50);
+            terminal(pid,x,top?0:h,top?'top':'bottom',x,top?oy+inset:oy+50-inset);
           }
         }else {n[1].transform=transform;geometry.push(n);}
       }
@@ -114,6 +118,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       const w=horizontal?(controlled?80:72):64,h=horizontal?64:(controlled?80:72);
       group[1]['s:width']=w;group[1]['s:height']=h;
       const cx=horizontal?w/2:30,cy=horizontal?32:(controlled?40:34);
+      body={x:cx-(controlled?20:radius),y:cy-radius,w:2*(controlled?20:radius),h:radius*2};
       geometry.push(controlled?path(`M${cx},${cy-radius} L${cx+20},${cy} ${cx},${cy+radius} ${cx-20},${cy} Z`):['circle',{cx,cy,r:radius,class:'symbol'}]);
       const current=type==='i'||type==='spice_f'||type==='spice_b'&&/^[IP]\s*=/i.test(cell.attributes.value),sign=reversed?-1:1;
       if(current)geometry.push(path(horizontal?`M${cx-12*sign},${cy} H${cx+12*sign} M${cx+5*sign},${cy-5} L${cx+12*sign},${cy} ${cx+5*sign},${cy+5}`:`M${cx},${cy-12*sign} V${cy+12*sign} M${cx-5},${cy+5*sign} L${cx},${cy+12*sign} ${cx+5},${cy+5*sign}`));
@@ -130,10 +135,12 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     } else if (['r_v','spice_br', 'l_v', 'c_v', 'd_v', 'q_npn', 'q_pnp'].includes(type) || type.startsWith('spice_q4_')) {
       const original = structuredClone(find(type==='spice_br'?'r_v':type.startsWith('spice_q4_') ? 'q_' + type.slice(9) : type));
       const ox = 30, oy = 30;
+      const passive=['r_v','spice_br','l_v','c_v','d_v'].includes(type),inset=type==='c_v'?20:type==='d_v'?15:type==='l_v'?5:10;
+      body=passive?{x:ox,y:oy+inset,w:+original[1]['s:width'],h:50-2*inset}:{x:ox,y:oy,w:32,h:32};
       for (const n of original.slice(2)) {
-        if (n[0] === 's:alias' || n[0] === 'text') continue;
+        if (n[0] === 's:alias' || n[0] === 'text'||passive&&n[1]?.class?.includes('connect')) continue;
         if (n[0] === 'g' && n[1]['s:pid']) {
-          const a = n[1], sx = Number(a['s:x']) + ox, sy = Number(a['s:y']) + oy;
+          const a = n[1], sx = Number(a['s:x']) + ox, sy = (passive?(Number(a['s:y'])===0?inset:50-inset):Number(a['s:y'])) + oy;
           const side = a['s:position'];
           // The analog PNP glyph has its emitter arrow on the upper branch.
           const pnp=type==='q_pnp'||type==='spice_q4_pnp';
@@ -143,19 +150,20 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
         } else { n[1].transform = `translate(${ox},${oy})`; if (n[1].style) n[1].style = n[1].style.replace(/#000000/g,color); geometry.push(n); }
       }
       if (type.startsWith('spice_q4_')) {
-        geometry.push(path(`M62,46 H80 V${height-15}`),txt(width-20,height-21,'S'));
-        terminal('S',width,height-15,'right',80,height-15);
+        geometry.push(txt(65,42,'S'));terminal('S',width,46,'right',62,46);
       }
     } else if (/^spice_(?:jfet|mesfet|igbt)_/.test(type)) {
       const igbt=type.includes('igbt'),p=type.endsWith('_p');
       geometry.push(path('M42,30 V85 M42,35 H58 V20 M42,80 H58 V100'));
-      if(igbt)geometry.push(path('M28,35 V80 M0,55 H28'));
-      else geometry.push(path(p?'M0,55 H42 M30,50 L23,55 30,60':'M0,55 H42 M33,50 L40,55 33,60'));
+      if(igbt)geometry.push(path('M28,35 V80'));
+      else geometry.push(path(p?'M23,55 H42 M30,50 L23,55 30,60':'M23,55 H42 M33,50 L40,55 33,60'));
+      body={x:igbt?28:23,y:20,w:igbt?30:35,h:80};
       const labels=igbt?['C','G','E']:['D','G','S'];
-      terminal(labels[0],58,0,'top',58,20);terminal(labels[1],0,55,'left',0,55);terminal(labels[2],58,height,'bottom',58,100);
+      terminal(labels[0],58,0,'top',58,20);terminal(labels[1],0,55,'left',body.x,55);terminal(labels[2],58,height,'bottom',58,100);
       geometry.push(txt(63,20,labels[0]),txt(4,47,'G'),txt(63,105,labels[2]));
     } else if (/^spice_(?:nmos|pmos|m|q)/.test(type)) {
       const isQ = type.startsWith('spice_q');
+      body=isQ?{x:20,y:25,w:45,h:65}:{x:28,y:25,w:30,h:65};
       if (isQ) geometry.push(['rect', {x:20,y:25,width:45,height:65}], txt(38,60,'Q'));
       else geometry.push(path('M28,35 V75 M38,35 V75 M38,40 H55 V25 M38,70 H55 V90'));
       if (type !== 'spice_m' && !isQ) {
@@ -166,11 +174,11 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
       geometry.push(txt(60,22,portNames[0]),txt(4,49,portNames[1]),txt(60,100,portNames[2]));
       if (Object.keys(cell.connections).length === 4) {
         const bulk = isQ ? 'S' : 'B';
-        geometry.push(path(`M${isQ?65:58},55 H75 V${height-15}`), txt(width-20,height-21,bulk));
-        terminal(bulk,width,height-15,'right',75,height-15);
+        geometry.push(txt(62,50,bulk));terminal(bulk,width,55,'right',isQ?65:58,55);
       }
     } else {
       const controlled = /^spice_[efgh]$/.test(type);
+      body=controlled?{x:25,y:25,w:40,h:60}:{x:23,y:33,w:44,h:44};
       geometry.push(controlled ? path('M45,25 L65,55 45,85 25,55 Z') : ['circle',{cx:45,cy:55,r:22,class:'symbol'}]);
       const isCurrent = type === 'i' || /^spice_[fg]$/.test(type) || (type === 'spice_b' && /^[IP]\s*=/i.test(cell.attributes.value));
       geometry.push(path(isCurrent ? 'M45,42 V68 M40,61 L45,68 50,61' : 'M39,45 H51 M45,39 V51 M39,66 H51'));
@@ -193,7 +201,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     // netlistsvg turns s:attribute text into ELK label rectangles. Use literal
     // annotations instead, so ELK never receives text obstacles at all.
     for(const child of group)if(Array.isArray(child)&&child[0]==='text'&&child[1]['s:attribute']){child[2]=cell.attributes[child[1]['s:attribute']]||cell.attributes.ref||'';delete child[1]['s:attribute'];}
-    group[1]['data-symbol-only']='true';group.push(...pins);if(gridSize)gridSkin(group,gridSize);templates.push(onml.stringify(group));
+    group[1]['data-symbol-only']='true';group.push(...pins);shortSymbolPins(group,body,pinStep);gridSkin(group,gridSize||8);templates.push(onml.stringify(group));
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:s="https://github.com/nturley/netlistsvg">
   <s:properties constants="false" splitsAndJoins="false" genericsLaterals="true"><s:layoutEngine

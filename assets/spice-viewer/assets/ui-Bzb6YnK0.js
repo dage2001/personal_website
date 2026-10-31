@@ -204,9 +204,9 @@ function Qt(t, e = {}) {
       const L = Dt(N, i), { pins: U, nodeTokens: m, ...d } = L;
       L.polarityKnown || a("warning", x, `${N[0]}: model polarity unknown; explicit ${U.join("/")} terminals retained.`);
       const D = Ue();
-      U.forEach((q, G) => {
+      U.forEach(($, G) => {
         const K = pe(m[G]);
-        l[K] || (l[K] = { name: K, displayName: N[G + 1], bit: Object.keys(l).length + 2, terminals: [] }), l[K].terminals.push({ component: N[0], pin: q }), D[q] = K;
+        l[K] || (l[K] = { name: K, displayName: N[G + 1], bit: Object.keys(l).length + 2, terminals: [] }), l[K].terminals.push({ component: N[0], pin: $ }), D[$] = K;
       }), r.push({ ...d, name: N[0], terminals: D, line: x, raw: y }), E.add(T);
     } catch (L) {
       a("error", x, `${N[0]}: ${L.message} Statement: ${y}`);
@@ -498,7 +498,7 @@ function Gt(t, e = {}) {
         if (Object.hasOwn(C.definitions, m)) throw Error("Duplicate subcircuit definition: " + T[1]);
         const d = L.map(ue);
         if (new Set(d).size !== L.length || d.includes("0")) throw Error("Subcircuit formal ports must be unique and cannot be ground 0.");
-        if (L.some((q) => /[{}()=]/.test(q))) throw Error("Invalid formal port.");
+        if (L.some(($) => /[{}()=]/.test($))) throw Error("Invalid formal port.");
         if (u.length > 64) throw Error("Definition nesting exceeds 64 levels.");
         const D = C.id + "/" + encodeURIComponent(m);
         C.definitions[m] = D, u.push(p(D, T[1], C.id, L, U, N));
@@ -607,7 +607,7 @@ function Me(t, e, n = (r) => r, o = (r) => r) {
     return "(" + h + ")";
   }), t.replace(/@@(\d+)@@/g, (l, a) => r[Number(a)]);
 }
-function $t(t, e, n, o) {
+function qt(t, e, n, o) {
   const r = { ...e, ...n }, i = se(), l = /* @__PURE__ */ new Set(), a = se();
   for (const [h, u] of Object.entries(o)) a[h] = Me(ot(u), (b) => t[b]);
   function p(h) {
@@ -677,7 +677,7 @@ function Xe(t, e, n, o) {
   } else Object.hasOwn(e, t.toLowerCase()) && (r = "{" + e[t.toLowerCase()] + "}");
   return r;
 }
-class qt {
+class $t {
   /**
    * @callback HookCallback
    * @this {*|Jsep} this
@@ -1276,7 +1276,7 @@ class k {
     };
   }
 }
-const Yt = new qt();
+const Yt = new $t();
 Object.assign(k, {
   hooks: Yt,
   plugins: new zt(k),
@@ -1533,7 +1533,7 @@ function ze(t, { isolate: e = "" } = {}) {
     if (++r > 2e3) throw Error("Elaboration exceeds 2000 instances.");
     const _ = t.scopes[a], E = p.length ? xe(p.slice(0, -1), p.at(-1)) : "", I = se();
     if (e && E === e && (h = se()), w.some((C) => C.scopeId === a)) throw Error("Circular subcircuit reference at " + E);
-    const x = $t(u, _.defaults, _.parameters, b);
+    const x = qt(u, _.defaults, _.parameters, b);
     function y(C) {
       if (/^\{[\s\S]*\}$/.test(C)) {
         const U = Se(C, x);
@@ -1562,7 +1562,7 @@ function ze(t, { isolate: e = "" } = {}) {
       const L = /^\.model\s+(\S+)/i.exec(C.text)?.[1];
       if (!L) continue;
       const U = M(L), m = _.models[L.toLowerCase()], d = Xe(C.text, x, y, (D) => xe(p, D));
-      N.models[U] = { ...m, name: U, raw: d.replace(/^(\.model\s+)\S+/i, (D, q) => q + U), instanceId: E, parameters: x };
+      N.models[U] = { ...m, name: U, raw: d.replace(/^(\.model\s+)\S+/i, (D, $) => $ + U), instanceId: E, parameters: x };
     }
     for (const C of _.devices) {
       if (++i > 3e3) throw Error("Elaboration exceeds 3000 primitive devices.");
@@ -1575,19 +1575,19 @@ function ze(t, { isolate: e = "" } = {}) {
       let L = C.definitionId;
       if (!L) {
         const D = String(Se(C.definitionName, x)).toLowerCase();
-        let q = _;
-        for (; q && !L; )
-          L = q.definitions[D], q = t.scopes[q.parent];
+        let $ = _;
+        for (; $ && !L; )
+          L = $.definitions[D], $ = t.scopes[$.parent];
         if (!L) throw Error("Undefined selected subcircuit: " + D);
       }
       const U = t.scopes[L], m = se();
       if (U.ports.length !== C.nodes.length) throw Error(C.name + ": expected " + U.ports.length + " ports; got " + C.nodes.length);
-      U.ports.forEach((D, q) => {
-        m[D.toLowerCase()] = y(C.nodes[q]);
+      U.ports.forEach((D, $) => {
+        m[D.toLowerCase()] = y(C.nodes[$]);
       });
       const d = l(L, [...p, C.name], m, x, C.parameters, C, T);
-      C.pinNames?.length === d.ports.length && d.ports.forEach((D, q) => {
-        D.label = C.pinNames[q];
+      C.pinNames?.length === d.ports.length && d.ports.forEach((D, $) => {
+        D.label = C.pinNames[$];
       }), N.children.push(d);
     }
     return N;
@@ -1667,12 +1667,12 @@ function Ye(t, e = {}) {
     }
     const d = m.kind === "Q" ? "bjt" : ["M", "J", "Z"].includes(m.kind) ? "fet" : null, D = d === "bjt" ? /_(npn|pnp)$/.exec(m.type)?.[1] : /_(nmos|pmos|jfet_n|jfet_p|mesfet_n|mesfet_p)$/.exec(m.type)?.[1];
     if (!d || !D) continue;
-    const q = m.terminals, G = q[d === "bjt" ? "B" : "G"], K = q[d === "bjt" ? "C" : "D"], O = q[d === "bjt" ? "E" : "S"];
-    [G, K, O].some((v) => v === void 0) || G === O || K === O || i.push({ id: m.name, family: d, polarity: D, control: G, drain: K, source: O, body: m.kind === "M" ? q.B : void 0 });
+    const $ = m.terminals, G = $[d === "bjt" ? "B" : "G"], K = $[d === "bjt" ? "C" : "D"], O = $[d === "bjt" ? "E" : "S"];
+    [G, K, O].some((v) => v === void 0) || G === O || K === O || i.push({ id: m.name, family: d, polarity: D, control: G, drain: K, source: O, body: m.kind === "M" ? $.B : void 0 });
   }
-  const p = [], h = /* @__PURE__ */ new Set(), u = (m, d, D, q, G, K = "basic", O = [], v = "high") => {
+  const p = [], h = /* @__PURE__ */ new Set(), u = (m, d, D, $, G, K = "basic", O = [], v = "high") => {
     const P = [.../* @__PURE__ */ new Set([...d, ...O])], Q = JSON.stringify([m, K, [...P].sort()]);
-    h.has(Q) || (h.add(Q), p.push({ id: "motif" + p.length, kind: m, variant: K, transistors: d, members: P, roles: D, nets: q, evidence: G, confidence: v }));
+    h.has(Q) || (h.add(Q), p.push({ id: "motif" + p.length, kind: m, variant: K, transistors: d, members: P, roles: D, nets: $, evidence: G, confidence: v }));
   }, b = (m, d) => m.family === d.family && m.polarity === d.polarity, f = /* @__PURE__ */ new Map(), w = /* @__PURE__ */ new Map(), _ = /* @__PURE__ */ new Map(), E = new Map(i.map((m) => [m.id, m])), I = (m, d, D) => {
     m.has(d) || m.set(d, []), m.get(d).push(D);
   }, x = (m, d) => JSON.stringify([m.family, m.polarity, d]);
@@ -1684,8 +1684,8 @@ function Ye(t, e = {}) {
   const y = (m) => [{ node: m.source, resistor: null }, ...(o.get(m.source) || []).flatMap((d) => {
     const D = n.get(d.device);
     if (D.kind !== "R") return [];
-    const q = Object.values(D.terminals).find((G) => G !== m.source);
-    return q !== void 0 && q !== m.control && q !== m.drain ? [{ node: q, resistor: D.name }] : [];
+    const $ = Object.values(D.terminals).find((G) => G !== m.source);
+    return $ !== void 0 && $ !== m.control && $ !== m.drain ? [{ node: $, resistor: D.name }] : [];
   })];
   for (const m of i) m.control === m.drain && u("diode-connected", [m.id], { reference: m.id }, { control: m.control, return: m.source }, ["control-drain-short", m.family]);
   for (const m of i) {
@@ -1693,11 +1693,11 @@ function Ye(t, e = {}) {
     if (d.filter((v) => v.control === v.drain).length > 1) continue;
     let D = null;
     if (m.control !== m.drain && m.family === "bjt" && (D = (f.get(x(m, m.drain)) || []).find((v) => v.id !== m.id && b(v, m) && v.control === m.drain && v.source === m.control && a(v.drain))), m.control !== m.drain && !D) continue;
-    const q = y(m), G = [];
+    const $ = y(m), G = [];
     let K = null, O = [];
     for (const v of d) {
       if (v.id === m.id || v.id === D?.id || v.drain === m.drain || v.drain === v.control) continue;
-      const P = q.flatMap((Q) => y(v).filter((V) => Q.node === V.node).map((V) => ({ node: Q.node, rs: [Q.resistor, V.resistor].filter(Boolean) }))).find((Q) => K === null || Q.node === K);
+      const P = $.flatMap((Q) => y(v).filter((V) => Q.node === V.node).map((V) => ({ node: Q.node, rs: [Q.resistor, V.resistor].filter(Boolean) }))).find((Q) => K === null || Q.node === K);
       P && (K = P.node, G.push(v.id), O.push(...P.rs));
     }
     if (G.length) {
@@ -1721,8 +1721,8 @@ function Ye(t, e = {}) {
       u("differential-pair", [m.id, d.id], { inputs: [m.id, d.id] }, { tail: m.source }, ["same-polarity", "distinct-controls", "shared-tail", G ? "tail-bias-connection" : "unbiased-tail", K ? "two-input-tail" : "multi-input-tail"], "basic", [], G && K && m.body === d.body ? "high" : "medium");
     }
     if (m.family !== "bjt" || m.drain !== d.drain || m.source === d.source) continue;
-    const D = i.filter((G) => G.family === "bjt" && G.polarity !== m.polarity && G.source === m.source), q = i.filter((G) => G.family === "bjt" && G.polarity !== m.polarity && G.source === d.source);
-    for (const G of D) for (const K of q) G.id !== K.id && G.control === K.control && G.drain !== K.drain && G.control !== G.drain && K.control !== K.drain && u("differential-pair", [m.id, d.id, G.id, K.id], { inputs: [m.id, d.id], commonBase: [G.id, K.id] }, { inputCollectors: m.drain, bias: G.control }, ["same-polarity-inputs", "distinct-controls", "complementary-emitter-pairs", "shared-common-base"], "complementary-common-base");
+    const D = i.filter((G) => G.family === "bjt" && G.polarity !== m.polarity && G.source === m.source), $ = i.filter((G) => G.family === "bjt" && G.polarity !== m.polarity && G.source === d.source);
+    for (const G of D) for (const K of $) G.id !== K.id && G.control === K.control && G.drain !== K.drain && G.control !== G.drain && K.control !== K.drain && u("differential-pair", [m.id, d.id, G.id, K.id], { inputs: [m.id, d.id], commonBase: [G.id, K.id] }, { inputCollectors: m.drain, bias: G.control }, ["same-polarity-inputs", "distinct-controls", "complementary-emitter-pairs", "shared-common-base"], "complementary-common-base");
   }
   for (const m of i) if (m.family === "bjt" && m.control !== m.drain) {
     const d = r.get(l(m.drain, m.control)) || [], D = r.get(l(m.control, m.source)) || [];
@@ -1745,7 +1745,7 @@ function Ye(t, e = {}) {
   }
   for (const m of C.filter((d) => d.polarity === "npn" && a(d.drain))) for (const d of C.filter((D) => D.polarity === "pnp" && a(D.drain))) {
     if (e[m.drain].potential <= e[d.drain].potential) continue;
-    const D = y(m).flatMap((q) => y(d).filter((G) => q.node === G.node && !a(q.node)).map((G) => ({ node: q.node, rs: [q.resistor, G.resistor].filter(Boolean) })))[0];
+    const D = y(m).flatMap(($) => y(d).filter((G) => $.node === G.node && !a($.node)).map((G) => ({ node: $.node, rs: [$.resistor, G.resistor].filter(Boolean) })))[0];
     D && u("push-pull-pair", [m.id, d.id], { upper: m.id, lower: d.id }, { output: D.node }, ["complementary-polarity", "ordered-collector-supplies", D.rs.length ? "resistive-common-output" : "shared-emitter-output"], "emitter-follower", D.rs);
   }
   return p;
@@ -1827,8 +1827,8 @@ function sn(t) {
   }
   return r;
 }
-const $e = 20;
-function qe(t) {
+const qe = 21;
+function $e(t) {
   const e = String(t).split("/").at(-1);
   let n;
   try {
@@ -1839,7 +1839,7 @@ function qe(t) {
   return n === "0" ? "ret" : /^(IN|OUT|IO|PWR|RET|BIAS|FB|N)_/i.exec(n)?.[1].toLowerCase() || "unknown";
 }
 const Oe = (t) => ["pwr", "ret", "bias"].includes(t), an = (t) => String(t).split("/").at(-1).toLowerCase(), bt = (t) => ({ vdd: "pwr", vcc: "pwr", vee: "ret", vss: "ret" })[an(t)] || "unknown", st = (t) => {
-  const e = qe(t);
+  const e = $e(t);
   return e !== "unknown" ? e : { in: "in", input: "in", out: "out", output: "out" }[String(t).toLowerCase()] || bt(t);
 };
 function cn(t) {
@@ -1877,7 +1877,7 @@ function cn(t) {
 function ln(t, e, n = null) {
   const o = cn(Ne(e.localScope ? t.contexts[e.focus] : t.root)), r = /* @__PURE__ */ Object.create(null), i = /* @__PURE__ */ Object.create(null);
   for (const u of Object.values(e.nodes)) {
-    const b = qe(u.name), f = bt(u.name);
+    const b = $e(u.name), f = bt(u.name);
     r[u.name] = { role: b !== "unknown" ? b : f, roleSource: b !== "unknown" ? "node-name" : f !== "unknown" ? "legacy-rail-name" : "unknown", potential: o.nodes[u.name]?.known ? o.nodes[u.name].value : null };
   }
   if (e.localScope) for (const u of e.interfaceBindings) {
@@ -1888,16 +1888,16 @@ function ln(t, e, n = null) {
     const w = { role: r[f].role, roleSource: r[f].roleSource }, _ = u.block?.ports.find((x) => x.pin === b);
     if (_?.implicit || !u.block && !u.synthetic) return w;
     const E = u.synthetic ? u.value : _?.name || _?.label, I = st(E);
-    return I !== "unknown" ? { role: I, roleSource: qe(E) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : Oe(w.role) ? { ...w, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
+    return I !== "unknown" ? { role: I, roleSource: $e(E) !== "unknown" ? "formal-prefix" : "legacy-interface-name" } : Oe(w.role) ? { ...w, roleSource: "bound-rail" } : { role: "unknown", roleSource: "unknown" };
   };
   for (const u of e.components) {
     const b = Object.fromEntries(Object.entries(u.terminals).map(([U, m]) => [U, { ...r[m], ...h(u, U, m) }])), f = Object.values(b), w = ["r_v", "spice_br", "l_v", "c_v", "d_v"].includes(u.type), _ = w && !a.has(u.name) && f.length === 2 && f.every((U) => !Oe(U.role) && (U.potential === null || U.role !== "unknown")), E = u.terminals["+"], I = u.terminals["-"], x = [E, I].filter((U) => U && U !== "0"), y = u.kind === "V" && x.some((U) => Oe(r[U]?.role)) && !x.some((U) => ["in", "out", "io", "fb"].includes(r[U]?.role)) && [E, I].every((U) => o.nodes[U]?.known), N = E === "0" ? I : E, T = Object.keys(u.terminals), M = (U) => Oe(U.role) ? U.potential !== null ? U.potential > 0 ? "high" : "low" : U.role === "ret" ? "low" : "high" : "signal";
     let C = !1;
     T.length === 2 && (u.kind === "V" && f.every((U) => U.potential !== null) ? C = f[0].potential < f[1].potential : u.terminals[T[0]] === "0" ? C = !0 : u.terminals[T[1]] === "0" ? C = !1 : f.every((U) => U.potential !== null) ? C = f[0].potential < f[1].potential : C = M(f[0]) === "low" || M(f[1]) === "high" && M(f[0]) === "signal"), a.has(u.name) && (C = a.get(u.name).reverse);
     const L = u.synthetic ? "" : u.name.startsWith(e.focus + "/") ? u.name.slice(e.focus.length + 1) : u.name;
-    i[u.name] = { version: $e, kind: u.kind, polarity: u.type.endsWith("pnp") ? "p" : u.type.endsWith("npn") ? "n" : null, currentLimiter: p.has(u.name), orientationReason: a.get(u.name)?.reason || null, owner: L.includes("/") ? L.slice(0, L.lastIndexOf("/")) : "", passive: w, source: ["V", "I", "E", "F", "G", "H"].includes(u.kind) || u.kind === "B" && !w, ports: b, horizontal: _, orientation: _ ? "horizontal" : C ? "vertical-reversed" : "vertical", flexible: T.length === 2 && (w || ["V", "I", "B", "F", "H"].includes(u.kind)), supply: !!y, voltage: y ? o.nodes[N].value : null };
+    i[u.name] = { version: qe, kind: u.kind, polarity: u.type.endsWith("pnp") ? "p" : u.type.endsWith("npn") ? "n" : null, currentLimiter: p.has(u.name), orientationReason: a.get(u.name)?.reason || null, owner: L.includes("/") ? L.slice(0, L.lastIndexOf("/")) : "", passive: w, source: ["V", "I", "E", "F", "G", "H"].includes(u.kind) || u.kind === "B" && !w, ports: b, horizontal: _, orientation: _ ? "horizontal" : C ? "vertical-reversed" : "vertical", flexible: T.length === 2 && (w || ["V", "I", "B", "F", "H"].includes(u.kind)), supply: !!y, voltage: y ? o.nodes[N].value : null };
   }
-  return { version: $e, nodes: r, cells: i, motifs: l, diagnostics: o.diagnostics };
+  return { version: qe, nodes: r, cells: i, motifs: l, diagnostics: o.diagnostics };
 }
 function yt(t, e) {
   const n = e.ports.map((r, i) => ({ pin: "P" + i, name: r.name, label: r.label || r.name, node: r.node, implicit: !1 })), o = new Set(Ne(e).flatMap((r) => Object.values(r.terminals)));
@@ -2037,7 +2037,7 @@ async function pn(t, e) {
 function hn(t, e) {
   const n = new Worker(new URL(
     /* @vite-ignore */
-    "" + new URL("render-worker-CkF79f-P.js", import.meta.url).href,
+    "" + new URL("render-worker-W9q15v2l.js", import.meta.url).href,
     import.meta.url
   ), { type: "module" });
   return new Promise((o, r) => {
@@ -2520,7 +2520,7 @@ function Cn(t) {
       _ && (document.documentElement.style.overflow = _.html, document.body.style.overflow = _.body, window.scrollTo(_.x, _.y)), w?.focus?.({ preventScroll: !0 }), y();
     }
   }
-  async function q() {
+  async function $() {
     d(), t.dataset.nativeFullscreen = "false";
   }
   async function G() {
@@ -2533,7 +2533,7 @@ function Cn(t) {
       }
     D();
   }
-  N(e("fullscreen"), "click", () => b ? G() : q()), N(e("exit-fullscreen"), "click", G), N(e("reset-windows"), "click", m);
+  N(e("fullscreen"), "click", () => b ? G() : $()), N(e("exit-fullscreen"), "click", G), N(e("reset-windows"), "click", m);
   for (const O of Object.keys(r)) {
     N(e("pin-" + O), "click", () => {
       const Q = C(r[O]);
@@ -2574,7 +2574,7 @@ function Cn(t) {
   }, { capture: !0 }), N(window, "resize", U);
   const K = new ResizeObserver(U);
   for (const O of Object.values(r)) K.observe(O);
-  return { enter: q, exit: G, showPanel: T, reset: m, destroy() {
+  return { enter: $, exit: G, showPanel: T, reset: m, destroy() {
     G(), n.abort(), K.disconnect();
   } };
 }
@@ -2838,14 +2838,14 @@ function kn(t, e, { changed: n, inspect: o, getNetColor: r }) {
       }
       return;
     }
-    e("edit-tool").value = v, q(), U();
+    e("edit-tool").value = v, $(), U();
   }
   function D() {
     if (!i) return;
     const v = L();
     C(`${v.unrouted} connection${v.unrouted === 1 ? "" : "s"} unrouted · ${v.wires} wire segments${p ? " · Auto-routing…" : ""}`), U(), n(i.drawing(), v, i.bounds()), x.set(_, i.snapshot()), x.size > 20 && x.delete(x.keys().next().value);
   }
-  function q(v = null) {
+  function $(v = null) {
     if (l?.querySelector("[data-route-preview]")?.remove(), !h || !l) return;
     const P = [...h.points];
     if (v) {
@@ -2884,7 +2884,7 @@ function kn(t, e, { changed: n, inspect: o, getNetColor: r }) {
       }
       l.append(P, Q);
     }
-    q();
+    $();
     const V = ce("g", { "data-airwires": "true", "pointer-events": "none" });
     for (const H of i.airwires()) V.append(ce("line", { x1: H.a.x, y1: H.a.y, x2: H.b.x, y2: H.b.y, stroke: M(H.bit), "stroke-opacity": 0.75, "stroke-width": 0.8, "vector-effect": "non-scaling-stroke", "data-air-net": H.bit, "data-from-owner": H.a.owner || "", "data-to-owner": H.b.owner || "" }));
     l.append(V);
@@ -2893,7 +2893,7 @@ function kn(t, e, { changed: n, inspect: o, getNetColor: r }) {
   }
   function K(v, P) {
     if (!h) {
-      h = { bit: P, points: [v] }, q(), C("Click grid points for corners, then a pin or wire of the same node. Escape cancels.");
+      h = { bit: P, points: [v] }, $(), C("Click grid points for corners, then a pin or wire of the same node. Escape cancels.");
       return;
     }
     if (P !== void 0 && h.bit !== P) {
@@ -2906,7 +2906,7 @@ function kn(t, e, { changed: n, inspect: o, getNetColor: r }) {
       return;
     }
     if (P === void 0) {
-      h.points.push(...V.slice(1)), q();
+      h.points.push(...V.slice(1)), $();
       return;
     }
     try {
@@ -2966,7 +2966,7 @@ function kn(t, e, { changed: n, inspect: o, getNetColor: r }) {
           V.dataset.fromOwner === u.id && (V.setAttribute("x1", +V.getAttribute("x1") - Number(V.dataset.dx || 0) + u.dx), V.setAttribute("y1", +V.getAttribute("y1") - Number(V.dataset.dy || 0) + u.dy)), V.dataset.toOwner === u.id && (V.setAttribute("x2", +V.getAttribute("x2") - Number(V.dataset.dx || 0) + u.dx), V.setAttribute("y2", +V.getAttribute("y2") - Number(V.dataset.dy || 0) + u.dy)), V.dataset.dx = u.dx, V.dataset.dy = u.dy;
         return;
       }
-      h && q(T(v));
+      h && $(T(v));
     }
   }, { capture: !0 }), t.addEventListener("pointerup", (v) => {
     if (!u) return;
@@ -3315,10 +3315,10 @@ function Wn(t) {
   }), n;
 }
 var je = {};
-const Xn = {}, $n = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Xn = {}, qn = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   default: Xn
-}, Symbol.toStringTag, { value: "Module" })), qn = /* @__PURE__ */ Wn($n);
+}, Symbol.toStringTag, { value: "Module" })), $n = /* @__PURE__ */ Wn(qn);
 var dt;
 function zn() {
   return dt || (dt = 1, (function(t) {
@@ -3364,7 +3364,7 @@ function zn() {
         if (!(this instanceof o))
           return new o(c, s);
         var A = this;
-        i(A), A.q = A.c = "", A.bufferCheckPosition = e.MAX_BUFFER_LENGTH, A.encoding = null, A.opt = s || {}, A.opt.lowercase = A.opt.lowercase || A.opt.lowercasetags, A.looseCase = A.opt.lowercase ? "toLowerCase" : "toUpperCase", A.opt.maxEntityCount = A.opt.maxEntityCount || 512, A.opt.maxEntityDepth = A.opt.maxEntityDepth || 4, A.entityCount = A.entityDepth = 0, A.tags = [], A.closed = A.closedRoot = A.sawRoot = !1, A.tag = A.error = null, A.strict = !!c, A.noscript = !!(c || A.opt.noscript), A.state = d.BEGIN, A.strictEntities = A.opt.strictEntities, A.ENTITIES = A.strictEntities ? Object.create(e.XML_ENTITIES) : Object.create(e.ENTITIES), A.attribList = [], A.opt.xmlns && (A.ns = Object.create(I)), A.opt.unquotedAttributeValues === void 0 && (A.opt.unquotedAttributeValues = !c), A.trackPosition = A.opt.position !== !1, A.trackPosition && (A.position = A.line = A.column = 0), q(A, "onready");
+        i(A), A.q = A.c = "", A.bufferCheckPosition = e.MAX_BUFFER_LENGTH, A.encoding = null, A.opt = s || {}, A.opt.lowercase = A.opt.lowercase || A.opt.lowercasetags, A.looseCase = A.opt.lowercase ? "toLowerCase" : "toUpperCase", A.opt.maxEntityCount = A.opt.maxEntityCount || 512, A.opt.maxEntityDepth = A.opt.maxEntityDepth || 4, A.entityCount = A.entityDepth = 0, A.tags = [], A.closed = A.closedRoot = A.sawRoot = !1, A.tag = A.error = null, A.strict = !!c, A.noscript = !!(c || A.opt.noscript), A.state = d.BEGIN, A.strictEntities = A.opt.strictEntities, A.ENTITIES = A.strictEntities ? Object.create(e.XML_ENTITIES) : Object.create(e.ENTITIES), A.attribList = [], A.opt.xmlns && (A.ns = Object.create(I)), A.opt.unquotedAttributeValues === void 0 && (A.opt.unquotedAttributeValues = !c), A.trackPosition = A.opt.position !== !1, A.trackPosition && (A.position = A.line = A.column = 0), $(A, "onready");
       }
       Object.create || (Object.create = function(c) {
         function s() {
@@ -3378,7 +3378,7 @@ function zn() {
         return s;
       });
       function r(c) {
-        for (var s = Math.max(e.MAX_BUFFER_LENGTH, 10), A = 0, g = 0, $ = n.length; g < $; g++) {
+        for (var s = Math.max(e.MAX_BUFFER_LENGTH, 10), A = 0, g = 0, q = n.length; g < q; g++) {
           var Z = c[n[g]].length;
           if (Z > s)
             switch (n[g]) {
@@ -3423,7 +3423,7 @@ function zn() {
       };
       var a;
       try {
-        a = qn.Stream;
+        a = $n.Stream;
       } catch {
         a = function() {
         };
@@ -3459,10 +3459,10 @@ function zn() {
             get: function() {
               return A._parser["on" + g];
             },
-            set: function($) {
-              if (!$)
-                return A.removeAllListeners(g), A._parser["on" + g] = $, $;
-              A.on(g, $);
+            set: function(q) {
+              if (!q)
+                return A.removeAllListeners(g), A._parser["on" + g] = q, q;
+              A.on(g, q);
             },
             enumerable: !0,
             configurable: !1
@@ -3863,7 +3863,7 @@ function zn() {
       for (var D in e.STATE)
         e.STATE[e.STATE[D]] = D;
       d = e.STATE;
-      function q(c, s, A) {
+      function $(c, s, A) {
         c[s] && c[s](A);
       }
       function G(c) {
@@ -3887,10 +3887,10 @@ function zn() {
         }
       }
       function P(c, s, A) {
-        c.textNode && Q(c), q(c, s, A);
+        c.textNode && Q(c), $(c, s, A);
       }
       function Q(c) {
-        c.textNode = V(c.opt, c.textNode), c.textNode && q(c, "ontext", c.textNode), c.textNode = "";
+        c.textNode = V(c.opt, c.textNode), c.textNode && $(c, "ontext", c.textNode), c.textNode = "";
       }
       function V(c, s) {
         return c.trim && (s = s.trim()), c.normalize && (s = s.replace(/\s+/g, " ")), s;
@@ -3899,10 +3899,10 @@ function zn() {
         return Q(c), c.trackPosition && (s += `
 Line: ` + c.line + `
 Column: ` + c.column + `
-Char: ` + c.c), s = new Error(s), c.error = s, q(c, "onerror", s), c;
+Char: ` + c.c), s = new Error(s), c.error = s, $(c, "onerror", s), c;
       }
       function H(c) {
-        return c.sawRoot && !c.closedRoot && B(c, "Unclosed root tag"), c.state !== d.BEGIN && c.state !== d.BEGIN_WHITESPACE && c.state !== d.TEXT && Y(c, "Unexpected end"), Q(c), c.c = "", c.closed = !0, q(c, "onend"), o.call(c, c.strict, c.opt), c;
+        return c.sawRoot && !c.closedRoot && B(c, "Unclosed root tag"), c.state !== d.BEGIN && c.state !== d.BEGIN_WHITESPACE && c.state !== d.TEXT && Y(c, "Unexpected end"), Q(c), c.c = "", c.closed = !0, $(c, "onend"), o.call(c, c.strict, c.opt), c;
       }
       function B(c, s) {
         if (typeof c != "object" || !(c instanceof o))
@@ -3915,8 +3915,8 @@ Char: ` + c.c), s = new Error(s), c.error = s, q(c, "onerror", s), c;
         c.opt.xmlns && (A.ns = s.ns), c.attribList.length = 0, P(c, "onopentagstart", A);
       }
       function R(c, s) {
-        var A = c.indexOf(":"), g = A < 0 ? ["", c] : c.split(":"), $ = g[0], Z = g[1];
-        return s && c === "xmlns" && ($ = "xmlns", Z = ""), { prefix: $, local: Z };
+        var A = c.indexOf(":"), g = A < 0 ? ["", c] : c.split(":"), q = g[0], Z = g[1];
+        return s && c === "xmlns" && (q = "xmlns", Z = ""), { prefix: q, local: Z };
       }
       function S(c) {
         if (c.strict || (c.attribName = c.attribName[c.looseCase]()), c.attribList.indexOf(c.attribName) !== -1 || c.tag.attributes.hasOwnProperty(c.attribName)) {
@@ -3939,8 +3939,8 @@ Actual: ` + c.attribValue
 Actual: ` + c.attribValue
               );
             else {
-              var $ = c.tag, Z = c.tags[c.tags.length - 1] || c;
-              $.ns === Z.ns && ($.ns = Object.create(Z.ns)), $.ns[g] = c.attribValue;
+              var q = c.tag, Z = c.tags[c.tags.length - 1] || c;
+              q.ns === Z.ns && (q.ns = Object.create(Z.ns)), q.ns[g] = c.attribValue;
             }
           c.attribList.push([c.attribName, c.attribValue]);
         } else
@@ -3957,8 +3957,8 @@ Actual: ` + c.attribValue
             c,
             "Unbound namespace prefix: " + JSON.stringify(c.tagName)
           ), A.uri = g.prefix);
-          var $ = c.tags[c.tags.length - 1] || c;
-          A.ns && $.ns !== A.ns && Object.keys(A.ns).forEach(function(Je) {
+          var q = c.tags[c.tags.length - 1] || c;
+          A.ns && q.ns !== A.ns && Object.keys(A.ns).forEach(function(Je) {
             P(c, "onopennamespace", {
               prefix: Je,
               uri: A.ns[Je]
@@ -3996,8 +3996,8 @@ Actual: ` + c.attribValue
         var s = c.tags.length, A = c.tagName;
         c.strict || (A = A[c.looseCase]());
         for (var g = A; s--; ) {
-          var $ = c.tags[s];
-          if ($.name !== g)
+          var q = c.tags[s];
+          if (q.name !== g)
             B(c, "Unexpected close tag");
           else
             break;
@@ -4022,8 +4022,8 @@ Actual: ` + c.attribValue
         s === 0 && (c.closedRoot = !0), c.tagName = c.attribValue = c.attribName = "", c.attribList.length = 0, c.state = d.TEXT;
       }
       function z(c) {
-        var s = c.entity, A = s.toLowerCase(), g, $ = "";
-        return c.ENTITIES[s] ? c.ENTITIES[s] : c.ENTITIES[A] ? c.ENTITIES[A] : (s = A, s.charAt(0) === "#" && (s.charAt(1) === "x" ? (s = s.slice(2), g = parseInt(s, 16), $ = g.toString(16)) : (s = s.slice(1), g = parseInt(s, 10), $ = g.toString(10))), s = s.replace(/^0+/, ""), isNaN(g) || $.toLowerCase() !== s || g < 0 || g > 1114111 || !X(g) ? (B(c, "Invalid character entity"), "&" + c.entity + ";") : String.fromCodePoint(g));
+        var s = c.entity, A = s.toLowerCase(), g, q = "";
+        return c.ENTITIES[s] ? c.ENTITIES[s] : c.ENTITIES[A] ? c.ENTITIES[A] : (s = A, s.charAt(0) === "#" && (s.charAt(1) === "x" ? (s = s.slice(2), g = parseInt(s, 16), q = g.toString(16)) : (s = s.slice(1), g = parseInt(s, 10), q = g.toString(10))), s = s.replace(/^0+/, ""), isNaN(g) || q.toLowerCase() !== s || g < 0 || g > 1114111 || !X(g) ? (B(c, "Invalid character entity"), "&" + c.entity + ";") : String.fromCodePoint(g));
       }
       function X(c) {
         return c === 9 || c === 10 || c === 13 || c >= 32 && c <= 55295 || c >= 57344 && c <= 65533 || c >= 65536 && c <= 1114111;
@@ -4084,8 +4084,8 @@ Actual: ` + c.attribValue
                 s.state = d.PROC_INST, s.procInstName = s.procInstBody = "";
               else {
                 if (B(s, "Unencoded <"), s.startTagPosition + 1 < s.position) {
-                  var $ = s.position - s.startTagPosition;
-                  g = new Array($).join(" ") + g;
+                  var q = s.position - s.startTagPosition;
+                  g = new Array(q).join(" ") + g;
                 }
                 s.textNode += "<" + g, s.state = d.TEXT;
               }
@@ -4252,7 +4252,7 @@ Actual: ` + c.attribValue
       }
       String.fromCodePoint || (function() {
         var c = String.fromCharCode, s = Math.floor, A = function() {
-          var g = 16384, $ = [], Z, ee, oe = -1, ae = arguments.length;
+          var g = 16384, q = [], Z, ee, oe = -1, ae = arguments.length;
           if (!ae)
             return "";
           for (var fe = ""; ++oe < ae; ) {
@@ -4262,7 +4262,7 @@ Actual: ` + c.attribValue
             ie > 1114111 || // not a valid Unicode code point
             s(ie) !== ie)
               throw RangeError("Invalid code point: " + ie);
-            ie <= 65535 ? $.push(ie) : (ie -= 65536, Z = (ie >> 10) + 55296, ee = ie % 1024 + 56320, $.push(Z, ee)), (oe + 1 === ae || $.length > g) && (fe += c.apply(null, $), $.length = 0);
+            ie <= 65535 ? q.push(ie) : (ie -= 65536, Z = (ie >> 10) + 55296, ee = ie % 1024 + 56320, q.push(Z, ee)), (oe + 1 === ae || q.length > g) && (fe += c.apply(null, q), q.length = 0);
           }
           return fe;
         };
@@ -4419,14 +4419,14 @@ if (ye) {
     N = { x: W, y: z, w: Math.max(N.x + N.w, F.right + 20) - W, h: Math.max(N.y + N.h, F.bottom + 20) - z }, p && vn(R, h, p), a?.refreshColors(), Qe(R, b?.layout.report?.gridSize || 0, j("show-grid").checked, y);
     const X = R.cloneNode(!0);
     a?.cleanExport(X), X.setAttribute("width", N.w), X.setAttribute("height", N.h), X.setAttribute("viewBox", `${N.x} ${N.y} ${N.w} ${N.h}`), Qe(X, b?.layout.report?.gridSize || 0, j("show-grid").checked, N), u = new XMLSerializer().serializeToString(X), j("source").value = u;
-  }, q = function(R) {
+  }, $ = function(R) {
     const S = j("example-info");
     if (S && (S.replaceChildren(), !!R && (S.append(document.createTextNode(R.description + " ")), R.url))) {
       const F = document.createElement("a");
       F.href = R.url, F.target = "_blank", F.rel = "noopener noreferrer", F.textContent = R.reference, S.append(F);
     }
   }, G = function() {
-    a.invalidate(), d.setEnabled(!1), r = null, i = null, u = "", L(), q(Object.values(Re).find((R) => R.source === t.value)), n.textContent = "Input changed — generate to refresh the schematic.";
+    a.invalidate(), d.setEnabled(!1), r = null, i = null, u = "", L(), $(Object.values(Re).find((R) => R.source === t.value)), n.textContent = "Input changed — generate to refresh the schematic.";
   }, K = function(R) {
     o.replaceChildren();
     for (const { severity: S, line: F, message: W, source: z } of R) {
@@ -4529,7 +4529,7 @@ if (ye) {
     t.value = sessionStorage.getItem("spice-netlist-v2") || mt;
   } catch {
   }
-  q(Object.values(Re).find((R) => R.source === t.value)), t.addEventListener("input", G);
+  $(Object.values(Re).find((R) => R.source === t.value)), t.addEventListener("input", G);
   for (const R of ["font", "size", "detailed", "conventional", "grid", "grid-size"]) j(R).addEventListener("input", G);
   j("zoom-in").onclick = () => v(0.8), j("zoom-out").onclick = () => v(1.25), j("fit").onclick = () => {
     y = { ...N }, O();
@@ -4598,48 +4598,48 @@ ${Object.entries(W.terminals).map(([z, X]) => `${z} → ${X}`).join("   ")}`, W.
       if (he) {
         b.layout.report = JSON.parse(he.textContent);
         const g = b.layout.report;
-        if (S.push({ severity: "info", message: `Layout: compact signal flow; ${g.powerSourcesChecked} DC/ground symbols checked, ${g.powerOrderViolations} DC order preference(s) unmet. ${g.powerPass}. ${g.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), g.classicTemplateFallback && S.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), g.groundPlacement && S.push({ severity: "info", message: `Ground: ${g.groundPlacement}; ${g.straightenedGroundDrops || 0} return-path simplification(s).` }), g.explicitGroups && S.push({ severity: "info", message: `Layout comments: ${g.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), g.classicRails && S.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${g.railCount} shared voltage rails.` }), g.localClassicInstances?.length && S.push({ severity: "info", message: `${g.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), g.localClassicStages?.length && S.push({ severity: "info", message: `Classic transistor proximity active: ${g.localClassicStages.join(", ")}.` }), g.sharedClassicRails && S.push({ severity: "info", message: "Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes." }), g.mirroredTransistors?.length && S.push({ severity: "info", message: `Control-pin mirror choices: ${g.mirroredTransistors.join(", ")}.` }), g.recognizedMotifs?.length && S.push({ severity: "info", message: `Transistor structures: ${g.recognizedMotifs.map(($) => `${$.kind} (${$.members.join(", ")}; ${$.confidence})`).join("; ")}.` }), g.appliedMotifs?.length && S.push({ severity: "info", message: `Topology preferences applied to ${g.appliedMotifs.length} local structure(s); ELK still determines placement and routing.` }), g.subnetFirstFallback && S.push({ severity: "warning", message: "Subnet attachment kept the previous safe placement: " + g.subnetFirstFallback }), g.pairCompactionFallback && S.push({ severity: "warning", message: "Pair proximity kept the original regions: " + g.pairCompactionFallback }), g.compoundPairFallback && S.push({ severity: "warning", message: "Compound-pair placement fell back to proximity rules: " + g.compoundPairFallback }), g.pairConstraints?.length) {
-          const $ = g.pairConstraints.filter((Z) => Z.crossRegion && !Z.compacted).length;
-          S.push({ severity: "info", message: `${g.pairConstraints.length - $} adjacent transistor pair(s); ${$} cross-region mirror row constraint(s).` });
+        if (S.push({ severity: "info", message: `Layout: compact signal flow; ${g.powerSourcesChecked} DC/ground symbols checked, ${g.powerOrderViolations} DC order preference(s) unmet. ${g.powerPass}. ${g.classicRails ? "Fixed local voltage rails." : "Global voltage bands are a preference."}` }), g.classicTemplateFallback && S.push({ severity: "info", message: "Some local branches could not use the classic template without crossing symbols; automatic layout was used." }), g.groundPlacement && S.push({ severity: "info", message: `Ground: ${g.groundPlacement}; ${g.straightenedGroundDrops || 0} return-path simplification(s).` }), g.explicitGroups && S.push({ severity: "info", message: `Layout comments: ${g.explicitGroups} visual groups; nested row/column placement retained on expansion.` }), g.classicRails && S.push({ severity: "info", message: `Transistor layout: local load/bias branches; ${g.railCount} shared voltage rails.` }), g.localClassicInstances?.length && S.push({ severity: "info", message: `${g.localClassicInstances.length} expanded instance(s) retain independent transistor layouts.` }), g.localClassicStages?.length && S.push({ severity: "info", message: `Classic transistor proximity active: ${g.localClassicStages.join(", ")}.` }), g.sharedClassicRails && S.push({ severity: "info", message: "Classic stages share voltage-ordered sheet rails; supplies do not follow stage-boundary signal routes." }), g.mirroredTransistors?.length && S.push({ severity: "info", message: `Control-pin mirror choices: ${g.mirroredTransistors.join(", ")}.` }), g.recognizedMotifs?.length && S.push({ severity: "info", message: `Transistor structures: ${g.recognizedMotifs.map((q) => `${q.kind} (${q.members.join(", ")}; ${q.confidence})`).join("; ")}.` }), g.appliedMotifs?.length && S.push({ severity: "info", message: `Topology preferences applied to ${g.appliedMotifs.length} local structure(s); ELK still determines placement and routing.` }), g.subnetFirstFallback && S.push({ severity: "warning", message: "Subnet attachment kept the previous safe placement: " + g.subnetFirstFallback }), g.pairCompactionFallback && S.push({ severity: "warning", message: "Pair proximity kept the original regions: " + g.pairCompactionFallback }), g.compoundPairFallback && S.push({ severity: "warning", message: "Compound-pair placement fell back to proximity rules: " + g.compoundPairFallback }), g.pairConstraints?.length) {
+          const q = g.pairConstraints.filter((Z) => Z.crossRegion && !Z.compacted).length;
+          S.push({ severity: "info", message: `${g.pairConstraints.length - q} adjacent transistor pair(s); ${q} cross-region mirror row constraint(s).` });
         }
         g.netShortcuts && S.push({ severity: "info", message: `${g.netShortcuts} safe straight net shortcut(s); ${g.netWireSaved.toFixed(1)} units of redundant wire removed before SVG/ASC export.` }), g.sharedRailFallback && S.push({ severity: "warning", message: `Shared rail layout uses an automatic fallback: ${g.sharedRailFallback}.` });
-        for (const $ of g.localClassicFallbacks || []) $.stage && S.push({ severity: "info", message: `Classic stage ${$.stage} uses automatic layout: ${$.reason || "No unobstructed local template"}.` });
+        for (const q of g.localClassicFallbacks || []) q.stage && S.push({ severity: "info", message: `Classic stage ${q.stage} uses automatic layout: ${q.reason || "No unobstructed local template"}.` });
         g.geometricConnectivityVerified && S.push({ severity: "info", message: `Net geometry verified; ${g.cyclesRemoved} same-net loop(s) and ${g.leavesRemoved} unused wire branch(es) removed.` }), K(S);
       }
       if (X.localName !== "svg" || X.querySelector("script,foreignObject")) throw Error("Invalid schematic output.");
       const me = Number(X.getAttribute("width")), be = Number(X.getAttribute("height")), c = JSON.parse(X.getAttribute("data-label-bounds") || "null");
       N = { x: Math.min(-20, (c?.x ?? 0) - 20), y: Math.min(-20, (c?.y ?? 0) - 20) }, N.w = Math.max(me, c?.right || 0) + 20 - N.x, N.h = Math.max(be, c?.bottom || 0) + 20 - N.y, y = { ...N }, X.setAttribute("viewBox", `${N.x} ${N.y} ${N.w} ${N.h}`), X.setAttribute("width", String(N.w)), X.setAttribute("height", String(N.h)), X.setAttribute("role", "img"), X.setAttribute("aria-label", b.title || "SPICE schematic"), X.setAttribute("style", "background:white");
       for (const g of b.components) {
-        const $ = z.getElementById("cell_" + g.name);
-        if (!$) throw Error("Renderer omitted component " + g.name);
-        $.setAttribute("data-component", g.name), g.kind === "X" && ($.setAttribute("data-instance", g.instanceId), $.setAttribute("role", "button"), $.setAttribute("tabindex", "0"), $.setAttribute("aria-label", "Open " + g.name));
+        const q = z.getElementById("cell_" + g.name);
+        if (!q) throw Error("Renderer omitted component " + g.name);
+        q.setAttribute("data-component", g.name), g.kind === "X" && (q.setAttribute("data-instance", g.instanceId), q.setAttribute("role", "button"), q.setAttribute("tabindex", "0"), q.setAttribute("aria-label", "Open " + g.name));
         const Z = z.createElementNS(X.namespaceURI, "title");
         Z.textContent = g.raw + `
 Resolved: ` + g.value + `
-` + Object.entries(g.terminals).map(([ee, oe]) => ee + ": " + oe).join(", "), $.prepend(Z);
+` + Object.entries(g.terminals).map(([ee, oe]) => ee + ": " + oe).join(", "), q.prepend(Z);
       }
       for (const g of Object.values(b.nodes))
-        for (const $ of X.querySelectorAll(".net_" + g.bit)) {
-          $.setAttribute("data-net", g.name);
+        for (const q of X.querySelectorAll(".net_" + g.bit)) {
+          q.setAttribute("data-net", g.name);
           const Z = z.createElementNS(X.namespaceURI, "title");
-          Z.textContent = "Node " + g.displayName, $.append(Z);
+          Z.textContent = "Node " + g.displayName, q.append(Z);
         }
       const s = b.components.filter((g) => g.kind === "K").map((g) => ({ name: g.name, inductors: g.coupledInductors, value: g.value }));
       if (s.length) {
         const g = z.createElementNS(X.namespaceURI, "metadata");
         g.setAttribute("id", "spice-magnetic-couplings"), g.textContent = JSON.stringify(s), X.append(g);
-        for (const $ of s) for (const Z of $.inductors) {
+        for (const q of s) for (const Z of q.inductors) {
           const ee = z.getElementById("cell_" + Z);
           if (!ee) continue;
           const oe = z.createElementNS(X.namespaceURI, "circle"), ae = [...ee.children].find((Ie) => Ie.getAttribute("s:pid") === "A"), fe = ae?.getAttribute("s:position"), ie = { left: [6, -8], right: [-6, -8], top: [-8, 6], bottom: [-8, -6] }[fe] || [0, 0];
-          for (const [Ie, Ae] of Object.entries({ cx: Number(ae?.getAttribute("s:x")) + ie[0], cy: Number(ae?.getAttribute("s:y")) + ie[1], r: 3, fill: U().color, stroke: "none", "data-coupling": $.name })) oe.setAttribute(Ie, String(Ae));
+          for (const [Ie, Ae] of Object.entries({ cx: Number(ae?.getAttribute("s:x")) + ie[0], cy: Number(ae?.getAttribute("s:y")) + ie[1], r: 3, fill: U().color, stroke: "none", "data-coupling": q.name })) oe.setAttribute(Ie, String(Ae));
           const de = z.createElementNS(X.namespaceURI, "title");
-          de.textContent = $.name + " · dotted terminal: " + $.inductors.join(", "), oe.append(de), ee.append(oe);
+          de.textContent = q.name + " · dotted terminal: " + q.inductors.join(", "), oe.append(de), ee.append(oe);
         }
       }
       r = W.drawing, u = new XMLSerializer().serializeToString(X), j("source").value = u, e.replaceChildren(document.importNode(X, !0)), O();
       const A = S.filter((g) => g.severity === "warning").length;
-      n.textContent = `${b.components.filter((g) => !g.synthetic).length} components · ${Object.keys(b.nodes).length} nodes · ${b.topology.leafCount} primitive devices verified${b.interfaceAliases.length ? " · Parent-connected ports: " + b.interfaceAliases.map((g) => g.ports.join(" = ")).join("; ") + "." : ""}${A ? " · Review " + A + " warning(s); drawing may be partial." : " · Schematic ready."}`, n.textContent += ` Layout rules v${$e}.`, b.layout.report?.gridVerified && (n.textContent += ` Grid ${b.layout.report.gridSize}.`), b.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${b.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), b.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found."), j("json").value = JSON.stringify({ circuit: b, netlist: F, hierarchy: w }, null, 2), d.setCircuit(b, t.value), a.mount(e.querySelector("svg"), r, b, F, U(), { reset: R }), m(), j("selection").textContent = "Click a component to inspect its original statement and pin connections.", H();
+      n.textContent = `${b.components.filter((g) => !g.synthetic).length} components · ${Object.keys(b.nodes).length} nodes · ${b.topology.leafCount} primitive devices verified${b.interfaceAliases.length ? " · Parent-connected ports: " + b.interfaceAliases.map((g) => g.ports.join(" = ")).join("; ") + "." : ""}${A ? " · Review " + A + " warning(s); drawing may be partial." : " · Schematic ready."}`, n.textContent += ` Layout rules v${qe}.`, b.layout.report?.gridVerified && (n.textContent += ` Grid ${b.layout.report.gridSize}.`), b.layout?.report?.powerOrderViolations && (n.textContent += ` Layout: ${b.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`), b.layout?.report?.groundPlacement?.startsWith("ELK fallback") && (n.textContent += " Ground marker: routed fallback; no safe short attachment found."), j("json").value = JSON.stringify({ circuit: b, netlist: F, hierarchy: w }, null, 2), d.setCircuit(b, t.value), a.mount(e.querySelector("svg"), r, b, F, U(), { reset: R }), m(), j("selection").textContent = "Click a component to inspect its original statement and pin connections.", H();
     } catch (F) {
       if (e.replaceChildren(), u = "", j("source").value = "", j("json").value = "", j("nets").replaceChildren(), j("selection").textContent = "", n.textContent = F.message, !f)
         j("hierarchy-panel").hidden = !0, j("selection-actions").hidden = !0, j("breadcrumbs").replaceChildren();
@@ -4657,7 +4657,7 @@ Resolved: ` + g.value + `
   j("generate").onclick = () => B({ resetEditor: !0 });
   for (const R of ye.querySelectorAll("[data-example]")) R.onclick = () => {
     const S = Re[R.dataset.example];
-    t.value = S.source, G(), q(S), B();
+    t.value = S.source, G(), $(S), B();
   };
   j("file").onchange = async (R) => {
     const S = R.target.files[0];
@@ -4699,7 +4699,7 @@ Resolved: ` + g.value + `
     if (!(!S || x || l)) {
       l = !0, L(), n.textContent = "Generating ASC from the selected layout and checking connections…";
       try {
-        const { exportAsc: F } = await import("./asc-export-BuFSVOs7.js");
+        const { exportAsc: F } = await import("./asc-export-C-rHpa7n.js");
         if (r !== S) throw Error("Schematic changed. Generate again before exporting ASC.");
         i ||= F({ tree: f, circuit: b, drawing: S, source: t.value, libraries: C });
         const W = R ? i.zip : i.ascBytes, z = URL.createObjectURL(new Blob([W], { type: R ? "application/zip" : "application/octet-stream" })), X = document.createElement("a");
@@ -4726,5 +4726,5 @@ export {
   ze as e,
   Ne as l,
   We as n,
-  $t as p
+  qt as p
 };
