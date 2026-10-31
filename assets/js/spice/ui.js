@@ -11,6 +11,7 @@ import {createWorkspace} from './workspace.js';
 import {createInteractiveEditor} from './interactive-editor.js';
 import {showCoordinateGrid} from './svg-grid.js';
 import {mountToolIcons} from './tool-icons.js';
+import {placeDomLabels} from './label-placement.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
@@ -26,7 +27,7 @@ if (root) {
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
   const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,gridSize:$('grid').checked&&$('conventional').checked?Number($('grid-size').value):0,detailed:$('detailed').checked,conventional:$('conventional').checked});
-  function syncSource(){const svg=preview.querySelector('svg');if(!svg)return;if(colorState)colorSvgNets(svg,colorNodes,colorState);editor?.refreshColors();showCoordinateGrid(svg,circuit?.layout.report?.gridSize||0,$('show-grid').checked,view);const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,circuit?.layout.report?.gridSize||0,$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;}
+  function syncSource(){const svg=preview.querySelector('svg');if(!svg)return;const font=Number(svg.querySelector('style')?.textContent.match(/font-size:([\d.]+)px/)?.[1])||12,b=placeDomLabels(svg,font),x=Math.min(full.x,b.x-20),y=Math.min(full.y,b.y-20);full={x,y,w:Math.max(full.x+full.w,b.right+20)-x,h:Math.max(full.y+full.h,b.bottom+20)-y};if(colorState)colorSvgNets(svg,colorNodes,colorState);editor?.refreshColors();showCoordinateGrid(svg,circuit?.layout.report?.gridSize||0,$('show-grid').checked,view);const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('width',full.w);exported.setAttribute('height',full.h);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,circuit?.layout.report?.gridSize||0,$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;}
   const nodeColors=createNodeColorControls($,(state,nodes)=>{colorState=state;colorNodes=nodes;syncSource();});
   editor=createInteractiveEditor(preview,$,{getNetColor:bit=>{const n=colorNodes.find(n=>n.bit===bit);return n&&colorState&&(colorState.auto||colorState.manual.has(n.name))?colorState.color(n.name):null;},inspect:id=>{const c=circuit?.components.find(c=>c.name===id);if(c){selectedInstance=c.instanceId||'';$('selection').textContent=c.raw;updateSelection();}},changed:(next,stats,bounds)=>{drawing=next;ascPackage=null;full=bounds;const svg=preview.querySelector('svg');if(svg){svg.setAttribute('width',String(full.w));svg.setAttribute('height',String(full.h));const meta=svg.querySelector('#spice-layout-report');if(meta){const r=JSON.parse(meta.textContent);r.manualWiring=stats;r.verifiedTerminals=!stats.unrouted;r.geometricConnectivityVerified=!stats.unrouted;meta.textContent=JSON.stringify(r);}}if(circuit&&ir)$('json').value=JSON.stringify({circuit,netlist:toNetlistsvg(circuit),hierarchy:ir,interactive:{...stats,drawing:next}},null,2);syncSource();exports();}});
   $('show-grid').onchange=syncSource;
@@ -196,7 +197,7 @@ if (root) {
       }
       if (svg.localName!=='svg' || svg.querySelector('script,foreignObject')) throw Error('Invalid schematic output.');
       const width=Number(svg.getAttribute('width')),height=Number(svg.getAttribute('height'));
-      full={x:-20,y:-20,w:width+40,h:height+40}; view={...full};
+      const lb=JSON.parse(svg.getAttribute('data-label-bounds')||'null');full={x:Math.min(-20,(lb?.x??0)-20),y:Math.min(-20,(lb?.y??0)-20)};full.w=Math.max(width,lb?.right||0)+20-full.x;full.h=Math.max(height,lb?.bottom||0)+20-full.y;view={...full};
       svg.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);
       svg.setAttribute('width',String(full.w));svg.setAttribute('height',String(full.h));
       svg.setAttribute('role','img');svg.setAttribute('aria-label',circuit.title||'SPICE schematic');

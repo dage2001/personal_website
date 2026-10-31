@@ -287,3 +287,12 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - Chrome 验证按钮与 R/X/Y 快捷键、实际 SVG 引脚和 Drawing IR 重合、文字不随图形翻转、变换后自动布线及 ASC bundle；全屏验证 Escape 取消布线但保持全屏、Alt+Escape 退出、关闭信息栏后工具仍可用。原有浏览器回归及窄屏/拖动/调整大小/停靠/退出恢复检查通过。
 - 变换后的五器件 RLC ASC 通过本机 LTspice 节点连接检查。日志：`tmp/transforms-full.log`、`tmp/transforms-browser.log`、`tmp/transforms-workspace.log`、`tmp/transforms-regression.log`、`tmp/transforms-native.log`。截图：`tmp/transforms-fullscreen.png`、`tmp/spice-fullscreen-desktop.png`、`tmp/spice-fullscreen-mobile.png`。
 - 当前使用视口应用全屏，替代先前默认的 Fullscreen API；浏览器标签和地址栏由浏览器管理。全屏退出快捷键已统一为 Alt+Escape。
+
+## v20：符号碰撞箱与文字分离
+
+- 根因包括 skin 按位号/参数宽度扩张元件、按文字行数增加高度，以及 netlistsvg 将 `s:attribute` 转成 ELK label 矩形。现采用固定符号尺寸与普通 SVG 文字，新增 `label-placement.js` 在布线完成后单独放置注释；界面、交互与导出统一使用这套边界。
+- 157/157 测试通过，无跳过，包括全部 LTspice prefix、私有 VDPO、经典三极管与层级拓扑。新增四项测试验证长位号/参数、8/24 字号、Detailed 模式不改变物理尺寸与端子；实际 ELK 不含文字矩形；自动布局/布线坐标严格一致；文字后处理不改器件、线路或注释数量。
+- 原有配对回归继续要求 32 单位近邻间隔、四个经典区域、共同电源轨、拓扑和配对惩罚改善。更新两个依赖旧尺寸的比较：差分对间距允许从零保持为零；跨区域配对以线长加间距惩罚的合成目标衡量，不再假定缩短配对必然减少纯线长。
+- 同次本地 skin 对照（默认网格 8，其余代码使用本轮版本）的符号/布线区域：RLC 568×240→408×208，线长 808→584，弯折保持 2；共射 1000×528→664×528，线长 3128→2408，弯折保持 5；741 局部页 2664×1312→2080×1312，线长 19568→19416，弯折 48→52。三个重复的耗时中位数分别 34→22、47→45、408→387 ms，仅是这次本地对照，不是通用加速保证。最终 SVG 边界另计外置文字。
+- Chrome 全部示例/层级/导出回归、交互布线/变换和全屏停靠回归通过；两组 RLC ASC（移动及旋转后）通过原生 LTspice 节点连接检查。拖动改为对坐标差吸附一次，避免紧凑符号中心落在半格时的浮点舍入偏移。
+- 日志：`tmp/symbol-only-tests.log`、`tmp/symbol-label-tests.log`、`tmp/symbol-only-browser.log`、`tmp/symbol-only-regression.log`、`tmp/symbol-only-workspace.log`、`tmp/symbol-only-native.log`；对照数据：`tmp/symbol-only-comparison.json`。

@@ -4,6 +4,7 @@ import {renderConventional} from './netlistsvg-elk-bridge.js';
 import onml from 'onml';
 import {chooseLayoutCandidate} from './layout-quality.js';
 import {captureDrawing} from './drawing-ir.js';
+import {placeSvgLabels} from './label-placement.js';
 
 self.onmessage = async ({data}) => {
   const originalError=console.error;let layoutError='';
@@ -40,7 +41,7 @@ self.onmessage = async ({data}) => {
       drawing=chosen.drawing;
     }
     if (!svg) throw Error(layoutError||'netlistsvg / ELK could not create a drawing.');
-    self.postMessage({svg,drawing});
+    self.postMessage({svg:placeSvgLabels(svg),drawing});
   } catch (error) { self.postMessage({error: error.message || String(error)}); }
   finally{console.error=originalError;}
 };
