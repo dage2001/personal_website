@@ -353,3 +353,12 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 地符号此前因 `decoration` 标记被单选/选框排除；新增显式可选属性，保留装饰性存储和导出分类，不增加/修改电气器件。验证地符号单选、双向选框规则、移动、撤销及工程上传恢复；纯视觉装饰继续排除。
 - 日志：`tmp/messages-repro.log`（修复前宽度复现）、`tmp/messages-browser.log`、`tmp/messages-unit.log`、`tmp/messages-selection.log`、`tmp/messages-project.log`。截图：`tmp/messages-desktop.png`、`tmp/messages-mobile.png`。
 - 相关 20 项单元测试通过，地符号旋转/镜像后的引脚身份及工程往返通过；原有自动渲染/层级/导出、全屏/窄屏与人工布线/旋转/ASC Bundle 浏览器回归通过：`tmp/messages-regression.log`、`tmp/messages-workspace.log`、`tmp/messages-interactive.log`。
+
+## 日志不换行、真实滚动与紧凑浮窗按钮
+
+- 日志行和当前状态显式覆盖网站通用 `p / li { max-width:65ch }`；条目保持单行，超长诊断由列表水平滚动查看。
+- 原生 `details::details-content` 撑高了列表（约 906px，而外层可用高度约 97px），造成外层裁切、列表无实际纵向溢出。改为真实 section + aria-expanded 折叠按钮，列表作为直接 flex 子项，限制高度并提供双轴滚动；保留折叠、错误自动展开及历史跟随功能。
+- 重新以真实鼠标滚轮和键盘 End 检查历史翻阅，并验证水平滚动、折叠/展开及窗口变化后跟随。内容追加不再被误判为视口尺寸改变，用户回到底部后能够继续跟随。
+- 三个浮窗的 Pin 与关闭按钮统一 24px，Pin 图形 14px，与 13px 标题协调；保持原按钮操作与键盘支持。
+- 日志：`tmp/inspect-messages.log`（修复前滚动盒复现）、`tmp/log-scroll-browser.log`。对应回归位于 `scripts/test-spice-messages-browser.cjs`。
+- 完整 Jekyll 页面（含全局 65ch 排版）回归通过：`tmp/log-scroll-site.log`；原有全屏浮窗拖动、Pin、尺寸与窄屏检查通过：`tmp/log-scroll-workspace.log`。
