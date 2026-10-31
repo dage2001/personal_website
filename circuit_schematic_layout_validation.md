@@ -321,3 +321,10 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 移除长操作说明，只保留简短标签、链接及悬停提示。层级导航始终单行，禁止垂直滚动与换行，超长路径仅横向滚动；浏览器用超长面包屑检查 scrollTop 保持零且 scrollLeft 可变化。
 - 桌面检查左侧两栏等高且不重叠、底部面板只含消息、Details 可独立关闭；390×844 窄屏检查三个窗口均在视口内。原有全屏、节点配色、人工布线与全部电路浏览器回归通过。
 - 日志：`tmp/grid-coverage-workspace.log`、`tmp/grid-coverage-interactive.log`、`tmp/grid-coverage-browser.log`。截图：`tmp/spice-fullscreen-desktop.png`、`tmp/spice-fullscreen-mobile.png`。
+
+## 单行合并顶栏与自适应 Messages
+
+- 全屏通过原 DOM portal 将层级导航、缩放/下载、编辑工具放进同一栏，用短竖线分组；退出后回到原预览工具位置，避免重复控件或丢失事件。移除三面板开关，保留 PanelsLeftBottom Reset 与 Shrink；两者固定在右侧，窄屏不随工具横向滚动而隐藏。
+- 默认顶部空间缩至 64px，左侧两栏等分其下空间；短面包屑按实际内容收缩。Messages 固定时按实际可用宽度适配，测试覆盖 1440→1720→1170→1440 及 390×844；取消固定后仍可手动调整窗口宽高。
+- 浏览器验证合并栏结构、三开关不存在、Reset 图标及恢复全部窗口、单行高度、消息栏宽度随视口变化且恢复一致；全画布网格、层级横向滚动、键盘退出、原布局恢复、人工布线/变换及全部示例/导出回归通过。
+- 日志：`tmp/ribbon-workspace.log`、`tmp/ribbon-interactive.log`、`tmp/ribbon-browser.log`。官方图标来源记录于 `assets/js/spice/icons/SOURCE.md`，本地打包无运行时请求。

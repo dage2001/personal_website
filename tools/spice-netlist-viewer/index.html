@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793464250">
+  <link rel="stylesheet" href="/assets/main.css?v=1793465669">
   <link rel="canonical" href="/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793464250" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793465669" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793464250">
-  <script type="module" src="/assets/spice-viewer/viewer-C3pSR5Qe.js"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793465669">
+  <script type="module" src="/assets/spice-viewer/viewer-C5S55fIW.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -147,12 +147,11 @@
 </header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
-  <div class="spice-workspace-tools spice-fullscreen-only" role="toolbar" aria-label="Fullscreen workspace">
+  <div class="spice-workspace-bar spice-fullscreen-only" id="spice-workspace-bar" role="toolbar" aria-label="Fullscreen workspace">
+    <div id="spice-workspace-strip"></div>
+    <span class="spice-tool-divider" role="separator" aria-orientation="vertical"></span>
+    <button type="button" id="spice-reset-windows" title="Reset window layout">Reset windows</button>
     <button type="button" id="spice-exit-fullscreen" title="Exit fullscreen (Alt+Escape)">Exit fullscreen</button>
-    <button type="button" id="spice-show-editor" aria-controls="spice-editor-panel" aria-expanded="true">Netlist</button>
-    <button type="button" id="spice-show-details" aria-controls="spice-details-panel" aria-expanded="true">Details</button>
-    <button type="button" id="spice-show-info" aria-controls="spice-info-panel" aria-expanded="true">Messages</button>
-    <button type="button" id="spice-reset-windows">Reset windows</button>
   </div>
   <div class="spice-hierarchy-bar">
     <span>Hierarchical view</span>
@@ -192,13 +191,13 @@
         <button type="button" id="spice-zoom-in" aria-label="Zoom in">+</button>
         <button type="button" id="spice-fit">Fit</button><span id="spice-zoom-level">100%</span>
         <button type="button" id="spice-copy" disabled>Copy SVG</button>
-        <button type="button" id="spice-download" disabled>Download SVG ↓</button>
-        <button type="button" id="spice-download-asc" title="ASC file; requires the companion ASY symbols in the bundle" disabled>Download ASC ↓</button>
-        <button type="button" id="spice-download-asc-bundle" title="ASC plus all generated symbols; extract together" disabled>ASC bundle ↓</button>
+        <button type="button" id="spice-download" title="Download SVG" disabled>SVG ↓</button>
+        <button type="button" id="spice-download-asc" title="Download ASC; requires the companion ASY symbols in the bundle" disabled>ASC ↓</button>
+        <button type="button" id="spice-download-asc-bundle" title="Download ASC bundle with all required symbols" disabled>Bundle ↓</button>
       </div>
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
-        <label><input type="checkbox" id="spice-interactive"> Interactive</label>
-        <label><input type="checkbox" id="spice-flywire"> Manual flywires</label>
+        <label title="Enable interactive component placement and wiring"><input type="checkbox" id="spice-interactive"> Edit</label>
+        <label title="Start with automatic placement and straight flywires"><input type="checkbox" id="spice-flywire"> Flywires</label>
         <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
         <button type="button" data-editor-mode="move" title="Move / select (V)" aria-pressed="true">Move</button>
         <button type="button" data-editor-mode="route" title="Route / branch (W)" aria-pressed="false">Wire</button>
@@ -299,7 +298,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793464250"></script>
+<script src="/assets/js/site.js?v=1793465669"></script>
 
 
 
