@@ -49,7 +49,7 @@ export function shortenLayoutNets(layout,cells,voltageRails=[],pairs=[]) {
   for(const e of layout.edges){const source=e.sourcePort||e.sources?.[0],at=source.lastIndexOf('.'),bit=cells[source.slice(0,at)]?.connections[source.slice(at+1)]?.[0];if(bit===undefined)throw Error('Shortcut edge has no real net.');edgeBits.set(e.id,bit);if(!nets.has(bit))nets.set(bit,[]);for(const section of e.sections||[]){const ps=[section.startPoint,...section.bendPoints||[],section.endPoint];for(let i=1;i<ps.length;i++)if(length({a:ps[i-1],b:ps[i]})>eps)nets.get(bit).push({a:ps[i-1],b:ps[i]});}}
   for(const rail of voltageRails)if(nets.has(rail.bit)){
     const segments=nets.get(rail.bit),protect=segments.filter(s=>same(s.a.y,rail.y)&&same(s.b.y,rail.y));
-    for(const n of layout.children)if(cells[n.id]?.spiceLayout?.passive&&n.ports.length===2)for(const p of n.ports){if(cells[n.id].connections[p.id.slice(n.id.length+1)]?.[0]!==rail.bit)continue;const point={x:n.x+p.x,y:n.y+p.y},drop={a:point,b:{x:point.x,y:rail.y}};if(length(drop)>eps&&covered(drop,segments))protect.push(drop);}
+    for(const n of layout.children)for(const p of n.ports){if(cells[n.id].connections[p.id.slice(n.id.length+1)]?.[0]!==rail.bit)continue;const point={x:n.x+p.x,y:n.y+p.y},drop={a:point,b:{x:point.x,y:rail.y}};if(length(drop)>eps&&covered(drop,segments))protect.push(drop);}
     protectedNets.set(rail.bit,protect);
   }
   const preferredSegments=new Map(),preferredPaths=new Map();
