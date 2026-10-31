@@ -7,3 +7,4 @@ pin.svg: Lucide pin SVG supplied directly by the user, 2026-10-31; same ISC lice
 expand.svg: Lucide expand SVG supplied directly by the user, 2026-10-31; same ISC license.
 shrink.svg: official Lucide release 0.468.0, ISC license.
 panels-left-bottom.svg: official Lucide release 0.468.0, ISC license; reset window layout.
+download.svg and upload.svg: official Lucide release 0.468.0, ISC license.

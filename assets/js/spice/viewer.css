@@ -97,3 +97,15 @@
 .spice-is-fullscreen #spice-editor-panel[data-pinned=true],.spice-is-fullscreen #spice-details-panel[data-pinned=true]{left:12px}.spice-is-fullscreen #spice-info-panel[data-pinned=true]{left:calc(var(--spice-left-width) + 24px);right:12px;bottom:12px;width:auto;resize:vertical}
 @media(max-width:1000px){.spice-app.spice-is-fullscreen{--spice-left-width:280px}}
 @media(max-width:600px){.spice-app.spice-is-fullscreen{--spice-left-width:calc(100% - 16px);--spice-left-bottom:calc(max(18vh,92px) + 24px)}.spice-is-fullscreen #spice-workspace-bar{left:8px;right:8px}.spice-is-fullscreen #spice-editor-panel[data-pinned=true],.spice-is-fullscreen #spice-details-panel[data-pinned=true]{left:8px}.spice-is-fullscreen #spice-info-panel[data-pinned=true]{left:8px;right:8px;bottom:8px}}
+.spice-download-dialog{box-sizing:border-box;width:min(460px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:22px;border:1px solid #d6d8d1;border-radius:10px;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif;box-shadow:0 16px 60px #0003}
+.spice-download-dialog::backdrop{background:rgb(20 26 22 / 35%)}
+.spice-download-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.spice-download-heading h2{margin:0;font-size:18px}
+.spice-download-heading h2:after{display:none}
+.spice-download-heading button{padding:3px 10px;font-size:22px;line-height:1.2}
+.spice-download-dialog p{margin:12px 0;font-size:12px;line-height:1.5;color:#62675f}
+.spice-download-options{display:grid;gap:10px}
+.spice-download-options button{display:flex;flex-direction:column;align-items:flex-start;gap:5px;width:100%;padding:12px 14px;white-space:normal;text-align:left}
+.spice-download-options strong{font-size:14px}
+.spice-download-options span{font-size:12px;font-weight:normal;line-height:1.5}
+.spice-download-options button:disabled{opacity:.45}
