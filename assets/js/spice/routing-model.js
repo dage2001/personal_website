@@ -5,8 +5,8 @@ function clean(ps){const out=[];for(const p of ps){if(out.length&&key(out.at(-1)
 export class RoutingScene {
   constructor(drawing,{step=8,segments=drawing.segments}={}){this.step=step;this.components=structuredClone(drawing.components);this.segments=structuredClone(segments);this.seed=structuredClone(this.segments);this.initial=JSON.stringify(this.components);this.base={width:drawing.width,height:drawing.height};this.undoStack=[];this.redoStack=[];this.cache=null;}
   pins(){return this.pinCache||(this.pinCache=this.components.flatMap(n=>n.ports.map(p=>({...p,owner:n.id,id:n.id+'.'+p.pin}))));}
-  snapshot(){return structuredClone({components:this.components,segments:this.segments});}
-  restore(s){this.components=structuredClone(s.components);this.segments=structuredClone(s.segments);this.cache=null;this.pinCache=null;}
+  snapshot(){return structuredClone({components:this.components,segments:this.segments,...(this.labelOverrides?.length?{labelOverrides:this.labelOverrides}:{})});}
+  restore(s){this.components=structuredClone(s.components);this.segments=structuredClone(s.segments);this.labelOverrides=structuredClone(s.labelOverrides||[]);this.cache=null;this.pinCache=null;}
   remember(before=this.snapshot()){this.undoStack.push(before);if(this.undoStack.length>60)this.undoStack.shift();this.redoStack=[];this.cache=null;this.pinCache=null;}
   undo(){if(!this.undoStack.length)return;this.redoStack.push(this.snapshot());this.restore(this.undoStack.pop());}
   redo(){if(!this.redoStack.length)return;this.undoStack.push(this.snapshot());this.restore(this.redoStack.pop());}
@@ -60,7 +60,7 @@ export class RoutingScene {
   }
   airwires(){const result=[];for(const {bit,islands}of this.connectivity()){if(islands.length<2)continue;const joined=new Set([0]);while(joined.size<islands.length){let best;for(const i of joined)for(let j=0;j<islands.length;j++)if(!joined.has(j))for(const a of islands[i].points)for(const b of islands[j].points){const d=(a.x-b.x)**2+(a.y-b.y)**2;if(!best||d<best.d)best={bit,a,b,d,j};}result.push(best);joined.add(best.j);}}return result;}
   bounds(){const xs=[-20,this.base.width+20],ys=[-20,this.base.height+20];for(const n of this.components){xs.push(n.x-20,n.x+n.width+20);ys.push(n.y-20,n.y+n.height+20);}for(const s of this.segments){xs.push(s.a.x-20,s.b.x+20);ys.push(s.a.y-20,s.b.y+20);}const x=Math.min(...xs),y=Math.min(...ys);return {x,y,w:Math.max(...xs)-x,h:Math.max(...ys)-y};}
-  drawing(){const b=this.bounds();return {version:1,width:b.w,height:b.h,components:structuredClone(this.components.filter(n=>!n.decoration)),segments:structuredClone(this.segments)};}
+  drawing(){const b=this.bounds();return {version:1,width:b.w,height:b.h,components:structuredClone(this.components.filter(n=>!n.decoration)),segments:structuredClone(this.segments),...(this.labelOverrides?.length?{labelOverrides:structuredClone(this.labelOverrides)}:{})};}
   findPath(bit,a,b){
     if(!this.onGrid(a)||!this.onGrid(b))return null;const good=ps=>ps.slice(1).every((p,i)=>this.validSegment({a:ps[i],b:p},bit));for(const ps of [[a,b],[a,{x:b.x,y:a.y},b],[a,{x:a.x,y:b.y},b]]){const path=clean(ps);if(good(path))return path;}
     const g=this.step,bs=this.bounds(),minX=Math.floor(Math.min(bs.x,a.x,b.x)/g)-5,maxX=Math.ceil(Math.max(bs.x+bs.w,a.x,b.x)/g)+5,minY=Math.floor(Math.min(bs.y,a.y,b.y)/g)-5,maxY=Math.ceil(Math.max(bs.y+bs.h,a.y,b.y)/g)+5;

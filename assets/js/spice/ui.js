@@ -15,6 +15,7 @@ import {symbolGridSize} from './short-pins.js';
 import {placeDomLabels} from './label-placement.js';
 import {decodeProject,encodeProject,maxProjectBytes,restoreProjectScene} from './project-file.js';
 import {createActivityLog} from './activity-log.js';
+import {validateLabelTargets} from './label-layer.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
@@ -34,13 +35,20 @@ if (root) {
   const exports = () => { $('upload').disabled=busy||projectLoading||ascExporting; $('download-project').disabled=$('open-download').disabled = $('copy').disabled = $('download').disabled = !svgText || busy || projectLoading || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,gridSize:$('grid').checked&&$('conventional').checked?symbolGridSize:0,detailed:$('detailed').checked,conventional:$('conventional').checked});
   const displayGridStep=()=>circuit?.layout.report?.gridSize?Number($('grid-size').value):0;
-  function syncSource(){const svg=preview.querySelector('svg');if(!svg)return;const font=Number(svg.querySelector('style')?.textContent.match(/font-size:([\d.]+)px/)?.[1])||12,b=placeDomLabels(svg,font),x=Math.min(full.x,b.x-20),y=Math.min(full.y,b.y-20);full={x,y,w:Math.max(full.x+full.w,b.right+20)-x,h:Math.max(full.y+full.h,b.bottom+20)-y};if(colorState)colorSvgNets(svg,colorNodes,colorState);editor?.refreshColors();showCoordinateGrid(svg,displayGridStep(),$('show-grid').checked,view);const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('width',full.w);exported.setAttribute('height',full.h);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,displayGridStep(),$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;}
+  function syncSource(){
+    const svg=preview.querySelector('svg');if(!svg)return;
+    editor?.resetLabelDisplay();const font=Number(svg.querySelector('style')?.textContent.match(/font-size:([\d.]+)px/)?.[1])||12,automatic=placeDomLabels(svg,font),b=editor?.placeLabels()||automatic;
+    svg.dataset.labelBounds=JSON.stringify(b);const x=Math.min(full.x,b.x-20),y=Math.min(full.y,b.y-20);full={x,y,w:Math.max(full.x+full.w,b.right+20)-x,h:Math.max(full.y+full.h,b.bottom+20)-y};
+    if(colorState)colorSvgNets(svg,colorNodes,colorState);editor?.refreshColors();showCoordinateGrid(svg,displayGridStep(),$('show-grid').checked,view);
+    const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('width',full.w);exported.setAttribute('height',full.h);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,displayGridStep(),$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;
+  }
   const nodeColors=createNodeColorControls($,(state,nodes)=>{colorState=state;colorNodes=nodes;syncSource();});
   editor=createInteractiveEditor(preview,$,{report:activity.append,getNetColor:bit=>{const n=colorNodes.find(n=>n.bit===bit);return n&&colorState&&(colorState.auto||colorState.manual.has(n.name))?colorState.color(n.name):null;},inspect:(id,symbol)=>{const c=circuit?.components.find(c=>c.name===id);if(c){selectedInstance=c.instanceId||'';$('selection').textContent=c.raw;updateSelection();}else if(symbol?.decoration){selectedInstance='';const node=Object.values(circuit.nodes).find(n=>n.bit===symbol.ports[0]?.bit);$('selection').textContent='Ground symbol · '+(node?.displayName||'0');updateSelection();}},changed:(next,stats,bounds)=>{drawing=next;ascPackage=null;full=bounds;const svg=preview.querySelector('svg');if(svg){svg.setAttribute('width',String(full.w));svg.setAttribute('height',String(full.h));const meta=svg.querySelector('#spice-layout-report');if(meta){const r=JSON.parse(meta.textContent);r.manualWiring=stats;r.verifiedTerminals=!stats.unrouted;r.geometricConnectivityVerified=!stats.unrouted;meta.textContent=JSON.stringify(r);}}if(circuit&&ir)$('json').value=JSON.stringify({circuit,netlist:toNetlistsvg(circuit),hierarchy:ir,interactive:{...stats,drawing:next}},null,2);syncSource();exports();}});
   $('show-grid').onchange=syncSource;
   $('grid-size').onchange=()=>{syncSource();setView();};
   async function enableEditing(){if(!drawing||!circuit?.layout.report?.gridVerified){$('grid').checked=true;$('conventional').checked=true;await generate({resetEditor:true});}editor.setEnabled($('interactive').checked);exports();}
   $('interactive').onchange=enableEditing;
+  $('label-edit').onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.setLabelEditing(!editor.labelEditing());preview.focus({preventScroll:true});};
   $('flywire').onchange=async()=>{$('interactive').checked=true;await enableEditing();if($('flywire').checked)editor.clear();else await editor.autoRoute();exports();};
   $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
   $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();
@@ -93,7 +101,7 @@ if (root) {
   preview.addEventListener('pointerup', event => {
     if (!drag) return; const moved=drag.moved; drag=null;
     if (preview.hasPointerCapture(event.pointerId)) preview.releasePointerCapture(event.pointerId);
-    if (!moved) {
+    if (!moved&&!editor?.labelEditing()) {
       const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-component]');
       const component=circuit?.components.find(c => c.name === target?.dataset.component);
       if (component) {
@@ -142,7 +150,7 @@ if (root) {
   preview.addEventListener('pointercancel', () => {drag=null;});
   preview.addEventListener('keydown', event => {
     const block=event.target.closest('[data-instance]');
-    if(block&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;route(selectedInstance);return;}
+    if(block&&!editor?.labelEditing()&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;route(selectedInstance);return;}
     if (event.key === '+' || event.key === '=') zoom(.8);
     else if (event.key === '-') zoom(1.25);
     else if (event.key.toLowerCase() === 'f') {view={...full};setView();}
@@ -261,7 +269,7 @@ if (root) {
       busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;$('libraries').disabled=false;
       for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button')) element.disabled=false;
       if(tree&&tree.contexts[focus])updateHierarchy();
-      nodeColors.setEnabled(!!svgText);preview.setAttribute('aria-busy','false');exports();
+      nodeColors.setEnabled(!!svgText);editor.refreshControls();preview.setAttribute('aria-busy','false');exports();
       if(pendingRoute){pendingRoute=false;readRoute();queueMicrotask(generate);}
     }
   }
@@ -296,6 +304,7 @@ if (root) {
         setStatus('Checking saved sheet '+(s.scope||'Top')+'…',{category:'Files'});
         const netlist=toNetlistsvg(c),rendered=await renderSchematic(netlist,s.settings),svg=new DOMParser().parseFromString(rendered.svg,'image/svg+xml').documentElement;
         for(const n of Object.values(c.nodes))for(const element of svg.querySelectorAll('.net_'+n.bit))element.setAttribute('data-net',n.name);
+        validateLabelTargets(svg,s.snapshot.labelOverrides);
         restoreProjectScene(prepareRoutingDrawing(svg,rendered.drawing,c,netlist),s.snapshot,s.settings.gridSize);
       }
       if(!p.sheets.some(s=>s.scope===p.focus&&JSON.stringify(s.settings)===JSON.stringify(p.settings))){
@@ -310,7 +319,7 @@ if (root) {
       nodeColors.restore(p.colors);showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
       try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));sessionStorage.setItem('spice-netlist-v2',input.value);}catch{}
       $('library-status').textContent=Object.keys(libraries).length+' project library file(s) loaded';
-      await generate();if(svgText){status.textContent+=' Project restored.';activity.append({message:'Project restored.',category:'Files'});}
+      await generate();if(svgText){editor.setLabelEditing(p.labelEditing===true);status.textContent+=' Project restored.';activity.append({message:'Project restored.',category:'Files'});}
     }finally{root.inert=wasInert;projectLoading=false;exports();}
   }
   $('libraries').onchange=async event=>{
@@ -333,7 +342,7 @@ if (root) {
   $('download-project').onclick=()=>{
     try{
       const sheets=editor.snapshotSheets().filter(s=>tree?.contexts[s.scope]&&projectHierarchy(tree,{focus:s.scope}).topology.signature===s.topology).map(s=>({...s,...(sheetViews.has(s.scope)?{view:sheetViews.get(s.scope)}:{})}));
-      const text=encodeProject({source:input.value,libraries,settings:settings(),displayGridStep:Number($('grid-size').value),showGrid:$('show-grid').checked,interactive:$('interactive').checked,flywire:$('flywire').checked,focus,view:{...view},colors:nodeColors.snapshot(),sheets});
+      const text=encodeProject({source:input.value,libraries,settings:settings(),displayGridStep:Number($('grid-size').value),showGrid:$('show-grid').checked,interactive:$('interactive').checked,flywire:$('flywire').checked,labelEditing:editor.labelEditing(),focus,view:{...view},colors:nodeColors.snapshot(),sheets});
       downloadDialog.close();const url=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='spice-schematic.spiceproj';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
       setStatus('Project saved. Upload the .spiceproj file to resume editing.',{category:'Files'});
     }catch(error){setStatus('Project save failed: '+error.message,{severity:'error',category:'Files'});}

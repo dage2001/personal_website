@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPICE Netlist Viewer</title>
 <style>body{margin:0;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif}main{max-width:1440px;margin:40px auto;padding:0 24px}h1{font-size:32px;letter-spacing:-1px}a{color:#344b40}header p{color:#74776e}</style>
-<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-BvwB32Bs.js"></script>
+<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-By28ChQD.js"></script>
 </head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>Explore nested circuits. Expand blocks or open an instance sheet, then export the schematic as SVG.</p></header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
@@ -55,6 +55,7 @@
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
         <label title="Enable interactive component placement and wiring"><input type="checkbox" id="spice-interactive"> Edit</label>
         <label title="Start with automatic placement and straight flywires"><input type="checkbox" id="spice-flywire"> Flywires</label>
+        <button type="button" id="spice-label-edit" title="Edit labels: lock components and wires (T)" aria-pressed="false">Labels</button>
         <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="select">Single select</option><option value="box">Box select</option><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
         <button type="button" data-editor-mode="select" title="Single select / exit tool (S, Escape)" aria-pressed="true">Select</button>
         <button type="button" data-editor-mode="box" title="CAD box select: left-to-right contains, right-to-left crosses (B)" aria-pressed="false">Box select</button>
@@ -87,6 +88,11 @@
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
+  <dialog id="spice-label-dialog" class="spice-download-dialog" aria-labelledby="spice-label-title">
+    <div class="spice-download-heading"><h2 id="spice-label-title">Edit display text</h2><button type="button" id="spice-close-label" aria-label="Close label editor">×</button></div>
+    <p>Display only. The SPICE netlist, component values and node identities stay unchanged.</p>
+    <form id="spice-label-form"><label for="spice-label-text">Text</label><input type="text" id="spice-label-text" maxlength="20000" autocomplete="off"><div class="spice-label-actions"><button type="button" id="spice-label-reset">Reset label</button><button type="submit">Apply</button></div></form>
+  </dialog>
   <dialog id="spice-download-dialog" class="spice-download-dialog" aria-labelledby="spice-download-title" aria-describedby="spice-download-description">
     <div class="spice-download-heading"><h2 id="spice-download-title">Download schematic</h2><button type="button" id="spice-close-download" aria-label="Close download dialog">×</button></div>
     <p id="spice-download-description">Choose a format for the current sheet.</p>

@@ -362,3 +362,12 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 三个浮窗的 Pin 与关闭按钮统一 24px，Pin 图形 14px，与 13px 标题协调；保持原按钮操作与键盘支持。
 - 日志：`tmp/inspect-messages.log`（修复前滚动盒复现）、`tmp/log-scroll-browser.log`。对应回归位于 `scripts/test-spice-messages-browser.cjs`。
 - 完整 Jekyll 页面（含全局 65ch 排版）回归通过：`tmp/log-scroll-site.log`；原有全屏浮窗拖动、Pin、尺寸与窄屏检查通过：`tmp/log-scroll-workspace.log`。
+
+## 独立标签编辑域与工程 v2
+
+- 新增本地 Lucide SquareDashedText 工具，开启后元件、引脚和导线操作锁定。复用单选、CAD 选框、移动、旋转、双轴镜像、六种对齐与双轴等间隔；双击/Enter 修改显示纯文本，Reset 恢复原文字与自动位置。
+- 标签记录独立于电气数据，以元件 owner / 文本 index 稳定寻址；人工位置锚定所属元件，覆盖每次自动文字排布。拖动预览仅更新已选标签及其命中框，不重建全图标签。界面重绘、显示网格和工程恢复均保留改动；SVG 导出保留文字及变换并剔除编辑框。
+- 浏览器逐项比较编辑前后的所有元件、端子和导线，确认标签拖动/文字修改/排列/变换均不改电气几何或原始 CIR。标签模式撤销不能越过会改变元件/导线的历史项；真实组件拖动在标签域中无效。
+- 工程写为 v2，并兼容 v1。校验标签身份、位置、D4 旋转/镜像、纯文本及生成 SVG 中的实际目标，拒绝未知标签而保留当前工程。全新浏览器会话恢复文字、位置、编辑域；Sallen–Key 上层 block 与 LM741 内部标签分别编辑、导航和往返保存通过。
+- 相关 24 项单元测试通过；完整 Jekyll 页面上的标签端到端测试、既有选框/排列、项目恢复、全屏浮窗与人工布线/旋转/ASC Bundle 回归通过。
+- 日志：`tmp/label-mode-unit.log`、`tmp/label-mode-browser.log`、`tmp/label-mode-site.log`、`tmp/label-mode-selection.log`、`tmp/label-mode-project.log`、`tmp/label-mode-workspace.log`、`tmp/label-mode-interactive.log`。截图：`tmp/label-edit-fullscreen.png`。
