@@ -1,8 +1,9 @@
 import {RoutingScene} from './routing-model.js';
 import {layoutRulesVersion} from './layout-semantics.js';
+import {validateLabelOverrides} from './label-model.js';
 
 export const projectFormat='spice-viewer-project';
-export const projectVersion=1;
+export const projectVersion=2;
 export const maxProjectBytes=32*1024*1024;
 const fail=message=>{throw Error('Invalid project: '+message);};
 const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
@@ -18,12 +19,13 @@ export function decodeProject(text){
   if(new TextEncoder().encode(text).length>maxProjectBytes)fail('file exceeds 32 MB.');
   let p;try{p=JSON.parse(text);}catch{fail('expected a JSON project file.');}
   if(!object(p)||p.format!==projectFormat)fail('unrecognized file format.');
-  if(p.version!==projectVersion)fail('unsupported project version '+p.version+'.');
+  if(![1,projectVersion].includes(p.version))fail('unsupported project version '+p.version+'.');
   if(p.layoutRulesVersion!==layoutRulesVersion)fail('layout version differs; this project requires layout rules v'+p.layoutRulesVersion+'.');
   if(typeof p.source!=='string'||p.source.length>2000000||typeof p.focus!=='string')fail('missing netlist or sheet.');
   if(!object(p.libraries)||Object.entries(p.libraries).some(([name,text])=>!name||['__proto__','constructor','prototype'].includes(name)||typeof text!=='string'))fail('invalid libraries.');
   validateSettings(p.settings);
   if(![4,8,16].includes(p.displayGridStep)||['showGrid','interactive','flywire'].some(k=>typeof p[k]!=='boolean')||!validView(p.view))fail('invalid display settings.');
+  if(p.labelEditing!==undefined&&typeof p.labelEditing!=='boolean')fail('invalid label editing mode.');
   if(!object(p.colors)||typeof p.colors.sourceId!=='string'||typeof p.colors.auto!=='boolean'||['manual','assigned'].some(k=>!Array.isArray(p.colors[k])||p.colors[k].some(a=>!Array.isArray(a)||a.length!==2||typeof a[0]!=='string'||!/^#[\da-f]{6}$/i.test(a[1]))))fail('invalid node colors.');
   if(!Array.isArray(p.sheets)||p.sheets.length>1000)fail('invalid saved sheets.');
   const keys=new Set();
@@ -42,6 +44,7 @@ export function encodeProject(data){
 }
 export function validateSnapshot(s){
   if(!object(s)||!Array.isArray(s.components)||!Array.isArray(s.segments)||s.components.length>10000||s.segments.length>50000)fail('invalid scene size.');
+  validateLabelOverrides(s.labelOverrides);
   const ids=new Set();
   for(const n of s.components){
     if(!object(n)||typeof n.id!=='string'||ids.has(n.id)||!point(n)||!number(n.width)||!number(n.height)||n.width<0||n.height<0||!Array.isArray(n.ports)||n.ports.length>2000)fail('invalid component geometry.');ids.add(n.id);
@@ -71,5 +74,5 @@ export function restoreProjectScene(base,snapshot,step){
   const bits=new Set(scene.pins().map(p=>p.bit));
   if(scene.pins().some(p=>!scene.onGrid(p))||scene.segments.some(w=>!bits.has(w.bit)||!scene.validSegment(w,w.bit)))fail('off-grid wire, symbol collision or short circuit.');
   const positions=new Map();for(const p of scene.pins()){const key=p.x+','+p.y;if(positions.has(key)&&positions.get(key)!==p.bit)fail('different nodes share a pin position.');positions.set(key,p.bit);}
-  return scene.snapshot();
+  return {...scene.snapshot(),...(snapshot.labelOverrides?.length?{labelOverrides:structuredClone(snapshot.labelOverrides)}:{})};
 }
