@@ -10,7 +10,7 @@ Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version:
 - Node colors and automatic palette assignments.
 - Per-instance component positions, rotations/mirrors, pin identities and wire segments for each visited grid-enabled sheet. Incomplete wiring is saved; remaining flywires are derived from the actual connectivity when reopened.
 
-Sheets are identified by instance path, topology signature and drawing settings. Repeated instances remain separate. Unvisited sheets are generated on demand from their subcircuit definitions. Undo history, an unfinished route gesture and fullscreen window positions are session-only.
+Sheets are identified by instance path, topology signature and drawing settings. Repeated instances remain separate. Unvisited sheets are generated on demand from their subcircuit definitions. Alignment and distribution save their resulting placements and wiring like any other edit. Undo history, selection boxes, cursor guides, an unfinished route gesture and fullscreen window positions are session-only.
 
 The original netlist remains the electrical source of truth. The loader checks the file version, layout version, source hierarchy and every saved sheet's topology, then renders reference symbols locally and checks their identities, rigid transforms, grid coordinates and wire connectivity before replacing the current document. Imported SVG/HTML is never executed or inserted. Malformed or incompatible projects produce an explicit error and leave the current document intact. Version 1 requires the same layout-rules version; future migrations must be explicit rather than silently discarding manual geometry.
 
