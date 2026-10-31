@@ -9,7 +9,7 @@
 .spice-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--spice-border)}
 .spice-app button,.spice-upload{font:12px Arial,sans-serif;border:1px solid var(--spice-border);border-radius:5px;background:var(--bg-primary,#faf9f6);color:inherit;padding:8px 11px;cursor:pointer;display:inline-block;margin:0}
 .spice-app button:hover:not(:disabled),.spice-upload:hover{border-color:#6f806f;background:#edf0e9;color:#222}
-.spice-app button:disabled{opacity:.45;cursor:wait}.spice-app #spice-generate{background:#344b40;color:#fff;border-color:#344b40;margin-left:auto}
+.spice-app button:disabled{opacity:.45;cursor:pointer}.spice-app #spice-generate{background:#344b40;color:#fff;border-color:#344b40;margin-left:auto}
 .spice-app input[type=file]{width:100%;font-size:12px;max-width:230px}.spice-file-row{padding:10px 16px;font-size:12px}
 .spice-preview{height:435px;min-height:300px;overflow:hidden;touch-action:none;cursor:grab;background:radial-gradient(#e4e6df .6px,transparent .6px) 0 0/14px 14px #fff;color:#292b29;position:relative}
 .spice-preview:active{cursor:grabbing}.spice-preview:empty:before{content:'Your schematic will appear here';position:absolute;inset:45% 0;text-align:center;font-size:13px;color:#777}
