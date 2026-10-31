@@ -345,3 +345,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 相关单元测试 19 项通过；新增浏览器验证路线检查点回退、辅助线坐标、双向 CAD 选框、单选与导线排除、三元件对齐/分布、整组拖动和撤销、工程往返、SVG 导出排除临时覆盖层及 Copy SVG 图标的真实剪贴板输出。
 - 图标全部本地打包：MousePointer2、SquareDashedMousePointer、Align 系列及 Copy，排列工具以短竖线独立分组。日志：`tmp/selection-unit.log`、`tmp/selection-browser.log`、`tmp/selection-project.log`；截图：`tmp/selection-fullscreen.png`。
 - 原有自动渲染/层级/导出、全屏/窄屏与人工布线/旋转/镜像/ASC Bundle 回归通过：`tmp/selection-regression.log`、`tmp/selection-workspace.log`、`tmp/selection-interactive.log`。模式状态使用独立画布属性，避免误匹配工具按钮。
+
+## Messages 宽度、追加日志与地符号选择
+
+- 修复旧版浮窗 `max-width: calc(100% - 32px)` 与 12px 边距冲突。关闭两个侧栏时原可用宽度 1416px 被限制到 1408px；固定 Messages 移除这一限制，保留实际侧栏位置计算与浮动窗口约束。浏览器覆盖 1440 / 1720 / 1170 / 390px、侧栏关闭/恢复、超长路径诊断及移动端无横向溢出。
+- 统一会话日志按顺序追加，显示时间、类别与 info/warning/error；新的解析、渲染、工具操作、报错和文件操作不覆盖历史。验证真实异网连接警告、拒绝的移动错误、重新生成/工程恢复前后历史前缀完全保留，以及尾部跟随、翻阅历史和窗口缩放后的跟随状态。
+- 地符号此前因 `decoration` 标记被单选/选框排除；新增显式可选属性，保留装饰性存储和导出分类，不增加/修改电气器件。验证地符号单选、双向选框规则、移动、撤销及工程上传恢复；纯视觉装饰继续排除。
+- 日志：`tmp/messages-repro.log`（修复前宽度复现）、`tmp/messages-browser.log`、`tmp/messages-unit.log`、`tmp/messages-selection.log`、`tmp/messages-project.log`。截图：`tmp/messages-desktop.png`、`tmp/messages-mobile.png`。
+- 相关 20 项单元测试通过，地符号旋转/镜像后的引脚身份及工程往返通过；原有自动渲染/层级/导出、全屏/窄屏与人工布线/旋转/ASC Bundle 浏览器回归通过：`tmp/messages-regression.log`、`tmp/messages-workspace.log`、`tmp/messages-interactive.log`。

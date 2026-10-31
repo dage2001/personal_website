@@ -114,3 +114,16 @@
 .spice-preview.spice-editing[data-tool-mode=select] [data-editor-component]{cursor:default}
 .spice-preview.spice-editing[data-tool-mode=box] [data-editor-component],.spice-preview.spice-editing[data-tool-mode=route] [data-editor-component]{cursor:crosshair}
 .spice-preview.spice-editing[data-tool-mode=box],.spice-preview.spice-editing[data-tool-mode=route]{cursor:crosshair}
+.spice-is-fullscreen #spice-info-panel[data-pinned=true]{min-width:0;max-width:none}
+#spice-info-panel,#spice-info-content{min-width:0;box-sizing:border-box}
+.spice-app #spice-status{overflow-wrap:anywhere}
+.spice-app #spice-diagnostics{list-style:none;padding:0;margin:10px 0 0;max-height:260px;overflow:auto;min-width:0;max-width:100%;line-height:1.6;scrollbar-gutter:stable}
+.spice-app #spice-diagnostics li{display:grid;grid-template-columns:66px minmax(0,1fr);gap:8px;padding:5px 0;border-bottom:1px solid var(--spice-border);font:12px/1.6 Arial,sans-serif}
+.spice-app #spice-diagnostics time{font-size:11px;color:var(--text-muted,#777);font-variant-numeric:tabular-nums}
+.spice-app #spice-diagnostics li>span{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.spice-is-fullscreen #spice-info-content{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.spice-is-fullscreen #spice-info-content #spice-status{flex-shrink:0;margin:4px 0 6px;max-height:20px;line-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.spice-is-fullscreen #spice-messages{display:flex;flex-direction:column;min-height:0;padding:6px 0;overflow:hidden}
+.spice-is-fullscreen #spice-messages[open]{flex:1}
+.spice-is-fullscreen #spice-messages summary{flex-shrink:0}
+.spice-is-fullscreen #spice-diagnostics{flex:1;min-height:0;max-height:none;margin-top:6px;overflow:auto}
