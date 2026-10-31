@@ -87,8 +87,11 @@ export function installClassicRails(layout,classic,cells,lookup) {
   }
   graph.edges.push(...branchPaths);
   for(const edge of branchPaths)for(const s of edge.sections){const points=[s.startPoint,...s.bendPoints,s.endPoint];for(let i=1;i<points.length;i++){const hit=graph.children.find(n=>n.id!==edge.target&&Math.max(points[i-1].x,points[i].x)>n.x+.02&&Math.min(points[i-1].x,points[i].x)<n.x+n.width-.02&&Math.max(points[i-1].y,points[i].y)>n.y+.02&&Math.min(points[i-1].y,points[i].y)<n.y+n.height-.02);if(hit)return fail('Branch '+edge.id+' crosses symbol '+hit.id);}}
-  const minX=Math.min(0,...graph.children.map(n=>n.x)),minY=Math.min(0,...graph.children.map(n=>n.y));
-  graph.height=Math.max(...graph.children.map(n=>n.y+n.height))-minY;
+  // ELK may route feedback below/above every symbol. Supply bands must enclose
+  // those wires as well as the symbol boxes, even with minimum-length pins.
+  const coreWires=graph.edges.flatMap(e=>(e.sections||[]).flatMap(s=>[s.startPoint,...s.bendPoints||[],s.endPoint]));
+  const minX=Math.min(0,...graph.children.map(n=>n.x),...coreWires.map(p=>p.x)),minY=Math.min(0,...graph.children.map(n=>n.y),...coreWires.map(p=>p.y));
+  graph.height=Math.max(...graph.children.map(n=>n.y+n.height),...coreWires.map(p=>p.y))-minY;
   const sourceWidth=classic.sources.reduce((n,s)=>n+s.width+18,0)+24,portWidth=Math.max(0,...classic.railPorts.map(n=>n.width))+24,left=Math.max(sourceWidth+24,portWidth+24)-minX,pitch=Math.max(180,graph.height+100),railBase=classic.railPorts.length?80:30,top=Math.max(0,positive.length-1)*pitch+railBase+35-minY;
   for(const n of graph.children){n.x+=left;n.y+=top;}
   for(const e of graph.edges)for(const s of e.sections||[]){for(const p of [s.startPoint,...s.bendPoints||[],s.endPoint]){p.x+=left;p.y+=top;}for(const p of e.junctionPoints||[]){p.x+=left;p.y+=top;}}
@@ -108,7 +111,10 @@ export function installClassicRails(layout,classic,cells,lookup) {
     for(const id of [edge.sourcePort,edge.targetPort])if(!paths.has(id)) {
       const p=endpoint(id),out=p.side==='EAST'?{x:p.x+14,y:p.y}:p.side==='WEST'?{x:p.x-14,y:p.y}:p,join={x:out.x,y};
       let points=[p,...out!==p?[out]:[],join];
-      const clear=ps=>ps.slice(1).every((b,i)=>!obstacle(ps[i],b)&&!foreignPin(ps[i],b,bit));
+      // Compact fixed pins expose contacts that an obstacle-only test misses:
+      // rail escapes must also avoid endpoints of already routed foreign nets.
+      const foreign=graph.edges.filter(e=>Number(lookup[e.id]?.replaceAll(',',''))!==bit).flatMap(e=>(e.sections||[]).flatMap(s=>{const ps=[s.startPoint,...s.bendPoints||[],s.endPoint];return ps.slice(1).map((b,i)=>({a:ps[i],b}));}));
+      const clear=ps=>ps.slice(1).every((b,i)=>!obstacle(ps[i],b)&&!foreignPin(ps[i],b,bit)&&!foreign.some(s=>pointOn(ps[i],s.a,s.b)||pointOn(b,s.a,s.b)||pointOn(s.a,ps[i],b)||pointOn(s.b,ps[i],b)));
       if(!clear(points)){
         // Keep a clear direct rail tap whenever possible. A buried collector
         // may need a short outward escape before reaching the shared rail.

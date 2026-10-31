@@ -1,7 +1,7 @@
 import onml from 'onml';
 import analog from 'netlistsvg/lib/analog.svg?raw';
 import {gridSkin} from './grid-symbols.js';
-import {shortSymbolPins} from './short-pins.js';
+import {shortSymbolPins,symbolGridSize} from './short-pins.js';
 
 const path = d => ['path', {d, class: 'symbol'}];
 const txt = (x, y, text) => ['text', {x, y, class: 'pin-label'}, text];
@@ -34,7 +34,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     // Captions are placed after routing; neither their length nor font is geometry.
     const width = 88, height = 112;
     const group = ['g', {'s:type': alias, 's:width': width, 's:height': height,...['spice_subckt','spice_device','spice_coupling'].includes(type)?{'data-grid-box':'true'}:{}}, ['s:alias', {val: alias}]];
-    const pins = [], geometry = [];let labelsPlaced=false,body=null;const pinStep=gridSize||8;
+    const pins = [], geometry = [];let labelsPlaced=false,body=null;const pinStep=symbolGridSize;
     let orientation=cell.spiceLayout?.orientation||(cell.spiceLayout?.horizontal?'horizontal':'vertical');
     if(orientationStrategy.startsWith('flow')&&cell.spiceLayout?.flexible&&cell.spiceLayout.source&&!Object.values(cell.spiceLayout.ports).every(p=>p.potential!==null))orientation=orientationStrategy==='flow'?'horizontal':'horizontal-reversed';
     if(verticalPairs.has(cell)&&cell.spiceLayout?.flexible)orientation=cell.spiceLayout.orientation.startsWith('vertical')?cell.spiceLayout.orientation:'vertical';
@@ -201,7 +201,7 @@ export function makeSkin(netlist, {font = 'Arial', fontSize = 12, color = '#292b
     // netlistsvg turns s:attribute text into ELK label rectangles. Use literal
     // annotations instead, so ELK never receives text obstacles at all.
     for(const child of group)if(Array.isArray(child)&&child[0]==='text'&&child[1]['s:attribute']){child[2]=cell.attributes[child[1]['s:attribute']]||cell.attributes.ref||'';delete child[1]['s:attribute'];}
-    group[1]['data-symbol-only']='true';group.push(...pins);shortSymbolPins(group,body,pinStep);gridSkin(group,gridSize||8);templates.push(onml.stringify(group));
+    group[1]['data-symbol-only']='true';group.push(...pins);shortSymbolPins(group,body,pinStep);gridSkin(group,symbolGridSize);templates.push(onml.stringify(group));
   }
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:s="https://github.com/nturley/netlistsvg">
   <s:properties constants="false" splitsAndJoins="false" genericsLaterals="true"><s:layoutEngine

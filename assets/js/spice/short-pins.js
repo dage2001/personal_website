@@ -1,6 +1,7 @@
-/** Pack a rigid symbol body with one grid cell of external terminal clearance.
+export const symbolGridSize=4;
+/** Pack a rigid symbol body with one fixed minimum cell of terminal clearance.
  * Non-grid body spans can require a fractional extra cell; never scale a glyph. */
-export function shortSymbolPins(group,body,step){
+export function shortSymbolPins(group,body,step=symbolGridSize){
   if(!body)return;const dx=step-body.x,dy=step-body.y,w=Math.ceil((body.w+2*step)/step)*step,h=Math.ceil((body.h+2*step)/step)*step;
   const leads=new Map(group.filter(n=>n[1]?.['data-pin-lead']).map(n=>[n[1]['data-pin-lead'],{x:+n[1]['data-inner-x'],y:+n[1]['data-inner-y']} ]));
   for(const n of group.slice(2)){

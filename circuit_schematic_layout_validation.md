@@ -304,3 +304,10 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 拓扑偏好关闭的 741 比较基线可能安全退回普通供电布局；该基线仍要求几何连通，正常启用偏好的版本继续要求共享供电轨、四个经典区域及无局部布局回退，不为更紧凑的端点跳过连接审计。
 - Chrome 验证原有全部示例、层级、节点配色与下载；人工移动/布线/撤销/自动补线、旋转/镜像及全屏停靠通过。移动和旋转后的两组 RLC ASC 通过原生 LTspice 节点连接检查。
 - 日志：`tmp/short-pin-tests.log`、`tmp/short-pin-unit.log`、`tmp/short-pin-browser.log`、`tmp/short-pin-regression.log`、`tmp/short-pin-workspace.log`、`tmp/short-pin-native.log`。截图：`tmp/manual-flywires.png`、`tmp/manual-routed.png`。
+
+## v22：固定最小几何，显示网格独立
+
+- 163/163 测试通过，无跳过。所有 LTspice prefix 在关闭网格及 4/8/16 显示设置下生成完全相同的 skin；RLC 与共射的完整 Drawing IR（位置、尺寸、引脚、导线）在三个设置下逐项一致。短引脚验证统一采用固定 4 单位基准。
+- Chrome 验证无需 Generate 即可切换显示网格，且不新增 worker、不改变元件/导线 SVG、不改变 JSON、不断开导出；部分人工布线在切换 16 再切回 8 后完整保留。原有示例、层级、配色、旋转镜像及全屏回归通过。两组 RLC ASC 经原生 LTspice 节点检查通过。
+- 统一最短几何暴露的经典供电轨问题已修复：轨道范围包含反馈导线的真实边界，支线避开异网导线端点。741 的跨区域紧凑电流镜、四区域及共享电源轨、子网优先/直接 IN_N/竖直返回等原有硬性回归不降低要求。
+- 日志：`tmp/fixed-pin-tests.log`、`tmp/fixed-pin-browser.log`、`tmp/fixed-pin-regression.log`、`tmp/fixed-pin-workspace.log`、`tmp/fixed-pin-native.log`。

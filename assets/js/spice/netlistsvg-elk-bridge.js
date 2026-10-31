@@ -21,6 +21,7 @@ import {compactPairGroups} from './pair-proximity.js';
 import {shortenLayoutNets} from './net-shortcuts.js';
 import {alignPassiveBanks} from './grid-align.js';
 import {snapLayoutGrid} from './grid-layout.js';
+import {symbolGridSize} from './short-pins.js';
 const {FlatModule}=flatModulePackage, Skin=skinPackage.default||skinPackage;
 const drawModule=drawPackage.default||drawPackage;
 const option='org.eclipse.elk.';
@@ -50,6 +51,7 @@ function portRole(port,cells) {
 }
 
 export async function renderConventional(skin,netlist,{groundDecoration=true,balanced=false,wrapping=false,groupParallel=true,classicLayout=true,localClassics=true,sharedRails=true,chooseControlSides=true,motifLayout=true,pairedDevices=true,compoundPairs=true,compactPairs=true,subnetFirst=true,pairOrder=[],gridSize=0,onLayout=null,onRawLayout=null}={}) {
+  gridSize=gridSize?symbolGridSize:0;
   const module=netlist.modules.circuit,compaction=compactPairs&&motifLayout&&pairedDevices?compactPairGroups(module.spiceLayoutDescription,module.spiceMotifs||[],module.cells):{description:module.spiceLayoutDescription,compactions:[]};
   if(compaction.compactions.length){
     const planned={...netlist,modules:{...netlist.modules,circuit:{...module,spiceLayoutDescription:compaction.description,spicePairCompactions:compaction.compactions}}};
