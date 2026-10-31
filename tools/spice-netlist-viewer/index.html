@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793478295">
+  <link rel="stylesheet" href="/assets/main.css?v=1793480677">
   <link rel="canonical" href="https://jordan-wang.win/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793478295" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793480677" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793478295">
-  <script type="module" src="/assets/spice-viewer/viewer-BPF-kKUN.js"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793480677">
+  <script type="module" src="/assets/spice-viewer/viewer-DLzvD6cP.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -173,20 +173,35 @@
         <button type="button" id="spice-zoom-out" aria-label="Zoom out">−</button>
         <button type="button" id="spice-zoom-in" aria-label="Zoom in">+</button>
         <button type="button" id="spice-fit">Fit</button><span id="spice-zoom-level">100%</span>
-        <button type="button" id="spice-copy" disabled>Copy SVG</button>
+        <button type="button" id="spice-copy" title="Copy SVG" disabled>Copy SVG</button>
         <button type="button" id="spice-upload" title="Upload SPICE netlist">Upload</button>
         <button type="button" id="spice-open-download" title="Download schematic" aria-haspopup="dialog" disabled>Download</button>
       </div>
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
         <label title="Enable interactive component placement and wiring"><input type="checkbox" id="spice-interactive"> Edit</label>
         <label title="Start with automatic placement and straight flywires"><input type="checkbox" id="spice-flywire"> Flywires</label>
-        <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
-        <button type="button" data-editor-mode="move" title="Move / select (V)" aria-pressed="true">Move</button>
+        <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="select">Single select</option><option value="box">Box select</option><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
+        <button type="button" data-editor-mode="select" title="Single select / exit tool (S, Escape)" aria-pressed="true">Select</button>
+        <button type="button" data-editor-mode="box" title="CAD box select: left-to-right contains, right-to-left crosses (B)" aria-pressed="false">Box select</button>
+        <button type="button" data-editor-mode="move" title="Move selected components (V)" aria-pressed="false">Move</button>
         <button type="button" data-editor-mode="route" title="Route / branch (W)" aria-pressed="false">Wire</button>
         <button type="button" data-editor-mode="erase" title="Erase wire (D)" aria-pressed="false">Erase</button>
         <button type="button" data-editor-mode="rotate" title="Rotate selected component 90° clockwise (R)" aria-pressed="false">Rotate 90°</button>
         <button type="button" data-editor-mode="mirror-x" title="Mirror about horizontal X axis (X)" aria-pressed="false">Mirror X</button>
         <button type="button" data-editor-mode="mirror-y" title="Mirror about vertical Y axis (Y)" aria-pressed="false">Mirror Y</button>
+        <span class="spice-tool-divider" role="separator" aria-orientation="vertical"></span>
+        <div class="spice-arrange-tools" role="group" aria-label="Align and distribute selected components">
+          <button type="button" data-editor-arrange="left" title="Align left" disabled>Left</button>
+          <button type="button" data-editor-arrange="center-x" title="Align horizontal centers" disabled>Center X</button>
+          <button type="button" data-editor-arrange="right" title="Align right" disabled>Right</button>
+          <button type="button" data-editor-arrange="top" title="Align top" disabled>Top</button>
+          <button type="button" data-editor-arrange="center-y" title="Align vertical centers" disabled>Center Y</button>
+          <button type="button" data-editor-arrange="bottom" title="Align bottom" disabled>Bottom</button>
+          <span class="spice-tool-divider" role="separator" aria-orientation="vertical"></span>
+          <button type="button" data-editor-arrange="space-x" title="Equal horizontal gaps (at least 3 components)" disabled>Space X</button>
+          <button type="button" data-editor-arrange="space-y" title="Equal vertical gaps (at least 3 components)" disabled>Space Y</button>
+        </div>
+        <span class="spice-tool-divider" role="separator" aria-orientation="vertical"></span>
         <button type="button" id="spice-auto-route">Auto-route</button>
         <button type="button" id="spice-wire-undo">Undo</button><button type="button" id="spice-wire-redo">Redo</button>
         <span id="spice-editor-status" role="status" aria-live="polite">Enable Interactive to move components or wire pins.</span>
@@ -291,7 +306,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793478295"></script>
+<script src="/assets/js/site.js?v=1793480677"></script>
 
 
 

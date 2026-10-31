@@ -28,6 +28,18 @@ export class RoutingScene {
     this.pinCache=null;const overlap=this.components.some(m=>m!==n&&n.x<m.x+m.width-eps&&n.x+n.width>m.x+eps&&n.y<m.y+m.height-eps&&n.y+n.height>m.y+eps);
     if(overlap||this.segments.some(s=>!this.validSegment(s,s.bit))||n.ports.some(p=>this.pins().some(q=>q.owner!==id&&q.bit!==p.bit&&key(q)===key(p)))){this.restore(before);throw Error('Drop blocked: a component or another node occupies that position.');}this.remember(before);
   }
+  moveMany(moves){
+    const translations=new Map(moves.map(m=>[m.id,{dx:Math.round(m.dx/this.step)*this.step,dy:Math.round(m.dy/this.step)*this.step}]).filter(([,d])=>d.dx||d.dy));
+    const moving=this.components.filter(n=>translations.has(n.id));if(!moving.length)return false;
+    const before=this.snapshot(),old=moving.flatMap(n=>n.ports);
+    // Detach wires at the old terminals. Unfinished same-net connections remain flywires.
+    this.segments=this.segments.filter(s=>!old.some(p=>p.bit===s.bit&&(pointOnWire(p,s))));
+    for(const n of moving){const d=translations.get(n.id);n.x+=d.dx;n.y+=d.dy;for(const p of n.ports){p.x+=d.dx;p.y+=d.dy;}}
+    this.pinCache=null;this.cache=null;
+    const pins=this.pins(),overlap=moving.some(n=>this.components.some(m=>m!==n&&n.x<m.x+m.width-eps&&n.x+n.width>m.x+eps&&n.y<m.y+m.height-eps&&n.y+n.height>m.y+eps));
+    if(overlap||pins.some(p=>!this.onGrid(p)||pins.some(q=>q.owner!==p.owner&&q.bit!==p.bit&&key(q)===key(p)))||this.segments.some(s=>!this.validSegment(s,s.bit))){this.restore(before);throw Error('Arrangement blocked: a component or another node occupies the target position.');}
+    this.remember(before);return true;
+  }
   transform(id,action){
     const n=this.components.find(n=>n.id===id);if(!n)return;const before=this.snapshot(),w=n.width,h=n.height;
     const m=action==='rotate'?[0,1,-1,0,h,0]:action==='mirror-x'?[1,0,0,-1,0,h]:action==='mirror-y'?[-1,0,0,1,w,0]:null;if(!m)throw Error('Unknown transform.');

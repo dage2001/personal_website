@@ -109,3 +109,8 @@
 .spice-download-options strong{font-size:14px}
 .spice-download-options span{font-size:12px;font-weight:normal;line-height:1.5}
 .spice-download-options button:disabled{opacity:.45}
+.spice-arrange-tools{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;flex-shrink:0}
+.spice-preview.spice-editing[data-tool-mode=select]{cursor:default}
+.spice-preview.spice-editing[data-tool-mode=select] [data-editor-component]{cursor:default}
+.spice-preview.spice-editing[data-tool-mode=box] [data-editor-component],.spice-preview.spice-editing[data-tool-mode=route] [data-editor-component]{cursor:crosshair}
+.spice-preview.spice-editing[data-tool-mode=box],.spice-preview.spice-editing[data-tool-mode=route]{cursor:crosshair}

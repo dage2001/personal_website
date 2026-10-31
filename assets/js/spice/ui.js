@@ -42,6 +42,7 @@ if (root) {
   $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
   $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();
   for(const button of root.querySelectorAll('[data-editor-mode]'))button.onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.chooseTool(button.dataset.editorMode);preview.focus({preventScroll:true});};
+  for(const button of root.querySelectorAll('[data-editor-arrange]'))button.onclick=()=>{editor.arrange(button.dataset.editorArrange);preview.focus({preventScroll:true});};
   nodeColors.setEnabled(false);
   function showExampleInfo(example) {
     const element=$('example-info');if(!element)return;element.replaceChildren();if(!example)return;

@@ -336,3 +336,12 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 加载先核对全部保存页的源网表拓扑与引脚身份，并用本地新生成符号校验刚体变换、符号碰撞、整数网格和跨节点短路；校验通过后才替换当前工程。未知版本、拓扑篡改及非法几何明确拒绝。
 - `scripts/test-spice-project.mjs` 与原 routing/node-color 单元测试合计 14 项通过。浏览器在全新 sessionStorage 下验证未布线/已布线工程、镜像、颜色、缩放、嵌套页面、重复实例及 `.include` 库恢复；经典放大器、Sallen–Key、Instrumentation 和 LM741 内部页面均完成工程往返。私有三 VDPO 注释网表的已访问代表页面也通过往返；私有源与工程文件未发布。
 - 原有完整浏览器、全屏及交互编辑/ASC Bundle 导出回归通过。日志：`tmp/project-unit.log`、`tmp/project-browser.log`、`tmp/project-workspace.log`、`tmp/project-interactive.log`、`tmp/project-regression.log`。格式说明见 `circuit_schematic_project_format.md`。
+
+## CAD 元件选择与排列
+
+- 新增单选与双向选框，单选为退出工具后的默认模式；左至右仅包含、右至左交叉选择，只检查真实元件符号箱。Ctrl/Command 点击增减选择。导线不进入元件选择集，布线和擦除工具单独处理导线。
+- 布线草稿以用户点击为单位记录检查点，Backspace 撤回整段途经点及其自动转折，撤回起点则清除草稿；不删除已完成导线。辅助十字线交于鼠标的 4 单位吸附点，缩放时刷新，并始终位于飞线下层。主/辅网格不透明度调整为 0.38 / 0.16。
+- 六种对齐及双轴等边缘间距采用原子多元件位移；先生成全部目标，再检查碰撞、端口落格与异网接触。失败整体回退，成功一次撤销。网格无法表达的居中/间距明确提示取整；受移动影响的连接以飞线表示。多选组可整体拖动，不删除或改写原网表器件/节点。
+- 相关单元测试 19 项通过；新增浏览器验证路线检查点回退、辅助线坐标、双向 CAD 选框、单选与导线排除、三元件对齐/分布、整组拖动和撤销、工程往返、SVG 导出排除临时覆盖层及 Copy SVG 图标的真实剪贴板输出。
+- 图标全部本地打包：MousePointer2、SquareDashedMousePointer、Align 系列及 Copy，排列工具以短竖线独立分组。日志：`tmp/selection-unit.log`、`tmp/selection-browser.log`、`tmp/selection-project.log`；截图：`tmp/selection-fullscreen.png`。
+- 原有自动渲染/层级/导出、全屏/窄屏与人工布线/旋转/镜像/ASC Bundle 回归通过：`tmp/selection-regression.log`、`tmp/selection-workspace.log`、`tmp/selection-interactive.log`。模式状态使用独立画布属性，避免误匹配工具按钮。
