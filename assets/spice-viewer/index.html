@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPICE Netlist Viewer</title>
 <style>body{margin:0;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif}main{max-width:1440px;margin:40px auto;padding:0 24px}h1{font-size:32px;letter-spacing:-1px}a{color:#344b40}header p{color:#74776e}</style>
-<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-By_TK6-8.js"></script>
+<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-C3pSR5Qe.js"></script>
 </head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>Explore nested circuits. Expand blocks or open an instance sheet, then export the schematic as SVG.</p></header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
   <div class="spice-workspace-tools spice-fullscreen-only" role="toolbar" aria-label="Fullscreen workspace">
     <button type="button" id="spice-exit-fullscreen" title="Exit fullscreen (Alt+Escape)">Exit fullscreen</button>
     <button type="button" id="spice-show-editor" aria-controls="spice-editor-panel" aria-expanded="true">Netlist</button>
-    <button type="button" id="spice-show-info" aria-controls="spice-info-panel" aria-expanded="true">Information</button>
+    <button type="button" id="spice-show-details" aria-controls="spice-details-panel" aria-expanded="true">Details</button>
+    <button type="button" id="spice-show-info" aria-controls="spice-info-panel" aria-expanded="true">Messages</button>
     <button type="button" id="spice-reset-windows">Reset windows</button>
   </div>
   <div class="spice-hierarchy-bar">
@@ -40,7 +41,7 @@
       </div>
     </section>
     <section class="spice-panel" id="spice-canvas-panel">
-      <div class="spice-panel-header"><h2>Schematic</h2><span class="spice-caption">02 / Connected SVG</span><button type="button" id="spice-fullscreen" aria-pressed="false">Fullscreen ↗</button></div>
+      <div class="spice-panel-header"><h2>Schematic</h2><span class="spice-caption">02 / Connected SVG</span><button type="button" id="spice-fullscreen" aria-pressed="false" title="Fullscreen (Alt+Escape to exit)">Fullscreen ↗</button></div>
       <div class="spice-canvas-stage">
       <div class="spice-preview" id="spice-preview" tabindex="0" role="region" aria-label="Schematic preview. Scroll to zoom, drag to pan, F to fit." aria-busy="false"></div>
       <div class="spice-preview-tools" id="spice-preview-tools" role="toolbar" aria-label="Schematic tools">
@@ -69,16 +70,21 @@
       </div>
       </div>
       </div>
-      <p class="spice-help spice-edit-help" id="spice-edit-help">Manual flywires starts with placement only. Move/select V · Wire W · Erase D · Rotate 90° R · Mirror X / Y · + / − zoom · F fit. Select a component, then transform it, or choose a transform and click a component. Moving or transforming disconnects attached wire segments. Click pins or same-node wires to connect; click empty grid points for waypoints. Shift-drag pans · Delete removes a selected wire · Escape cancels wiring and returns to Move without leaving fullscreen. Generate resets the current sheet; Auto-route keeps positions. Flywires are straight and always on top.</p>
       <p id="spice-selection">Click a component to inspect its pins.</p>
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
   <section id="spice-info-panel">
-    <div class="spice-window-header spice-fullscreen-only" data-window-handle="info"><h2 id="spice-info-title">Information</h2><span class="spice-help">Drag to unpin · resize from corner</span><button type="button" id="spice-pin-info" aria-pressed="true" title="Pin information to bottom edge">Pin</button><button type="button" id="spice-close-info" aria-label="Close information window">×</button></div>
+    <div class="spice-window-header spice-fullscreen-only" data-window-handle="info"><h2 id="spice-info-title">Parser &amp; rendering</h2><button type="button" id="spice-pin-info" aria-pressed="true" title="Pin messages to bottom edge">Pin</button><button type="button" id="spice-close-info" aria-label="Close messages window">×</button></div>
     <div class="spice-info-content" id="spice-info-content">
   <p id="spice-status" role="status" aria-live="polite">Loading schematic viewer…</p>
-  <p class="spice-help" id="spice-input-help">Paste a netlist or open a file. Scroll to zoom · Drag to pan · + / − to zoom · F to fit. SVG exports always include the full drawing.</p>
+  <details id="spice-messages" open><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
+    </div>
+  </section>
+  <section id="spice-details-panel">
+    <div class="spice-window-header spice-fullscreen-only" data-window-handle="details"><h2 id="spice-details-title">Details</h2><button type="button" id="spice-pin-details" aria-pressed="true" title="Pin details to lower left">Pin</button><button type="button" id="spice-close-details" aria-label="Close details window">×</button></div>
+    <div class="spice-info-content" id="spice-details-content">
+  <p class="spice-help" id="spice-input-help">Local .cir viewer</p>
   <div class="spice-settings" role="group" aria-label="Schematic appearance">
     <label for="spice-font">Font <select id="spice-font"><option>Arial</option><option>Helvetica</option><option>Times New Roman</option><option>monospace</option></select></label>
     <label for="spice-size">Size <input type="number" id="spice-size" min="8" max="24" step="1" value="12"> px</label>
@@ -87,12 +93,10 @@
     <label for="spice-grid"><input type="checkbox" id="spice-grid" checked> Grid routing · preview</label>
     <label for="spice-grid-size" title="Display spacing only. Pins and routing always use the fixed minimum 4-unit grid.">Display grid step <select id="spice-grid-size"><option>4</option><option selected>8</option><option>16</option></select></label>
     <label><input type="checkbox" id="spice-show-grid" checked> Show grid</label>
-    <span class="spice-help">Pins and routing use fixed 4-unit geometry. Display grid updates immediately; Generate applies other layout settings.</span>
+    <span class="spice-help">Fixed 4-unit pins and routing.</span>
   </div>
-  <p class="spice-help">Circuit layout rules use IN_/OUT_ interfaces and PWR_/RET_/BIAS_ rails. Optional * @layout comments describe rows, columns and visual groups. <a href="/circuit_pin_naming_convention.md">Naming and layout syntax</a>. Open a block to inspect its independent internal sheet.</p>
-  <details id="spice-messages"><summary>Parser &amp; rendering · <span id="spice-message-count">0 messages</span></summary><ul id="spice-diagnostics"></ul></details>
+  <p class="spice-help"><a href="/circuit_pin_naming_convention.md">Pin naming and layout syntax</a></p>
   <details id="spice-node-panel" open><summary>Node colors &amp; connections</summary>
-    <p class="spice-help">Color wires and junction dots by electrical node; component symbols stay unchanged. Search by node or terminal. Select visible rows to apply a color in bulk.</p>
     <div class="spice-node-tools">
       <label for="spice-node-search">Search <input type="search" id="spice-node-search" placeholder="Node or terminal" autocomplete="off"></label>
       <label><input type="checkbox" id="spice-node-auto"> Automatic node colors</label>
@@ -104,13 +108,12 @@
       <button type="button" id="spice-node-clear">Clear selected colors</button>
       <button type="button" id="spice-node-reset">Reset all colors</button>
     </div>
-    <details class="spice-node-palette"><summary>Palette · shared with Arbitrary Plot Generator</summary><div id="spice-node-swatches" class="spice-node-swatches" role="group" aria-label="Node color palette"></div><p class="spice-help">Click a swatch to color the selected nodes. Automatic mode cycles through the palette across color families; manual choices take priority. Colors repeat when the palette is exhausted.</p></details>
+    <details class="spice-node-palette"><summary>Palette</summary><div id="spice-node-swatches" class="spice-node-swatches" role="group" aria-label="Node color palette"></div></details>
     <div class="spice-table-wrap"><table class="spice-node-table"><thead><tr><th><input type="checkbox" id="spice-node-all" aria-label="Select all visible nodes"></th><th>Node</th><th>Wire color</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div>
   </details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>
   <details><summary>Parsed circuit &amp; netlistsvg JSON</summary><textarea id="spice-json" readonly aria-label="Parsed JSON" spellcheck="false"></textarea></details>
-  <p class="spice-help">LTspice · A, B, C, D, E, F, G, H, I, J, K, L, M, O, Q, R, S, T, U, V, W, X, Z, @, &amp; and library-native Ö. Includes VDMOS, POLY/TABLE/LAPLACE and nested subcircuits. Add .lib/.sub files for external dependencies. Long labels use …; hover or enable Detailed parameter labels for full values. K elements retain magnetic references and mark the dotted inductor terminals; they never create electrical shorts. This is a topology viewer, not a simulator.</p>
-  <p class="spice-help">Automatic wiring by <a href="https://github.com/nturley/netlistsvg">netlistsvg</a> and <a href="https://github.com/kieler/elkjs">ELK.js</a>, using an extended analog skin. All viewer dependencies are bundled locally; netlists stay in your browser. <a href="./THIRD-PARTY.txt">Open-source licenses</a>.</p>
+  <p class="spice-help"><a href="https://github.com/nturley/netlistsvg">netlistsvg</a> · <a href="https://github.com/kieler/elkjs">ELK.js</a> · <a href="./THIRD-PARTY.txt">Open-source licenses</a></p>
     </div>
   </section>
 </div>
