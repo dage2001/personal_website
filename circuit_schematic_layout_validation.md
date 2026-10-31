@@ -296,3 +296,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 同次本地 skin 对照（默认网格 8，其余代码使用本轮版本）的符号/布线区域：RLC 568×240→408×208，线长 808→584，弯折保持 2；共射 1000×528→664×528，线长 3128→2408，弯折保持 5；741 局部页 2664×1312→2080×1312，线长 19568→19416，弯折 48→52。三个重复的耗时中位数分别 34→22、47→45、408→387 ms，仅是这次本地对照，不是通用加速保证。最终 SVG 边界另计外置文字。
 - Chrome 全部示例/层级/导出回归、交互布线/变换和全屏停靠回归通过；两组 RLC ASC（移动及旋转后）通过原生 LTspice 节点连接检查。拖动改为对坐标差吸附一次，避免紧凑符号中心落在半格时的浮点舍入偏移。
 - 日志：`tmp/symbol-only-tests.log`、`tmp/symbol-label-tests.log`、`tmp/symbol-only-browser.log`、`tmp/symbol-only-regression.log`、`tmp/symbol-only-workspace.log`、`tmp/symbol-only-native.log`；对照数据：`tmp/symbol-only-comparison.json`。
+
+## v21：一格为目标的短引脚
+
+- 161/161 测试通过，无跳过；新增 4/8/16 三种间距下的短引脚/端点落格/旧 connect 线移除测试，以及 block 在全局扩框后仍保持一格端子的测试。全部 LTspice prefix、私有 VDPO、经典配对、局部独立层级及标签分离回归保留。
+- 默认 RLC 的最终 SVG 引线：V1 两端各 10，R1 各 9，L1 各 12，C1 各 11，Rload 各 9，地符号 8 单位。网格步长为 8；余量来自固定字形尺寸与全局整数轨道，已均分到两端，不拉伸元件本体。
+- 拓扑偏好关闭的 741 比较基线可能安全退回普通供电布局；该基线仍要求几何连通，正常启用偏好的版本继续要求共享供电轨、四个经典区域及无局部布局回退，不为更紧凑的端点跳过连接审计。
+- Chrome 验证原有全部示例、层级、节点配色与下载；人工移动/布线/撤销/自动补线、旋转/镜像及全屏停靠通过。移动和旋转后的两组 RLC ASC 通过原生 LTspice 节点连接检查。
+- 日志：`tmp/short-pin-tests.log`、`tmp/short-pin-unit.log`、`tmp/short-pin-browser.log`、`tmp/short-pin-regression.log`、`tmp/short-pin-workspace.log`、`tmp/short-pin-native.log`。截图：`tmp/manual-flywires.png`、`tmp/manual-routed.png`。
