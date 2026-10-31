@@ -2,14 +2,14 @@
  * A future React host can mount/destroy this controller without owning the SVG. */
 export function createWorkspace(root){
   const $=id=>root.querySelector('#spice-'+id),abort=new AbortController(),signal=abort.signal;
-  const panels={editor:$('editor-panel'),info:$('info-panel')},handles=Object.fromEntries(Object.keys(panels).map(id=>[id,root.querySelector(`[data-window-handle="${id}"]`)]));
-  const visible={editor:true,info:true},pinned={editor:true,info:true},docked=[],styles={editor:{},info:{}},siblings=[];let active=false,nativeRequested=false,previousFocus=null,scroll=null,drag=null,mountAnchor=null;
-  function pin(id,value){pinned[id]=value;panels[id].dataset.pinned=String(value);$('pin-'+id).setAttribute('aria-pressed',String(value));if(value)for(const p of ['left','top','right','bottom','width','height'])panels[id].style.removeProperty(p);}
+  const panels={editor:$('editor-panel'),details:$('details-panel'),info:$('info-panel')},handles=Object.fromEntries(Object.keys(panels).map(id=>[id,root.querySelector(`[data-window-handle="${id}"]`)]));
+  const visible={editor:true,details:true,info:true},pinned={editor:true,details:true,info:true},docked=[],styles={editor:{},details:{},info:{}},siblings=[];let active=false,nativeRequested=false,previousFocus=null,scroll=null,drag=null,mountAnchor=null;
+  function pin(id,value){pinned[id]=value;panels[id].dataset.pinned=String(value);const button=$('pin-'+id),name={editor:'netlist',details:'details',info:'messages'}[id],edge=id==='info'?'bottom edge':id==='details'?'lower left':'left edge',label=value?`Unpin ${name} from ${edge}`:`Pin ${name} to ${edge}`;button.setAttribute('aria-pressed',String(value));button.setAttribute('aria-label',label);button.title=label;if(value)for(const p of ['left','top','right','bottom','width','height'])panels[id].style.removeProperty(p);}
   for(const id of Object.keys(panels))pin(id,true);
   const emit=()=>root.dispatchEvent(new CustomEvent('spice:workspacechange',{detail:{fullscreen:active,panels:{...visible}}}));
   const listen=(node,type,fn,options={})=>node.addEventListener(type,fn,{...options,signal});
   function showPanel(id,value){visible[id]=value;panels[id].hidden=active&&!value;$('show-'+id).setAttribute('aria-expanded',String(value));emit();}
-  function dock(node){const anchor=document.createComment('workspace return');node.before(anchor);docked.push({node,anchor});$('info-content').prepend(node);}
+  function dock(node){const anchor=document.createComment('workspace return');node.before(anchor);docked.push({node,anchor});$('details-content').prepend(node);}
   function bounds(panel){const r=panel.getBoundingClientRect(),host=root.getBoundingClientRect();return {x:r.left-host.left,y:r.top-host.top,w:r.width,h:r.height,width:host.width,height:host.height};}
   function move(panel,x,y){const b=bounds(panel),top=parseFloat(getComputedStyle(root).getPropertyValue('--spice-window-top'))||100;const left=Math.max(8,Math.min(x,b.width-b.w-8)),upper=Math.max(8,Math.min(top,b.height-b.h-8)),above=Math.max(upper,Math.min(y,b.height-b.h-8));panel.style.left=Math.round(left)+'px';panel.style.top=Math.round(above)+'px';panel.style.right='auto';panel.style.bottom='auto';}
   function clamp(){if(active)for(const [id,panel]of Object.entries(panels))if(!panel.hidden&&!pinned[id]){const b=bounds(panel);move(panel,b.x,b.y);}}
@@ -22,7 +22,7 @@ export function createWorkspace(root){
     for(const node of document.body.children)if(node!==root){siblings.push({node,inert:node.inert});node.inert=true;}
     document.documentElement.style.overflow='hidden';document.body.style.overflow='hidden';root.classList.add('spice-is-fullscreen');$('fullscreen').setAttribute('aria-pressed','true');
     for(const id of Object.keys(panels)){styles[id].base=panels[id].style.cssText;if(styles[id].floating)panels[id].style.cssText=styles[id].floating;panels[id].setAttribute('role','dialog');panels[id].setAttribute('aria-modal','false');panels[id].setAttribute('aria-labelledby','spice-'+id+'-title');handles[id].tabIndex=0;handles[id].title='Drag to move; arrow keys move the window';showPanel(id,visible[id]);}
-    for(const id of ['selection-actions','selection','edit-help','hierarchy-panel'])dock($(id));
+    for(const id of ['selection-actions','selection','hierarchy-panel'])dock($(id));
     requestAnimationFrame(clamp);$('exit-fullscreen').focus({preventScroll:true});emit();
   }
   function deactivate(){

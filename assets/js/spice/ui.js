@@ -66,6 +66,7 @@ if (root) {
     const svg=preview.querySelector('svg');if(svg)showCoordinateGrid(svg,displayGridStep(),$('show-grid').checked,view);
     $('zoom-level').textContent = Math.round(full.w / view.w * 100) + '%';
   }
+  const gridViewportObserver=new ResizeObserver(()=>{const svg=preview.querySelector('svg');if(svg)showCoordinateGrid(svg,displayGridStep(),$('show-grid').checked,view);});gridViewportObserver.observe(preview);
   function zoom(factor, cx = view.x + view.w/2, cy = view.y + view.h/2) {
     if (!preview.querySelector('svg')) return;
     const ratio = Math.max(.05, Math.min(10, view.w * factor / full.w)) * full.w / view.w;

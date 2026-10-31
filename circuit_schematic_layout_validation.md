@@ -311,3 +311,13 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - Chrome 验证无需 Generate 即可切换显示网格，且不新增 worker、不改变元件/导线 SVG、不改变 JSON、不断开导出；部分人工布线在切换 16 再切回 8 后完整保留。原有示例、层级、配色、旋转镜像及全屏回归通过。两组 RLC ASC 经原生 LTspice 节点检查通过。
 - 统一最短几何暴露的经典供电轨问题已修复：轨道范围包含反馈导线的真实边界，支线避开异网导线端点。741 的跨区域紧凑电流镜、四区域及共享电源轨、子网优先/直接 IN_N/竖直返回等原有硬性回归不降低要求。
 - 日志：`tmp/fixed-pin-tests.log`、`tmp/fixed-pin-browser.log`、`tmp/fixed-pin-regression.log`、`tmp/fixed-pin-workspace.log`、`tmp/fixed-pin-native.log`。
+
+## 工作区网格覆盖与图标
+
+- 网格范围从实际预览区域经 SVG 屏幕矩阵反算，覆盖等比 Fit 的留白及顶部工具区；预览 SVG 允许向外绘制，由预览容器裁切。ResizeObserver 在普通/全屏/窄屏尺寸变化后刷新覆盖，不改变电路的 viewBox、缩放比例或物理几何。
+- 导出克隆使用有限的完整图纸边界，不沿用屏幕扩展矩形。浏览器验证普通/全屏/窄屏、缩放、平移及退出恢复时，网格四边始终覆盖画布；全屏与视口变化不修改导出源码。原有浏览器和人工布线回归通过。
+- 三个停靠按钮使用用户提供的 Lucide Pin，入口全屏按钮使用 Lucide Expand；保留原生按钮键盘操作、aria-pressed 状态和随固定状态切换的可访问标签/悬停说明。图标本地打包，来源记录于 `assets/js/spice/icons/SOURCE.md`。
+- 全屏拆为三个独立窗口：左上网表与左下 Details 等高，底部 Messages 仅包含状态和 parser/rendering 消息。选择、层级树、外观、节点配色、SVG/JSON 进入 Details；三栏均支持关闭/重开、拖动/取消 Pin、键盘和重置。普通页面退出后恢复 DOM、位置和交互状态。
+- 移除长操作说明，只保留简短标签、链接及悬停提示。层级导航始终单行，禁止垂直滚动与换行，超长路径仅横向滚动；浏览器用超长面包屑检查 scrollTop 保持零且 scrollLeft 可变化。
+- 桌面检查左侧两栏等高且不重叠、底部面板只含消息、Details 可独立关闭；390×844 窄屏检查三个窗口均在视口内。原有全屏、节点配色、人工布线与全部电路浏览器回归通过。
+- 日志：`tmp/grid-coverage-workspace.log`、`tmp/grid-coverage-interactive.log`、`tmp/grid-coverage-browser.log`。截图：`tmp/spice-fullscreen-desktop.png`、`tmp/spice-fullscreen-mobile.png`。
