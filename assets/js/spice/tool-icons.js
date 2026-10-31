@@ -15,9 +15,11 @@ import pin from './icons/pin.svg?raw';
 import expand from './icons/expand.svg?raw';
 import shrink from './icons/shrink.svg?raw';
 import reset from './icons/panels-left-bottom.svg?raw';
+import download from './icons/download.svg?raw';
+import upload from './icons/upload.svg?raw';
 export function mountToolIcons(root){
   const modes={move,route,erase,rotate,'mirror-x':mirrorX,'mirror-y':mirrorY};
-  const ids={'zoom-in':zoomIn,'zoom-out':zoomOut,fit,'wire-undo':undo,'wire-redo':redo,'auto-route':auto,'pin-editor':pin,'pin-info':pin,'pin-details':pin,fullscreen:expand,'exit-fullscreen':shrink,'reset-windows':reset};
+  const ids={'zoom-in':zoomIn,'zoom-out':zoomOut,fit,'wire-undo':undo,'wire-redo':redo,'auto-route':auto,'pin-editor':pin,'pin-info':pin,'pin-details':pin,fullscreen:expand,'exit-fullscreen':shrink,'reset-windows':reset,'open-download':download,upload};
   const apply=(button,svg)=>{if(!button)return;const label=button.title||button.getAttribute('aria-label')||button.textContent;button.setAttribute('aria-label',label);button.title=label;button.innerHTML=svg;button.firstElementChild.setAttribute('aria-hidden','true');button.firstElementChild.setAttribute('focusable','false');button.classList.add('spice-icon-button');};
   for(const [mode,svg]of Object.entries(modes))apply(root.querySelector(`[data-editor-mode="${mode}"]`),svg);
   for(const [id,svg]of Object.entries(ids))apply(root.querySelector('#spice-'+id),svg);

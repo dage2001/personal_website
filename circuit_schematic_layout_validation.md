@@ -328,3 +328,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 默认顶部空间缩至 64px，左侧两栏等分其下空间；短面包屑按实际内容收缩。Messages 固定时按实际可用宽度适配，测试覆盖 1440→1720→1170→1440 及 390×844；取消固定后仍可手动调整窗口宽高。
 - 浏览器验证合并栏结构、三开关不存在、Reset 图标及恢复全部窗口、单行高度、消息栏宽度随视口变化且恢复一致；全画布网格、层级横向滚动、键盘退出、原布局恢复、人工布线/变换及全部示例/导出回归通过。
 - 日志：`tmp/ribbon-workspace.log`、`tmp/ribbon-interactive.log`、`tmp/ribbon-browser.log`。官方图标来源记录于 `assets/js/spice/icons/SOURCE.md`，本地打包无运行时请求。
+
+## 下载格式弹窗与工程恢复
+
+- 下载入口合并为本地 Lucide Download 图标；原 SVG / ASC / Bundle 按钮进入原生 modal dialog，另提供 Project。Upload 使用本地 Lucide Upload，兼容普通网表与 `.spiceproj`。Escape 关闭弹窗，不触发布线快捷键或退出全屏。
+- 工程为带版本号的 UTF-8 JSON；保存原始网表、库、独立实例页面的几何/布线、旋转镜像、未完成连接、节点配色与显示/视图设置。按实例路径区分重复定义，不再以仅拓扑相同为理由混用编辑状态；移除仅保留 20 个页面的隐式淘汰。
+- 加载先核对全部保存页的源网表拓扑与引脚身份，并用本地新生成符号校验刚体变换、符号碰撞、整数网格和跨节点短路；校验通过后才替换当前工程。未知版本、拓扑篡改及非法几何明确拒绝。
+- `scripts/test-spice-project.mjs` 与原 routing/node-color 单元测试合计 14 项通过。浏览器在全新 sessionStorage 下验证未布线/已布线工程、镜像、颜色、缩放、嵌套页面、重复实例及 `.include` 库恢复；经典放大器、Sallen–Key、Instrumentation 和 LM741 内部页面均完成工程往返。私有三 VDPO 注释网表的已访问代表页面也通过往返；私有源与工程文件未发布。
+- 原有完整浏览器、全屏及交互编辑/ASC Bundle 导出回归通过。日志：`tmp/project-unit.log`、`tmp/project-browser.log`、`tmp/project-workspace.log`、`tmp/project-interactive.log`、`tmp/project-regression.log`。格式说明见 `circuit_schematic_project_format.md`。

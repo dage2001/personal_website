@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPICE Netlist Viewer</title>
 <style>body{margin:0;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif}main{max-width:1440px;margin:40px auto;padding:0 24px}h1{font-size:32px;letter-spacing:-1px}a{color:#344b40}header p{color:#74776e}</style>
-<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-C5S55fIW.js"></script>
+<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-BPF-kKUN.js"></script>
 </head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>Explore nested circuits. Expand blocks or open an instance sheet, then export the schematic as SVG.</p></header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
@@ -35,7 +35,7 @@
         <button type="button" id="spice-generate">Generate ↗</button>
       </div>
       <p class="spice-help" id="spice-example-info" aria-live="polite"></p>
-      <div class="spice-file-row"><label for="spice-file">Open .cir file </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,text/plain"></div>
+      <div class="spice-file-row"><label for="spice-file">Open netlist / project </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,.spiceproj,application/json,text/plain"></div>
       <div class="spice-file-row"><label for="spice-libraries">Library files </label><input type="file" id="spice-libraries" accept=".lib,.sub,.mod,.cir,.txt" multiple><p class="spice-help" id="spice-library-status">For .include / .lib dependencies</p></div>
       </div>
     </section>
@@ -49,9 +49,8 @@
         <button type="button" id="spice-zoom-in" aria-label="Zoom in">+</button>
         <button type="button" id="spice-fit">Fit</button><span id="spice-zoom-level">100%</span>
         <button type="button" id="spice-copy" disabled>Copy SVG</button>
-        <button type="button" id="spice-download" title="Download SVG" disabled>SVG ↓</button>
-        <button type="button" id="spice-download-asc" title="Download ASC; requires the companion ASY symbols in the bundle" disabled>ASC ↓</button>
-        <button type="button" id="spice-download-asc-bundle" title="Download ASC bundle with all required symbols" disabled>Bundle ↓</button>
+        <button type="button" id="spice-upload" title="Upload SPICE netlist">Upload</button>
+        <button type="button" id="spice-open-download" title="Download schematic" aria-haspopup="dialog" disabled>Download</button>
       </div>
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
         <label title="Enable interactive component placement and wiring"><input type="checkbox" id="spice-interactive"> Edit</label>
@@ -73,6 +72,17 @@
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
+  <dialog id="spice-download-dialog" class="spice-download-dialog" aria-labelledby="spice-download-title" aria-describedby="spice-download-description">
+    <div class="spice-download-heading"><h2 id="spice-download-title">Download schematic</h2><button type="button" id="spice-close-download" aria-label="Close download dialog">×</button></div>
+    <p id="spice-download-description">Choose a format for the current sheet.</p>
+    <div class="spice-download-options">
+      <button type="button" id="spice-download-project" disabled><strong>Project · .spiceproj</strong><span>Save netlist, libraries, all visited sheets, manual wiring, node colors and view settings. Upload to resume.</span></button>
+      <button type="button" id="spice-download" disabled><strong>SVG</strong><span>Vector image of the current schematic.</span></button>
+      <button type="button" id="spice-download-asc" disabled><strong>ASC</strong><span>LTspice schematic. Requires companion ASY symbols from the Bundle.</span></button>
+      <button type="button" id="spice-download-asc-bundle" disabled><strong>Bundle · ZIP</strong><span>ASC, required symbols, source netlist and libraries.</span></button>
+    </div>
+    <p id="spice-download-note">Use Project to resume editing, including unfinished wiring. ASC exports require fully connected wiring.</p>
+  </dialog>
   <section id="spice-info-panel">
     <div class="spice-window-header spice-fullscreen-only" data-window-handle="info"><h2 id="spice-info-title">Parser &amp; rendering</h2><button type="button" id="spice-pin-info" aria-pressed="true" title="Pin messages to bottom edge">Pin</button><button type="button" id="spice-close-info" aria-label="Close messages window">×</button></div>
     <div class="spice-info-content" id="spice-info-content">
@@ -94,7 +104,7 @@
     <label><input type="checkbox" id="spice-show-grid" checked> Show grid</label>
     <span class="spice-help">Fixed 4-unit pins and routing.</span>
   </div>
-  <p class="spice-help"><a href="/circuit_pin_naming_convention.md">Pin naming and layout syntax</a></p>
+  <p class="spice-help"><a href="/circuit_pin_naming_convention.md">Pin naming and layout syntax</a> · <a href="/circuit_schematic_project_format.md">Project format</a></p>
   <details id="spice-node-panel" open><summary>Node colors &amp; connections</summary>
     <div class="spice-node-tools">
       <label for="spice-node-search">Search <input type="search" id="spice-node-search" placeholder="Node or terminal" autocomplete="off"></label>

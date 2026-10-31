@@ -8,11 +8,12 @@ import {layoutRulesVersion} from './layout-semantics.js';
 import './viewer.css';
 import {createNodeColorControls,colorSvgNets,defaultWireColor} from './node-colors.js';
 import {createWorkspace} from './workspace.js';
-import {createInteractiveEditor} from './interactive-editor.js';
+import {createInteractiveEditor,prepareRoutingDrawing} from './interactive-editor.js';
 import {showCoordinateGrid} from './svg-grid.js';
 import {mountToolIcons} from './tool-icons.js';
 import {symbolGridSize} from './short-pins.js';
 import {placeDomLabels} from './label-placement.js';
+import {decodeProject,encodeProject,maxProjectBytes,restoreProjectScene} from './project-file.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
@@ -24,9 +25,10 @@ if (root) {
   let drawing=null,ascPackage=null,ascExporting=false,editor=null,colorState=null,colorNodes=[];
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
   let pendingRoute=false,libraries={};
+  let sheetViews=new Map(),projectLoading=false;
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
-  const exports = () => { $('copy').disabled = $('download').disabled = !svgText || busy || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
+  const exports = () => { $('upload').disabled=busy||projectLoading||ascExporting; $('download-project').disabled=$('open-download').disabled = $('copy').disabled = $('download').disabled = !svgText || busy || projectLoading || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,gridSize:$('grid').checked&&$('conventional').checked?symbolGridSize:0,detailed:$('detailed').checked,conventional:$('conventional').checked});
   const displayGridStep=()=>circuit?.layout.report?.gridSize?Number($('grid-size').value):0;
   function syncSource(){const svg=preview.querySelector('svg');if(!svg)return;const font=Number(svg.querySelector('style')?.textContent.match(/font-size:([\d.]+)px/)?.[1])||12,b=placeDomLabels(svg,font),x=Math.min(full.x,b.x-20),y=Math.min(full.y,b.y-20);full={x,y,w:Math.max(full.x+full.w,b.right+20)-x,h:Math.max(full.y+full.h,b.bottom+20)-y};if(colorState)colorSvgNets(svg,colorNodes,colorState);editor?.refreshColors();showCoordinateGrid(svg,displayGridStep(),$('show-grid').checked,view);const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('width',full.w);exported.setAttribute('height',full.h);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,displayGridStep(),$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;}
@@ -62,6 +64,7 @@ if (root) {
     $('message-count').textContent = `${items.length} message${items.length === 1 ? '' : 's'}`;
   }
   function setView() {
+    if(!busy&&svgText)sheetViews.set(focus,{...view});
     preview.querySelector('svg')?.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`);
     const svg=preview.querySelector('svg');if(svg)showCoordinateGrid(svg,displayGridStep(),$('show-grid').checked,view);
     $('zoom-level').textContent = Math.round(full.w / view.w * 100) + '%';
@@ -156,6 +159,7 @@ if (root) {
     let items=[];
     try {
       if(lastSource!==input.value||!tree) {
+        if(lastSource&&lastSource!==input.value){editor.clearSheets();sheetViews.clear();}
         ir=parseHierarchy(input.value,{files:libraries});items=[...ir.diagnostics];
         if(items.some(d=>d.severity==='error')){tree=null;throw Error('Fix the parser errors below before generating.');}
         tree=elaborateCircuit(ir);
@@ -239,7 +243,9 @@ if (root) {
       status.textContent+=` Layout rules v${layoutRulesVersion}.`;if(circuit.layout.report?.gridVerified)status.textContent+=` Grid ${circuit.layout.report.gridSize}.`;
       if(circuit.layout?.report?.powerOrderViolations)status.textContent+=` Layout: ${circuit.layout.report.powerOrderViolations} DC ordering preference(s) unmet; see messages.`;
       if(circuit.layout?.report?.groundPlacement?.startsWith('ELK fallback'))status.textContent+=' Ground marker: routed fallback; no safe short attachment found.';
-      $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);nodeColors.setCircuit(circuit,input.value);editor.mount(preview.querySelector('svg'),drawing,circuit,netlist,settings(),{reset:resetEditor});syncSource();
+      $('json').value=JSON.stringify({circuit,netlist,hierarchy:ir},null,2);nodeColors.setCircuit(circuit,input.value);editor.mount(preview.querySelector('svg'),drawing,circuit,netlist,settings(),{reset:resetEditor,scope:focus});syncSource();
+      if(!resetEditor&&sheetViews.has(focus))view={...sheetViews.get(focus)};
+      else sheetViews.set(focus,{...view});setView();
       $('selection').textContent='Click a component to inspect its original statement and pin connections.';
       updateHierarchy();
     } catch(error) {
@@ -263,20 +269,77 @@ if (root) {
   for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{const example=examples[button.dataset.example];input.value=example.source;invalidate();showExampleInfo(example);generate();};
   $('file').onchange=async event=>{
     const file=event.target.files[0];if (!file)return;
-    if (file.size>2000000) {status.textContent='File exceeds 2 MB.';return;}
-    try {input.value=await readSpiceFile(file);invalidate();generate();} catch(error){status.textContent='File could not be read: '+error.message;}
-    finally{event.target.value='';}
+    if(busy||projectLoading){event.target.value='';return;}
+    try {
+      const isProject=/\.(spiceproj|json)$/i.test(file.name);
+      if(file.size>(isProject?maxProjectBytes:2000000))throw Error(isProject?'Project exceeds 32 MB.':'Netlist exceeds 2 MB.');
+      if(isProject)await openProject(await file.text());
+      else{input.value=await readSpiceFile(file);invalidate();await generate();}
+    } catch(error){status.textContent='File could not be opened: '+error.message;}
+    finally{event.target.value='';exports();}
   };
+  async function openProject(text){
+    projectLoading=true;exports();const wasInert=root.inert;root.inert=true;
+    try{
+      const p=decodeProject(text),nextIR=parseHierarchy(p.source,{files:p.libraries});
+      if(nextIR.diagnostics.some(d=>d.severity==='error'))throw Error('Project netlist has parser errors. Current work was kept.');
+      const nextTree=elaborateCircuit(nextIR);
+      if(!nextTree.contexts[p.focus])throw Error('Saved sheet is not present in the netlist.');
+      // Check all saved sheets against the source before replacing the current work.
+      for(const s of p.sheets){
+        if(!nextTree.contexts[s.scope])throw Error('Unknown saved sheet: '+s.scope);
+        const c=projectHierarchy(nextTree,{focus:s.scope});
+        if(c.topology.signature!==s.topology)throw Error('Saved topology differs from the netlist: '+(s.scope||'Top'));
+        const expected=new Map(c.components.filter(c=>c.kind!=='K').map(c=>[c.name,c]));
+        for(const n of s.snapshot.components){if(n.decoration)continue;const d=expected.get(n.id);if(!d||n.ports.length!==Object.keys(d.terminals).length||n.ports.some(p=>c.nodes[d.terminals[p.pin]]?.bit!==p.bit))throw Error('Saved pin connectivity differs from the netlist: '+n.id);expected.delete(n.id);}
+        if(expected.size)throw Error('Saved sheet omits components.');
+        status.textContent='Checking saved sheet '+(s.scope||'Top')+'…';
+        const netlist=toNetlistsvg(c),rendered=await renderSchematic(netlist,s.settings),svg=new DOMParser().parseFromString(rendered.svg,'image/svg+xml').documentElement;
+        for(const n of Object.values(c.nodes))for(const element of svg.querySelectorAll('.net_'+n.bit))element.setAttribute('data-net',n.name);
+        restoreProjectScene(prepareRoutingDrawing(svg,rendered.drawing,c,netlist),s.snapshot,s.settings.gridSize);
+      }
+      if(!p.sheets.some(s=>s.scope===p.focus&&JSON.stringify(s.settings)===JSON.stringify(p.settings))){
+        status.textContent='Checking current sheet…';await renderSchematic(toNetlistsvg(projectHierarchy(nextTree,{focus:p.focus})),p.settings);
+      }
+      editor.invalidate();editor.restoreSheets(p.sheets);sheetViews=new Map(p.sheets.filter(s=>s.view).map(s=>[s.scope,s.view]));sheetViews.set(p.focus,p.view);
+      input.value=p.source;libraries=p.libraries;tree=nextTree;ir=nextIR;lastSource=p.source;focus=p.focus;selectedInstance='';
+      for(const id of ['font','size'])$(id).value=id==='font'?p.settings.font:p.settings.fontSize;
+      for(const [id,value]of Object.entries({detailed:p.settings.detailed,conventional:p.settings.conventional,grid:!!p.settings.gridSize,'show-grid':p.showGrid,interactive:p.interactive,flywire:p.flywire}))$(id).checked=value;
+      $('grid-size').value=p.displayGridStep;
+      history.replaceState(null,'',location.pathname+location.search+(focus?'#'+new URLSearchParams({instance:focus}):''));
+      nodeColors.restore(p.colors);showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
+      try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));sessionStorage.setItem('spice-netlist-v2',input.value);}catch{}
+      $('library-status').textContent=Object.keys(libraries).length+' project library file(s) loaded';
+      await generate();if(svgText)status.textContent+=' Project restored.';
+    }finally{root.inert=wasInert;projectLoading=false;exports();}
+  }
   $('libraries').onchange=async event=>{
     try{
       for(const file of event.target.files){if(file.size>16000000)throw Error('Library exceeds 16 MB: '+file.name);libraries[file.webkitRelativePath||file.name]=await readSpiceFile(file);}
       try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));}catch{}
-      tree=null;lastSource='';$('library-status').textContent=Object.keys(libraries).length+' library file(s) loaded';generate();
+      editor.invalidate();editor.clearSheets();sheetViews.clear();tree=null;lastSource='';$('library-status').textContent=Object.keys(libraries).length+' library file(s) loaded';generate();
     }catch(error){status.textContent=error.message;}
     finally{event.target.value='';}
   };
   $('library-status').textContent=Object.keys(libraries).length?'Libraries restored from this session.':'For .include / .lib dependencies';
+  const downloadDialog=$('download-dialog');
+  root.addEventListener('spice:workspacechange',()=>{if(downloadDialog.open)downloadDialog.close();});
+  $('open-download').onclick=()=>{exports();downloadDialog.showModal();};
+  $('close-download').onclick=()=>downloadDialog.close();
+  downloadDialog.addEventListener('click',event=>{if(event.target!==downloadDialog)return;const b=downloadDialog.getBoundingClientRect();if(event.clientX<b.left||event.clientX>b.right||event.clientY<b.top||event.clientY>b.bottom)downloadDialog.close();});
+  // Keep modal keyboard events out of the schematic editing shortcuts.
+  document.addEventListener('keydown',event=>{if(downloadDialog.open&&!(event.altKey&&event.key==='Escape')){event.stopImmediatePropagation();if(event.key==='Escape'){event.preventDefault();downloadDialog.close();}}},{capture:true});
+  $('upload').onclick=()=>$('file').click();
+  $('download-project').onclick=()=>{
+    try{
+      const sheets=editor.snapshotSheets().filter(s=>tree?.contexts[s.scope]&&projectHierarchy(tree,{focus:s.scope}).topology.signature===s.topology).map(s=>({...s,...(sheetViews.has(s.scope)?{view:sheetViews.get(s.scope)}:{})}));
+      const text=encodeProject({source:input.value,libraries,settings:settings(),displayGridStep:Number($('grid-size').value),showGrid:$('show-grid').checked,interactive:$('interactive').checked,flywire:$('flywire').checked,focus,view:{...view},colors:nodeColors.snapshot(),sheets});
+      downloadDialog.close();const url=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='spice-schematic.spiceproj';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      status.textContent='Project saved. Upload the .spiceproj file to resume editing.';
+    }catch(error){status.textContent='Project save failed: '+error.message;}
+  };
   $('download').onclick=()=>{
+    downloadDialog.close();
     const url=URL.createObjectURL(new Blob([svgText],{type:'image/svg+xml;charset=utf-8'}));
     const a=document.createElement('a');a.href=url;a.download='spice-schematic.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   };
@@ -295,8 +358,8 @@ if (root) {
     }catch(error){status.textContent='ASC export failed: '+error.message;const li=document.createElement('li');li.className='error';li.textContent=status.textContent;diagnostics.append(li);}
     finally{ascExporting=false;exports();}
   }
-  $('download-asc').onclick=()=>downloadAsc(false);
-  $('download-asc-bundle').onclick=()=>downloadAsc(true);
+  $('download-asc').onclick=()=>{downloadDialog.close();downloadAsc(false);};
+  $('download-asc-bundle').onclick=()=>{downloadDialog.close();downloadAsc(true);};
   $('copy').onclick=async()=>{
     try {await navigator.clipboard.writeText(svgText);status.textContent='SVG source copied to clipboard.';}
     catch { $('source-details').open=true;$('source').focus();$('source').select();status.textContent='Clipboard unavailable. SVG source selected — press Ctrl+C / ⌘C.'; }
