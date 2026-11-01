@@ -31,6 +31,8 @@ import spaceY from './icons/align-vertical-space-between.svg?raw';
 import labels from './icons/square-dashed-text.svg?raw';
 import group from './icons/group.svg?raw';
 import paintbrush from './icons/paintbrush.svg?raw';
+import edit from './icons/square-pen.svg?raw';
+import flywires from './icons/flywires.svg?raw';
 export function mountToolIcons(root){
   const modes={select,box,move,route,erase,rotate,'mirror-x':mirrorX,'mirror-y':mirrorY};
   const arrangements={left,right,top,bottom,'center-x':centerX,'center-y':centerY,'space-x':spaceX,'space-y':spaceY};
@@ -40,6 +42,8 @@ export function mountToolIcons(root){
   apply(root.querySelector('#spice-label-edit'),labels);
   apply(root.querySelector('#spice-group'),group);
   apply(root.querySelector('#spice-layout-brush'),paintbrush);
+  apply(root.querySelector('#spice-interactive'),edit);
+  apply(root.querySelector('#spice-flywire'),flywires);
   for(const [action,svg]of Object.entries(arrangements))apply(root.querySelector(`[data-editor-arrange="${action}"]`),svg);
   for(const [mode,svg]of Object.entries(modes))apply(root.querySelector(`[data-editor-mode="${mode}"]`),svg);
   for(const [id,svg]of Object.entries(ids))apply(root.querySelector('#spice-'+id),svg);

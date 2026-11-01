@@ -139,3 +139,10 @@
 .spice-preview[data-label-editing=true][data-tool-mode=box] [data-editor-label]{cursor:crosshair}
 #spice-label-form>input{box-sizing:border-box;display:block;width:100%;margin:8px 0 16px;padding:10px;font:14px Arial,sans-serif;border:1px solid var(--spice-border);border-radius:5px;background:white;color:#292b29}
 .spice-label-actions{display:flex;justify-content:space-between;gap:10px}
+.spice-app .spice-edit-toolbar{flex-wrap:nowrap;gap:4px}
+.spice-edit-tools-reveal{width:0;flex:0 0 auto;overflow:hidden;opacity:0;transform:translateX(-8px);transition:width 240ms cubic-bezier(.2,.75,.25,1),opacity 180ms ease,transform 240ms ease}
+.spice-edit-tools-reveal.is-open{opacity:1;transform:translateX(0)}
+.spice-edit-tools-inner{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;width:max-content;min-height:32px}
+.spice-is-fullscreen .spice-edit-tools-inner{min-height:28px}
+.spice-app #spice-editor-status{position:absolute;width:1px!important;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;flex-basis:auto}
+@media(prefers-reduced-motion:reduce){.spice-edit-tools-reveal{transition:none;transform:none}}

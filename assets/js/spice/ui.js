@@ -16,12 +16,14 @@ import {mountToolIcons} from './tool-icons.js';
 import {symbolGridSize} from './short-pins.js';
 import {placeDomLabels} from './label-placement.js';
 import {decodeProject,encodeProject,maxProjectBytes,restoreProjectScene} from './project-file.js';
+import {createEditToolbar} from './edit-toolbar.js';
 import {createActivityLog} from './activity-log.js';
 import {validateLabelTargets} from './label-layer.js';
 const filter=examples.filter.source;
 
 const $ = id => document.getElementById('spice-' + id);
 const root = $('app');
+const editToolbar=createEditToolbar($);
 if (root) {
   mountToolIcons(root);
   createWorkspace(root);
@@ -67,15 +69,21 @@ if (root) {
     for(const sheet of pending)editor.saveTemplateSheet(sheet);
     activity.append({category:'Tools',message:'Layout template applied to '+pending.length+' subcircuit page(s), including all nested instances.'});
   }
-  async function enableEditing(){if(!drawing||!circuit?.layout.report?.gridVerified){$('grid').checked=true;$('conventional').checked=true;await generate({resetEditor:true});}editor.setEnabled($('interactive').checked);exports();}
-  $('interactive').onchange=enableEditing;
-  $('label-edit').onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.setLabelEditing(!editor.labelEditing());preview.focus({preventScroll:true});};
+  async function enableEditing(){if(!drawing||!circuit?.layout.report?.gridVerified){$('grid').checked=true;$('conventional').checked=true;await generate({resetEditor:true});}editor.setEnabled(editToolbar.enabled());exports();}
+  $('interactive').onclick=async()=>{editToolbar.set(!editToolbar.enabled());await enableEditing();preview.focus({preventScroll:true});};
+  $('label-edit').onclick=async()=>{editToolbar.set(true);await enableEditing();editor.setLabelEditing(!editor.labelEditing());preview.focus({preventScroll:true});};
   $('group').onclick=()=>{editor.toggleGroup();preview.focus({preventScroll:true});};
-  $('flywire').onchange=async()=>{$('interactive').checked=true;await enableEditing();if($('flywire').checked)editor.clear();else await editor.autoRoute();exports();};
+  const clearWiresDialog=$('clear-wires-dialog');let clearWiresContext=null;
+  $('flywire').onclick=()=>{if(!editor.canEdit()||editor.working())return;clearWiresContext={tree,focus};clearWiresDialog.showModal();};
+  $('cancel-clear-wires').onclick=()=>clearWiresDialog.close();
+  $('confirm-clear-wires').onclick=()=>{const context=clearWiresContext;clearWiresDialog.close();if(context?.tree!==tree||context?.focus!==focus||!editToolbar.enabled()||editor.working())return;editor.clear();exports();};
+  clearWiresDialog.addEventListener('close',()=>{clearWiresContext=null;$('flywire').focus({preventScroll:true});});
+  root.addEventListener('spice:workspacechange',()=>{if(clearWiresDialog.open)clearWiresDialog.close();});
+  document.addEventListener('keydown',event=>{if(clearWiresDialog.open&&!(event.altKey&&event.key==='Escape')){event.stopImmediatePropagation();if(event.key==='Escape'){event.preventDefault();clearWiresDialog.close();}}},{capture:true});
   $('layout-brush').onclick=()=>{editor.toggleLayoutBrush();preview.focus({preventScroll:true});};
-  $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
+  $('auto-route').onclick=async()=>{editToolbar.set(true);await enableEditing();await editor.autoRoute();exports();};
   $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();
-  for(const button of root.querySelectorAll('[data-editor-mode]'))button.onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.chooseTool(button.dataset.editorMode);preview.focus({preventScroll:true});};
+  for(const button of root.querySelectorAll('[data-editor-mode]'))button.onclick=async()=>{editToolbar.set(true);await enableEditing();editor.chooseTool(button.dataset.editorMode);preview.focus({preventScroll:true});};
   for(const button of root.querySelectorAll('[data-editor-arrange]'))button.onclick=()=>{editor.arrange(button.dataset.editorArrange);preview.focus({preventScroll:true});};
   nodeColors.setEnabled(false);
   function showExampleInfo(example) {
@@ -337,7 +345,8 @@ if (root) {
       editor.invalidate();editor.restoreSheets(p.sheets);sheetViews=new Map(p.sheets.filter(s=>s.view).map(s=>[s.scope,s.view]));sheetViews.set(p.focus,p.view);
       input.value=p.source;libraries=p.libraries;tree=nextTree;ir=nextIR;lastSource=p.source;focus=p.focus;selectedInstance='';
       for(const id of ['font','size'])$(id).value=id==='font'?p.settings.font:p.settings.fontSize;
-      for(const [id,value]of Object.entries({detailed:p.settings.detailed,conventional:p.settings.conventional,grid:!!p.settings.gridSize,'show-grid':p.showGrid,interactive:p.interactive,flywire:p.flywire}))$(id).checked=value;
+      for(const [id,value]of Object.entries({detailed:p.settings.detailed,conventional:p.settings.conventional,grid:!!p.settings.gridSize,'show-grid':p.showGrid}))$(id).checked=value;
+      editToolbar.set(p.interactive);
       $('grid-size').value=p.displayGridStep;
       history.replaceState(null,'',location.pathname+location.search+(focus?'#'+new URLSearchParams({instance:focus}):''));
       nodeColors.restore(p.colors);showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
@@ -366,7 +375,7 @@ if (root) {
   $('download-project').onclick=()=>{
     try{
       const sheets=editor.snapshotSheets().filter(s=>tree?.contexts[s.scope]&&projectHierarchy(tree,{focus:s.scope}).topology.signature===s.topology).map(s=>({...s,...(sheetViews.has(s.scope)?{view:sheetViews.get(s.scope)}:{})}));
-      const text=encodeProject({source:input.value,libraries,settings:settings(),displayGridStep:Number($('grid-size').value),showGrid:$('show-grid').checked,interactive:$('interactive').checked,flywire:$('flywire').checked,labelEditing:editor.labelEditing(),focus,view:{...view},colors:nodeColors.snapshot(),sheets});
+      const text=encodeProject({source:input.value,libraries,settings:settings(),displayGridStep:Number($('grid-size').value),showGrid:$('show-grid').checked,interactive:editToolbar.enabled(),flywire:false,labelEditing:editor.labelEditing(),focus,view:{...view},colors:nodeColors.snapshot(),sheets});
       downloadDialog.close();const url=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='spice-schematic.spiceproj';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
       setStatus('Project saved. Upload the .spiceproj file to resume editing.',{category:'Files'});
     }catch(error){setStatus('Project save failed: '+error.message,{severity:'error',category:'Files'});}
