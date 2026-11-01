@@ -10,7 +10,7 @@ export function loadSources(source,{files={},filename='input.cir'}={}) {
     const direct=[...catalog].filter(([key])=>normalize(key)===normalize(name)||normalize(key)===full);
     if(direct.length===1)return direct[0];
     const matches=[...catalog].filter(([key])=>base(key)===base(name));
-    if(matches.length!==1)throw Error(matches.length?'Ambiguous library filename: '+name:'Missing library '+name+'. Add this file using Library files.');
+    if(matches.length!==1)throw Error(matches.length?'Ambiguous library filename: '+name:'Missing library '+name+'. Add this file using Upload.');
     return matches[0];
   };
   function expand(text,file,section='',stack=[]) {

@@ -2,6 +2,8 @@
 
 Use **Download → Project** to save `spice-schematic.spiceproj`, and **Upload** to resume in this viewer. Upload also accepts ordinary SPICE netlists. No server, account or external service is required.
 
+The preview toolbar's Upload is the single file entry point. It accepts one project, a main netlist with its dependency libraries, or libraries alone. File extensions, content and include references determine roles automatically; ambiguous files or multiple main-netlist candidates open a role-selection dialog. A cancelled selection preserves the current work. Netlist-side file inputs have been removed.
+
 Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version: 4`. Version 1, 2 and 3 files remain readable. New versions prevent older viewers from silently dropping label-editing, manual-group or layout-template state. They contain:
 
 - Original netlist and uploaded library texts.

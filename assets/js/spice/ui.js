@@ -3,6 +3,7 @@ import {elaborateCircuit} from './elaborate.js';
 import {projectHierarchy,toNetlistsvg} from './layout-adapter.js';
 import {renderSchematic} from './renderer.js';
 import {examples} from './examples.js';
+import {planUploads,resolveUploads,uploadName} from './upload-plan.js';
 import {readSpiceFile} from './file-text.js';
 import {layoutRulesVersion} from './layout-semantics.js';
 import './viewer.css';
@@ -32,11 +33,11 @@ if (root) {
   function setStatus(message,{severity='info',category='Rendering'}={}){status.textContent=message;activity.append({message,severity,category});}
   let drawing=null,ascPackage=null,ascExporting=false,editor=null,colorState=null,colorNodes=[];
   let svgText = '', circuit, tree, ir, lastSource='', focus='', selectedInstance='', busy = false, view = {x:0,y:0,w:1,h:1}, full = {...view}, drag;
-  let pendingRoute=false,libraries={};
+  let pendingRoute=false,libraries={},uploadLoading=false;
   let sheetViews=new Map(),projectLoading=false;
   try{libraries=JSON.parse(sessionStorage.getItem('spice-libraries-v3')||'{}');}catch{}
   root.addEventListener('click',event=>{if(busy&&event.target.closest('a[href^="#"]'))event.preventDefault();});
-  const exports = () => { $('upload').disabled=busy||projectLoading||ascExporting; $('download-project').disabled=$('open-download').disabled = $('copy').disabled = $('download').disabled = !svgText || busy || projectLoading || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
+  const exports = () => { $('generate').disabled=busy||projectLoading||uploadLoading; $('upload').disabled=busy||projectLoading||uploadLoading||ascExporting; $('download-project').disabled=$('open-download').disabled = $('copy').disabled = $('download').disabled = !svgText || busy || projectLoading || editor?.working(); $('download-asc').disabled=$('download-asc-bundle').disabled=!svgText||!drawing||busy||ascExporting||!editor?.complete(); };
   const settings = () => ({font:$('font').value, fontSize:Number($('size').value), color:defaultWireColor,gridSize:$('grid').checked&&$('conventional').checked?symbolGridSize:0,detailed:$('detailed').checked,conventional:$('conventional').checked});
   const displayGridStep=()=>circuit?.layout.report?.gridSize?Number($('grid-size').value):0;
   function syncSource(){
@@ -191,7 +192,7 @@ if (root) {
     if (busy) return;
     loggedDiagnostics=new Set();
     busy=true; editor.invalidate();nodeColors.setEnabled(false);drawing=null;ascPackage=null;svgText=''; exports(); $('generate').disabled=true;
-    input.readOnly=true; $('file').disabled=true;$('libraries').disabled=true;
+    input.readOnly=true; $('file').disabled=true;
     for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button, #spice-breadcrumbs button')) element.disabled=true;
     setStatus('Parsing netlist and routing wires…'); preview.setAttribute('aria-busy','true');
     let items=[];
@@ -297,7 +298,7 @@ if (root) {
       if (!items.some(d=>d.severity==='error')) items.push({severity:'error',line:0,message:error.message});
       showDiagnostics(items);
     } finally {
-      busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;$('libraries').disabled=false;
+      busy=false; $('generate').disabled=false; input.readOnly=false; $('file').disabled=false;
       for (const element of root.querySelectorAll('[data-example], select, input[type=number], input[type=color], input[type=checkbox], #spice-instances button')) element.disabled=false;
       if(tree&&tree.contexts[focus])updateHierarchy();
       nodeColors.setEnabled(!!svgText);editor.refreshControls();preview.setAttribute('aria-busy','false');exports();
@@ -306,16 +307,36 @@ if (root) {
   }
   $('generate').onclick=()=>generate({resetEditor:true});
   for (const button of root.querySelectorAll('[data-example]')) button.onclick=()=>{const example=examples[button.dataset.example];input.value=example.source;invalidate();showExampleInfo(example);generate();};
+  const uploadDialog=$('upload-dialog');
+  $('cancel-upload').onclick=()=>uploadDialog.close('cancel');
+  uploadDialog.addEventListener('cancel',event=>{event.preventDefault();uploadDialog.close('cancel');});
+  root.addEventListener('spice:workspacechange',()=>{if(uploadDialog.open)uploadDialog.close('cancel');});
+  document.addEventListener('keydown',event=>{if(uploadDialog.open&&!(event.altKey&&event.key==='Escape')){event.stopImmediatePropagation();if(event.key==='Escape'){event.preventDefault();uploadDialog.close('cancel');}}},{capture:true});
+  function chooseUploadRoles(files){
+    let chosen=false;const hasMain=files.some(f=>f.kind==='netlist'),selects=[];$('upload-choices').replaceChildren();$('upload-error').textContent='';
+    for(const f of files){const label=document.createElement('label'),name=document.createElement('span'),select=document.createElement('select');name.textContent=f.name;select.setAttribute('aria-label','Role for '+f.name);for(const [value,text]of [['netlist','Main netlist'],['library','Library / include']]){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);}
+      const main=!chosen&&(f.kind==='netlist'||f.kind==='unknown'&&!hasMain);select.value=main?'netlist':'library';if(main)chosen=true;selects.push(select);label.append(name,select);$('upload-choices').append(label);}
+    $('confirm-upload').onclick=()=>{try{resolveUploads(files.map((f,i)=>({...f,kind:selects[i].value})));uploadDialog.close('apply');}catch(error){$('upload-error').textContent=error.message;}};
+    return new Promise(resolve=>{uploadDialog.returnValue='cancel';uploadDialog.addEventListener('close',()=>resolve(uploadDialog.returnValue==='apply'?files.map((f,i)=>({...f,kind:selects[i].value})):null),{once:true});uploadDialog.showModal();});
+  }
   $('file').onchange=async event=>{
-    const file=event.target.files[0];if (!file)return;
-    if(busy||projectLoading){event.target.value='';return;}
-    try {
-      const isProject=/\.(spiceproj|json)$/i.test(file.name);
-      if(file.size>(isProject?maxProjectBytes:2000000))throw Error(isProject?'Project exceeds 32 MB.':'Netlist exceeds 2 MB.');
-      if(isProject)await openProject(await file.text());
-      else{input.value=await readSpiceFile(file);invalidate();await generate();}
-    } catch(error){setStatus('File could not be opened: '+error.message,{severity:'error',category:'Files'});}
-    finally{event.target.value='';exports();}
+    const selected=[...event.target.files];if(!selected.length)return;
+    if(busy||projectLoading||uploadLoading){event.target.value='';return;}
+    uploadLoading=true;exports();
+    try{
+      if(selected.length>64||selected.reduce((n,f)=>n+f.size,0)>maxProjectBytes)throw Error('Upload exceeds 64 files or 32 MB.');
+      const files=await Promise.all(selected.map(async file=>({name:file.webkitRelativePath||file.name,text:await readSpiceFile(file)})));
+      const plan=planUploads(files,input.value),assigned=plan.needsChoice?await chooseUploadRoles(plan.files):plan.files;
+      if(!assigned){activity.append({category:'Files',message:'Upload cancelled. Current work was kept.'});return;}
+      const opened=resolveUploads(assigned);if(opened.project){await openProject(opened.project.text);return;}
+      const next={...libraries};for(const f of opened.libraries){for(const name of Object.keys(next))if(uploadName(name)===uploadName(f.name))delete next[name];Object.defineProperty(next,f.name,{value:f.text,enumerable:true,configurable:true,writable:true});}
+      libraries=next;try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));}catch{}
+      editor.invalidate();editor.clearSheets();sheetViews.clear();tree=null;lastSource='';
+      if(opened.netlist){input.value=opened.netlist.text;focus='';selectedInstance='';history.replaceState(null,'',location.pathname+location.search);}
+      activity.append({category:'Files',message:(opened.netlist?'Opened '+opened.netlist.name+'. ':'')+opened.libraries.length+' library file(s) loaded.'});
+      await generate();
+    }catch(error){setStatus('File could not be opened: '+error.message,{severity:'error',category:'Files'});}
+    finally{uploadLoading=false;event.target.value='';exports();}
   };
   async function openProject(text){
     projectLoading=true;exports();const wasInert=root.inert;root.inert=true;
@@ -351,19 +372,10 @@ if (root) {
       history.replaceState(null,'',location.pathname+location.search+(focus?'#'+new URLSearchParams({instance:focus}):''));
       nodeColors.restore(p.colors);showExampleInfo(Object.values(examples).find(e=>e.source===input.value));
       try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));sessionStorage.setItem('spice-netlist-v2',input.value);}catch{}
-      $('library-status').textContent=Object.keys(libraries).length+' project library file(s) loaded';
+      activity.append({category:'Files',message:Object.keys(libraries).length+' project library file(s) loaded.'});
       await generate();if(svgText){editor.setLabelEditing(p.labelEditing===true);status.textContent+=' Project restored.';activity.append({message:'Project restored.',category:'Files'});}
     }finally{root.inert=wasInert;projectLoading=false;exports();}
   }
-  $('libraries').onchange=async event=>{
-    try{
-      for(const file of event.target.files){if(file.size>16000000)throw Error('Library exceeds 16 MB: '+file.name);libraries[file.webkitRelativePath||file.name]=await readSpiceFile(file);}
-      try{sessionStorage.setItem('spice-libraries-v3',JSON.stringify(libraries));}catch{}
-      editor.invalidate();editor.clearSheets();sheetViews.clear();tree=null;lastSource='';$('library-status').textContent=Object.keys(libraries).length+' library file(s) loaded';generate();
-    }catch(error){setStatus(error.message,{severity:'error',category:'Files'});}
-    finally{event.target.value='';}
-  };
-  $('library-status').textContent=Object.keys(libraries).length?'Libraries restored from this session.':'For .include / .lib dependencies';
   const downloadDialog=$('download-dialog');
   root.addEventListener('spice:workspacechange',()=>{if(downloadDialog.open)downloadDialog.close();});
   $('open-download').onclick=()=>{exports();downloadDialog.showModal();};

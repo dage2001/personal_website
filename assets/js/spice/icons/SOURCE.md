@@ -14,3 +14,4 @@ group.svg: official Lucide release 0.468.0, ISC license; manual editor groups on
 paintbrush.svg and circle-check.svg: official Lucide release 0.468.0, ISC license; subcircuit layout format brush and applied-template marker.
 square-pen.svg: official Lucide release 0.468.0, ISC license; edit toolbar toggle.
 flywires.svg: SVG supplied directly by the user, 2026-11-01; clear wiring / show flywires action.
+pencil-ruler.svg: official Lucide release 0.468.0, ISC license; generate schematic.
