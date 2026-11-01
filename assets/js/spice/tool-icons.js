@@ -29,6 +29,7 @@ import bottom from './icons/align-vertical-justify-end.svg?raw';
 import spaceX from './icons/align-horizontal-space-between.svg?raw';
 import spaceY from './icons/align-vertical-space-between.svg?raw';
 import labels from './icons/square-dashed-text.svg?raw';
+import group from './icons/group.svg?raw';
 export function mountToolIcons(root){
   const modes={select,box,move,route,erase,rotate,'mirror-x':mirrorX,'mirror-y':mirrorY};
   const arrangements={left,right,top,bottom,'center-x':centerX,'center-y':centerY,'space-x':spaceX,'space-y':spaceY};
@@ -36,6 +37,7 @@ export function mountToolIcons(root){
   const apply=(button,svg)=>{if(!button)return;const label=button.title||button.getAttribute('aria-label')||button.textContent;button.setAttribute('aria-label',label);button.title=label;button.innerHTML=svg;button.firstElementChild.setAttribute('aria-hidden','true');button.firstElementChild.setAttribute('focusable','false');button.classList.add('spice-icon-button');};
   apply(root.querySelector('#spice-copy'),copy);
   apply(root.querySelector('#spice-label-edit'),labels);
+  apply(root.querySelector('#spice-group'),group);
   for(const [action,svg]of Object.entries(arrangements))apply(root.querySelector(`[data-editor-arrange="${action}"]`),svg);
   for(const [mode,svg]of Object.entries(modes))apply(root.querySelector(`[data-editor-mode="${mode}"]`),svg);
   for(const [id,svg]of Object.entries(ids))apply(root.querySelector('#spice-'+id),svg);

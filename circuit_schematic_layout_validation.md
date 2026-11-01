@@ -371,3 +371,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 工程写为 v2，并兼容 v1。校验标签身份、位置、D4 旋转/镜像、纯文本及生成 SVG 中的实际目标，拒绝未知标签而保留当前工程。全新浏览器会话恢复文字、位置、编辑域；Sallen–Key 上层 block 与 LM741 内部标签分别编辑、导航和往返保存通过。
 - 相关 24 项单元测试通过；完整 Jekyll 页面上的标签端到端测试、既有选框/排列、项目恢复、全屏浮窗与人工布线/旋转/ASC Bundle 回归通过。
 - 日志：`tmp/label-mode-unit.log`、`tmp/label-mode-browser.log`、`tmp/label-mode-site.log`、`tmp/label-mode-selection.log`、`tmp/label-mode-project.log`、`tmp/label-mode-workspace.log`、`tmp/label-mode-interactive.log`。截图：`tmp/label-edit-fullscreen.png`。
+
+## 人工元件编组
+
+- Group 按钮位于选框之后，支持合并、解除、撤销/重做；选组时整组选取，框选按组外包围盒判断，移动/排列/旋转/镜像保持内部相对位置与端口身份。碰撞检查包含组内空隙，拒绝外部元件侵入或包住未选中的元件。
+- 网表、拓扑签名、子电路界定与器件集合保持原样。单元测试直接穿过组内部空隙寻找自动路径，证明自动布线不使用组包围盒；浏览器验证 Auto-route 不改变位置/组记录，而 Generate 清除当前人工组。
+- 工程 v3 保存成员标识并兼容 v1/v2，验证未知/重复成员及包围盒碰撞；非法导入保留当前工程。全新会话恢复组选择，SVG 不包含编辑框。标签编辑模式禁用编组按钮。
+- 相关 29 项单元测试及人工编组浏览器验收通过。日志：`tmp/groups-unit.log`、`tmp/groups-browser.log`、`tmp/groups-labels.log`；截图：`tmp/manual-groups-fullscreen.png`。
+- 完整 Jekyll 页面编组验收及既有人工布线、全屏浮窗、工程恢复回归通过。日志：`tmp/groups-site.log`、`tmp/groups-interactive.log`、`tmp/groups-workspace.log`、`tmp/groups-project.log`。

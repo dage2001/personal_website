@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPICE Netlist Viewer</title>
 <style>body{margin:0;background:#faf9f6;color:#292b29;font-family:Arial,sans-serif}main{max-width:1440px;margin:40px auto;padding:0 24px}h1{font-size:32px;letter-spacing:-1px}a{color:#344b40}header p{color:#74776e}</style>
-<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-By28ChQD.js"></script>
+<link rel="stylesheet" href="./viewer.css"><script type="module" src="./viewer-Dxr87qPp.js"></script>
 </head><body><main><header><p>CIRCUITS &amp; ELECTRONICS / ⏚</p><h1>SPICE Netlist Viewer</h1><p>Explore nested circuits. Expand blocks or open an instance sheet, then export the schematic as SVG.</p></header>
 <div class="spice-app" id="spice-app">
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
@@ -59,6 +59,7 @@
         <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="select">Single select</option><option value="box">Box select</option><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
         <button type="button" data-editor-mode="select" title="Single select / exit tool (S, Escape)" aria-pressed="true">Select</button>
         <button type="button" data-editor-mode="box" title="CAD box select: left-to-right contains, right-to-left crosses (B)" aria-pressed="false">Box select</button>
+        <button type="button" id="spice-group" title="Group selected components (Ctrl+G); select a group and click again to ungroup" aria-pressed="false" disabled>Group</button>
         <button type="button" data-editor-mode="move" title="Move selected components (V)" aria-pressed="false">Move</button>
         <button type="button" data-editor-mode="route" title="Route / branch (W)" aria-pressed="false">Wire</button>
         <button type="button" data-editor-mode="erase" title="Erase wire (D)" aria-pressed="false">Erase</button>

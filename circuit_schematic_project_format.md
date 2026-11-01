@@ -2,7 +2,7 @@
 
 Use **Download → Project** to save `spice-schematic.spiceproj`, and **Upload** to resume in this viewer. Upload also accepts ordinary SPICE netlists. No server, account or external service is required.
 
-Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version: 2`. Version 1 files remain readable. Version 2 prevents older viewers from silently dropping the new label-editing state. They contain:
+Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version: 3`. Version 1 and 2 files remain readable. New versions prevent older viewers from silently dropping label-editing or manual-group state. They contain:
 
 - Original netlist and uploaded library texts.
 - Drawing settings, display grid, grid visibility, editing and flywire modes.
@@ -10,10 +10,11 @@ Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version:
 - Node colors and automatic palette assignments.
 - Per-instance component positions, rotations/mirrors, pin identities and wire segments for each visited grid-enabled sheet. Incomplete wiring is saved; remaining flywires are derived from the actual connectivity when reopened.
 - Optional per-sheet `snapshot.labelOverrides`: stable owner/index identity, display text, owner-relative position and rotation/mirror orientation. Label editing mode is saved separately. Text changes are display annotations; original device values and node identities always come from the netlist.
+- Optional per-sheet `snapshot.manualGroups`: flat, disjoint sets of component identifiers for manual editing. Their bounding boxes are derived from member symbol geometry, excluding text. Groups never introduce SPICE subcircuits, nets, ports or layout directives. Automatic layout and automatic routing ignore them; Generate creates a fresh current sheet without manual grouping.
 
 Sheets are identified by instance path, topology signature and drawing settings. Repeated instances remain separate. Unvisited sheets are generated on demand from their subcircuit definitions. Alignment and distribution save their resulting placements and wiring like any other edit. Ground symbols retain their electrical identity and saved placement, despite being excluded from the SPICE device count. Undo history, activity logs, selection boxes, cursor guides, an unfinished route gesture and fullscreen window positions are session-only. Loading a project appends to the existing session log.
 
-The original netlist remains the electrical source of truth. The loader checks the file version, layout version, source hierarchy and every saved sheet's topology, then renders reference symbols locally and checks their identities, rigid transforms, grid coordinates, wire connectivity and label targets before replacing the current document. Imported SVG/HTML is never executed or inserted. Malformed or incompatible projects produce an explicit error and leave the current document intact. Both supported project versions require the same layout-rules version; future migrations must be explicit rather than silently discarding manual geometry.
+The original netlist remains the electrical source of truth. The loader checks the file version, layout version, source hierarchy and every saved sheet's topology, then renders reference symbols locally and checks their identities, rigid transforms, grid coordinates, wire connectivity, label targets and group membership/envelopes before replacing the current document. Imported SVG/HTML is never executed or inserted. Malformed or incompatible projects produce an explicit error and leave the current document intact. All supported project versions require the same layout-rules version; future migrations must be explicit rather than silently discarding manual geometry.
 
 Limits: 32 MiB per project, 2 million netlist characters, 1,000 saved sheet/configuration records; each record allows up to 10,000 components and 50,000 wire segments. The format is uncompressed and can be reviewed as text. It includes uploaded library contents, so sharing a project also shares those libraries.
 
