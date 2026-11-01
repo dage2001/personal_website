@@ -181,7 +181,7 @@ export function createInteractiveEditor(preview,$,{changed,inspect,getNetColor,r
   preview.addEventListener('pointerleave',()=>{if(!ghost&&!marquee){cursor=null;drawDraft();}});
   preview.addEventListener('wheel',e=>{requestAnimationFrame(()=>{if(enabled&&scene&&svg&&$('edit-tool').value==='route'){cursor=point(e);drawDraft();}});},{passive:true});
   document.addEventListener('keydown',e=>{
-    if($('download-dialog').open||$('label-dialog').open||$('clear-wires-dialog').open||!enabled||!scene||working||e.target.closest('input,textarea,select,[contenteditable="true"]')||!$('app').contains(e.target))return;
+    if($('download-dialog').open||$('label-dialog').open||$('clear-wires-dialog').open||$('upload-dialog').open||!enabled||!scene||working||e.target.closest('input,textarea,select,[contenteditable="true"]')||!$('app').contains(e.target))return;
     if(brushSource){if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();toggleLayoutBrush();}return;}const pin=e.target.closest('[data-editor-pin]'),k=e.key.toLowerCase();if((e.ctrlKey||e.metaKey)&&k==='g'){e.preventDefault();e.stopImmediatePropagation();toggleGroup(e.shiftKey);return;}if(k==='t'&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();e.stopImmediatePropagation();setLabelEditing(!labelMode);return;}if(labelMode&&e.key==='Enter'&&selection.size===1){e.preventDefault();e.stopImmediatePropagation();openLabel([...selection][0]);return;}
     if(pin&&$('edit-tool').value==='route'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();const p=scene.pins().find(p=>p.id===pin.dataset.editorPin);startOrEnd({x:p.x,y:p.y},p.bit);return;}
     if(e.key==='Backspace'&&$('edit-tool').value==='route'){

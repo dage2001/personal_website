@@ -49,7 +49,7 @@
 
   
   <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793547177">
-  <script type="module" src="/assets/spice-viewer/viewer-DuFUcCl9.js"></script>
+  <script type="module" src="/assets/spice-viewer/viewer-3I7WnujC.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -157,11 +157,9 @@
         <button type="button" data-example="follower">Emitter follower</button>
         <button type="button" data-example="sallen">Sallen–Key · LM741</button>
         <button type="button" data-example="instrumentation">Instrumentation amp</button>
-        <button type="button" id="spice-generate">Generate ↗</button>
+        <button type="button" id="spice-generate" title="Generate schematic" aria-label="Generate schematic">Generate</button>
       </div>
       <p class="spice-help" id="spice-example-info" aria-live="polite"></p>
-      <div class="spice-file-row"><label for="spice-file">Open netlist / project </label><input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,.spiceproj,application/json,text/plain"></div>
-      <div class="spice-file-row"><label for="spice-libraries">Library files </label><input type="file" id="spice-libraries" accept=".lib,.sub,.mod,.cir,.txt" multiple><p class="spice-help" id="spice-library-status">For .include / .lib dependencies</p></div>
       </div>
     </section>
     <section class="spice-panel" id="spice-canvas-panel">
@@ -174,7 +172,7 @@
         <button type="button" id="spice-zoom-in" aria-label="Zoom in">+</button>
         <button type="button" id="spice-fit">Fit</button><span id="spice-zoom-level">100%</span>
         <button type="button" id="spice-copy" title="Copy SVG" disabled>Copy SVG</button>
-        <button type="button" id="spice-upload" title="Upload SPICE netlist">Upload</button>
+        <button type="button" id="spice-upload" title="Open netlist, project or libraries">Upload</button>
         <button type="button" id="spice-open-download" title="Download schematic" aria-haspopup="dialog" disabled>Download</button>
       </div>
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
@@ -217,6 +215,14 @@
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
+  <input type="file" id="spice-file" accept=".cir,.sp,.spice,.net,.txt,.lib,.sub,.mod,.inc,.spiceproj,.json,application/json,text/plain" multiple hidden>
+  <dialog id="spice-upload-dialog" class="spice-download-dialog" aria-labelledby="spice-upload-title">
+    <div class="spice-download-heading"><h2 id="spice-upload-title">Choose file roles</h2></div>
+    <p>These files cannot be assigned automatically. Choose at most one main netlist; other files are libraries.</p>
+    <div id="spice-upload-choices"></div>
+    <p id="spice-upload-error" role="alert"></p>
+    <div class="spice-label-actions"><button type="button" id="spice-cancel-upload" autofocus>Cancel</button><button type="button" id="spice-confirm-upload">Open files</button></div>
+  </dialog>
   <dialog id="spice-clear-wires-dialog" class="spice-download-dialog" aria-labelledby="spice-clear-wires-title" aria-describedby="spice-clear-wires-description">
     <div class="spice-download-heading"><h2 id="spice-clear-wires-title">Clear all wiring?</h2></div>
     <p id="spice-clear-wires-description">Delete all wire segments on this sheet and show flywires instead? Component positions and the netlist are kept. You can undo this action.</p>
@@ -272,7 +278,6 @@
       <button type="button" id="spice-node-clear">Clear selected colors</button>
       <button type="button" id="spice-node-reset">Reset all colors</button>
     </div>
-    <details class="spice-node-palette"><summary>Palette</summary><div id="spice-node-swatches" class="spice-node-swatches" role="group" aria-label="Node color palette"></div></details>
     <div class="spice-table-wrap"><table class="spice-node-table"><thead><tr><th><input type="checkbox" id="spice-node-all" aria-label="Select all visible nodes"></th><th>Node</th><th>Wire color</th><th>Connected terminals</th></tr></thead><tbody id="spice-nets"></tbody></table></div>
   </details>
   <details id="spice-source-details"><summary>SVG source</summary><textarea id="spice-source" readonly aria-label="SVG source" spellcheck="false"></textarea></details>

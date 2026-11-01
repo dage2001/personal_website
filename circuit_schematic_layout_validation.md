@@ -394,3 +394,10 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 日志：`tmp/edit-toolbar-browser.log`；截图：`tmp/edit-toolbar-fullscreen.png`。
 - 完整 Tools 静态页上的新交互验收通过，并通过原有人工布线/ASC、编组、选框对齐、标签、格式刷、工程文件及全屏浮窗回归；相关 31 项单元测试通过。飞线覆盖层仍保持最上层，格式刷徽标位于其下。
 - 日志：`tmp/edit-toolbar-site.log`、`tmp/edit-icons-interactive.log`、`tmp/edit-icons-groups.log`、`tmp/edit-icons-selection.log`、`tmp/edit-icons-labels.log`、`tmp/edit-icons-brush.log`、`tmp/edit-icons-project.log`、`tmp/edit-icons-workspace.log`、`tmp/edit-icons-unit.log`。静态页沿用已有框架，仅精确替换 workspace include 与 Vite 资源引用。
+
+## 统一上传与 Palette 移除
+
+- 12 项相关单元测试通过，包括项目内容识别、定义型 .cir 自动作为库、路径/section 引用、多个主文件判定、重复名称与大小限制，以及既有工程/配色逻辑。
+- 浏览器验证仅保留工具栏上传、Generate 图标、网表与嵌套依赖库的无弹窗批量加载、库单独补传、UTF-16、重命名工程内容识别、未知/多主文件弹窗校验与取消；原有工程、多层级库和 741 恢复回归通过。Palette 不再存在于页面。
+- 日志：`tmp/upload-unit.log`、`tmp/upload-browser.log`、`tmp/upload-project.log`；截图：`tmp/unified-upload.png`。
+- 完整 Tools 静态页面验收通过；同时通过原有工程/库文件恢复与 Edit/Flywires 交互回归。日志：`tmp/upload-site.log`、`tmp/upload-edit-tools.log`、`tmp/upload-project.log`。上传读取与类型选择期间禁用 Generate，避免生成和文件读取交错。
