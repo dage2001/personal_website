@@ -2,7 +2,7 @@
 
 Use **Download → Project** to save `spice-schematic.spiceproj`, and **Upload** to resume in this viewer. Upload also accepts ordinary SPICE netlists. No server, account or external service is required.
 
-Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version: 3`. Version 1 and 2 files remain readable. New versions prevent older viewers from silently dropping label-editing or manual-group state. They contain:
+Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version: 4`. Version 1, 2 and 3 files remain readable. New versions prevent older viewers from silently dropping label-editing, manual-group or layout-template state. They contain:
 
 - Original netlist and uploaded library texts.
 - Drawing settings, display grid, grid visibility, editing and flywire modes.
@@ -11,6 +11,7 @@ Project files are UTF-8 JSON with `format: "spice-viewer-project"` and `version:
 - Per-instance component positions, rotations/mirrors, pin identities and wire segments for each visited grid-enabled sheet. Incomplete wiring is saved; remaining flywires are derived from the actual connectivity when reopened.
 - Optional per-sheet `snapshot.labelOverrides`: stable owner/index identity, display text, owner-relative position and rotation/mirror orientation. Label editing mode is saved separately. Text changes are display annotations; original device values and node identities always come from the netlist.
 - Optional per-sheet `snapshot.manualGroups`: flat, disjoint sets of component identifiers for manual editing. Their bounding boxes are derived from member symbol geometry, excluding text. Groups never introduce SPICE subcircuits, nets, ports or layout directives. Automatic layout and automatic routing ignore them; Generate creates a fresh current sheet without manual grouping.
+- Optional per-sheet `templateSource`: source instance path for a successfully applied layout format brush. All nested target sheets are saved separately with their corresponding source paths. This supports completion badges after reopening. Subsequent manual edits clear the affected sheet's and its ancestors' template markers for that drawing configuration. The active brush gesture and highlights are session-only.
 
 Sheets are identified by instance path, topology signature and drawing settings. Repeated instances remain separate. Unvisited sheets are generated on demand from their subcircuit definitions. Alignment and distribution save their resulting placements and wiring like any other edit. Ground symbols retain their electrical identity and saved placement, despite being excluded from the SPICE device count. Undo history, activity logs, selection boxes, cursor guides, an unfinished route gesture and fullscreen window positions are session-only. Loading a project appends to the existing session log.
 

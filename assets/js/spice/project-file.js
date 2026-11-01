@@ -4,7 +4,7 @@ import {validateLabelOverrides} from './label-model.js';
 import {validateManualGroups,groupCollision} from './manual-groups.js';
 
 export const projectFormat='spice-viewer-project';
-export const projectVersion=3;
+export const projectVersion=4;
 export const maxProjectBytes=32*1024*1024;
 const fail=message=>{throw Error('Invalid project: '+message);};
 const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
@@ -20,7 +20,7 @@ export function decodeProject(text){
   if(new TextEncoder().encode(text).length>maxProjectBytes)fail('file exceeds 32 MB.');
   let p;try{p=JSON.parse(text);}catch{fail('expected a JSON project file.');}
   if(!object(p)||p.format!==projectFormat)fail('unrecognized file format.');
-  if(![1,2,projectVersion].includes(p.version))fail('unsupported project version '+p.version+'.');
+  if(![1,2,3,projectVersion].includes(p.version))fail('unsupported project version '+p.version+'.');
   if(p.layoutRulesVersion!==layoutRulesVersion)fail('layout version differs; this project requires layout rules v'+p.layoutRulesVersion+'.');
   if(typeof p.source!=='string'||p.source.length>2000000||typeof p.focus!=='string')fail('missing netlist or sheet.');
   if(!object(p.libraries)||Object.entries(p.libraries).some(([name,text])=>!name||['__proto__','constructor','prototype'].includes(name)||typeof text!=='string'))fail('invalid libraries.');
@@ -35,6 +35,7 @@ export function decodeProject(text){
     validateSettings(s.settings);const key=sheetKey(s.scope,s.topology,s.settings);if(keys.has(key))fail('duplicate sheet.');keys.add(key);
     if(s.settings.gridSize!==4||!s.settings.conventional)fail('saved manual scenes require the fixed 4-unit grid.');
     if(s.view!==undefined&&!validView(s.view))fail('invalid sheet viewport.');
+    if(s.templateSource!==undefined&&(typeof s.templateSource!=='string'||!s.templateSource||s.templateSource===s.scope||s.templateSource.length>10000))fail('invalid layout template source.');
     validateSnapshot(s.snapshot);
   }
   return p;

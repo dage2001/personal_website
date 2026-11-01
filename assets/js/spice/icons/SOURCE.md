@@ -11,3 +11,4 @@ download.svg and upload.svg: official Lucide release 0.468.0, ISC license.
 mouse-pointer-2.svg, square-dashed-mouse-pointer.svg, copy.svg and the align-*.svg subset: official Lucide release 0.468.0, ISC license.
 square-dashed-text.svg: official Lucide repository main, fetched 2026-11-01, ISC license.
 group.svg: official Lucide release 0.468.0, ISC license; manual editor groups only.
+paintbrush.svg and circle-check.svg: official Lucide release 0.468.0, ISC license; subcircuit layout format brush and applied-template marker.
