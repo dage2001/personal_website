@@ -401,3 +401,7 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 浏览器验证仅保留工具栏上传、Generate 图标、网表与嵌套依赖库的无弹窗批量加载、库单独补传、UTF-16、重命名工程内容识别、未知/多主文件弹窗校验与取消；原有工程、多层级库和 741 恢复回归通过。Palette 不再存在于页面。
 - 日志：`tmp/upload-unit.log`、`tmp/upload-browser.log`、`tmp/upload-project.log`；截图：`tmp/unified-upload.png`。
 - 完整 Tools 静态页面验收通过；同时通过原有工程/库文件恢复与 Edit/Flywires 交互回归。日志：`tmp/upload-site.log`、`tmp/upload-edit-tools.log`、`tmp/upload-project.log`。上传读取与类型选择期间禁用 Generate，避免生成和文件读取交错。
+
+## Generate 按钮位置与样式
+
+- 在既有编辑工具栏浏览器验收中核对 Generate 不在网表栏、文字与图标为白色、hover 保持原填充色、普通行与 Edit 垂直居中并靠右，全屏时紧邻 Reset windows 前的竖线，退出后返回原父节点。日志：`tmp/generate-position-browser.log`；截图：`tmp/edit-toolbar-fullscreen.png`。

@@ -25,6 +25,7 @@ export function createWorkspace(root){
     for(const id of Object.keys(panels)){styles[id].base=panels[id].style.cssText;if(styles[id].floating)panels[id].style.cssText=styles[id].floating;panels[id].setAttribute('role','dialog');panels[id].setAttribute('aria-modal','false');panels[id].setAttribute('aria-labelledby','spice-'+id+'-title');handles[id].tabIndex=0;handles[id].title='Drag to move; arrow keys move the window';showPanel(id,visible[id]);}
     for(const id of ['selection-actions','selection','hierarchy-panel'])dock($(id));
     const strip=$('workspace-strip');for(const id of ['hierarchy-bar','canvas-toolbar','edit-toolbar']){if(strip.childElementCount){const divider=document.createElement('span');divider.className='spice-tool-divider';divider.setAttribute('role','separator');divider.setAttribute('aria-orientation','vertical');strip.append(divider);}dock(id==='hierarchy-bar'?root.querySelector('.spice-hierarchy-bar'):$(id),strip);}
+    dock($('generate'),$('workspace-bar'));$('workspace-bar').insertBefore($('generate'),$('workspace-fixed-divider'));
     requestAnimationFrame(clamp);$('exit-fullscreen').focus({preventScroll:true});emit();
   }
   function deactivate(){
