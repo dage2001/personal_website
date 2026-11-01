@@ -149,5 +149,5 @@
 #spice-upload-choices{display:flex;flex-direction:column;gap:10px;margin:16px 0;max-height:40vh;overflow:auto}#spice-upload-choices label{display:flex;align-items:center;justify-content:space-between;gap:16px;overflow-wrap:anywhere}#spice-upload-choices select{flex-shrink:0;padding:6px;font:13px Arial,sans-serif}
 .spice-edit-controls{display:flex;align-items:center;gap:4px;flex:1;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}.spice-edit-controls::-webkit-scrollbar{display:none}
 .spice-app #spice-generate{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0;width:auto;height:32px;padding:6px 10px;white-space:nowrap;color:#fff;background:#344b40;border-color:#344b40}
-.spice-app #spice-generate svg{width:18px;height:18px;flex-shrink:0;pointer-events:none;stroke:currentColor}
+.spice-app #spice-generate svg{width:1em;height:1em;flex-shrink:0;pointer-events:none;color:#fff;stroke:#fff}
 .spice-is-fullscreen .spice-edit-controls{flex:none;overflow:visible}.spice-is-fullscreen #spice-workspace-bar #spice-generate{height:28px;padding:4px 9px;margin-left:0}
