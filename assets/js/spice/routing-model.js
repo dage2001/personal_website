@@ -1,3 +1,4 @@
+import {expandGroupSelection,manualUnits,groupCollision,validateManualGroups} from './manual-groups.js';
 const eps=.001,key=p=>Math.round(p.x*1000)+','+Math.round(p.y*1000),same=(a,b)=>Math.abs(a-b)<eps;
 export const pointOnWire=(p,s)=>same(s.a.x,s.b.x)?same(p.x,s.a.x)&&p.y>=Math.min(s.a.y,s.b.y)-eps&&p.y<=Math.max(s.a.y,s.b.y)+eps:same(p.y,s.a.y)&&p.x>=Math.min(s.a.x,s.b.x)-eps&&p.x<=Math.max(s.a.x,s.b.x)+eps;
 const length=s=>Math.abs(s.a.x-s.b.x)+Math.abs(s.a.y-s.b.y),hits=(s,n)=>Math.max(s.a.x,s.b.x)>n.x+eps&&Math.min(s.a.x,s.b.x)<n.x+n.width-eps&&Math.max(s.a.y,s.b.y)>n.y+eps&&Math.min(s.a.y,s.b.y)<n.y+n.height-eps;
@@ -5,8 +6,8 @@ function clean(ps){const out=[];for(const p of ps){if(out.length&&key(out.at(-1)
 export class RoutingScene {
   constructor(drawing,{step=8,segments=drawing.segments}={}){this.step=step;this.components=structuredClone(drawing.components);this.segments=structuredClone(segments);this.seed=structuredClone(this.segments);this.initial=JSON.stringify(this.components);this.base={width:drawing.width,height:drawing.height};this.undoStack=[];this.redoStack=[];this.cache=null;}
   pins(){return this.pinCache||(this.pinCache=this.components.flatMap(n=>n.ports.map(p=>({...p,owner:n.id,id:n.id+'.'+p.pin}))));}
-  snapshot(){return structuredClone({components:this.components,segments:this.segments,...(this.labelOverrides?.length?{labelOverrides:this.labelOverrides}:{})});}
-  restore(s){this.components=structuredClone(s.components);this.segments=structuredClone(s.segments);this.labelOverrides=structuredClone(s.labelOverrides||[]);this.cache=null;this.pinCache=null;}
+  snapshot(){return structuredClone({components:this.components,segments:this.segments,...(this.labelOverrides?.length?{labelOverrides:this.labelOverrides}:{}),...(this.manualGroups?.length?{manualGroups:this.manualGroups}:{})});}
+  restore(s){this.components=structuredClone(s.components);this.segments=structuredClone(s.segments);this.labelOverrides=structuredClone(s.labelOverrides||[]);this.manualGroups=structuredClone(s.manualGroups||[]);this.cache=null;this.pinCache=null;}
   remember(before=this.snapshot()){this.undoStack.push(before);if(this.undoStack.length>60)this.undoStack.shift();this.redoStack=[];this.cache=null;this.pinCache=null;}
   undo(){if(!this.undoStack.length)return;this.redoStack.push(this.snapshot());this.restore(this.undoStack.pop());}
   redo(){if(!this.redoStack.length)return;this.undoStack.push(this.snapshot());this.restore(this.redoStack.pop());}
@@ -24,11 +25,12 @@ export class RoutingScene {
     }return true;
   }
   addPath(bit,path){const ps=clean(path),parts=ps.slice(1).map((b,i)=>({bit,a:ps[i],b})).filter(s=>length(s)>eps);if(!parts.length)return false;if(parts.some(s=>!this.validSegment(s,bit)))throw Error('Route blocked by a component or another node.');this.remember();this.segments.push(...parts);return true;}
-  move(id,dx,dy){dx=Math.round(dx/this.step)*this.step;dy=Math.round(dy/this.step)*this.step;if(!dx&&!dy)return;const before=this.snapshot(),n=this.components.find(n=>n.id===id);if(!n)return;const old=n.ports.map(p=>({...p}));this.segments=this.segments.filter(s=>!old.some(p=>p.bit===s.bit&&(key(p)===key(s.a)||key(p)===key(s.b))));n.x+=dx;n.y+=dy;for(const p of n.ports){p.x+=dx;p.y+=dy;}
+  move(id,dx,dy){if(this.manualGroups?.length)return this.moveMany([{id,dx,dy}]);dx=Math.round(dx/this.step)*this.step;dy=Math.round(dy/this.step)*this.step;if(!dx&&!dy)return;const before=this.snapshot(),n=this.components.find(n=>n.id===id);if(!n)return;const old=n.ports.map(p=>({...p}));this.segments=this.segments.filter(s=>!old.some(p=>p.bit===s.bit&&(key(p)===key(s.a)||key(p)===key(s.b))));n.x+=dx;n.y+=dy;for(const p of n.ports){p.x+=dx;p.y+=dy;}
     this.pinCache=null;const overlap=this.components.some(m=>m!==n&&n.x<m.x+m.width-eps&&n.x+n.width>m.x+eps&&n.y<m.y+m.height-eps&&n.y+n.height>m.y+eps);
     if(overlap||this.segments.some(s=>!this.validSegment(s,s.bit))||n.ports.some(p=>this.pins().some(q=>q.owner!==id&&q.bit!==p.bit&&key(q)===key(p)))){this.restore(before);throw Error('Drop blocked: a component or another node occupies that position.');}this.remember(before);
   }
   moveMany(moves){
+    const expanded=new Map(moves.map(m=>[m.id,{...m}]));for(const g of this.manualGroups||[]){const chosen=g.members.map(id=>expanded.get(id)).filter(Boolean);if(!chosen.length)continue;const first=chosen[0];if(chosen.some(m=>m.dx!==first.dx||m.dy!==first.dy))throw Error('Grouped components must move together.');for(const id of g.members)expanded.set(id,{id,dx:first.dx,dy:first.dy});}moves=[...expanded.values()];
     const translations=new Map(moves.map(m=>[m.id,{dx:Math.round(m.dx/this.step)*this.step,dy:Math.round(m.dy/this.step)*this.step}]).filter(([,d])=>d.dx||d.dy));
     const moving=this.components.filter(n=>translations.has(n.id));if(!moving.length)return false;
     const before=this.snapshot(),old=moving.flatMap(n=>n.ports);
@@ -37,10 +39,11 @@ export class RoutingScene {
     for(const n of moving){const d=translations.get(n.id);n.x+=d.dx;n.y+=d.dy;for(const p of n.ports){p.x+=d.dx;p.y+=d.dy;}}
     this.pinCache=null;this.cache=null;
     const pins=this.pins(),overlap=moving.some(n=>this.components.some(m=>m!==n&&n.x<m.x+m.width-eps&&n.x+n.width>m.x+eps&&n.y<m.y+m.height-eps&&n.y+n.height>m.y+eps));
-    if(overlap||pins.some(p=>!this.onGrid(p)||pins.some(q=>q.owner!==p.owner&&q.bit!==p.bit&&key(q)===key(p)))||this.segments.some(s=>!this.validSegment(s,s.bit))){this.restore(before);throw Error('Arrangement blocked: a component or another node occupies the target position.');}
+    if(overlap||groupCollision(this.components,this.manualGroups)||pins.some(p=>!this.onGrid(p)||pins.some(q=>q.owner!==p.owner&&q.bit!==p.bit&&key(q)===key(p)))||this.segments.some(s=>!this.validSegment(s,s.bit))){this.restore(before);throw Error('Arrangement blocked: a component, manual group or another node occupies the target position.');}
     this.remember(before);return true;
   }
   transform(id,action){
+    const group=this.manualGroups?.find(g=>g.members.includes(id));if(group)return this.transformGroup(group.id,action);
     const n=this.components.find(n=>n.id===id);if(!n)return;const before=this.snapshot(),w=n.width,h=n.height;
     const m=action==='rotate'?[0,1,-1,0,h,0]:action==='mirror-x'?[1,0,0,-1,0,h]:action==='mirror-y'?[-1,0,0,1,w,0]:null;if(!m)throw Error('Unknown transform.');
     const old=n.ports.map(p=>({...p})),apply=p=>({x:m[0]*p.x+m[2]*p.y+m[4],y:m[1]*p.x+m[3]*p.y+m[5]});
@@ -49,7 +52,20 @@ export class RoutingScene {
     for(const p of n.ports){const q=apply({x:p.x-n.x,y:p.y-n.y});p.x=n.x+q.x;p.y=n.y+q.y;p.side=sides[p.side]||p.side;}
     const b=n.editorMatrix||[1,0,0,1,0,0];n.editorMatrix=[m[0]*b[0]+m[2]*b[1],m[1]*b[0]+m[3]*b[1],m[0]*b[2]+m[2]*b[3],m[1]*b[2]+m[3]*b[3],m[0]*b[4]+m[2]*b[5]+m[4],m[1]*b[4]+m[3]*b[5]+m[5]];
     if(action==='rotate'){n.width=h;n.height=w;}this.pinCache=null;
-    if(n.ports.some(p=>!this.onGrid(p))||this.components.some(q=>q!==n&&n.x<q.x+q.width-eps&&n.x+n.width>q.x+eps&&n.y<q.y+q.height-eps&&n.y+n.height>q.y+eps)||this.segments.some(s=>!this.validSegment(s,s.bit))||n.ports.some(p=>this.pins().some(q=>q.owner!==id&&q.bit!==p.bit&&key(q)===key(p)))){this.restore(before);throw Error('Transform blocked: a component or wire occupies that position.');}this.remember(before);
+    if(groupCollision(this.components,this.manualGroups)||n.ports.some(p=>!this.onGrid(p))||this.components.some(q=>q!==n&&n.x<q.x+q.width-eps&&n.x+n.width>q.x+eps&&n.y<q.y+q.height-eps&&n.y+n.height>q.y+eps)||this.segments.some(s=>!this.validSegment(s,s.bit))||n.ports.some(p=>this.pins().some(q=>q.owner!==id&&q.bit!==p.bit&&key(q)===key(p)))){this.restore(before);throw Error('Transform blocked: a component or wire occupies that position.');}this.remember(before);
+  }
+  group(ids){
+    const members=[...expandGroupSelection(ids,this.manualGroups)],next=(this.manualGroups||[]).filter(g=>!g.members.some(id=>members.includes(id)));if(members.length<2)throw Error('Select at least two components to group.');
+    let index=1;while(next.some(g=>g.id==='g'+index))index++;const group={id:'g'+index,members};next.push(group);validateManualGroups(next,this.components);if(groupCollision(this.components,next))throw Error('Group box overlaps an unselected component or another group. Include it in the selection or move it away.');this.remember();this.manualGroups=next;return group;
+  }
+  ungroup(ids){const chosen=new Set(ids),next=(this.manualGroups||[]).filter(g=>!g.members.some(id=>chosen.has(id)));if(next.length===(this.manualGroups||[]).length)return false;this.remember();this.manualGroups=next;return true;}
+  transformGroup(id,action){
+    const g=this.manualGroups?.find(g=>g.id===id);if(!g)return;const box=manualUnits(this.components,[g]).find(n=>n.groupId===id),t=action==='rotate'?[0,1,-1,0,box.height,0]:action==='mirror-x'?[1,0,0,-1,0,box.height]:action==='mirror-y'?[-1,0,0,1,box.width,0]:null;if(!t)throw Error('Unknown group transform.');
+    const before=this.snapshot(),members=this.components.filter(n=>g.members.includes(n.id)),old=members.flatMap(n=>n.ports);this.segments=this.segments.filter(s=>!old.some(p=>p.bit===s.bit&&pointOnWire(p,s)));
+    const apply=p=>({x:box.x+t[0]*(p.x-box.x)+t[2]*(p.y-box.y)+t[4],y:box.y+t[1]*(p.x-box.x)+t[3]*(p.y-box.y)+t[5]}),sides=action==='rotate'?{NORTH:'EAST',EAST:'SOUTH',SOUTH:'WEST',WEST:'NORTH'}:action==='mirror-x'?{NORTH:'SOUTH',SOUTH:'NORTH'}:{EAST:'WEST',WEST:'EAST'};
+    for(const n of members){const w=n.width,h=n.height,ps=[apply(n),apply({x:n.x+w,y:n.y+h})],x=Math.min(...ps.map(p=>p.x)),y=Math.min(...ps.map(p=>p.y)),origin=apply(n),b=n.editorMatrix||[1,0,0,1,0,0];n.editorMatrix=[t[0]*b[0]+t[2]*b[1],t[1]*b[0]+t[3]*b[1],t[0]*b[2]+t[2]*b[3],t[1]*b[2]+t[3]*b[3],t[0]*b[4]+t[2]*b[5]+origin.x-x,t[1]*b[4]+t[3]*b[5]+origin.y-y];for(const p of n.ports){const q=apply(p);p.x=q.x;p.y=q.y;p.side=sides[p.side]||p.side;}n.x=x;n.y=y;if(action==='rotate'){n.width=h;n.height=w;}}
+    this.pinCache=null;this.cache=null;const pins=this.pins(),overlap=members.some(n=>this.components.some(m=>m!==n&&n.x<m.x+m.width-eps&&n.x+n.width>m.x+eps&&n.y<m.y+m.height-eps&&n.y+n.height>m.y+eps));
+    if(overlap||groupCollision(this.components,this.manualGroups)||pins.some(p=>!this.onGrid(p)||pins.some(q=>q.bit!==p.bit&&key(q)===key(p)))||this.segments.some(s=>!this.validSegment(s,s.bit))){this.restore(before);throw Error('Group transform blocked by a component, wire or another node.');}this.remember(before);
   }
   connectivity(){
     if(this.cache)return this.cache;const nets=new Map();for(const p of this.pins()){if(!nets.has(p.bit))nets.set(p.bit,{pins:[],segments:[]});nets.get(p.bit).pins.push(p);}for(const s of this.segments){if(!nets.has(s.bit))nets.set(s.bit,{pins:[],segments:[]});nets.get(s.bit).segments.push(s);}
@@ -60,7 +76,7 @@ export class RoutingScene {
   }
   airwires(){const result=[];for(const {bit,islands}of this.connectivity()){if(islands.length<2)continue;const joined=new Set([0]);while(joined.size<islands.length){let best;for(const i of joined)for(let j=0;j<islands.length;j++)if(!joined.has(j))for(const a of islands[i].points)for(const b of islands[j].points){const d=(a.x-b.x)**2+(a.y-b.y)**2;if(!best||d<best.d)best={bit,a,b,d,j};}result.push(best);joined.add(best.j);}}return result;}
   bounds(){const xs=[-20,this.base.width+20],ys=[-20,this.base.height+20];for(const n of this.components){xs.push(n.x-20,n.x+n.width+20);ys.push(n.y-20,n.y+n.height+20);}for(const s of this.segments){xs.push(s.a.x-20,s.b.x+20);ys.push(s.a.y-20,s.b.y+20);}const x=Math.min(...xs),y=Math.min(...ys);return {x,y,w:Math.max(...xs)-x,h:Math.max(...ys)-y};}
-  drawing(){const b=this.bounds();return {version:1,width:b.w,height:b.h,components:structuredClone(this.components.filter(n=>!n.decoration)),segments:structuredClone(this.segments),...(this.labelOverrides?.length?{labelOverrides:structuredClone(this.labelOverrides)}:{})};}
+  drawing(){const b=this.bounds();return {version:1,width:b.w,height:b.h,components:structuredClone(this.components.filter(n=>!n.decoration)),segments:structuredClone(this.segments),...(this.labelOverrides?.length?{labelOverrides:structuredClone(this.labelOverrides)}:{}),...(this.manualGroups?.length?{manualGroups:structuredClone(this.manualGroups)}:{})};}
   findPath(bit,a,b){
     if(!this.onGrid(a)||!this.onGrid(b))return null;const good=ps=>ps.slice(1).every((p,i)=>this.validSegment({a:ps[i],b:p},bit));for(const ps of [[a,b],[a,{x:b.x,y:a.y},b],[a,{x:a.x,y:b.y},b]]){const path=clean(ps);if(good(path))return path;}
     const g=this.step,bs=this.bounds(),minX=Math.floor(Math.min(bs.x,a.x,b.x)/g)-5,maxX=Math.ceil(Math.max(bs.x+bs.w,a.x,b.x)/g)+5,minY=Math.floor(Math.min(bs.y,a.y,b.y)/g)-5,maxY=Math.ceil(Math.max(bs.y+bs.h,a.y,b.y)/g)+5;

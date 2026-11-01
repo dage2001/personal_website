@@ -29,10 +29,10 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="/assets/main.css?v=1793490076">
+  <link rel="stylesheet" href="/assets/main.css?v=1793547177">
   <link rel="canonical" href="https://jordan-wang.win/tools/spice-netlist-viewer/">
   
-  <link rel="icon" href="/favicon.ico?v=1793490076" sizes="any">
+  <link rel="icon" href="/favicon.ico?v=1793547177" sizes="any">
   <link rel="alternate" type="application/rss+xml" title="Junda Wang" href="https://jordan-wang.win/feed.xml">
 
   <!-- Accent color from config -->
@@ -48,8 +48,8 @@
   
 
   
-  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793490076">
-  <script type="module" src="/assets/spice-viewer/viewer-By28ChQD.js"></script>
+  <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793547177">
+  <script type="module" src="/assets/spice-viewer/viewer-Dxr87qPp.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -184,6 +184,7 @@
         <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="select">Single select</option><option value="box">Box select</option><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
         <button type="button" data-editor-mode="select" title="Single select / exit tool (S, Escape)" aria-pressed="true">Select</button>
         <button type="button" data-editor-mode="box" title="CAD box select: left-to-right contains, right-to-left crosses (B)" aria-pressed="false">Box select</button>
+        <button type="button" id="spice-group" title="Group selected components (Ctrl+G); select a group and click again to ungroup" aria-pressed="false" disabled>Group</button>
         <button type="button" data-editor-mode="move" title="Move selected components (V)" aria-pressed="false">Move</button>
         <button type="button" data-editor-mode="route" title="Route / branch (W)" aria-pressed="false">Wire</button>
         <button type="button" data-editor-mode="erase" title="Erase wire (D)" aria-pressed="false">Erase</button>
@@ -312,7 +313,7 @@
 </footer>
 
 <script src="/assets/javascript/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js?v=1793490076"></script>
+<script src="/assets/js/site.js?v=1793547177"></script>
 
 
 

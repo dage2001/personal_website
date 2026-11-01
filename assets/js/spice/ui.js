@@ -49,6 +49,7 @@ if (root) {
   async function enableEditing(){if(!drawing||!circuit?.layout.report?.gridVerified){$('grid').checked=true;$('conventional').checked=true;await generate({resetEditor:true});}editor.setEnabled($('interactive').checked);exports();}
   $('interactive').onchange=enableEditing;
   $('label-edit').onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.setLabelEditing(!editor.labelEditing());preview.focus({preventScroll:true});};
+  $('group').onclick=()=>{editor.toggleGroup();preview.focus({preventScroll:true});};
   $('flywire').onchange=async()=>{$('interactive').checked=true;await enableEditing();if($('flywire').checked)editor.clear();else await editor.autoRoute();exports();};
   $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
   $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();

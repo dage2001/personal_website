@@ -1,9 +1,10 @@
 import {RoutingScene} from './routing-model.js';
 import {layoutRulesVersion} from './layout-semantics.js';
 import {validateLabelOverrides} from './label-model.js';
+import {validateManualGroups,groupCollision} from './manual-groups.js';
 
 export const projectFormat='spice-viewer-project';
-export const projectVersion=2;
+export const projectVersion=3;
 export const maxProjectBytes=32*1024*1024;
 const fail=message=>{throw Error('Invalid project: '+message);};
 const object=v=>v&&typeof v==='object'&&!Array.isArray(v);
@@ -19,7 +20,7 @@ export function decodeProject(text){
   if(new TextEncoder().encode(text).length>maxProjectBytes)fail('file exceeds 32 MB.');
   let p;try{p=JSON.parse(text);}catch{fail('expected a JSON project file.');}
   if(!object(p)||p.format!==projectFormat)fail('unrecognized file format.');
-  if(![1,projectVersion].includes(p.version))fail('unsupported project version '+p.version+'.');
+  if(![1,2,projectVersion].includes(p.version))fail('unsupported project version '+p.version+'.');
   if(p.layoutRulesVersion!==layoutRulesVersion)fail('layout version differs; this project requires layout rules v'+p.layoutRulesVersion+'.');
   if(typeof p.source!=='string'||p.source.length>2000000||typeof p.focus!=='string')fail('missing netlist or sheet.');
   if(!object(p.libraries)||Object.entries(p.libraries).some(([name,text])=>!name||['__proto__','constructor','prototype'].includes(name)||typeof text!=='string'))fail('invalid libraries.');
@@ -45,6 +46,7 @@ export function encodeProject(data){
 export function validateSnapshot(s){
   if(!object(s)||!Array.isArray(s.components)||!Array.isArray(s.segments)||s.components.length>10000||s.segments.length>50000)fail('invalid scene size.');
   validateLabelOverrides(s.labelOverrides);
+  validateManualGroups(s.manualGroups,s.components);
   const ids=new Set();
   for(const n of s.components){
     if(!object(n)||typeof n.id!=='string'||ids.has(n.id)||!point(n)||!number(n.width)||!number(n.height)||n.width<0||n.height<0||!Array.isArray(n.ports)||n.ports.length>2000)fail('invalid component geometry.');ids.add(n.id);
@@ -70,9 +72,10 @@ export function restoreProjectScene(base,snapshot,step){
     return {...b,x:n.x,y:n.y,width:n.width,height:n.height,ports,...(n.editorMatrix?{editorMatrix:[...m]}:{})};
   });
   const scene=new RoutingScene({...base,components,segments:snapshot.segments},{step});
+  if(groupCollision(components,snapshot.manualGroups))fail('manual group boxes overlap other components or groups.');
   for(let i=0;i<components.length;i++)for(let j=i+1;j<components.length;j++){const a=components[i],b=components[j];if(a.x<b.x+b.width-.001&&a.x+a.width>b.x+.001&&a.y<b.y+b.height-.001&&a.y+a.height>b.y+.001)fail('component symbols overlap.');}
   const bits=new Set(scene.pins().map(p=>p.bit));
   if(scene.pins().some(p=>!scene.onGrid(p))||scene.segments.some(w=>!bits.has(w.bit)||!scene.validSegment(w,w.bit)))fail('off-grid wire, symbol collision or short circuit.');
   const positions=new Map();for(const p of scene.pins()){const key=p.x+','+p.y;if(positions.has(key)&&positions.get(key)!==p.bit)fail('different nodes share a pin position.');positions.set(key,p.bit);}
-  return {...scene.snapshot(),...(snapshot.labelOverrides?.length?{labelOverrides:structuredClone(snapshot.labelOverrides)}:{})};
+  return {...scene.snapshot(),...(snapshot.labelOverrides?.length?{labelOverrides:structuredClone(snapshot.labelOverrides)}:{}),...(snapshot.manualGroups?.length?{manualGroups:structuredClone(snapshot.manualGroups)}:{})};
 }
