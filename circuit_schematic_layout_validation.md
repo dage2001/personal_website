@@ -387,3 +387,10 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 实际 VDPO 工程中的 XOL/XOC、XIL/XIC、XDIL/XDIC 和含嵌套 XM 的 XFBL/XFBC 同构检查通过（各约 6–17 ms，为本机当次测量，不是性能保证）。
 - 日志：`tmp/brush-unit.log`、`tmp/brush-browser.log`、`tmp/brush-groups.log`、`tmp/brush-labels.log`。截图：`tmp/layout-brush-applied.png`。
 - 完整 Tools 静态页面验收与既有人工布线/全屏浮窗/工程恢复回归通过。日志：`tmp/brush-site.log`、`tmp/brush-interactive.log`、`tmp/brush-workspace.log`、`tmp/brush-project.log`。当次 Docker 引擎未就绪，未运行完整 Jekyll 构建；生成页按完全匹配的旧 workspace 替换为新 include，并更新 Vite bundle 引用，其余页面内容保留。
+
+## Edit / Flywires 图标与展开工具栏
+
+- 验证真实按钮与图标、默认折叠及 inert、展开过程的中间宽度、退出后工具重置、清线确认/取消/Escape、布线草稿保持、确认后几何与网表不变、Undo、单次清线语义、全新会话恢复、全屏模式与 reduced-motion。
+- 日志：`tmp/edit-toolbar-browser.log`；截图：`tmp/edit-toolbar-fullscreen.png`。
+- 完整 Tools 静态页上的新交互验收通过，并通过原有人工布线/ASC、编组、选框对齐、标签、格式刷、工程文件及全屏浮窗回归；相关 31 项单元测试通过。飞线覆盖层仍保持最上层，格式刷徽标位于其下。
+- 日志：`tmp/edit-toolbar-site.log`、`tmp/edit-icons-interactive.log`、`tmp/edit-icons-groups.log`、`tmp/edit-icons-selection.log`、`tmp/edit-icons-labels.log`、`tmp/edit-icons-brush.log`、`tmp/edit-icons-project.log`、`tmp/edit-icons-workspace.log`、`tmp/edit-icons-unit.log`。静态页沿用已有框架，仅精确替换 workspace include 与 Vite 资源引用。

@@ -20,3 +20,5 @@ The original netlist remains the electrical source of truth. The loader checks t
 Limits: 32 MiB per project, 2 million netlist characters, 1,000 saved sheet/configuration records; each record allows up to 10,000 components and 50,000 wire segments. The format is uncompressed and can be reviewed as text. It includes uploaded library contents, so sharing a project also shares those libraries.
 
 SVG, ASC and Bundle remain export formats for the current sheet. Bundle includes the ASC, generated ASY symbols, original netlist, libraries and connectivity manifest for LTspice. It does not restore this viewer's complete interactive editing state; use Project for that purpose.
+
+The `interactive` field restores the Edit button and horizontal tool reveal. Flywires is now a one-shot, confirmed action on the current sheet; new exports retain the legacy `flywire` field as `false`. Legacy files with `flywire: true` still restore their saved incomplete wiring, but the flag never clears additional or newly generated sheets. Use Auto-route explicitly to complete the saved wiring.

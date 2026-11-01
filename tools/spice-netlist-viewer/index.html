@@ -49,7 +49,7 @@
 
   
   <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793547177">
-  <script type="module" src="/assets/spice-viewer/viewer-q0FdZSeq.js"></script>
+  <script type="module" src="/assets/spice-viewer/viewer-DuFUcCl9.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -195,8 +195,9 @@
         <button type="button" id="spice-open-download" title="Download schematic" aria-haspopup="dialog" disabled>Download</button>
       </div>
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
-        <label title="Enable interactive component placement and wiring"><input type="checkbox" id="spice-interactive"> Edit</label>
-        <label title="Start with automatic placement and straight flywires"><input type="checkbox" id="spice-flywire"> Flywires</label>
+        <button type="button" id="spice-interactive" title="Edit schematic" aria-pressed="false" aria-expanded="false" aria-controls="spice-edit-tools-reveal">Edit</button>
+        <div class="spice-edit-tools-reveal" id="spice-edit-tools-reveal" inert><div class="spice-edit-tools-inner" id="spice-edit-tools-inner">
+        <button type="button" id="spice-flywire" title="Clear wiring and show flywires" aria-haspopup="dialog">Flywires</button>
         <button type="button" id="spice-label-edit" title="Edit labels: lock components and wires (T)" aria-pressed="false">Labels</button>
         <select id="spice-edit-tool" aria-label="Wiring tool" hidden><option value="select">Single select</option><option value="box">Box select</option><option value="move">Move / select</option><option value="route">Route / branch</option><option value="erase">Erase wire</option><option value="rotate">Rotate</option><option value="mirror-x">Mirror X</option><option value="mirror-y">Mirror Y</option></select>
         <button type="button" data-editor-mode="select" title="Single select / exit tool (S, Escape)" aria-pressed="true">Select</button>
@@ -225,6 +226,7 @@
         <button type="button" id="spice-layout-brush" title="Copy the selected subcircuit's internal layout" aria-pressed="false" disabled>Layout format brush</button>
         <button type="button" id="spice-wire-undo">Undo</button><button type="button" id="spice-wire-redo">Redo</button>
         <span id="spice-editor-status" role="status" aria-live="polite">Enable Interactive to move components or wire pins.</span>
+        </div></div>
       </div>
       </div>
       </div>
@@ -232,6 +234,11 @@
       <div id="spice-selection-actions" class="spice-toolbar" hidden><a id="spice-open-instance" href="#">Open instance sheet ↗</a></div>
     </section>
   </div>
+  <dialog id="spice-clear-wires-dialog" class="spice-download-dialog" aria-labelledby="spice-clear-wires-title" aria-describedby="spice-clear-wires-description">
+    <div class="spice-download-heading"><h2 id="spice-clear-wires-title">Clear all wiring?</h2></div>
+    <p id="spice-clear-wires-description">Delete all wire segments on this sheet and show flywires instead? Component positions and the netlist are kept. You can undo this action.</p>
+    <div class="spice-label-actions"><button type="button" id="spice-cancel-clear-wires" autofocus>Cancel</button><button type="button" id="spice-confirm-clear-wires">Clear wiring</button></div>
+  </dialog>
   <dialog id="spice-label-dialog" class="spice-download-dialog" aria-labelledby="spice-label-title">
     <div class="spice-download-heading"><h2 id="spice-label-title">Edit display text</h2><button type="button" id="spice-close-label" aria-label="Close label editor">×</button></div>
     <p>Display only. The SPICE netlist, component values and node identities stay unchanged.</p>
