@@ -49,7 +49,7 @@
 
   
   <link rel="stylesheet" href="/assets/spice-viewer/viewer.css?v=1793547177">
-  <script type="module" src="/assets/spice-viewer/viewer-3I7WnujC.js"></script>
+  <script type="module" src="/assets/spice-viewer/viewer-B1jpP9LE.js"></script>
   
 
   <!-- JSON-LD Structured Data -->
@@ -132,7 +132,7 @@
   <noscript>Enable JavaScript to parse netlists and generate a schematic locally.</noscript>
   <div class="spice-workspace-bar spice-fullscreen-only" id="spice-workspace-bar" role="toolbar" aria-label="Fullscreen workspace">
     <div id="spice-workspace-strip"></div>
-    <span class="spice-tool-divider" role="separator" aria-orientation="vertical"></span>
+    <span id="spice-workspace-fixed-divider" class="spice-tool-divider" role="separator" aria-orientation="vertical"></span>
     <button type="button" id="spice-reset-windows" title="Reset window layout">Reset windows</button>
     <button type="button" id="spice-exit-fullscreen" title="Exit fullscreen (Alt+Escape)">Exit fullscreen</button>
   </div>
@@ -157,7 +157,6 @@
         <button type="button" data-example="follower">Emitter follower</button>
         <button type="button" data-example="sallen">Sallen–Key · LM741</button>
         <button type="button" data-example="instrumentation">Instrumentation amp</button>
-        <button type="button" id="spice-generate" title="Generate schematic" aria-label="Generate schematic">Generate</button>
       </div>
       <p class="spice-help" id="spice-example-info" aria-live="polite"></p>
       </div>
@@ -176,6 +175,7 @@
         <button type="button" id="spice-open-download" title="Download schematic" aria-haspopup="dialog" disabled>Download</button>
       </div>
       <div class="spice-edit-toolbar" id="spice-edit-toolbar" role="group" aria-label="Interactive wiring">
+        <div class="spice-edit-controls">
         <button type="button" id="spice-interactive" title="Edit schematic" aria-pressed="false" aria-expanded="false" aria-controls="spice-edit-tools-reveal">Edit</button>
         <div class="spice-edit-tools-reveal" id="spice-edit-tools-reveal" inert><div class="spice-edit-tools-inner" id="spice-edit-tools-inner">
         <button type="button" id="spice-flywire" title="Clear wiring and show flywires" aria-haspopup="dialog">Flywires</button>
@@ -208,6 +208,8 @@
         <button type="button" id="spice-wire-undo">Undo</button><button type="button" id="spice-wire-redo">Redo</button>
         <span id="spice-editor-status" role="status" aria-live="polite">Enable Interactive to move components or wire pins.</span>
         </div></div>
+        </div>
+        <button type="button" id="spice-generate" title="Generate schematic" aria-label="Generate schematic">Generate</button>
       </div>
       </div>
       </div>

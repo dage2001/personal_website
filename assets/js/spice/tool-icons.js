@@ -45,7 +45,7 @@ export function mountToolIcons(root){
   apply(root.querySelector('#spice-layout-brush'),paintbrush);
   apply(root.querySelector('#spice-interactive'),edit);
   apply(root.querySelector('#spice-flywire'),flywires);
-  apply(root.querySelector('#spice-generate'),generate);
+  const generateButton=root.querySelector('#spice-generate');apply(generateButton,generate);generateButton.classList.remove('spice-icon-button');generateButton.classList.add('spice-generate-button');const generateLabel=document.createElement('span');generateLabel.textContent='Generate';generateButton.prepend(generateLabel);
   for(const [action,svg]of Object.entries(arrangements))apply(root.querySelector(`[data-editor-arrange="${action}"]`),svg);
   for(const [mode,svg]of Object.entries(modes))apply(root.querySelector(`[data-editor-mode="${mode}"]`),svg);
   for(const [id,svg]of Object.entries(ids))apply(root.querySelector('#spice-'+id),svg);
