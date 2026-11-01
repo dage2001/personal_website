@@ -151,3 +151,6 @@
 .spice-app #spice-generate{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex-shrink:0;width:auto;height:32px;padding:6px 10px;white-space:nowrap;color:#fff;background:#344b40;border-color:#344b40}
 .spice-app #spice-generate svg{width:1em;height:1em;flex-shrink:0;pointer-events:none;color:#fff;stroke:#fff}
 .spice-is-fullscreen .spice-edit-controls{flex:none;overflow:visible}.spice-is-fullscreen #spice-workspace-bar #spice-generate{height:28px;padding:4px 9px;margin-left:0}
+.spice-app .spice-icon-button,.spice-app #spice-generate{box-sizing:border-box}
+.spice-is-fullscreen #spice-workspace-strip #spice-edit-toolbar{height:28px;align-self:center;overflow:visible}
+.spice-is-fullscreen .spice-edit-controls{height:28px;align-items:center;align-self:center}
