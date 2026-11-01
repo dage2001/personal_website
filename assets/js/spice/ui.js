@@ -9,6 +9,8 @@ import './viewer.css';
 import {createNodeColorControls,colorSvgNets,defaultWireColor} from './node-colors.js';
 import {createWorkspace} from './workspace.js';
 import {createInteractiveEditor,prepareRoutingDrawing} from './interactive-editor.js';
+import {matchLayoutInstances,transferLayoutSnapshot} from './layout-template.js';
+import {labelId} from './label-model.js';
 import {showCoordinateGrid} from './svg-grid.js';
 import {mountToolIcons} from './tool-icons.js';
 import {symbolGridSize} from './short-pins.js';
@@ -43,14 +45,34 @@ if (root) {
     const exported=svg.cloneNode(true);editor?.cleanExport(exported);exported.setAttribute('width',full.w);exported.setAttribute('height',full.h);exported.setAttribute('viewBox',`${full.x} ${full.y} ${full.w} ${full.h}`);showCoordinateGrid(exported,displayGridStep(),$('show-grid').checked,full);svgText=new XMLSerializer().serializeToString(exported);$('source').value=svgText;
   }
   const nodeColors=createNodeColorControls($,(state,nodes)=>{colorState=state;colorNodes=nodes;syncSource();});
-  editor=createInteractiveEditor(preview,$,{report:activity.append,getNetColor:bit=>{const n=colorNodes.find(n=>n.bit===bit);return n&&colorState&&(colorState.auto||colorState.manual.has(n.name))?colorState.color(n.name):null;},inspect:(id,symbol)=>{const c=circuit?.components.find(c=>c.name===id);if(c){selectedInstance=c.instanceId||'';$('selection').textContent=c.raw;updateSelection();}else if(symbol?.decoration){selectedInstance='';const node=Object.values(circuit.nodes).find(n=>n.bit===symbol.ports[0]?.bit);$('selection').textContent='Ground symbol · '+(node?.displayName||'0');updateSelection();}},changed:(next,stats,bounds)=>{drawing=next;ascPackage=null;full=bounds;const svg=preview.querySelector('svg');if(svg){svg.setAttribute('width',String(full.w));svg.setAttribute('height',String(full.h));const meta=svg.querySelector('#spice-layout-report');if(meta){const r=JSON.parse(meta.textContent);r.manualWiring=stats;r.verifiedTerminals=!stats.unrouted;r.geometricConnectivityVerified=!stats.unrouted;meta.textContent=JSON.stringify(r);}}if(circuit&&ir)$('json').value=JSON.stringify({circuit,netlist:toNetlistsvg(circuit),hierarchy:ir,interactive:{...stats,drawing:next}},null,2);syncSource();exports();}});
+  editor=createInteractiveEditor(preview,$,{report:activity.append,applyLayoutTemplate,getNetColor:bit=>{const n=colorNodes.find(n=>n.bit===bit);return n&&colorState&&(colorState.auto||colorState.manual.has(n.name))?colorState.color(n.name):null;},inspect:(id,symbol)=>{const c=circuit?.components.find(c=>c.name===id);if(c){selectedInstance=c.instanceId||'';$('selection').textContent=c.raw;updateSelection();}else if(symbol?.decoration){selectedInstance='';const node=Object.values(circuit.nodes).find(n=>n.bit===symbol.ports[0]?.bit);$('selection').textContent='Ground symbol · '+(node?.displayName||'0');updateSelection();}},changed:(next,stats,bounds)=>{drawing=next;ascPackage=null;full=bounds;const svg=preview.querySelector('svg');if(svg){svg.setAttribute('width',String(full.w));svg.setAttribute('height',String(full.h));const meta=svg.querySelector('#spice-layout-report');if(meta){const r=JSON.parse(meta.textContent);r.manualWiring=stats;r.verifiedTerminals=!stats.unrouted;r.geometricConnectivityVerified=!stats.unrouted;meta.textContent=JSON.stringify(r);}}if(circuit&&ir)$('json').value=JSON.stringify({circuit,netlist:toNetlistsvg(circuit),hierarchy:ir,interactive:{...stats,drawing:next}},null,2);syncSource();exports();}});
   $('show-grid').onchange=syncSource;
   $('grid-size').onchange=()=>{syncSource();setView();};
+  async function applyLayoutTemplate(source,target,isCurrent){
+    const activeTree=tree,sourceText=input.value,currentSettings=settings(),match=matchLayoutInstances(activeTree,source,target),records=editor.snapshotSheets(),pending=[];
+    const sameSettings=s=>JSON.stringify(s)===JSON.stringify(currentSettings);
+    async function base(c){const netlist=toNetlistsvg(c),rendered=await renderSchematic(netlist,currentSettings),svg=new DOMParser().parseFromString(rendered.svg,'image/svg+xml').documentElement;
+      for(const node of Object.values(c.nodes))for(const e of svg.querySelectorAll('.net_'+node.bit))e.setAttribute('data-net',node.name);
+      return {drawing:prepareRoutingDrawing(svg,rendered.drawing,c,netlist),svg};}
+    for(const instance of match.instances){
+      const from=records.find(s=>s.scope===instance.source&&sameSettings(s.settings)),to=records.find(s=>s.scope===instance.target&&sameSettings(s.settings));
+      const sourceBase=await base(instance.sourceCircuit),targetBase=await base(instance.targetCircuit),sourceSnapshot=from?.snapshot||sourceBase.drawing;
+      restoreProjectScene(sourceBase.drawing,sourceSnapshot,4);
+      const counts=new Map(),targetLabels=new Map();for(const node of targetBase.svg.querySelectorAll('text')){if(node.closest('defs'))continue;const owner=node.closest('g[id^="cell_"]')?.id.slice(5)||'',index=counts.get(owner)||0;counts.set(owner,index+1);targetLabels.set(labelId(owner,index),node.textContent);}
+      const snapshot=transferLayoutSnapshot(sourceSnapshot,targetBase.drawing,instance,{targetLabels,targetOverrides:to?.snapshot.labelOverrides||[]});validateLabelTargets(targetBase.svg,snapshot.labelOverrides);
+      pending.push({scope:instance.target,topology:instance.targetCircuit.topology.signature,settings:currentSettings,snapshot,templateSource:instance.source});
+    }
+    if(!isCurrent()||tree!==activeTree||input.value!==sourceText||!sameSettings(settings()))throw Error('Layout template cancelled because the current circuit changed.');
+    // Commit only after every nested sheet has passed structure and geometry validation.
+    for(const sheet of pending)editor.saveTemplateSheet(sheet);
+    activity.append({category:'Tools',message:'Layout template applied to '+pending.length+' subcircuit page(s), including all nested instances.'});
+  }
   async function enableEditing(){if(!drawing||!circuit?.layout.report?.gridVerified){$('grid').checked=true;$('conventional').checked=true;await generate({resetEditor:true});}editor.setEnabled($('interactive').checked);exports();}
   $('interactive').onchange=enableEditing;
   $('label-edit').onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.setLabelEditing(!editor.labelEditing());preview.focus({preventScroll:true});};
   $('group').onclick=()=>{editor.toggleGroup();preview.focus({preventScroll:true});};
   $('flywire').onchange=async()=>{$('interactive').checked=true;await enableEditing();if($('flywire').checked)editor.clear();else await editor.autoRoute();exports();};
+  $('layout-brush').onclick=()=>{editor.toggleLayoutBrush();preview.focus({preventScroll:true});};
   $('auto-route').onclick=async()=>{$('interactive').checked=true;await enableEditing();await editor.autoRoute();exports();};
   $('wire-undo').onclick=()=>editor.undo();$('wire-redo').onclick=()=>editor.redo();
   for(const button of root.querySelectorAll('[data-editor-mode]'))button.onclick=async()=>{$('interactive').checked=true;await enableEditing();editor.chooseTool(button.dataset.editorMode);preview.focus({preventScroll:true});};
@@ -151,7 +173,7 @@ if (root) {
   preview.addEventListener('pointercancel', () => {drag=null;});
   preview.addEventListener('keydown', event => {
     const block=event.target.closest('[data-instance]');
-    if(block&&!editor?.labelEditing()&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;route(selectedInstance);return;}
+    if(block&&!editor?.layoutBrushActive()&&!editor?.labelEditing()&&(event.key==='Enter'||event.key===' ')){event.preventDefault();selectedInstance=block.dataset.instance;route(selectedInstance);return;}
     if (event.key === '+' || event.key === '=') zoom(.8);
     else if (event.key === '-') zoom(1.25);
     else if (event.key.toLowerCase() === 'f') {view={...full};setView();}
@@ -297,6 +319,7 @@ if (root) {
       // Check all saved sheets against the source before replacing the current work.
       for(const s of p.sheets){
         if(!nextTree.contexts[s.scope])throw Error('Unknown saved sheet: '+s.scope);
+        if(s.templateSource&&!nextTree.contexts[s.templateSource])throw Error('Unknown layout template source: '+s.templateSource);
         const c=projectHierarchy(nextTree,{focus:s.scope});
         if(c.topology.signature!==s.topology)throw Error('Saved topology differs from the netlist: '+(s.scope||'Top'));
         const expected=new Map(c.components.filter(c=>c.kind!=='K').map(c=>[c.name,c]));

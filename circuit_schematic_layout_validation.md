@@ -379,3 +379,11 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 - 工程 v3 保存成员标识并兼容 v1/v2，验证未知/重复成员及包围盒碰撞；非法导入保留当前工程。全新会话恢复组选择，SVG 不包含编辑框。标签编辑模式禁用编组按钮。
 - 相关 29 项单元测试及人工编组浏览器验收通过。日志：`tmp/groups-unit.log`、`tmp/groups-browser.log`、`tmp/groups-labels.log`；截图：`tmp/manual-groups-fullscreen.png`。
 - 完整 Jekyll 页面编组验收及既有人工布线、全屏浮窗、工程恢复回归通过。日志：`tmp/groups-site.log`、`tmp/groups-interactive.log`、`tmp/groups-workspace.log`、`tmp/groups-project.log`。
+
+## 子电路布局格式刷
+
+- 独立拓扑同构匹配、控制引用、端口顺序、语句/名称无关匹配、嵌套递归与搜索预算测试通过。布局转移重新校验刚性变换、端口身份、布线和标签目标，保留目标文字与参数。与相关工程/人工组/标签/布线/选择合计 31 项单元测试通过。
+- 浏览器验证按钮位置/图标、纯分立页禁用、源单选、高亮与非块元素锁定/淡化、深层不匹配时不写入任何页、整棵匹配子树批量应用、完成徽标、Escape 取消、SVG 去除编辑覆盖层，以及全新会话恢复所有嵌套页。不同阻容值及 NPN/PNP 模型也通过同构复制，模型和原始网表不改变。
+- 实际 VDPO 工程中的 XOL/XOC、XIL/XIC、XDIL/XDIC 和含嵌套 XM 的 XFBL/XFBC 同构检查通过（各约 6–17 ms，为本机当次测量，不是性能保证）。
+- 日志：`tmp/brush-unit.log`、`tmp/brush-browser.log`、`tmp/brush-groups.log`、`tmp/brush-labels.log`。截图：`tmp/layout-brush-applied.png`。
+- 完整 Tools 静态页面验收与既有人工布线/全屏浮窗/工程恢复回归通过。日志：`tmp/brush-site.log`、`tmp/brush-interactive.log`、`tmp/brush-workspace.log`、`tmp/brush-project.log`。当次 Docker 引擎未就绪，未运行完整 Jekyll 构建；生成页按完全匹配的旧 workspace 替换为新 include，并更新 Vite bundle 引用，其余页面内容保留。
