@@ -45,7 +45,7 @@ export function mountToolIcons(root){
   apply(root.querySelector('#spice-layout-brush'),paintbrush);
   apply(root.querySelector('#spice-interactive'),edit);
   apply(root.querySelector('#spice-flywire'),flywires);
-  const generateButton=root.querySelector('#spice-generate');apply(generateButton,generate);generateButton.classList.remove('spice-icon-button');generateButton.classList.add('spice-generate-button');const generateLabel=document.createElement('span');generateLabel.textContent='Generate';generateButton.prepend(generateLabel);
+  const generateButton=root.querySelector('#spice-generate');apply(generateButton,generate);generateButton.classList.remove('spice-icon-button');generateButton.classList.add('spice-generate-button');const generateIcon=generateButton.querySelector('svg');Object.assign(generateIcon.style,{width:'1em',height:'1em',color:'#fff',stroke:'#fff'});for(const path of generateIcon.querySelectorAll('path'))Object.assign(path.style,{stroke:'#fff',fill:'none'});const generateLabel=document.createElement('span');generateLabel.textContent='Generate';generateButton.prepend(generateLabel);
   for(const [action,svg]of Object.entries(arrangements))apply(root.querySelector(`[data-editor-arrange="${action}"]`),svg);
   for(const [mode,svg]of Object.entries(modes))apply(root.querySelector(`[data-editor-mode="${mode}"]`),svg);
   for(const [id,svg]of Object.entries(ids))apply(root.querySelector('#spice-'+id),svg);

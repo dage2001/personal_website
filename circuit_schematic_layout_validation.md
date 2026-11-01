@@ -405,3 +405,4 @@ node scripts/test-spice-acceptance.cjs '<delivery 目录中的 01_cluster_three_
 ## Generate 按钮位置与样式
 
 - 在既有编辑工具栏浏览器验收中核对 Generate 不在网表栏、文字与图标为白色、hover 保持原填充色、普通行与 Edit 垂直居中并靠右，全屏时紧邻 Reset windows 前的竖线，退出后返回原父节点。日志：`tmp/generate-position-browser.log`；截图：`tmp/edit-toolbar-fullscreen.png`。
+- Generate 图标改为 1em，与按钮字号保持一致；对 SVG 及每条路径显式指定白色。完整页面验收逐条检查路径 stroke，并比较图标实际高度与普通/全屏按钮字号（误差 <0.1 px），同时检查 hover 与原填充色。日志：`tmp/generate-white-site.log`。
